@@ -1,0 +1,7 @@
+DEBUG = True
+SECRET_KEY = 'YouNeedToChangeThis!'
+PORT = 5010
+HOST = '127.0.0.1'
+
+# flask configs
+SQLALCHEMY_DATABASE_URI = 'mysql://username:password@server/db'
