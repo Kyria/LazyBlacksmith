@@ -1,0 +1,8 @@
+{
+  "name": "LazyBlacksmith",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-flake8": "^0.1.3"
+  }
+}
