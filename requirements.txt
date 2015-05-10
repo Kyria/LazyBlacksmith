@@ -5,5 +5,5 @@ pytz>=2015.2
 sqlalchemy>=1.0.3
 Flask-Migrate>=1.4.0
 Flask-Script>=2.0.5
-alembic==0.7.6
-
+alembic>=0.7.6
+flask-wtf>=0.11
