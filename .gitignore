@@ -59,5 +59,9 @@ target/
 # nodeJS stuff
 node_modules/
 
+# OSX hidden files
+.DS_Store
+
 # project stuff
 config.py
+lazyblacksmith/static/ccp/Types/
