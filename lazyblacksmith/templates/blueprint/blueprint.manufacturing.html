@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% import "macro.html" as macro %}
+
+{% block title %}:: Manufacturing{% endblock %}
+
+{% block js %}
+    <script>
+        LazyBlacksmith.setLoader(LazyBlacksmith.blueprint.manufacturing);
+        LazyBlacksmith.blueprint.manufacturing.systemUrls = "{{ url('ajax_system_list') }}";
+        LazyBlacksmith.blueprint.manufacturing.materialBOM = "{{ url('ajax_blueprint_material_bom', blueprint.id) }}";
+    </script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" role="tablist" id="bp-tabs">
+            <li class="active"><a href="#tab-bp">Blueprint</a></li>
+            {% if has_manufactured_components %}<li><a href="#tab-subcomp">Sub Components</a></li>{% endif %}
+            <li><a href="#tab-summary">Summary</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="row fade in active tab-pane" id="tab-bp">
+                <div class="col-md-2">
+                    <div class="well">
+                        <div>
+                            Facility<br>
+                            <select name="facility" id="facility" class="form-control input-sm">
+                                <option value="100" selected>Station</option>
+                                <option value="98">Assembly Array</option>
+                                <option value="90">Thukker Component Array</option>
+                                <option value="105">Rapid Assembly Array</option>
+                            </select>
+                        </div>
+                        <div>
+                            Facility Tax<br>
+                            <input id="tax" type="text" class="form-control input-sm" value="0.00">
+                        </div>
+                        <div>
+                            System<br>
+                            <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
+                        </div>
+                    </div>
+                    <div class="well">
+                        <div>
+                            # Runs <br>
+                            <input id="runs" type="text" class="form-control input-sm" value="1">
+                        </div>
+                        <div>
+                            ME Level (<span id="ME-Level">0%</span>)<br>
+                            <div id="ME"></div>
+                        </div>
+                        <div>
+                            TE Level (<span id="TE-Level">0%</span>)<br>
+                            <div id="TE"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-10 main-list">
+                        <div class="pull-right">
+                            {{ macro.eveicon(USE_CCP_ICONS, blueprint.icon_32(), blueprint.name) }} 
+                        </div>
+                        <h4>{{ blueprint.name }}</h4>
+                        <table class="table table-condensed materials-list table-hover table-striped">
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>Name</th>
+                                <th>Base Qty</th>
+                                <th>Adjusted Qty</th>
+                                <th>Job Qty</th>
+                            </tr>
+                        {% for material in materials.all() %}
+                            <tr class="material" data-id="{{material.material.id}}" data-is-manufactured="{{- material.material.is_manufactured() -}}" data-qty="{{ material.quantity }}" data-qty-job="{{ material.quantity }}" data-qty-adj="{{ material.quantity }}">
+                                <td class="icon">
+                                    {{- macro.eveicon(USE_CCP_ICONS, material.material.icon_32(), material.material.name) -}}
+                                </td>
+                                <td>
+                                    {{- material.material.name -}}
+                                </td>
+                                <td class="quantity" data-name="quantity">
+                                    {{- material.quantity|intcomma -}}
+                                </td>
+                                <td class="quantity" data-name="quantity-adjusted">{{ material.quantity|intcomma }}</td>
+                                <td class="quantity" data-name="quantity-job">{{ material.quantity|intcomma }}</td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                </div>
+            </div>
+            
+            {% if has_manufactured_components %}
+            <div class="row fade tab-pane" id="tab-subcomp">
+                <input type="hidden" value='<div class="col-md-12 sub-list-@@ID@@"><div class="pull-right">{% if USE_CCP_ICONS %}<img src="@@ICON@@" alt="@@NAME@@">{% endif %}</div><h4>@@NAME@@ <span class="small">(ME: -10, Quantity required: <span id="qty-required-@@ID@@">@@QTY@@</span>)</span></h4><table class="table table-condensed materials-list table-hover table-striped"><tr><th>&nbsp;</th><th>Name</th><th>Base Qty</th><th>Adjusted Qty</th><th>Job Qty</th></tr>@@BOM@@</table></div>' id="table-bom"/>
+                <input type="hidden" value='<tr class="material" data-id="@@ID@@" data-qty="@@QTY@@" data-qty-adj="@@QTY-ADJ@@" data-qty-job="@@QTY-JOB@@"><td class="icon">{% if USE_CCP_ICONS %}<img src="@@ICON@@" alt="@@NAME@@">{% endif %}</td><td>@@NAME@@</td><td class="quantity" data-name="quantity">@@QTY-STD@@</td><td class="quantity" data-name="quantity-adjusted">@@QTY-ADJ@@</td><td class="quantity" data-name="quantity-job">@@QTY-JOB@@</td></tr>' id="table-row-bom"/>
+                Loading materials...
+            </div>
+            {% endif %} 
+            
+            <div class="row fade tab-pane" id="tab-summary">
+                <div class="col-md-12">
+                    <div class="row">
+                    
+                    </div>
+                    TODO / Summary : qties + prices
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

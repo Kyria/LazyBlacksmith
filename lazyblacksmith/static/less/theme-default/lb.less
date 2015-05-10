@@ -1,0 +1,49 @@
+.well legend {
+    font-size: @font-size-base;
+    line-height: @font-size-base;
+    color: @gray-light;
+}
+
+.materials-list td {
+     vertical-align: middle;
+}
+.materials-list td.icon {
+    width:32px;
+}
+
+.materials-list td.quantity {
+    text-align: right;
+    padding-right: 20px;
+    width: 20%;
+}
+.materials-list th {
+    text-align: center;
+}
+
+#bp-tabs {
+    margin-bottom:15px;
+}
+
+footer {
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    background: @gray-lighter;
+    margin:0;
+}
+html,
+body {
+  height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto -30px;
+  /* Pad bottom by footer height */
+  padding: 0 0 30px;
+}

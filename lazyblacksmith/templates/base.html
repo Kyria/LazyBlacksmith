@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]>
+    <meta http-equiv="X-UA-Compatible" content="IE=10">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Tool for eve online industry">
+    <meta name="author" content="G. (Kyria) Bisch">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <title>Lazy Blacksmith {% block title %}{% endblock %}</title>
+
+{% if config.DEBUG %}
+    <link href="{{ url_for('static', filename='less/theme-default/bootstrap.less') }}" rel="stylesheet/less">
+{% else %}
+    <link href="{{ url_for('static', filename='css/theme-default.min.css') }}" rel="stylesheet">
+{% endif %}
+</head>
+
+<body>
+    <div id="wrap">
+        <div class="navbar navbar-default navbar-static-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">LazyBlacksmith</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Blueprint</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container-fluid">
+        {% block content %}{% endblock %}
+        </div>
+    </div>
+    
+    <footer class="footer">
+      <div class="container-fluid">
+        <span class="text-muted"><a href="https://github.com/Kyria/LazyBlacksmith#readme">LazyB.</a> &copy; Kyria.</span>
+      </div>
+    </footer>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    
+{% if config.DEBUG %}
+    <script src="{{ url_for('static', filename='js/less.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/tooltip.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/popover.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/button.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/collapse.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/dropdown.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/tab.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/affix.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/alert.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/carousel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/transition.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/scrollspy.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery.typewatch.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/misc/humanize.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/misc/typeahead.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lazyblacksmith.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lazyblacksmith.blueprint.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lazyblacksmith.blueprint.manufacturing.js') }}"></script>
+{% else %}
+    <script src="{{ url_for('static', filename='js/lazybl-combined.min.js') }}"></script>
+{% endif %}
+
+{% block js %}{% endblock %}
+    <script>$(document).ready(LazyBlacksmith.load);</script>
+
+</body>
+</html>
