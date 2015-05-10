@@ -1,1 +1,1 @@
-from .. import db
+from lazyblacksmith.models import db
