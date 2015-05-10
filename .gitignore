@@ -65,3 +65,4 @@ node_modules/
 # project stuff
 config.py
 lazyblacksmith/static/ccp/Types/
+*.sqlite
