@@ -66,3 +66,4 @@ node_modules/
 config.py
 lazyblacksmith/static/ccp/Types/
 *.sqlite
+*.sublime-project
