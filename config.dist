@@ -5,3 +5,6 @@ HOST = '127.0.0.1'
 
 # flask configs
 SQLALCHEMY_DATABASE_URI = 'mysql://username:password@server/db'
+
+# application config
+USE_CCP_ICONS = False
