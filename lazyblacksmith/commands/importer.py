@@ -124,9 +124,9 @@ class Importer:
                 continue
 
             item = {
-                'id':id,
-                'name':data[0],
-                'max_production_limit':int(data[1]) if data[1] is not None else None,
+                'id': id,
+                'name': data[0],
+                'max_production_limit': int(data[1]) if data[1] else None,
             }
             new.append(item)
             added += 1
