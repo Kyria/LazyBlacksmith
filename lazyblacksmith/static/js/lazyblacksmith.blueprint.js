@@ -46,12 +46,13 @@ LazyBlacksmith.blueprint = {
         
         var url = LazyBlacksmith.blueprint.blueprintSearchUrl.replace(/0000/, nameEscaped);
                         
-        $.getJSON(url, function(data) {
+        $.getJSON(url, function(jsonData) {
             htmlResult = "";
+            data = jsonData['result'];
             for(var item in data) {
-                var inventionLink = LazyBlacksmith.blueprint.blueprintInventionUrl.replace(/0000/, data[item][0]);
-                var manufacturingLink = LazyBlacksmith.blueprint.blueprintManufacturingUrl.replace(/0000/, data[item][0]);
-                var researchLink = LazyBlacksmith.blueprint.blueprintResearchUrl.replace(/0000/, data[item][0]);
+                var inventionLink = LazyBlacksmith.blueprint.blueprintInventionUrl.replace(/999999999/, data[item][0]);
+                var manufacturingLink = LazyBlacksmith.blueprint.blueprintManufacturingUrl.replace(/999999999/, data[item][0]);
+                var researchLink = LazyBlacksmith.blueprint.blueprintResearchUrl.replace(/999999999/, data[item][0]);
                 
                 var invention = (data[item][2] == 1) ? '<a href="'+inventionLink+'" class="btn btn-default btn-xs pull-right">Invention</a> ' 
                             : ((data[item][2] == 2) ? '<a href="'+reverseEngineeringLink+'" class="btn btn-default btn-xs pull-right">Reverse Engineering</a> ' : '');

@@ -25,8 +25,8 @@ LazyBlacksmith.blueprint.manufacturing = {
             limit: 10,
             prefetch: {
                 url: LazyBlacksmith.blueprint.manufacturing.systemUrls,
-                filter: function(list) {
-                    return $.map(list, function(system) { return { name: system }; });
+                filter: function(listResult) {
+                    return $.map(listResult['result'], function(system) { return { name: system }; });
                 }
             }
         });
@@ -164,7 +164,8 @@ LazyBlacksmith.blueprint.manufacturing = {
             alert('Error, no URL is found to get BOM for materials.');
             return;
         }
-        $.getJSON(LazyBlacksmith.blueprint.manufacturing.materialBOM, function(materialList) {
+        $.getJSON(LazyBlacksmith.blueprint.manufacturing.materialBOM, function(materialListResult) {
+            var materialList = materialListResult['result'];
             var templateTable = $('#table-bom').val();
             var templateRows = $('#table-row-bom').val();
             
