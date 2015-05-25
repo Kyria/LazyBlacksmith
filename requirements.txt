@@ -7,3 +7,4 @@ Flask-Migrate>=1.4.0
 Flask-Script>=2.0.5
 alembic>=0.7.6
 flask-wtf>=0.11
+humanize
