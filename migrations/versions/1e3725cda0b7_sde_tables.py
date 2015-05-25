@@ -1,13 +1,13 @@
-"""eve sde tables
+"""sde tables
 
-Revision ID: 542d7b856bd
+Revision ID: 1e3725cda0b7
 Revises: None
-Create Date: 2015-05-08 19:17:54.057855
+Create Date: 2015-05-25 18:35:38.132000
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '542d7b856bd'
+revision = '1e3725cda0b7'
 down_revision = None
 
 from alembic import op
