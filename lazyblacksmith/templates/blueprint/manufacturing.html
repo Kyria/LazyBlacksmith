@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-{% import "blueprint/macro.html" as macro %}
 
-{% block title %}:: Manufacturing{% endblock %}
+{% block title %}:: Manufacturing :: {{ blueprint.name }}{% endblock %}
 
 {% block js %}
     <script>
@@ -57,13 +56,15 @@
                     </div>
                 </div>
                 <div class="col-md-10 main-list">
+                        {% if config.USE_CCP_ICONS -%}
                         <div class="pull-right">
-                            {{ macro.eveicon(blueprint.icon_32(), blueprint.name) }} 
+                            <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}">
                         </div>
+                        {%- endif %}
                         <h4>{{ blueprint.name }}</h4>
                         <table class="table table-condensed materials-list table-hover table-striped">
                             <tr>
-                                <th>&nbsp;</th>
+                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
                                 <th>Name</th>
                                 <th>Base Qty</th>
                                 <th>Adjusted Qty</th>
@@ -71,9 +72,12 @@
                             </tr>
                         {% for material in materials.all() %}
                             <tr class="material" data-id="{{material.material.id}}" data-is-manufactured="{{- material.material.is_manufactured() -}}" data-qty="{{ material.quantity }}" data-qty-job="{{ material.quantity }}" data-qty-adj="{{ material.quantity }}">
+
+                                {% if config.USE_CCP_ICONS -%}
                                 <td class="icon">
-                                    {{- macro.eveicon(material.material.icon_32(), material.material.name) -}}
+                                    <img src="{{ material.material.icon_32() }}" alt="{{ material.material.name }}">
                                 </td>
+                                {%- endif %}
                                 <td>
                                     {{- material.material.name -}}
                                 </td>
@@ -90,9 +94,9 @@
             
             {% if has_manufactured_components %}
             <div class="row fade tab-pane" id="tab-subcomp">
-                <input type="hidden" value='<div class="col-md-12 sub-list-@@ID@@"><div class="pull-right">{% if USE_CCP_ICONS %}<img src="@@ICON@@" alt="@@NAME@@">{% endif %}</div><h4>@@NAME@@ <span class="small">(ME: -10, Quantity required: <span id="qty-required-@@ID@@">@@QTY@@</span>)</span></h4><table class="table table-condensed materials-list table-hover table-striped"><tr><th>&nbsp;</th><th>Name</th><th>Base Qty</th><th>Adjusted Qty</th><th>Job Qty</th></tr>@@BOM@@</table></div>' id="table-bom"/>
-                <input type="hidden" value='<tr class="material" data-id="@@ID@@" data-qty="@@QTY@@" data-qty-adj="@@QTY-ADJ@@" data-qty-job="@@QTY-JOB@@"><td class="icon">{% if USE_CCP_ICONS %}<img src="@@ICON@@" alt="@@NAME@@">{% endif %}</td><td>@@NAME@@</td><td class="quantity" data-name="quantity">@@QTY-STD@@</td><td class="quantity" data-name="quantity-adjusted">@@QTY-ADJ@@</td><td class="quantity" data-name="quantity-job">@@QTY-JOB@@</td></tr>' id="table-row-bom"/>
-                Loading materials...
+                <input type="hidden" value='<div class="col-md-12 sub-list-@@ID@@">{% if config.USE_CCP_ICONS %}<div class="pull-right"><img src="@@ICON@@" alt="@@NAME@@"></div>{% endif %}<h4>@@NAME@@ <span class="small">(ME: -10, Quantity required: <span id="qty-required-@@ID@@">@@QTY@@</span>)</span></h4><table class="table table-condensed materials-list table-hover table-striped"><tr>{% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}<th>Name</th><th>Base Qty</th><th>Adjusted Qty</th><th>Job Qty</th></tr>@@BOM@@</table></div>' id="table-bom"/>
+                <input type="hidden" value='<tr class="material" data-id="@@ID@@" data-qty="@@QTY@@" data-qty-adj="@@QTY-ADJ@@" data-qty-job="@@QTY-JOB@@">{% if config.USE_CCP_ICONS %}<td class="icon"><img src="@@ICON@@" alt="@@NAME@@"></td>{% endif %}<td>@@NAME@@</td><td class="quantity" data-name="quantity">@@QTY-STD@@</td><td class="quantity" data-name="quantity-adjusted">@@QTY-ADJ@@</td><td class="quantity" data-name="quantity-job">@@QTY-JOB@@</td></tr>' id="table-row-bom"/>
+                <strong>Loading materials... please wait a second</strong>
             </div>
             {% endif %} 
             
