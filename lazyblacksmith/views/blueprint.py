@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template, abort
+
+from flask import abort
+from flask import Blueprint
+from flask import render_template
 
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Activity

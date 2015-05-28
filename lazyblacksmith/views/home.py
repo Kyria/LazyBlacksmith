@@ -1,6 +1,11 @@
-from lazyblacksmith import app
+from flask import Blueprint
 from flask import render_template
 
-@app.route("/")
+from lazyblacksmith.cache import cache
+
+home = Blueprint('home', __name__)
+
+@home.route("/")
+@cache.cached(timeout=3600*24)
 def index():
     return render_template('base.html')
