@@ -9,13 +9,13 @@ templatefilter = flask.Blueprint('filters', __name__)
 @jinja2.contextfilter
 @templatefilter.app_template_filter()
 def intcomma(context, value):
-	return humanize.intcomma(value)
+    return humanize.intcomma(value)
 
 
 @jinja2.contextfilter
 @templatefilter.app_template_filter()
 def intword(context, value):
-	return humanize.intword()
+    return humanize.intword()
 
 
 @jinja2.contextfilter
@@ -27,4 +27,4 @@ def naturalday(context, value, format='%b %d'):
 @jinja2.contextfilter
 @templatefilter.app_template_filter()
 def naturaltime(context, value, future=False, months=True):
-	return humanize.naturaltime(value, future, months)
+    return humanize.naturaltime(value, future, months)

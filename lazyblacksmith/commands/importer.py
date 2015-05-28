@@ -109,7 +109,7 @@ class Importer:
                 ON ib.typeID = i.typeID
             WHERE i.published=1
         """)
-				
+                
         bulk_data = {}
         for row in self.sde_cursor:
             bulk_data[int(row[0])] = row[1:]
@@ -162,7 +162,7 @@ class Importer:
                 ON  i.typeID = ia.typeID 
                 AND i.published = 1
         """)
-				
+                
         bulk_data = []
         for row in self.sde_cursor:
             bulk_data.append(row)
@@ -215,7 +215,7 @@ class Importer:
                 ON  i.typeID = iam.typeID 
                 AND i.published = 1
         """)
-		
+        
         bulk_data = []
         for row in self.sde_cursor:
             bulk_data.append(row)
@@ -279,7 +279,7 @@ class Importer:
                 ON  i2.typeID = iap.productTypeID 
                 AND i2.published = 1
         """)
-		
+        
         bulk_data = []
         for row in self.sde_cursor:
             bulk_data.append(row)
@@ -336,7 +336,7 @@ class Importer:
                 AND i.published = 1
             GROUP BY ias.typeID, ias.activityID, ias.skillID
         """)
-		
+        
         bulk_data = []
         for row in self.sde_cursor:
             bulk_data.append(row)
@@ -385,7 +385,7 @@ class Importer:
                 , regionName
             FROM mapRegions
         """)
-				
+                
         bulk_data = {}
         for row in self.sde_cursor:
             bulk_data[int(row[0])] = row[1:]
@@ -432,7 +432,7 @@ class Importer:
                 , constellationName
             FROM mapConstellations
         """)
-				
+                
         bulk_data = {}
         for row in self.sde_cursor:
             bulk_data[int(row[0])] = row[1:]
@@ -481,7 +481,7 @@ class Importer:
                 , constellationID
             FROM mapSolarSystems
         """)
-				
+                
         bulk_data = {}
         for row in self.sde_cursor:
             bulk_data[int(row[0])] = row[1:]

@@ -19,7 +19,7 @@ def manufacturing(item_id):
     for material in materials:
         if material.material.is_manufactured():
             has_manufactured_components = True
-        break;
+            break;
 
     return render_template('blueprint/manufacturing.html', **{
         'blueprint' : item,
