@@ -14,7 +14,9 @@ def manufacturing(item_id):
     Display the manufacturing page with all data
     """
     item = Item.query.get(item_id)
+    activity = item.activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
     materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
+    product = item.activity_products.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
 
     # is any of the materials manufactured ?
     has_manufactured_components = False
@@ -27,6 +29,8 @@ def manufacturing(item_id):
     return render_template('blueprint/manufacturing.html', **{
         'blueprint' : item,
         'materials': materials,
+        'activity' : activity,
+        'product' : product,
         'has_manufactured_components': has_manufactured_components,
     })
 

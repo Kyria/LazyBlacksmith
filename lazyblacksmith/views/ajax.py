@@ -78,13 +78,15 @@ def blueprint_bom(blueprint_id):
 
             # As all item cannot be manufactured, catch the exception 
             try:
-                bp_final = bp.material.product_for_activities
-                bp_final = bp_final.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
-                bp_final = bp_final.blueprint
+                product = bp.material.product_for_activities
+                product = product.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
+                bp_final = product.blueprint
             except NoResultFound:
                 continue
 
+            activity = bp_final.activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
             mats = bp_final.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).all()
+
 
             if bp_final.id not in data:
                 data[bp_final.id] = {
@@ -92,6 +94,9 @@ def blueprint_bom(blueprint_id):
                     'icon':bp_final.icon_32(),
                     'name':bp_final.name,
                     'materials':[],
+                    'time':activity.time,
+                    'product_name': bp.material.name,
+                    'product_qty': product.quantity,
                 }
 
             for mat in mats:

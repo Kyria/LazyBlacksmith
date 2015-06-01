@@ -4,20 +4,24 @@
     color: @gray-light;
 }
 
-.materials-list td {
-     vertical-align: middle;
+.materials-list {
+    td {
+        vertical-align: middle;
+        &.icon {
+            width:32px;
+        };
+        &.quantity {
+            text-align: right;
+            padding-right: 20px;
+            width: 20%;
+        };
+    };
+    th {
+        text-align: center;
+    };
 }
-.materials-list td.icon {
-    width:32px;
-}
-
-.materials-list td.quantity {
+.materials-list-summary {
     text-align: right;
-    padding-right: 20px;
-    width: 20%;
-}
-.materials-list th {
-    text-align: center;
 }
 
 #bp-tabs {
@@ -32,18 +36,20 @@ footer {
     background: @gray-lighter;
     margin:0;
 }
+
 html,
 body {
-  height: 100%;
-  /* The html and body elements cannot have any padding or margin. */
+    height: 100%;
+    /* The html and body elements cannot have any padding or margin. */
 }
 
 /* Wrapper for page content to push down footer */
 #wrap {
-  min-height: 100%;
-  height: auto;
-  /* Negative indent footer by its height */
-  margin: 0 auto -30px;
-  /* Pad bottom by footer height */
-  padding: 0 0 30px;
+    min-height: 100%;
+    height: auto;
+    /* Negative indent footer by its height */
+    margin: 0 auto -30px;
+    /* Pad bottom by footer height */
+    padding: 0 0 30px;
 }
+
