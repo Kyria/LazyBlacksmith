@@ -7,6 +7,9 @@
         LazyBlacksmith.setLoader(LazyBlacksmith.blueprint.manufacturing);
         LazyBlacksmith.blueprint.manufacturing.systemUrls = "{{ url_for('ajax.solarsystems') }}";
         LazyBlacksmith.blueprint.manufacturing.materialBOM = "{{ url_for('ajax.blueprint_bom', blueprint_id=blueprint.id) }}";
+        LazyBlacksmith.blueprint.manufacturing.tplSublistBlockUrl = "{{ url_for('template.manufacturing_sublist_block') }}";
+        LazyBlacksmith.blueprint.manufacturing.tplSublistRowUrl = "{{ url_for('template.manufacturing_sublist_row') }}";
+ 
         LazyBlacksmith.blueprint.hasManufacturedComponent = {% if has_manufactured_components %}true{% else %}false{% endif %};
     </script>
 {% endblock %}
@@ -26,10 +29,10 @@
                         <div>
                             Facility<br>
                             <select name="facility" id="facility" class="form-control input-sm">
-                                <option value="100" selected>Station</option>
-                                <option value="98">Assembly Array</option>
-                                <option value="90">Thukker Component Array</option>
-                                <option value="105">Rapid Assembly Array</option>
+                                <option value="0" selected>Station</option>
+                                <option value="1">Assembly Array</option>
+                                <option value="2">Thukker Component Array</option>
+                                <option value="3">Rapid Assembly Array</option>
                             </select>
                         </div>
                         <div>
@@ -38,7 +41,7 @@
                         </div>
                         <div>
                             System<br>
-                            <input id="modal-system" type="text" class="form-control input-sm typeahead" value="Jita">
+                            <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
                         </div>
                     </div>
                     <div class="well">
@@ -100,9 +103,6 @@
             
             {% if has_manufactured_components %}
             <div class="row fade tab-pane" id="tab-subcomp">
-            
-                <input type="hidden" value='<div class="col-md-10 sub-list-@@ID@@">{% if config.USE_CCP_ICONS %}<div class="pull-right"><img src="@@ICON@@" alt="@@NAME@@"></div>{% endif %}<h4>@@NAME@@ <span class="small">(@@PRODUCT_NAME@@ x @@PRODUCT_QTY@@) <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#subComponentBpConfigModal" data-name="@@NAME@@" data-id="@@ID@@"><i class="fa fa-cog"></button></i><br><strong>ME: </strong><span class="me">10%</span> - <strong>TE: </strong><span class="te">10%</span> - <strong>Qty: </strong><span id="qty-required-@@ID@@">@@QTY@@</span> - <strong>Time per run: </strong><span data-time="@@ACTIVITY_TIME@@" class="time-per-run" data-id="@@ID@@">@@ACTIVITY_TIME_HUMAN@@</span> - <strong>Total time: </strong><span class="total-time" data-id="@@ID@@">@@ACTIVITY_TIME_TOTAL@@</span></span></h4><table class="table table-condensed materials-list table-hover table-striped"><tr>{% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}<th>Name</th><th>Base Qty</th><th>Adjusted Qty</th><th>Job Qty</th></tr>@@BOM@@</table></div>' id="table-bom"/>
-                <input type="hidden" value='<tr class="material" data-id="@@ID@@" data-qty="@@QTY@@" data-qty-adj="@@QTY-ADJ@@" data-qty-job="@@QTY-JOB@@" data-name="@@NAME@@">{% if config.USE_CCP_ICONS %}<td class="icon"><img src="@@ICON@@" alt="@@NAME@@"></td>{% endif %}<td>@@NAME@@</td><td class="quantity" data-name="quantity">@@QTY-STD@@</td><td class="quantity" data-name="quantity-adjusted">@@QTY-ADJ-HUMAN@@</td><td class="quantity" data-name="quantity-job">@@QTY-JOB-HUMAN@@</td></tr>' id="table-row-bom"/>
                 <strong>Loading materials... please wait a second</strong>
             </div>
             {% endif %} 
@@ -117,7 +117,7 @@
 {% endblock %}
 
 {% block modal %}
-<div class="modal fade" role="dialog" id="subComponentBpConfigModal" aria-labelledby="subComponentBpConfigModal" aria-hidden="true">
+<div class="modal fade" role="dialog" id="subComponentBpConfigModal" aria-labelledby="subComponentBpConfigModal" aria-hidden="true" data-bp-id="">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -133,29 +133,26 @@
                             <div class="well">
                                 <div>
                                     Facility<br>
-                                    <select name="facility" id="facility" class="form-control input-sm">
-                                        <option value="100" selected>Station</option>
-                                        <option value="98">Assembly Array</option>
-                                        <option value="90">Thukker Component Array</option>
-                                        <option value="105">Rapid Assembly Array</option>
+                                    <select name="modal-facility" id="modal-facility" class="form-control input-sm">
+                                        <option value="0">Station</option>
+                                        <option value="1">Assembly Array</option>
+                                        <option value="2">Thukker Component Array</option>
+                                        <option value="3">Rapid Assembly Array</option>
                                     </select>
                                 </div>
                                 <div>
                                     Facility Tax<br>
-                                    <input id="tax" type="text" class="form-control input-sm" value="0.00">
+                                    <input id="modal-tax" type="text" class="form-control input-sm" value="0.00">
                                 </div>
                                 <div>
                                     System<br>
-                                    <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
+                                    <input id="modal-system" type="text" class="form-control input-sm typeahead" value="Jita">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="well">
-                                <div>
-                                    # Runs: <span class='modalRuns'>0</span>
-                                </div>
                                 <div>
                                     ME Level (<span id="Modal-ME-Level">0%</span>)<br>
                                     <div id="ModalME"></div>
@@ -171,8 +168,9 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" id="modal-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
+                <button type="button" id="modal-apply-all" data-dismiss="modal" class="btn btn-success">Apply to all blueprints</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
