@@ -11,9 +11,11 @@ def create_app(config_object):
     from lazyblacksmith.views.ajax import ajax
     from lazyblacksmith.views.blueprint import blueprint
     from lazyblacksmith.views.home import home
+    from lazyblacksmith.views.template import template
     from lazyblacksmith.utils.template_filter import templatefilter
     app.register_blueprint(blueprint, url_prefix='/blueprint')
     app.register_blueprint(ajax, url_prefix='/ajax')
+    app.register_blueprint(template, url_prefix='/template')
     app.register_blueprint(home)
     app.register_blueprint(templatefilter)
 
