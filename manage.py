@@ -4,9 +4,12 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
 
-from lazyblacksmith import app
+import config
+from lazyblacksmith.app_factory import create_app
 from lazyblacksmith.models import db
 from lazyblacksmith.commands.sde_import import SdeImport
+
+app = create_app(config)
 
 db.init_app(app)
 migrate = Migrate(app, db)

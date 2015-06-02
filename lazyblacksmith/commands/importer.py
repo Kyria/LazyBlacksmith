@@ -3,7 +3,7 @@ import sys
 
 from decimal import Decimal
 
-from lazyblacksmith import db
+from lazyblacksmith.models import db
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivityMaterial

@@ -4,7 +4,7 @@ from flask.ext.script import Command
 from flask.ext.script import Manager
 from flask.ext.script import Option
 
-from lazyblacksmith import db
+from lazyblacksmith.models import db
 from lazyblacksmith.commands.importer import Importer
 
 class SdeImport(Command):
