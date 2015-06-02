@@ -67,3 +67,7 @@ config.py
 lazyblacksmith/static/ccp/Types/
 *.sqlite
 *.sublime-*
+lazyblacksmith/static/css/theme-default.min.css
+lazyblacksmith/static/js/bootstrap.js
+lazyblacksmith/static/js/lazybl-combined.min.map
+lazyblacksmith/static/js/lazybl-combined.min.js
