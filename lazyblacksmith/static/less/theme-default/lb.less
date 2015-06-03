@@ -4,8 +4,8 @@
     color: @gray-light;
 }
 
-.materials-list {
-    td {
+.materials-list > tbody > tr {
+    > td {
         vertical-align: middle;
         &.icon {
             width:32px;
@@ -16,7 +16,7 @@
             width: 20%;
         };
     };
-    th {
+    > th {
         text-align: center;
     };
 }

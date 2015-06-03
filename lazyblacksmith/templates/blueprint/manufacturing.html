@@ -60,44 +60,54 @@
                     </div>
                 </div>
                 <div class="col-md-10 main-list">
-                        {% if config.USE_CCP_ICONS -%}
-                        <div class="pull-right">
-                            <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}">
+                    <div class="row">
+                        <div class="col-xs-10">
+                            <h4>
+                                {{ blueprint.name }} 
+                                <span class="small">
+                                    ({{ product.product.name }} x {{ product.quantity|intcomma }}) -  
+                                    <strong>Time per run: </strong><span data-time="{{ activity.time }}" class="time-per-run" data-id="{{ blueprint.id }}">{{ activity.time|duration }}</span> - 
+                                    <strong>Total time: </strong><span class="total-time" data-id="{{ blueprint.id }}">{{ activity.time|duration }}</span>
+                                </span>
+                            </h4>
                         </div>
-                        {%- endif %}
-                        <h4>
-                            {{ blueprint.name }} <span class="small">({{ product.product.name }} x {{ product.quantity|intcomma }})<br>                            
-                                <strong>Time per run: </strong><span data-time="{{ activity.time }}" class="time-per-run" data-id="{{ blueprint.id }}">{{ activity.time|duration }}</span> - 
-                                <strong>Total time: </strong><span class="total-time" data-id="{{ blueprint.id }}">{{ activity.time|duration }}</span>
-                            </span>
-                        </h4>
-                        <table class="table table-condensed materials-list table-hover table-striped">
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                                <th>Name</th>
-                                <th>Base Qty</th>
-                                <th>Adjusted Qty</th>
-                                <th>Job Qty</th>
-                            </tr>
-                        {% for material in materials.all() %}
-                            <tr class="material" data-id="{{material.material.id}}" data-is-manufactured="{{- material.material.is_manufactured() -}}" data-qty="{{ material.quantity }}" data-qty-job="{{ material.quantity }}" data-qty-adj="{{ material.quantity }}" data-name="{{ material.material.name }}">
+                        <div class="col-xs-2 text-right">
+                            {% if config.USE_CCP_ICONS -%}
+                                <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}">
+                            {%- endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-condensed materials-list table-hover table-striped">
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Base Qty</th>
+                                    <th>Adjusted Qty</th>
+                                    <th>Job Qty</th>
+                                </tr>
+                            {% for material in materials.all() %}
+                                <tr class="material" data-id="{{material.material.id}}" data-is-manufactured="{{- material.material.is_manufactured() -}}" data-qty="{{ material.quantity }}" data-qty-job="{{ material.quantity }}" data-qty-adj="{{ material.quantity }}" data-name="{{ material.material.name }}">
 
-                                {% if config.USE_CCP_ICONS -%}
-                                <td class="icon">
-                                    <img src="{{ material.material.icon_32() }}" alt="{{ material.material.name }}">
-                                </td>
-                                {%- endif %}
-                                <td>
-                                    {{- material.material.name -}}
-                                </td>
-                                <td class="quantity" data-name="quantity">
-                                    {{- material.quantity|intcomma -}}
-                                </td>
-                                <td class="quantity" data-name="quantity-adjusted">{{ material.quantity|intcomma }}</td>
-                                <td class="quantity" data-name="quantity-job">{{ material.quantity|intcomma }}</td>
-                            </tr>
-                        {% endfor %}
-                        </table>
+                                    {% if config.USE_CCP_ICONS -%}
+                                    <td class="icon">
+                                        <img src="{{ material.material.icon_32() }}" alt="{{ material.material.name }}">
+                                    </td>
+                                    {%- endif %}
+                                    <td>
+                                        {{- material.material.name -}}
+                                    </td>
+                                    <td class="quantity" data-name="quantity">
+                                        {{- material.quantity|intcomma -}}
+                                    </td>
+                                    <td class="quantity" data-name="quantity-adjusted">{{ material.quantity|intcomma }}</td>
+                                    <td class="quantity" data-name="quantity-job">{{ material.quantity|intcomma }}</td>
+                                </tr>
+                            {% endfor %}
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -124,7 +134,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="subComponentBpConfigModal">Configure blueprint <span id="componentModalBpName"></span></h4>
+                <h4 class="modal-title" id="subComponentBpConfigModal">Configure Blueprint <span id="componentModalBpName"></span></h4>
             </div>
             <div class="modal-body">
                 <div class="container-fluid">

@@ -19,23 +19,28 @@ LazyBlacksmith.blueprint.manufacturing = {
     tplSublistRow: '',
 
     arrayStats: [
-                    { // station
-                        "me": 1.0,
-                        "te": 1.0,
-                    },
-                    { // Assembly Array
-                        "me": 0.98,
-                        "te": 0.75,
-                    },
-                    { // Thukker Component Array
-                        "me": 0.9,
-                        "te": 0.75,
-                    },
-                    { // Rapid Assembly Array
-                        "me": 1.05,
-                        "te": 0.65,
-                    },
-                ],
+        { // station
+            "me": 1.0,
+            "te": 1.0,
+            "name": 'Station',
+        },
+        { // Assembly Array
+            "me": 0.98,
+            "te": 0.75,
+            "name": 'Assembly Array',
+        },
+        { // Thukker Component Array
+            "me": 0.9,
+            "te": 0.75,
+            "name": 'Thukker Component Array',
+        },
+        { // Rapid Assembly Array
+            "me": 1.05,
+            "te": 0.65,
+            "name": 'Rapid Assembly Array',
+        },
+    ],
+
 
     onload: function() {
         LazyBlacksmith.blueprint.manufacturing.initTemplates();
@@ -175,6 +180,7 @@ LazyBlacksmith.blueprint.manufacturing = {
 
             var me = parseInt($('.sub-list-'+id+' .me').text());
             var te = parseInt($('.sub-list-'+id+' .te').text());
+            var facility = $('.sub-list-'+id+' .facility').attr('data-facility');
 
             $('#componentModalBpName').html(name);
             $('#componentModalBpName').attr('data-bp-id', id);
@@ -217,12 +223,15 @@ LazyBlacksmith.blueprint.manufacturing = {
         var ME = parseInt($('#Modal-ME-Level').text());
         var TE = parseInt($('#Modal-TE-Level').text());
 
+        var facilityName = LazyBlacksmith.blueprint.manufacturing.getFacilityName(facility);
+
         $(selector).attr('data-system', system);
-        $(selector).attr('data-facility', facility);
         $(selector).attr('data-tax', tax);
 
         $(selector+' .me').html(ME);
         $(selector+' .te').html(TE);
+        $(selector+' .facility').attr('data-facility', facility);
+        $(selector+' .facility').text(facilityName);
 
         LazyBlacksmith.blueprint.manufacturing.updateMaterials();
         $('#componentModalBpName').modal('hide');
@@ -269,7 +278,7 @@ LazyBlacksmith.blueprint.manufacturing = {
                 var id = parseInt($(this).attr('data-id'));               
                 var runs = parseInt($('#run-required-'+id).text());
 
-                var facility = parseInt($('.sub-list-'+id).attr('data-facility'));
+                var facility = parseInt($('.sub-list-'+id+' .facility').attr('data-facility'));
                 var facilityTE = LazyBlacksmith.blueprint.manufacturing.getFacilityTe(facility);
                 var TE = (1.00-parseInt($('.sub-list-'+id+' .te').text()) / 100);
 
@@ -313,7 +322,7 @@ LazyBlacksmith.blueprint.manufacturing = {
                 var runs = Math.ceil(qty_required/batch_per_run)
                 $('#run-required-'+id).html(runs);
 
-                var facility = parseInt($('.sub-list-'+id).attr('data-facility'));
+                var facility = parseInt($('.sub-list-'+id+' .facility').attr('data-facility'));
                 var facilityME = LazyBlacksmith.blueprint.manufacturing.getFacilityMe(facility);
 
                 var ME = (1.00-parseInt($('.sub-list-'+id+' .me').text()) / 100);
@@ -398,6 +407,9 @@ LazyBlacksmith.blueprint.manufacturing = {
     getFacilityTe: function(facility) {
         return LazyBlacksmith.blueprint.manufacturing.arrayStats[facility].te;
     },
+    getFacilityName: function(facility) {
+        return LazyBlacksmith.blueprint.manufacturing.arrayStats[facility].name;
+    },
     
     /**
      * Ajax functions
@@ -428,6 +440,7 @@ LazyBlacksmith.blueprint.manufacturing = {
 
                 var facilityTE = LazyBlacksmith.blueprint.manufacturing.getFacilityTe(facility);
                 var facilityME = LazyBlacksmith.blueprint.manufacturing.getFacilityMe(facility);
+                var facilityName = LazyBlacksmith.blueprint.manufacturing.getFacilityName(facility);
 
                 // production time
                 var time = material['time'];
@@ -459,6 +472,7 @@ LazyBlacksmith.blueprint.manufacturing = {
                                      .replace(/@@RUN@@/g, runs)
                                      .replace(/@@SYSTEM@@/g, system)
                                      .replace(/@@TAX@@/g, tax)
+                                     .replace(/@@FACILITY_NAME@@/g, facilityName)
                                      .replace(/@@FACILITY@@/g, facility)
                                      .replace(/@@ACTIVITY_TIME@@/g, time)
                                      .replace(/@@ACTIVITY_TIME_HUMAN@@/g, time_human)

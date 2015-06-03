@@ -1,39 +1,53 @@
-<div class="col-md-12 sub-list-@@ID@@" data-facility="@@FACILITY@@" data-tax="@@TAX@@" data-system="@@SYSTEM@@" data-output-per-run="@@PRODUCT_QTY@@">
-    {% if config.USE_CCP_ICONS %}
-    <div class="pull-right">
-        <img src="@@ICON@@" alt="@@NAME@@">
+<div class="col-md-12 sub-list-@@ID@@" data-tax="@@TAX@@" data-system="@@SYSTEM@@" data-output-per-run="@@PRODUCT_QTY@@">
+    <div class="row">
+        <div class="col-xs-10">
+            <h4>
+                @@NAME@@ 
+            </h4>
+        </div>
+        <div class="col-xs-2 text-right">
+            {% if config.USE_CCP_ICONS -%}
+                <img src="@@ICON@@" alt="@@NAME@@"/>
+            {%- endif %}
+        </div>
     </div>
-    {% endif %}
-    <h4>
-        @@NAME@@ 
-        <span class="small">
-            (@@PRODUCT_NAME@@ x @@PRODUCT_QTY@@) 
-            <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#subComponentBpConfigModal" data-name="@@NAME@@" data-id="@@ID@@">
-                <i class="fa fa-cog"></i>
-            </button>
-            <br>
-            <strong>ME: </strong><span class="me">10</span>% - 
-            <strong>TE: </strong><span class="te">20</span>% - 
-            <strong>Required: </strong><span id="qty-required-@@ID@@">@@QTY@@</span> - 
-            <strong>Runs: </strong><span id="run-required-@@ID@@">@@RUN@@</span> - 
-            <strong>Time per run: </strong>
-            <span data-time="@@ACTIVITY_TIME@@" class="time-per-run" data-id="@@ID@@">
-                @@ACTIVITY_TIME_HUMAN@@
-            </span> - 
-            <strong>Total time: </strong>
-            <span class="total-time" data-id="@@ID@@">
-                @@ACTIVITY_TIME_TOTAL@@
-            </span>
-        </span>
-    </h4>
-    <table class="table table-condensed materials-list table-hover table-striped">
-        <tr>
-            {% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}
-            <th>Name</th>
-            <th>Base Qty</th>
-            <th>Adjusted Qty</th>
-            <th>Job Qty</th>
-        </tr>
-        @@BOM@@
-    </table>
+
+    <div class="row">
+        <div class="col-md-2">
+            <div class="well">
+                <span class="small">
+                    <button type="button" class="pull-right btn btn-default btn-xs" data-toggle="modal" data-target="#subComponentBpConfigModal" data-name="@@NAME@@" data-id="@@ID@@">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                    <strong>@@PRODUCT_NAME@@</strong> <br>
+                    Qty/run: @@PRODUCT_QTY@@ <br>
+                    <strong>Required:</strong> <span id="qty-required-@@ID@@">@@QTY@@</span> <br>
+                    <strong>Runs:</strong> <span id="run-required-@@ID@@">@@RUN@@</span> <br>
+                    ME: <span class="me">10</span>% <br>
+                    TE: <span class="te">20</span>% <br> 
+                    Facility: <span class="facility" data-facility="@@FACILITY@@">@@FACILITY_NAME@@</span><br>
+                    Time/run: 
+                    <span data-time="@@ACTIVITY_TIME@@" class="time-per-run" data-id="@@ID@@">
+                        @@ACTIVITY_TIME_HUMAN@@
+                    </span> <br>
+                    <strong>Total time:</strong>
+                    <span class="total-time" data-id="@@ID@@">
+                        @@ACTIVITY_TIME_TOTAL@@
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <table class="table table-condensed materials-list table-hover table-striped">
+                <tr>
+                    {% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}
+                    <th>Name</th>
+                    <th>Base Qty</th>
+                    <th>Adjusted Qty</th>
+                    <th>Job Qty</th>
+                </tr>
+                @@BOM@@
+            </table>
+        </div>
+    </div>
 </div>
