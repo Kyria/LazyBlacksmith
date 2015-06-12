@@ -35,8 +35,6 @@ module.exports = function (grunt) {
                     'lazyblacksmith/static/js/bootstrap/carousel.js',
                     'lazyblacksmith/static/js/bootstrap/transition.js',
                     'lazyblacksmith/static/js/bootstrap/scrollspy.js',
-                    'lazyblacksmith/static/js/bootstrap-addons/*.js'
-
                 ],
                 dest: 'lazyblacksmith/static/js/bootstrap.js'
             }

@@ -1,10 +1,15 @@
 LazyBlacksmith.blueprint.manufacturing = {
+    //variables 
     ME: 0,
     TE: 0,
     runs: 1,
+    industryLvl: 0,
+    advIndustryLvl: 0,
+    t2IndustryLvl: 0,
 
     hasManufacturedComponent: false,
-    
+    useIcons: false,
+
     // urls
     systemUrls: false,
     materialBOM: false,
@@ -13,6 +18,8 @@ LazyBlacksmith.blueprint.manufacturing = {
     
     // boolean : did we already load submaterials ?
     materialBOMLoaded: false,
+    // boolean : do we calculate summary with sub components
+    summarySubComponent: false,
 
     // tpl values
     tplSublistBlock: '',
@@ -114,10 +121,22 @@ LazyBlacksmith.blueprint.manufacturing = {
                 LazyBlacksmith.blueprint.manufacturing.updateTimes();
             }
         );
+
         $('#facility').on('change', 
             function(event) {
                 LazyBlacksmith.blueprint.manufacturing.updateMaterials();
                 LazyBlacksmith.blueprint.manufacturing.updateTimes();
+        });
+
+        $('#display-sub-components-summary').bootstrapSwitch({
+            'size': 'mini',
+            'onColor': 'success',
+            'labelText': 'Show components requirements',
+            'state': false,
+            'onSwitchChange': function(event, state) {
+                LazyBlacksmith.blueprint.manufacturing.summarySubComponent = state;
+                LazyBlacksmith.blueprint.manufacturing.updateSummary();
+            }
         });
     },
     
@@ -130,7 +149,8 @@ LazyBlacksmith.blueprint.manufacturing = {
             }
         );
         $('#bp-tabs a').on('shown.bs.tab', function(e) {
-            if(!LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded) {
+            if(!LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded
+                && LazyBlacksmith.blueprint.manufacturing.hasManufacturedComponent) {
                 LazyBlacksmith.blueprint.manufacturing.getMaterialsBOM();
                 LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded = true;
             } else {
@@ -149,8 +169,8 @@ LazyBlacksmith.blueprint.manufacturing = {
         $('#TE').slider({
             min: 0,
             max: 20,
-            range: "min",
             step: 2,
+            range: "min",
             slide: LazyBlacksmith.blueprint.manufacturing.updateTE,
         });
         $('#ModalME').slider({
@@ -162,9 +182,15 @@ LazyBlacksmith.blueprint.manufacturing = {
         $('#ModalTE').slider({
             min: 0,
             max: 20,
-            range: "min",
             step: 2,
+            range: "min",
             slide: LazyBlacksmith.blueprint.manufacturing.updateModalTE,
+        });
+        $('#industry-level, #adv-industry-level, #t2-level').slider({
+            min: 0,
+            max: 5,
+            range: "min",
+            slide: LazyBlacksmith.blueprint.manufacturing.updateSkill,
         });
     },
     
@@ -189,8 +215,8 @@ LazyBlacksmith.blueprint.manufacturing = {
             $('#modal-facility option[value='+facility+']').prop('selected',true);
             $('#ModalME').slider("option", "value", me);
             $('#ModalTE').slider("option", "value", te);
-            $('#Modal-ME-Level').html(me+"%");
-            $('#Modal-TE-Level').html(te+"%");
+            $('#Modal-ME-Level').html(me);
+            $('#Modal-TE-Level').html(te);
         });
 
         $('#modal-apply').on('click',
@@ -253,38 +279,72 @@ LazyBlacksmith.blueprint.manufacturing = {
     },
 
     updateModalME: function(event, ui) {
-        $('#Modal-ME-Level').html(ui.value+"%");
+        $('#Modal-ME-Level').html(ui.value);
     },
 
     updateModalTE: function(event, ui) {
-        $('#Modal-TE-Level').html(ui.value+"%");
+        $('#Modal-TE-Level').html(ui.value);
+    },
+
+    updateSkill: function(event, ui) {
+        var id = $(this).attr('id');
+        var value = parseInt(ui.value);
+
+        switch(id) {
+            case 'industry-level':
+                LazyBlacksmith.blueprint.manufacturing.industryLvl = value;
+                $('#industry-level-display').html(value);
+                break;
+
+            case 'adv-industry-level':
+                LazyBlacksmith.blueprint.manufacturing.advIndustryLvl = value;
+                $('#adv-industry-level-display').html(value);
+                break;
+
+            case 't2-level':
+                LazyBlacksmith.blueprint.manufacturing.t2IndustryLvl = value;
+                $('#t2-level-display').html(value);
+                break;
+        };
+        LazyBlacksmith.blueprint.manufacturing.updateTimes();
     },
 
     updateTimes: function() {
-        var TEBonus = (1.00-LazyBlacksmith.blueprint.manufacturing.TE/100.00);
-        var time_pu = parseInt($('.main-list .time-per-run').attr('data-time'));
-        var facilityBonus = LazyBlacksmith.blueprint.manufacturing.getFacilityTe(parseInt($('#facility').val()));
-        var time_pu_adjusted = time_pu * TEBonus * facilityBonus;
+        var timePerUnit = parseInt($('.main-list .time-per-run').attr('data-time'));
+        var facility = parseInt($('#facility').val());
         //durationToString
-        var time_text = LazyBlacksmith.utils.durationToString(time_pu_adjusted*LazyBlacksmith.blueprint.manufacturing.runs);
+        var time = LazyBlacksmith.blueprint.manufacturing.calculateTime(
+            timePerUnit, 
+            facility, 
+            LazyBlacksmith.blueprint.manufacturing.TE,
+            LazyBlacksmith.blueprint.manufacturing.runs,
+            true
+        );
+
+        var time_text = LazyBlacksmith.utils.durationToString(time);
         $('.main-list .total-time').html(time_text);
 
         $('.main-list .materials-list tr.material').each(
             function() {
-                if(!LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded || 
-                    $(this).attr('data-is-manufactured') == 'False') {
+                if(!LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded 
+                    || $(this).attr('data-is-manufactured') == undefined) {
                     return;
                 }
-                var id = parseInt($(this).attr('data-id'));               
+                var id = parseInt($(this).attr('data-id'));        
+
                 var runs = parseInt($('#run-required-'+id).text());
-
                 var facility = parseInt($('.sub-list-'+id+' .facility').attr('data-facility'));
-                var facilityTE = LazyBlacksmith.blueprint.manufacturing.getFacilityTe(facility);
-                var TE = (1.00-parseInt($('.sub-list-'+id+' .te').text()) / 100);
+                var TE = parseInt($('.sub-list-'+id+' .te').text());
+                var timePerUnit = parseInt($('.sub-list-'+id+' .time-per-run').attr('data-time'));
 
-                var time_pu = parseInt($('.sub-list-'+id+' .time-per-run').attr('data-time'));
-                var time_pu_adjusted = time_pu * TE * runs * facilityTE;      
-                var time_text = LazyBlacksmith.utils.durationToString(time_pu_adjusted);
+                var time = LazyBlacksmith.blueprint.manufacturing.calculateTime(
+                    timePerUnit, 
+                    facility, 
+                    TE,
+                    runs,
+                    false
+                );
+                var time_text = LazyBlacksmith.utils.durationToString(time);
 
                 $('.sub-list-'+id+' .total-time').html(time_text);
             }
@@ -298,9 +358,8 @@ LazyBlacksmith.blueprint.manufacturing = {
                 var id = parseInt($(this).attr('data-id'));
                 var quantity = parseInt($(this).attr('data-qty'));
                 
-                var MEBonus = (1.00-LazyBlacksmith.blueprint.manufacturing.ME/100.00);
-                var facilityBonus = LazyBlacksmith.blueprint.manufacturing.getFacilityMe(parseInt($('#facility').val()));
-                var quantityAdjusted = LazyBlacksmith.blueprint.manufacturing.calculateAdjusted(quantity, MEBonus, facilityBonus);
+                var facility = parseInt($('#facility').val());
+                var quantityAdjusted = LazyBlacksmith.blueprint.manufacturing.calculateAdjusted(quantity, LazyBlacksmith.blueprint.manufacturing.ME, facility);
                 var quantityJob = LazyBlacksmith.blueprint.manufacturing.calculateJob(quantityAdjusted, LazyBlacksmith.blueprint.manufacturing.runs);
 
                 $(this).find('td[data-name="quantity-adjusted"]').html(Humanize.intcomma(quantityAdjusted, 2));
@@ -309,7 +368,8 @@ LazyBlacksmith.blueprint.manufacturing = {
                 $(this).attr('data-qty-adj',quantityAdjusted);
                 $(this).attr('data-qty-job',quantityJob);                   
                 
-                if(!LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded || $(this).attr('data-is-manufactured') == 'False') {
+                if(!LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded 
+                    || $(this).attr('data-is-manufactured') == undefined) {
                     return;
                 }
 
@@ -323,16 +383,15 @@ LazyBlacksmith.blueprint.manufacturing = {
                 $('#run-required-'+id).html(runs);
 
                 var facility = parseInt($('.sub-list-'+id+' .facility').attr('data-facility'));
-                var facilityME = LazyBlacksmith.blueprint.manufacturing.getFacilityMe(facility);
 
-                var ME = (1.00-parseInt($('.sub-list-'+id+' .me').text()) / 100);
+                var ME = parseInt($('.sub-list-'+id+' .me').text());
 
                 // update the sub comps (if there are some :)) for this material
                 $('.sub-list-'+id+' .materials-list tr.material').each(
                     function() {
                         var quantity = parseInt($(this).attr('data-qty'));
 
-                        var quantityAdjusted = LazyBlacksmith.blueprint.manufacturing.calculateAdjusted(quantity, ME, facilityME);
+                        var quantityAdjusted = LazyBlacksmith.blueprint.manufacturing.calculateAdjusted(quantity, ME, facility);
                         var quantityJob = LazyBlacksmith.blueprint.manufacturing.calculateJob(quantityAdjusted, runs);
                         
                         $(this).find('td[data-name="quantity-adjusted"]').html(Humanize.intcomma(quantityAdjusted, 2));
@@ -353,42 +412,92 @@ LazyBlacksmith.blueprint.manufacturing = {
      * Update the summary tab.
      */
     updateSummary: function() {
-        html = "";
-        materials = [];
-        names = [];
-        $('.material').each(
-            function() { 
-                qty = parseInt($(this).attr('data-qty-job'));
-                id = $(this).attr('data-id');
-                name = $(this).attr('data-name');
-                if(!(id in materials)) {
-                    materials[id] = 0;
+        
+        
+        var rowMaterial = '<tr>';
+        var rowTime = '<tr>';
+        if(LazyBlacksmith.blueprint.manufacturing.useIcons) {
+            rowMaterial += '<td class="icon">@@ICON@@</td>';
+            rowTime += '<td class="icon">@@ICON@@</td>'; 
+        }
+        rowMaterial += '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td><td class="quantity">@@PRICE@@</td></tr>';
+        rowTime += '<td>@@NAME@@</td><td>@@TIME@@</td></tr>';
+
+        var html = "";
+        var materials = [];
+        var names = [];
+
+        // get the correct material selector
+        var materialSelector = '.main-list .material';
+        if(LazyBlacksmith.blueprint.manufacturing.summarySubComponent
+            && LazyBlacksmith.blueprint.manufacturing.hasManufacturedComponent) {
+            materialSelector = '.material:not([data-is-manufactured])';
+        }
+
+        // find icons for all items
+        var icons = [];
+        if(LazyBlacksmith.blueprint.manufacturing.useIcons) {
+            var mainItemId = parseInt($('#main-product').attr('data-id'));
+            var mainItemIcon = $('#main-product').attr('data-icon');
+            var mainItemName = $('#main-product').text();
+            icons[mainItemId] = '<img src="'+mainItemIcon+'" alt="'+mainItemName+'">';
+            $('.material').each(
+                function() {
+                    var id = $(this).attr('data-id');
+                    var icon = $(this).find('td.icon').html();
+                    icons[id]=icon;
                 }
-                materials[id] += qty;
-                names[id] = name;
+            );
+        }
+
+        // calculate materials summary
+        $(materialSelector).each(
+            function() { 
+                var qty = parseInt($(this).attr('data-qty-job'));
+                var id = $(this).attr('data-id');
+                var name = $(this).attr('data-name');
+                if(!(id in materials)) {
+                    materials[id] = {};
+                    materials[id].qty = 0
+                }
+                materials[id].qty += qty;
+                materials[id].itemName = name;
             }
         );
 
         for(var id in materials) {
-            html += names[id] + " - " + materials[id] + "<br>";
+            html += rowMaterial.replace(/@@ICON@@/g, icons[id])
+                               .replace(/@@NAME@@/g, materials[id].itemName)
+                               .replace(/@@QTY@@/g, Humanize.intcomma(materials[id].qty))
+                               .replace(/@@PRICE@@/, '--');
         }
 
-        html += "<br><br>";
+        $('.materials-requirement tbody').html(html);
+
+        // now do time summary
+        html = '';
+
         $('.total-time').each(
             function() {
-                id = $(this).attr('data-id');
-                time = $(this).text();
-                html += names[id] + ": " + time + "<br>";
+                var id = $(this).attr('data-id');
+                var name = $(this).attr('data-name');
+                var time = $(this).text();
+
+                html += rowTime.replace(/@@ICON@@/g, icons[id])
+                               .replace(/@@NAME@@/g, name)
+                               .replace(/@@TIME@@/g, time);
             }
         );
-        $('#tab-summary').html(html);
+        $('.materials-time tbody').html(html);
     },
 
     /**
      * Calculate the adjusted quantity
      */
-    calculateAdjusted: function(quantity, MEBonus, FacilityBonus) {
-        return Math.max(1, quantity * MEBonus * FacilityBonus);
+    calculateAdjusted: function(quantity, ME, facility) {
+        var MEBonus = (1.00-ME/100.00);
+        var facilityBonus = LazyBlacksmith.blueprint.manufacturing.getFacilityMe(facility);
+        return Math.max(1, quantity * MEBonus * facilityBonus);
     },
     
     /**
@@ -397,7 +506,24 @@ LazyBlacksmith.blueprint.manufacturing = {
     calculateJob: function(quantityAdjusted, runs) {
         return Math.max(runs, Math.ceil(quantityAdjusted * runs));
     },
-    
+
+    /**
+     * Calculate the manufacturing time with the given informations.
+     * 
+     * Note: T2Time must never be used for subcomponents (as it's only required for tech2 items)
+     */
+    calculateTime: function(timePerUnit, facility, TE, runs, useT2Time) {
+        var TEBonus = (1.00-TE/100.00);
+        var facilityTe = LazyBlacksmith.blueprint.manufacturing.getFacilityTe(facility);
+        var time = timePerUnit * TEBonus * facilityTe * runs;
+        time *= (1 - LazyBlacksmith.blueprint.manufacturing.industryLvl * 0.04);
+        time *= (1 - LazyBlacksmith.blueprint.manufacturing.advIndustryLvl * 0.03);
+        if(useT2Time) {
+            time *= (1 - LazyBlacksmith.blueprint.manufacturing.t2IndustryLvl * 0.01);
+        }
+        return time;
+    },
+
     /**
      * Get facillity bonus values
      */
@@ -414,7 +540,7 @@ LazyBlacksmith.blueprint.manufacturing = {
     /**
      * Ajax functions
      */
-    getMaterialsBOM:function() {
+    getMaterialsBOM: function() {
         if(!LazyBlacksmith.blueprint.manufacturing.materialBOM){
             alert('Error, no URL is found to get BOM for materials.');
             return;
@@ -423,6 +549,8 @@ LazyBlacksmith.blueprint.manufacturing = {
             var materialList = materialListResult['result'];
             var templateTable = LazyBlacksmith.blueprint.manufacturing.tplSublistBlock;
             var templateRows = LazyBlacksmith.blueprint.manufacturing.tplSublistRow;
+            var ME = 10;
+            var TE = 20;
             
             var html = '';
             for(var matIndex in materialList) {
@@ -438,19 +566,24 @@ LazyBlacksmith.blueprint.manufacturing = {
                 var facility = $('#facility').val();
                 var tax = $('#tax').val();
 
-                var facilityTE = LazyBlacksmith.blueprint.manufacturing.getFacilityTe(facility);
-                var facilityME = LazyBlacksmith.blueprint.manufacturing.getFacilityMe(facility);
                 var facilityName = LazyBlacksmith.blueprint.manufacturing.getFacilityName(facility);
 
                 // production time
                 var time = material['time'];
-                var time_human = LazyBlacksmith.utils.durationToString(time);
-                var time_total_human = LazyBlacksmith.utils.durationToString(time * 0.8 * runs * facilityTE);
+                var timeHuman = LazyBlacksmith.utils.durationToString(time);
+                var timeTotal = LazyBlacksmith.blueprint.manufacturing.calculateTime(
+                    time, 
+                    facility, 
+                    TE,
+                    runs,
+                    false
+                );
+                var timeTotalHuman = LazyBlacksmith.utils.durationToString(timeTotal);
 
                 // sub materials
                 for(var bomIndex in material['materials']) {
                     var bom = material['materials'][bomIndex];
-                    var qtyAdjusted = LazyBlacksmith.blueprint.manufacturing.calculateAdjusted(bom['quantity'], 0.9, facilityME);
+                    var qtyAdjusted = LazyBlacksmith.blueprint.manufacturing.calculateAdjusted(bom['quantity'], ME, facility);
                     var qtyJob = LazyBlacksmith.blueprint.manufacturing.calculateJob(qtyAdjusted, runs);
                     
                     rows += templateRows.replace(/@@ID@@/g, bom['id'])
@@ -475,8 +608,8 @@ LazyBlacksmith.blueprint.manufacturing = {
                                      .replace(/@@FACILITY_NAME@@/g, facilityName)
                                      .replace(/@@FACILITY@@/g, facility)
                                      .replace(/@@ACTIVITY_TIME@@/g, time)
-                                     .replace(/@@ACTIVITY_TIME_HUMAN@@/g, time_human)
-                                     .replace(/@@ACTIVITY_TIME_TOTAL@@/g, time_total_human)
+                                     .replace(/@@ACTIVITY_TIME_HUMAN@@/g, timeHuman)
+                                     .replace(/@@ACTIVITY_TIME_TOTAL@@/g, timeTotalHuman)
                                      .replace(/@@BOM@@/g, rows);
             }
             
