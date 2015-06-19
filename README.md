@@ -1,8 +1,39 @@
-#Cool flask app.
-## Nothing to say yet. :)
+# LazyBlacksmith
+An EVE Online Industry application for lazy people. 
 
+## About
+LazyBlacksmith is a flask application allowing people to get informations about industry in eveonline. 
 
-## License
+#### Current features
+* Blueprint manufacture informations including components required
+* Current Industry Indexes, with history (only since the installation)
+
+#### TODO
+* Blueprint research and inventions informations
+* Give price everywhere (especially manufacturing)
+* Calculate industry taxes (I wish it never exists)
+* Things. 
+
+## Requirements
+* Python 2.7
+* [Redis](http://redis.io/) for async tasks and queues (and cache)!
+* [NodeJS](http://nodejs.org/) + [Grunt-CLI](http://gruntjs.com/getting-started)
+* Virtualenv (recommended)
+* Cache system (eg. python-memcached or redis-cache) (recommanded)
+* Database connectors depending on the one you use (MySQL,...)
+* See [requirements.txt](requirements.txt) for other requirements
+* Eve Online Icons (see CCP Icons part)
+
+## Installation
+
+Comin'... one day or another :) 
+
+## CCP Icons
+
+If you set ```USE_CCP_ICONS = True``` you need to download the files "EVE_VERSION_Types.zip" from CCP Toolkit ; http://community.eveonline.com/community/fansites/toolkit/ and then 
+move the files into ```lazyblacksmith/static/ccp/``` (as a result, you should have ```lazyblacksmith/static/ccp/Types/files.png```)
+
+## LazyBlacksmith License
 Copyright (c) 2015, Guillaume
 All rights reserved.
 
@@ -30,3 +61,7 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## CCP Licence
+
+Going to be added. 
