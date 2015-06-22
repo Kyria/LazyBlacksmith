@@ -11,3 +11,5 @@ from .eve_sde.activityskill import ActivitySkill
 from .eve_sde.region import Region
 from .eve_sde.constellation import Constellation
 from .eve_sde.solarsystem import SolarSystem
+
+from .crest.industry_index import IndustryIndex
