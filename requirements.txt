@@ -10,3 +10,4 @@ Flask-cache>=0.13.1
 alembic>=0.7.6
 humanize>=0.5.1
 rq>=0.5.2
+pycrest
