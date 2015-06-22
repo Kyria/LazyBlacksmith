@@ -6,6 +6,9 @@ LazyBlacksmith.blueprint.manufacturing = {
     industryLvl: 0,
     advIndustryLvl: 0,
     t2IndustryLvl: 0,
+    t2ScienceLvl1: 0,
+    t2ScienceLvl2: 0,
+    t2IndustryLvl: 0,
 
     hasManufacturedComponent: false,
     useIcons: false,
@@ -56,6 +59,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         LazyBlacksmith.blueprint.manufacturing.initTabs(); 
         LazyBlacksmith.blueprint.manufacturing.initTypeahead(); 
         LazyBlacksmith.blueprint.manufacturing.initModal(); 
+        LazyBlacksmith.blueprint.manufacturing.initTooltip(); 
     },
     
     /**
@@ -80,6 +84,12 @@ LazyBlacksmith.blueprint.manufacturing = {
                 LazyBlacksmith.blueprint.manufacturing.tplSublistRow = tpl;
             }
         );
+    },
+
+    initTooltip: function() {
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        })
     },
 
     initTypeahead: function() {
@@ -186,7 +196,7 @@ LazyBlacksmith.blueprint.manufacturing = {
             range: "min",
             slide: LazyBlacksmith.blueprint.manufacturing.updateModalTE,
         });
-        $('#industry-level, #adv-industry-level, #t2-level').slider({
+        $('#industry-level, #adv-industry-level, #t2-level, #t2-science1, #t2-science2').slider({
             min: 0,
             max: 5,
             range: "min",
@@ -304,6 +314,16 @@ LazyBlacksmith.blueprint.manufacturing = {
             case 't2-level':
                 LazyBlacksmith.blueprint.manufacturing.t2IndustryLvl = value;
                 $('#t2-level-display').html(value);
+                break;
+
+            case 't2-science1':
+                LazyBlacksmith.blueprint.manufacturing.t2ScienceLvl1 = value;
+                $('#t2-science1-display').html(value);
+                break;
+
+            case 't2-science2':
+                LazyBlacksmith.blueprint.manufacturing.t2ScienceLvl2 = value;
+                $('#t2-science2-display').html(value);
                 break;
         };
         LazyBlacksmith.blueprint.manufacturing.updateTimes();
@@ -520,6 +540,8 @@ LazyBlacksmith.blueprint.manufacturing = {
         time *= (1 - LazyBlacksmith.blueprint.manufacturing.advIndustryLvl * 0.03);
         if(useT2Time) {
             time *= (1 - LazyBlacksmith.blueprint.manufacturing.t2IndustryLvl * 0.01);
+            time *= (1 - LazyBlacksmith.blueprint.manufacturing.t2ScienceLvl1 * 0.01);
+            time *= (1 - LazyBlacksmith.blueprint.manufacturing.t2ScienceLvl2 * 0.01);
         }
         return time;
     },
