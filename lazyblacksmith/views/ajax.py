@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from collections import OrderedDict
 from flask import abort
 from flask import Blueprint

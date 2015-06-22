@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from . import db
 from .activity import Activity
 from flask import url_for

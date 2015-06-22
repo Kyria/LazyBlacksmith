@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from . import db
 
 class ActivityMaterial(db.Model):

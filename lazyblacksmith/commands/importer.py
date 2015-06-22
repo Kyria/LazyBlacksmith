@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import time
 import sys
 
@@ -13,7 +14,7 @@ from lazyblacksmith.models import Region
 from lazyblacksmith.models import Constellation
 from lazyblacksmith.models import SolarSystem
 
-class Importer:
+class Importer(object):
 
     # Import object in the list must be class from models to work
     IMPORT_ORDER = [
