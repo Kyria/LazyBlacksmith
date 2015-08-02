@@ -1,3 +1,5 @@
+from lazyblacksmith import __version as version 
+
 DEBUG = True
 SECRET_KEY = 'YouNeedToChangeThis!'
 PORT = 5015
@@ -12,3 +14,20 @@ USE_CCP_ICONS = False
 # cache configuration
 # - use https://pythonhosted.org/Flask-Cache/ to configure the cache you want
 CACHE_TYPE = null
+
+
+# CREST API Informations
+# -----------------------
+# Your crest api key
+CREST_API_KEY = ''
+# Your client ID
+CREST_CLIENT_ID = ''
+# Redirect DNS. Only put the DNS, as the whole URL while be 
+# constructed dynamically. (example: "localhost", "yourdomain.com")
+CREST_REDIRECT_DNS = ''
+# Custom user agent to identify yourself to CCP, in case of problems
+# None for default
+CREST_USER_AGENT = 'LazyBlacksmith/%d' % version
+# Scope required for CREST
+# please do not touch this
+CREST_SCOPE = ['publicData']

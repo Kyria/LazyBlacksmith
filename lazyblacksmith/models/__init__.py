@@ -13,3 +13,6 @@ from .eve_sde.constellation import Constellation
 from .eve_sde.solarsystem import SolarSystem
 
 from .crest.industry_index import IndustryIndex
+
+from .sso.eveuser import EveUser
+
