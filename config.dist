@@ -13,13 +13,13 @@ USE_CCP_ICONS = False
 
 # cache configuration
 # - use https://pythonhosted.org/Flask-Cache/ to configure the cache you want
-CACHE_TYPE = null
+CACHE_TYPE = 'null'
 
 
 # CREST API Informations
 # -----------------------
-# Your crest api key
-CREST_API_KEY = ''
+# Your crest secret key
+CREST_SECRET_KEY = ''
 # Your client ID
 CREST_CLIENT_ID = ''
 # Redirect DNS. Only put the DNS, as the whole URL while be 

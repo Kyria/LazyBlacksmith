@@ -8,8 +8,8 @@ def get_crest():
     """ Return a CREST object initialized """
     crest = pycrest.EVE(
         client_id = config.CREST_CLIENT_ID, 
-        api_key = config.CREST_API_KEY, 
-        redirect_uri = "%s%s" % (config.CREST_REDIRECT_DNS, url_for('sso.crest_callback')),
+        api_key = config.CREST_SECRET_KEY, 
+        redirect_uri = "%s%s" % (config.CREST_REDIRECT_DNS, '/sso/crest/callback'),
         user_agent = config.CREST_USER_AGENT,
     )
     crest()
