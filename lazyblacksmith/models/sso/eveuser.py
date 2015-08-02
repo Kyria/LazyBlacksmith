@@ -16,6 +16,7 @@ class EveUser(db.Model, UserMixin):
     token_type = db.Column(db.String(20))
     access_token = db.Column(db.String(100))
     access_token_expires_on = db.Column(db.DateTime(timezone=True))
+    access_token_expires_in = db.Column(db.Integer)
     refresh_token = db.Column(db.String(100))
     refresh_token_expires_on = db.Column(db.DateTime(timezone=True))
 
@@ -25,3 +26,13 @@ class EveUser(db.Model, UserMixin):
     def get_portrait_url(self, size=128):
         """returns URL to Character portrait from EVE Image Server"""
         return "{0}Character/{1}_{2}.jpg".format(get_crest()._image_server, self.character_id, size)
+
+    def get_id(self):
+        return self.character_id
+
+    def get_authed_crest(self):
+        return get_crest().temptoken_authorize(
+            self.access_token,
+            self.access_token_expires_in,
+            self.refresh_token
+        )

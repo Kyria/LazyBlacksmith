@@ -1,13 +1,13 @@
 """crest_user
 
-Revision ID: 4fc3d63f8a10
+Revision ID: 2fc4abd43219
 Revises: 53eb8abce4de
-Create Date: 2015-08-02 20:27:51.348000
+Create Date: 2015-08-03 00:17:44.956000
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '4fc3d63f8a10'
+revision = '2fc4abd43219'
 down_revision = '53eb8abce4de'
 
 from alembic import op
@@ -24,6 +24,7 @@ def upgrade():
     sa.Column('token_type', sa.String(length=20), nullable=True),
     sa.Column('access_token', sa.String(length=100), nullable=True),
     sa.Column('access_token_expires_on', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('access_token_expires_in', sa.Integer(), nullable=True),
     sa.Column('refresh_token', sa.String(length=100), nullable=True),
     sa.Column('refresh_token_expires_on', sa.DateTime(timezone=True), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
