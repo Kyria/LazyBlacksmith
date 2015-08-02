@@ -1,46 +1,27 @@
 # -*- encoding: utf-8 -*-
-from . import db
-from flask import url_for
 from flask.ext.login import UserMixin
-from pycrest import EVE
-from werkzeug import cached_property
+from sqlalchemy import func
+from lazyblacksmith.utils.crestutils import get_crest
+
+from . import db
 
 
 class EveUser(db.Model, UserMixin):
     
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(200))
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(200))
-    active = db.Column(db.Boolean, default=True)
+    character_id = db.Column(db.Integer, primary_key=True)
+    character_owner_hash = db.Column(db.String(255))
+    character_name = db.Column(db.String(200))
+    scopes = db.Column(db.String(200))
 
-    def is_active(self):
-        return self.active
+    token_type = db.Column(db.String(20))
+    access_token = db.Column(db.String(100))
+    access_token_expires_on = db.Column(db.DateTime(timezone=True))
+    refresh_token = db.Column(db.String(100))
+    refresh_token_expires_on = db.Column(db.DateTime(timezone=True))
 
-    @cached_property
-    def _eve_auth(self):
-        """shortcut to python-social-auth's EVE-related extra data for this user"""
-        return self.social_auth.get(provider='eveonline').extra_data
-
-    @property
-    def character_id(self):
-        """get CharacterID from authentification data"""
-        return self._eve_auth['id']
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def get_portrait_url(self, size=128):
         """returns URL to Character portrait from EVE Image Server"""
-        return "{0}Character/{1}_{2}.jpg".format(EVE._image_server, self.character_id, size)
-
-    def get_crest_tokens(self):
-        """get tokens for authenticated CREST"""
-        expires_in = time.mktime(
-            dateutil.parser.parse(
-                self._eve_auth['expires']  # expiration time string
-            ).timetuple()                             # expiration timestamp
-        ) - time.time()                               # seconds until expiration
-
-        return {
-            'access_token': self._eve_auth['access_token'],
-            'refresh_token': self._eve_auth['refresh_token'],
-            'expires_in': expires_in
-        }
+        return "{0}Character/{1}_{2}.jpg".format(get_crest()._image_server, self.character_id, size)
