@@ -82,6 +82,13 @@ def crest_callback():
 
 def update_or_create_eve_user(eve_user, auth_response, character_data, create = False):
     """ create or update an "eve_user" with sso informations """
+
+    # need to check if already exists first ! :) 
+    tmp_user = EveUser.query.get(character_data['CharacterID'])
+    if tmp_user is not None:
+        create = False
+        eve_user = tmp_user
+
     eve_user.character_owner_hash = character_data['CharacterOwnerHash']
     eve_user.character_name = character_data['CharacterName']
     eve_user.scopes = character_data['Scopes']
