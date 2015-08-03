@@ -1,15 +1,16 @@
 # -*- encoding: utf-8 -*-
-from flask import Blueprint, redirect, session, url_for, request, jsonify
+import datetime
+import time
+
+import pytz
+from flask import Blueprint, redirect, session, url_for, request
+from flask.ext.login import current_user, login_user, logout_user, login_required
 from flask_oauthlib.client import OAuthException
 
+from lazyblacksmith.models import db, EveUser
 from lazyblacksmith.oauth import eve_oauth
 from lazyblacksmith.utils.crestutils import get_crest
-from lazyblacksmith.models import db, EveUser
-
-from flask.ext.login import current_user, login_user, logout_user, login_required
 from lazyblacksmith.utils.time import utcnow
-import time
-import datetime
 
 
 sso = Blueprint('sso', __name__)
