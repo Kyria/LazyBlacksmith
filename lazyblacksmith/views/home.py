@@ -3,6 +3,7 @@ from flask import Blueprint
 from flask import render_template
 
 from lazyblacksmith.cache import cache
+from flask.ext.login import current_user
 
 home = Blueprint('home', __name__)
 
