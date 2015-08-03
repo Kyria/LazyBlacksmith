@@ -4,10 +4,13 @@ from flask_oauthlib.client import OAuthException
 
 from lazyblacksmith.oauth import eve_oauth
 from lazyblacksmith.utils.crestutils import get_crest
+from lazyblacksmith.models import db, EveUser
 
-from flask.ext.login import current_user, login_user, logout_user
+from flask.ext.login import current_user, login_user, logout_user, login_required
 from lazyblacksmith.utils.time import utcnow
 import time
+import datetime
+
 
 sso = Blueprint('sso', __name__)
 
@@ -19,6 +22,7 @@ def crest_login():
             _external = True
         ),
     )
+
 
 @sso.route('/crest/callback')
 def crest_callback():
@@ -38,31 +42,73 @@ def crest_callback():
     session['refresh_token'] = auth_response['refresh_token']
 
     crest_auth = get_crest()
-    crest_auth = crest_auth.temptoken_authorize(auth_response['access_token'], auth_response['expires_in'], auth_response['refresh_token'])
+    crest_auth = crest_auth.temptoken_authorize(
+        auth_response['access_token'], 
+        auth_response['expires_in'],
+        auth_response['refresh_token']
+    )
 
+    character_data = crest_auth.whoami()
+
+    new_user = True
     # save user
     if current_user.is_authenticated():
         # update data
-        pass
+        if current_user.character_id == character_data['character_id']:
+            update_or_create_eve_user(current_user, auth_response, character_data)
+            new_user = False
 
-    else:
-        pass
+        else:
+            # if we log with another character, logout the current char 
+            logout_user()
 
-    # login_user(eve_user)
+    if new_user:
+        eve_user = update_or_create_eve_user(
+            EveUser(), 
+            auth_response,
+            character_data, 
+            True
+        )
+
+        login_user(eve_user)
 
     # delete session data
+    del session['access_token'] 
+    del session['refresh_token']
 
     # redirect
-    return jsonify(crest_auth.whoami())
+    return redirect(url_for("home.index"))
+
+
+def update_or_create_eve_user(eve_user, auth_response, character_data, create = False):
+    """ create or update an "eve_user" with sso informations """
+    eve_user.character_owner_hash = character_data['CharacterOwnerHash']
+    eve_user.character_name = character_data['CharacterName']
+    eve_user.scopes = character_data['Scopes']
+    eve_user.token_type = character_data['TokenType']
+    eve_user.refresh_token_expires_on = character_data['ExpiresOn']
+
+    eve_user.refresh_token = auth_response['refresh_token']
+    eve_user.access_token = auth_response['access_token']
+    eve_user.access_token_expires_on = utcnow() + datetime.timedelta(seconds=int(auth_response['expires_in']) - 60)
+    eve_user.access_token_expires_in = auth_response['expires_in'] 
+
+    if create:
+        db.session.add(eve_user)
+    db.session.commit()
+
+    return eve_user
 
 
 @sso.route('/logout')
+@login_required
 def crest_logout():
     logout_user()
     return redirect(url_for("home.index"))
 
+
 @eve_oauth.tokengetter
-def eve_oauth_tokengetter(token=None):
+def eve_oauth_tokengetter(token = None):
     if 'access_token' in session:
         return (session['access_token'],)
     elif current_user.is_authenticated():
@@ -73,7 +119,9 @@ def eve_oauth_tokengetter(token=None):
 
             current_user.access_token = authed_crest.token
             current_user.access_token_expires_in = authed_crest.expires - time.time()
-            current_user.access_token_expires_on = datetime.fromtimestamp(authed_crest.expires, tz = pytz.utc)
+            current_user.access_token_expires_on = datetime.fromtimestamp(authed_crest.expires, 
+                                                                          tz = pytz.utc)
+            db.session.commit()
 
         return (current_user.access_token,)
     return None
