@@ -55,7 +55,7 @@ def crest_callback():
     # save user
     if current_user.is_authenticated():
         # update data
-        if current_user.character_id == character_data['character_id']:
+        if current_user.character_id == character_data['CharacterID']:
             update_or_create_eve_user(current_user, auth_response, character_data)
             new_user = False
 
@@ -94,7 +94,6 @@ def update_or_create_eve_user(eve_user, auth_response, character_data, create = 
     eve_user.character_name = character_data['CharacterName']
     eve_user.scopes = character_data['Scopes']
     eve_user.token_type = character_data['TokenType']
-    eve_user.refresh_token_expires_on = character_data['ExpiresOn']
 
     eve_user.refresh_token = auth_response['refresh_token']
     eve_user.access_token = auth_response['access_token']
@@ -102,6 +101,7 @@ def update_or_create_eve_user(eve_user, auth_response, character_data, create = 
     eve_user.access_token_expires_in = auth_response['expires_in'] 
 
     if create:
+        eve_user.character_id = character_data['CharacterID']
         db.session.add(eve_user)
     db.session.commit()
 
