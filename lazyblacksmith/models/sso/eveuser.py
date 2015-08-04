@@ -3,7 +3,7 @@ from flask.ext.login import UserMixin
 from sqlalchemy import func
 from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.models.utcdatetime import UTCDateTime
-
+from lazyblacksmith.utils.time import utcnow
 from . import db
 
 
@@ -33,6 +33,6 @@ class EveUser(db.Model, UserMixin):
     def get_authed_crest(self):
         return get_crest().temptoken_authorize(
             self.access_token,
-            self.access_token_expires_in,
+            (self.access_token_expires_on - utcnow()).total_seconds(),
             self.refresh_token
         )
