@@ -21,7 +21,8 @@
         <ul class="nav nav-tabs" role="tablist" id="bp-tabs">
             <li class="active"><a href="#tab-bp">Blueprint</a></li>
             {% if has_manufactured_components %}<li id='subcomp-tab'><a href="#tab-subcomp">Components Blueprints</a></li>{% endif %}
-            <li id='summary-tab'><a href="#tab-summary">Summary</a></li>
+            <li id='summary-tab'><a href="#tab-summary">Material Summary</a></li>
+            <li id='price-tab'><a href="#tab-price">Prices</a></li>
         </ul>
         <div class="tab-content">
             <div class="row fade in active tab-pane" id="tab-bp">
@@ -171,7 +172,6 @@
                                 {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
                                 <th>Name</th>
                                 <th>Quantity</th>
-                                <th>Price</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -197,6 +197,14 @@
                         </tbody>
                     </table>
                     </table>
+                </div>
+            </div>
+            
+            <div class="row fade tab-pane" id="tab-price">
+                <div class="col-md-12">
+                    {% if has_manufactured_components %}
+                        <strong><input type="checkbox" id="display-sub-components-price"/></strong>
+                    {% endif %}
                 </div>
             </div>
         </div>

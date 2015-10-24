@@ -145,7 +145,19 @@ LazyBlacksmith.blueprint.manufacturing = {
             'state': false,
             'onSwitchChange': function(event, state) {
                 LazyBlacksmith.blueprint.manufacturing.summarySubComponent = state;
+                $('#display-sub-components-price').bootstrapSwitch('state', state, true);
                 LazyBlacksmith.blueprint.manufacturing.updateSummary();
+            }
+        });
+        $('#display-sub-components-price').bootstrapSwitch({
+            'size': 'mini',
+            'onColor': 'success',
+            'labelText': 'Show components requirements',
+            'state': false,
+            'onSwitchChange': function(event, state) {
+                LazyBlacksmith.blueprint.manufacturing.summarySubComponent = state;
+                $('#display-sub-components-summary').bootstrapSwitch('state', state, true);
+                LazyBlacksmith.blueprint.manufacturing.updatePrice();
             }
         });
     },
@@ -165,6 +177,7 @@ LazyBlacksmith.blueprint.manufacturing = {
                 LazyBlacksmith.blueprint.manufacturing.materialBOMLoaded = true;
             } else {
                 LazyBlacksmith.blueprint.manufacturing.updateSummary();
+                LazyBlacksmith.blueprint.manufacturing.updatePrice();
             }
         });
     },
@@ -440,7 +453,7 @@ LazyBlacksmith.blueprint.manufacturing = {
             rowMaterial += '<td class="icon">@@ICON@@</td>';
             rowTime += '<td class="icon">@@ICON@@</td>'; 
         }
-        rowMaterial += '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td><td class="quantity">@@PRICE@@</td></tr>';
+        rowMaterial += '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td></tr>';
         rowTime += '<td>@@NAME@@</td><td>@@TIME@@</td></tr>';
 
         var html = "";
@@ -488,8 +501,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         for(var id in materials) {
             html += rowMaterial.replace(/@@ICON@@/g, icons[id])
                                .replace(/@@NAME@@/g, materials[id].itemName)
-                               .replace(/@@QTY@@/g, Humanize.intcomma(materials[id].qty))
-                               .replace(/@@PRICE@@/, '--');
+                               .replace(/@@QTY@@/g, Humanize.intcomma(materials[id].qty));
         }
 
         $('.materials-requirement tbody').html(html);
@@ -509,6 +521,17 @@ LazyBlacksmith.blueprint.manufacturing = {
             }
         );
         $('.materials-time tbody').html(html);
+    },
+
+    updatePrice: function() {
+        // get items ID, region (default: the forge/Jita)
+        // ajax call to update
+        // --> check if expired or already fetched before call
+        // check expiry / availability / crest sso infos
+        // --> if we need to (and can) update : update with CREST
+        // --> else return prices, region, expiry, or "null" values
+        // save those data
+        // display table
     },
 
     /**
@@ -637,6 +660,7 @@ LazyBlacksmith.blueprint.manufacturing = {
             
             $('#tab-subcomp').html(html);
             LazyBlacksmith.blueprint.manufacturing.updateSummary();
+            LazyBlacksmith.blueprint.manufacturing.updatePrice();
         });
     },
 }

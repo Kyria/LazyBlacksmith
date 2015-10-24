@@ -46,7 +46,12 @@
                     </ul>
                     {% if current_user.is_authenticated() %}
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="{{ url_for('sso.crest_logout') }}">Logout ({{ current_user.character_name }})</a></li>
+                        <li>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.character_name }} <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('sso.crest_logout') }}">Logout</a></li>
+                            </ul>
+                        </li>
                     </ul>
                     {% endif %}
                 </div>

@@ -12,3 +12,4 @@ alembic>=0.7.6
 humanize>=0.5.1
 rq>=0.5.2
 pycrest
+ratelim>=0.1.5

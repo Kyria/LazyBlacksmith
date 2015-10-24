@@ -7,6 +7,7 @@ from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_by_attr
+from lazyblacksmith.utils.time import utcnow
 
 def get_industry_index():
     """ Connect to the public CREST and get the industry indexes list. """
@@ -20,7 +21,7 @@ def get_industry_index():
 
     # TODO: get the date from headers
     # check if the data are not still from cache and if we don't already have them.  
-    date = datetime.datetime.utcnow()
+    date = utcnow()
 
     for index in all_indexes:
         solar_system = index.solarSystem.id
