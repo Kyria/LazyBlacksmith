@@ -1,12 +1,13 @@
 # -*- encoding: utf-8 -*-
-import pycrest
 import config
+
+from lazyblacksmith.utils.pycrest import EVE
 
 from flask import url_for
 
 def get_crest():
     """ Return a CREST object initialized """
-    crest = pycrest.EVE(
+    crest = EVE(
         client_id = config.CREST_CLIENT_ID, 
         api_key = config.CREST_SECRET_KEY, 
         redirect_uri = "%s%s" % (config.CREST_REDIRECT_DNS, '/sso/crest/callback'),
