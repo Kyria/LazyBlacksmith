@@ -104,7 +104,7 @@
                             <h4>
                                 {{ blueprint.name }} 
                                 <span class="small">
-                                    (<span id='main-product' data-id="{{ product.product.id }}" data-icon="{{ product.product.icon_32() }}">{{ product.product.name }}</span> x {{ product.quantity|intcomma }}) -  
+                                    (<span id='main-product' data-id="{{ product.product.id }}" data-icon="{{ product.product.icon_32() }}">{{ product.product.name }}</span> x <span id="qty-required-{{ product.product.id }}" data-qty="{{ product.quantity }}">{{ product.quantity|intcomma }})</span> -  
                                     <strong>Time per run: </strong><span data-time="{{ activity.time }}" class="time-per-run" data-id="{{ blueprint.id }}">{{ activity.time|duration }}</span> - 
                                     <strong>Total time: </strong><span class="total-time" data-id="{{ product.product.id }}" data-name="{{ product.product.name }}">{{ activity.time|duration }}</span>
                                 </span>
@@ -161,7 +161,7 @@
             <div class="row fade tab-pane" id="tab-summary">
                 <div class="col-md-6">
                     <h4>
-                        Materials requirements 
+                        Material requirements 
                         {% if has_manufactured_components %}
                             <input type="checkbox" id="display-sub-components-summary"/>
                         {% endif %}
@@ -201,11 +201,55 @@
             </div>
             
             <div class="row fade tab-pane" id="tab-price">
-                <div class="col-md-12">
-                    {% if has_manufactured_components %}
-                        <strong><input type="checkbox" id="display-sub-components-price"/></strong>
-                    {% endif %}
+                <div class="col-md-6">
+                    <h4>
+                        Material Prices                     
+                        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#priceConfigModal">
+                            <i class="fa fa-cog"></i>
+                        </button>                 
+
+                        {% if has_manufactured_components %}
+                            <strong><input type="checkbox" id="display-sub-components-price"/></strong>
+                        {% endif %}
+                    </h4>
+                    <table class="table table-condensed materials-prices table-hover table-striped">
+                        <thead>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Price Per Unit</th>
+                                <th>Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
                 </div>
+
+                <div class="col-md-6">
+                    <h4>
+                        Industry Taxes 
+                        <span class='small' data-toggle="tooltip" data-placement="top" title="Industry taxes may be wrong, as they will take the highest prices possible. Never forget to double check !">
+                                <i class="fa fa-exclamation-circle"></i>
+                        </span> 
+                    </h4>
+                    <table class="table table-condensed materials-taxes table-hover table-striped">
+                        <thead>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Tax Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>
@@ -214,6 +258,50 @@
 {% endblock %}
 
 {% block modal %}
+<!-- Prices config modals --> 
+<div class="modal fade" role="dialog" id="priceConfigModal" aria-labelledby="priceConfigModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="priceConfigModal">Configure Prices</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="well">
+                                <div>
+                                    Region<br>
+                                    <select name="modal-region" id="modal-region" class="form-control input-sm">
+                                        {% for region in regions %}
+                                        <option {% if region.id == 10000002 %}selected {% endif %}value="{{ region.id }}">{{ region.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    Use Buy/Sell orders<br>
+                                    <select name="modal-order" id="modal-order" class="form-control input-sm">
+                                        <option value="buy">Buy Orders</option>
+                                        <option value="sell">Sell Orders</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sub component config modals --> 
 <div class="modal fade" role="dialog" id="subComponentBpConfigModal" aria-labelledby="subComponentBpConfigModal" aria-hidden="true" data-bp-id="">
     <div class="modal-dialog">
         <div class="modal-content">

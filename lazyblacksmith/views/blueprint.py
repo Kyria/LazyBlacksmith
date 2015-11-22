@@ -5,6 +5,7 @@ from flask import render_template
 
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Activity
+from lazyblacksmith.models import Region
 
 blueprint = Blueprint('blueprint', __name__)
 
@@ -17,6 +18,7 @@ def manufacturing(item_id):
     activity = item.activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
     materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
     product = item.activity_products.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
+    regions = Region.query.filter_by(wh=False)
 
     # is any of the materials manufactured ?
     has_manufactured_components = False
@@ -31,6 +33,7 @@ def manufacturing(item_id):
         'materials': materials,
         'activity' : activity,
         'product' : product,
+        'regions' : regions,
         'has_manufactured_components': has_manufactured_components,
     })
 
