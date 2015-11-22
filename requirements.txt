@@ -10,6 +10,4 @@ Flask-Script>=2.0.5
 Flask-WTF>=0.11
 alembic>=0.7.6
 humanize>=0.5.1
-rq>=0.5.2
-pycrest
-ratelim>=0.1.5
+requests>=2.8.1
