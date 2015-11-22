@@ -6,11 +6,11 @@ LazyBlacksmith is a flask application allowing people to get informations about 
 
 #### Current features
 * Blueprint manufacture informations including components required
-* Current Industry Indexes, with history (only since the installation)
 
 #### TODO
 * Blueprint research and inventions informations
 * Give price everywhere (especially manufacturing)
+* Current Industry Indexes, with history (only since the installation)
 * Calculate industry taxes (I wish it never exists)
 * Things. 
 
@@ -20,13 +20,18 @@ LazyBlacksmith is a flask application allowing people to get informations about 
 * [NodeJS](http://nodejs.org/) + [Grunt-CLI](http://gruntjs.com/getting-started)
 * Virtualenv (recommended)
 * Cache system (eg. python-memcached or redis-cache) (recommanded)
-* Database connectors depending on the one you use (MySQL,...)
+* Database connectors depending on the one you use (MySQL 5.6+,...)
 * See [requirements.txt](requirements.txt) for other requirements
 * Eve Online Icons (see CCP Icons part)
 
 ## Installation
 
 Comin'... one day or another :) 
+
+## Contact
+Guillaume B.
+* Github: @Kyria
+* [TweetFleet Slack](https://www.fuzzwork.co.uk/tweetfleet-slack-invites/): @althalus
 
 ## CCP Icons
 
