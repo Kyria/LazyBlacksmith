@@ -382,9 +382,13 @@ class Importer(object):
         # get all data
         self.sde_cursor.execute("""
             SELECT  
-                  regionID
-                , regionName
-            FROM mapRegions
+                  mr.regionID
+                , mr.regionName
+                , CASE WHEN mrj.fromRegionID IS NULL THEN 1 ELSE 0 END AS IS_WH
+            FROM mapRegions mr
+            LEFT JOIN mapRegionJumps mrj 
+            ON mrj.fromRegionID = mr.regionID OR mrj.toRegionID = mr.regionID 
+            GROUP BY mr.regionID, mr.regionName, IS_WH        
         """)
                 
         bulk_data = {}
@@ -403,6 +407,7 @@ class Importer(object):
             item = {
                 'id':id,
                 'name':data[0],
+                'wh':data[1]
             }
             new.append(item)
             added += 1
