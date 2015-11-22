@@ -22,9 +22,8 @@
 <body>
     <div id="wrap">
         <div class="navbar navbar-default navbar-static-top" role="navigation">
-                   
             <div class="container-fluid">
-                {% if not current_user.is_authenticated() %}
+                {% if not current_user.is_authenticated %}
                 <div class="sso-banner">
                     <a href="{{ url_for('sso.crest_login') }}">
                         <img src="https://images.contentful.com/idjq7aai9ylm/18BxKSXCymyqY4QKo8KwKe/c2bdded6118472dd587c8107f24104d7/EVE_SSO_Login_Buttons_Small_White.png?w=195&amp;h=30" alt="Log in with eveonline.com" />
@@ -44,7 +43,7 @@
                     <ul class="nav navbar-nav">
                         <li {% if request.blueprint == 'blueprint' %}class="active"{% endif %}><a href="{{ url_for('blueprint.search') }}">Blueprint</a></li>
                     </ul>
-                    {% if current_user.is_authenticated() %}
+                    {% if current_user.is_authenticated %}
                     <ul class="nav navbar-nav navbar-right">
                         <li>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.character_name }} <span class="caret"></span></a>
