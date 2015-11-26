@@ -17,6 +17,7 @@ from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import Region
+from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_by_attr
 from lazyblacksmith.utils.crestutils import get_crest
 
@@ -148,7 +149,7 @@ def get_price_and_tax():
             crest = get_crest()
 
         region = Region.query.get(json['region'])
-        market_crest = (get_by_attr(crest.regions(), 'name', region.name))()
+        market_crest = (get_by_attr(get_all_items(crest.regions()), 'name', region.name))()
         buy_orders_crest = market_crest.marketBuyOrders
         sell_orders_crest = market_crest.marketSellOrders
         item_type_url = crest.itemTypes.href
