@@ -166,7 +166,7 @@ def get_price_and_tax():
                 sell_price_items = order.price
 
         # init final dict with the product price
-        item_price = {
+        item_prices_list = {
             json['product_id']: sell_price_items,
         }
 
@@ -196,9 +196,9 @@ def get_price_and_tax():
                     item_price = order.price
 
             # add it to the dict
-            item_price[item_id] = item_price
+            item_prices_list[item_id] = item_price
 
-        return jsonify(item_price)
+        return jsonify(item_prices_list)
     else:
         return 'Cannot call this page directly', 403
 
