@@ -32,9 +32,9 @@ class EveUser(db.Model, UserMixin):
 
     def get_authed_crest(self):
         crest = get_crest()
-		crest.temptoken_authorize(
+        crest.temptoken_authorize(
             self.access_token,
             (self.access_token_expires_on - utcnow()).total_seconds(),
             self.refresh_token
         )
-		return crest
+        return crest
