@@ -157,7 +157,7 @@ def get_price_and_tax():
         # get price for main item
         sell_price_items = get_all_items(
             sell_orders_crest(
-                params = ('type', '%s%s/' % (item_type_url, json['product_id']))
+                type = '%s%s/' % (item_type_url, json['product_id'])
             )
         )
         product_min_sell = sell_price_items[0].price
@@ -183,7 +183,7 @@ def get_price_and_tax():
             # get order list of the current item     
             price_items = get_all_items(
                 market_order_crest(
-                    params = ('type', '%s%s/' % (item_type_url, item_id))
+                    type = ''type', '%s%s/' % (item_type_url, item_id)
                 )
             )
 
