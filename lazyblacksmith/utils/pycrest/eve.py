@@ -106,7 +106,6 @@ class APIConnection(object):
             user_agent = "PyCrest/{0}".format(version)
         session.headers.update({
             "User-Agent": user_agent,
-            "Accept": "application/json",
         })
         session.headers.update(additional_headers)
 
@@ -156,7 +155,7 @@ class APIConnection(object):
         logger.debug('Getting resource %s (params=%s)', resource, prms)
         res = self._session.get(resource, params=prms, headers=headers)
         if res.status_code != 200:
-            raise APIException("Got unexpected status code from server: %i" % res.status_code)
+            raise APIException("Got unexpected status code from server: %i\nReason: %s\nURI: %s\nParams: %s" % (res.status_code, res.reason, resource, prms))
 
         ret = res.json()
 
