@@ -13,7 +13,7 @@ def get_crest():
         redirect_uri = "%s%s" % (config.CREST_REDIRECT_DNS, '/sso/crest/callback'),
         user_agent = config.CREST_USER_AGENT,
     )
-    #crest()
+    crest()
     return crest
 
 def get_by_attr(objlist, attr, val):
