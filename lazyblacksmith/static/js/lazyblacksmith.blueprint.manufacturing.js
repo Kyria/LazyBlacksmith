@@ -571,8 +571,8 @@ LazyBlacksmith.blueprint.manufacturing = {
             html_price += rowPrice.replace(/@@ICON@@/g, matAndIcons[id].icon)
                                .replace(/@@NAME@@/g, matAndIcons[id].itemName)
                                .replace(/@@QTY@@/g, Humanize.intcomma(matAndIcons[id].qty))
-                               .replace(/@@PRICE@@/g, Humanize.intcomma(prices[id]))
-                               .replace(/@@PRICE_TOTAL@@/g, Humanize.intcomma(prices[id] * matAndIcons[id].qty));
+                               .replace(/@@PRICE@@/g, Humanize.intcomma(prices[id], 2))
+                               .replace(/@@PRICE_TOTAL@@/g, Humanize.intcomma(prices[id] * matAndIcons[id].qty, 2));
         }
         $('.materials-prices tbody').html(html_price);
 
