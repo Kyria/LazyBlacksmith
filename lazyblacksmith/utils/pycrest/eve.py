@@ -164,7 +164,7 @@ class APIConnection(object):
         # as it will change each time we'll do get(), since we
         # pass "self" to APIObjects when we create them.
         # this way, we may access to request headers, at any time
-        self.current_headers = ret.headers
+        self.current_headers = res.headers
 
         # cache result
         expires = self._get_expires(res)
