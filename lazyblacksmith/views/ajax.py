@@ -183,7 +183,7 @@ def get_price_and_tax():
             # get order list of the current item     
             price_items = get_all_items(
                 market_order_crest(
-                    type = ''type', '%s%s/' % (item_type_url, item_id)
+                    type = '%s%s/' % (item_type_url, item_id)
                 )
             )
 
