@@ -524,7 +524,6 @@ LazyBlacksmith.blueprint.manufacturing = {
         }
 
         $('.materials-requirement tbody').html(html_summary);
-        $('.materials-prices tbody').html(html_price);
 
         // now do time summary table
         html_summary = "";
