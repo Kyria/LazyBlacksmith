@@ -17,6 +17,7 @@ from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import Region
+from lazyblacksmith.utils.crestutils import get_by_attr
 from lazyblacksmith.utils.crestutils import get_crest
 
 ajax = Blueprint('ajax', __name__)
