@@ -147,7 +147,7 @@ def get_price_and_tax():
             crest = get_crest()
 
         # ugly way to create url.. but thanks CCP !...
-        crest_region_url = "%s%s/" % (crest.region.href, json.region)
+        crest_region_url = "%s%s/" % (crest.regions.href, json.region)
         market_crest = crest.get(crest_region_url)
         buy_orders_crest = market_crest.marketBuyOrders
         sell_orders_crest = market_crest.marketSellOrders
