@@ -42,7 +42,8 @@ def crest_callback():
     session['access_token'] = auth_response['access_token']
     session['refresh_token'] = auth_response['refresh_token']
 
-    crest_auth = get_crest().temptoken_authorize(
+    crest_auth = get_crest()
+	crest_auth.temptoken_authorize(
         auth_response['access_token'], 
         auth_response['expires_in'],
         auth_response['refresh_token']
