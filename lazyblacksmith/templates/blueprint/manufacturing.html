@@ -6,12 +6,43 @@
     <script>
         LazyBlacksmith.setLoader(LazyBlacksmith.blueprint.manufacturing);
         LazyBlacksmith.blueprint.manufacturing.systemUrls = "{{ url_for('ajax.solarsystems') }}";
-        LazyBlacksmith.blueprint.manufacturing.materialBOM = "{{ url_for('ajax.blueprint_bom', blueprint_id=blueprint.id) }}";
+        LazyBlacksmith.blueprint.manufacturing.materialBOMUrl = "{{ url_for('ajax.blueprint_bom', blueprint_id=blueprint.id) }}";
+        LazyBlacksmith.blueprint.manufacturing.priceUrl = "{{ url_for('ajax.get_price_and_tax') }}";
         LazyBlacksmith.blueprint.manufacturing.tplSublistBlockUrl = "{{ url_for('template.manufacturing_sublist_block') }}";
         LazyBlacksmith.blueprint.manufacturing.tplSublistRowUrl = "{{ url_for('template.manufacturing_sublist_row') }}";
  
         LazyBlacksmith.blueprint.manufacturing.hasManufacturedComponent = {% if has_manufactured_components %}true{% else %}false{% endif %};
         LazyBlacksmith.blueprint.manufacturing.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
+
+        LazyBlacksmith.blueprint.manufacturing.materialBom.resultId = {{ product.product.id }};
+        LazyBlacksmith.blueprint.manufacturing.materialBom.resultIcon = '{{ product.product.icon_32() }}';
+        LazyBlacksmith.blueprint.manufacturing.materialBom.resultName = '{{ product.product.name }}';
+        LazyBlacksmith.blueprint.manufacturing.materialBom.resultQtyPerRun = {{ product.quantity }};
+        LazyBlacksmith.blueprint.manufacturing.materialBom.resultTimePerRun = {{ activity.time }};
+        LazyBlacksmith.blueprint.manufacturing.materialBom.resultTotalTime = {{ activity.time }};
+        LazyBlacksmith.blueprint.manufacturing.materialBom.resultTotalQty = {{ product.quantity }};
+        LazyBlacksmith.blueprint.manufacturing.materialBom.BoM = {};
+        LazyBlacksmith.blueprint.manufacturing.materialBom.BoMKeys = [];
+
+        {% for material in materials.all() %}
+        LazyBlacksmith.blueprint.manufacturing.materialBom.BoMKeys.push({{ material.material.id }});
+        LazyBlacksmith.blueprint.manufacturing.materialBom.BoM[{{ material.material.id }}] = {
+            'id': {{ material.material.id }},
+            'isManufactured': {% if material.material.is_manufactured() %}true{% else %}false{% endif %},
+            'qtyPerRun': -1,
+            'qtyRequiredPerRun': {{ material.quantity }},
+            'qtyAdjusted': {{ material.quantity }},
+            'qtyJob': {{ material.quantity }},
+            'timePerRun': 0,
+            'timeTotal': 0,
+            'runs': -1,
+            'name': '{{ material.material.name }}',
+            'icon': '{{ material.material.icon_32() }}',
+            'BoM': {},
+            'BoMKeys': [],
+        };
+        {% endfor %}
+
     </script>
 {% endblock %}
 
@@ -104,9 +135,10 @@
                             <h4>
                                 {{ blueprint.name }} 
                                 <span class="small">
-                                    (<span id='main-product' data-id="{{ product.product.id }}" data-icon="{{ product.product.icon_32() }}">{{ product.product.name }}</span> x <span id="qty-required-{{ product.product.id }}" data-qty="{{ product.quantity }}">{{ product.quantity|intcomma }})</span> -  
-                                    <strong>Time per run: </strong><span data-time="{{ activity.time }}" class="time-per-run" data-id="{{ blueprint.id }}">{{ activity.time|duration }}</span> - 
-                                    <strong>Total time: </strong><span class="total-time" data-id="{{ product.product.id }}" data-name="{{ product.product.name }}">{{ activity.time|duration }}</span>
+                                    ({{ product.product.name }} x 
+                                    <span id="qty-required-{{ product.product.id }}">{{ product.quantity|intcomma }}</span>) -  
+                                    <strong>Time per run: </strong><span class="time-per-run">{{ activity.time|duration }}</span> - 
+                                    <strong>Total time: </strong><span class="total-time">{{ activity.time|duration }}</span>
                                 </span>
                             </h4>
                         </div>
@@ -127,8 +159,7 @@
                                     <th>Job Qty</th>
                                 </tr>
                             {% for material in materials.all() %}
-                                <tr class="material" data-id="{{material.material.id}}" {% if material.material.is_manufactured() %}data-is-manufactured="true" {% endif %}data-qty="{{ material.quantity }}" data-qty-job="{{ material.quantity }}" data-qty-adj="{{ material.quantity }}" data-name="{{ material.material.name }}">
-
+                                <tr class="material" data-id="{{material.material.id}}">
                                     {% if config.USE_CCP_ICONS -%}
                                     <td class="icon">
                                         <img src="{{ material.material.icon_32() }}" alt="{{ material.material.name }}">
@@ -284,7 +315,7 @@
                                 <div>
                                     Use Buy/Sell orders<br>
                                     <select name="modal-order" id="modal-order" class="form-control input-sm">
-                                        <option value="buy">Buy Orders</option>
+                                        <option value="buy" selected>Buy Orders</option>
                                         <option value="sell">Sell Orders</option>
                                     </select>
                                 </div>
@@ -294,7 +325,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="modal-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
+                <button type="button" id="modal-price-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>

@@ -8,6 +8,7 @@ from flask import render_template
 from flask import request
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
+from flask.ext.login import current_user
 
 from lazyblacksmith.cache import cache
 from lazyblacksmith.models import Item
@@ -15,6 +16,8 @@ from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.models import Region
+from lazyblacksmith.utils.crestutils import get_crest
 
 ajax = Blueprint('ajax', __name__)
 
@@ -77,7 +80,7 @@ def blueprint_bom(blueprint_id):
         data = OrderedDict()
         for bp in blueprints:
 
-            # As all item cannot be manufactured, catch the exception 
+            # As some item cannot be manufactured, catch the exception 
             try:
                 product = bp.material.product_for_activities
                 product = product.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
@@ -91,13 +94,14 @@ def blueprint_bom(blueprint_id):
 
             if bp_final.id not in data:
                 data[bp_final.id] = {
-                    'id':bp.material.id,
+                    'id':bp_final.id,
                     'icon':bp_final.icon_32(),
                     'name':bp_final.name,
                     'materials':[],
                     'time':activity.time,
+                    'product_id': bp.material.id,
                     'product_name': bp.material.name,
-                    'product_qty': product.quantity,
+                    'product_qty_per_run': product.quantity,
                 }
 
             for mat in mats:
@@ -108,7 +112,7 @@ def blueprint_bom(blueprint_id):
                     'icon':mat.material.icon_32(),
                 })
 
-        return jsonify(result=data)
+        return jsonify(result=data.values())
 
     else:
         return 'Cannot call this page directly', 403
@@ -128,3 +132,73 @@ def solarsystems():
         return jsonify(result=data)
     else:
         return 'Cannot call this page directly', 403
+
+@ajax.route('/crest/get_price', methods=['POST'])
+def crest_get_price():
+    """
+    Get prices for all items we need !
+    """
+    if request.is_xhr:
+        json = request.get_json()
+        crest = None
+        if current_user.is_authenticated():
+            crest = current_user.get_authed_crest()
+        else:
+            crest = get_crest()
+
+        # ugly way to create url.. but thanks CCP !...
+        crest_region_url = "%s%s/" % (crest.region.href, json.region)
+        market_crest = crest.get(crest_region_url)
+        buy_orders_crest = market_crest.marketBuyOrders
+        sell_orders_crest = market_crest.marketSellOrders
+        item_type_url = crest.itemTypes.href
+
+        # get price for main item
+        sell_price_items = get_all_items(
+            sell_orders_crest(
+                params = {'type': '%s%s/' % (item_type_url, json.product_id)}
+            )
+        )
+        product_min_sell = sell_price_items[0].price
+        for order in sell_price_items:
+            if order.price < product_min_sell:
+                sell_price_items = order.price
+
+        # init final dict with the product price
+        item_price = {
+            json.product_id: sell_price_items,
+        }
+
+        # define which one we want (buy or sell)
+        market_order_crest = None
+        if json.buysell == 'buy':
+            market_order_crest = buy_orders_crest
+        else:
+            market_order_crest = sell_orders_crest
+
+
+        # loop over all items ID
+        for item_id in json.item_list:   
+            # get order list of the current item     
+            price_items = get_all_items(
+                market_order_crest(
+                    params = {'type': '%s%s/' % (item_type_url, item_id)}
+                )
+            )
+
+            # get the right price for it (greatest if buy orders, lowest for sell orders)
+            item_price = price_items[0].price
+            for order in price_items:
+                if json.buysell == 'buy' and order.price > item_price:
+                    item_price = order.price
+                elif json.buysell == 'sell' and order.price < item_price:
+                    item_price = order.price
+
+            # add it to the dict
+            item_price[item_id] = item_price
+
+        return jsonify(item_price)
+    else:
+        return 'Cannot call this page directly', 403
+
+

@@ -122,7 +122,7 @@ def eve_oauth_tokengetter(token = None):
         expires_at = current_user.access_token_expires_at
         if expires_at is None or (expires_at - utcnow()).total_seconds() <= 60:
             authed_crest = current_user.get_authed_crest()
-            authed_crest.refresh()
+            authed_crest.refr_authorize(current_user.refresh_token)
 
             current_user.access_token = authed_crest.token
             current_user.access_token_expires_in = authed_crest.expires - time.time()
