@@ -146,9 +146,8 @@ def get_price_and_tax():
         else:
             crest = get_crest()
 
-        # ugly way to create url.. but thanks CCP !...
-        crest_region_url = "%s%s/" % (crest.regions.href, json['region'])
-        market_crest = crest.get(crest_region_url)
+        region = Region.query.get(json['region'])
+        market_crest = (get_by_attr(crest.regions(), 'name', region.name))()
         buy_orders_crest = market_crest.marketBuyOrders
         sell_orders_crest = market_crest.marketSellOrders
         item_type_url = crest.itemTypes.href
