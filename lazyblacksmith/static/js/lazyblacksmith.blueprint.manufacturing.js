@@ -592,7 +592,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         }
         $('.materials-taxes tbody').html(html_price);
 
-    }
+    },
 
     updatePrice: function() {
         var priceLoad = LazyBlacksmith.blueprint.manufacturing.priceLoad;
