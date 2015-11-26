@@ -147,7 +147,7 @@ def get_price_and_tax():
             crest = get_crest()
 
         # ugly way to create url.. but thanks CCP !...
-        crest_region_url = "%s%s/" % (crest.regions.href, json.region)
+        crest_region_url = "%s%s/" % (crest.regions.href, json['region'])
         market_crest = crest.get(crest_region_url)
         buy_orders_crest = market_crest.marketBuyOrders
         sell_orders_crest = market_crest.marketSellOrders
@@ -156,7 +156,7 @@ def get_price_and_tax():
         # get price for main item
         sell_price_items = get_all_items(
             sell_orders_crest(
-                params = {'type': '%s%s/' % (item_type_url, json.product_id)}
+                params = {'type': '%s%s/' % (item_type_url, json['product_id'])}
             )
         )
         product_min_sell = sell_price_items[0].price
@@ -166,19 +166,19 @@ def get_price_and_tax():
 
         # init final dict with the product price
         item_price = {
-            json.product_id: sell_price_items,
+            json['product_id']: sell_price_items,
         }
 
         # define which one we want (buy or sell)
         market_order_crest = None
-        if json.buysell == 'buy':
+        if json['buysell'] == 'buy':
             market_order_crest = buy_orders_crest
         else:
             market_order_crest = sell_orders_crest
 
 
         # loop over all items ID
-        for item_id in json.item_list:   
+        for item_id in json['item_list']:   
             # get order list of the current item     
             price_items = get_all_items(
                 market_order_crest(
@@ -189,9 +189,9 @@ def get_price_and_tax():
             # get the right price for it (greatest if buy orders, lowest for sell orders)
             item_price = price_items[0].price
             for order in price_items:
-                if json.buysell == 'buy' and order.price > item_price:
+                if json['buysell'] == 'buy' and order.price > item_price:
                     item_price = order.price
-                elif json.buysell == 'sell' and order.price < item_price:
+                elif json['buysell'] == 'sell' and order.price < item_price:
                     item_price = order.price
 
             # add it to the dict
