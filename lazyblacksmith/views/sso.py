@@ -52,7 +52,7 @@ def crest_callback():
 
     new_user = True
     # save user
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         # update data
         if current_user.character_id == character_data['CharacterID']:
             update_or_create_eve_user(current_user, auth_response, character_data)
@@ -118,7 +118,7 @@ def crest_logout():
 def eve_oauth_tokengetter(token = None):
     if 'access_token' in session:
         return (session['access_token'],)
-    elif current_user.is_authenticated():
+    elif current_user.is_authenticated:
         expires_at = current_user.access_token_expires_at
         if expires_at is None or (expires_at - utcnow()).total_seconds() <= 60:
             authed_crest = current_user.get_authed_crest()

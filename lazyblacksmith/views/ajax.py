@@ -141,7 +141,7 @@ def get_price_and_tax():
     if request.is_xhr:
         json = request.get_json()
         crest = None
-        if current_user.is_authenticated():
+        if current_user.is_authenticated:
             crest = current_user.get_authed_crest()
         else:
             crest = get_crest()
