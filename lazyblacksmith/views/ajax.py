@@ -134,7 +134,7 @@ def solarsystems():
         return 'Cannot call this page directly', 403
 
 @ajax.route('/crest/get_price', methods=['POST'])
-def crest_get_price():
+def get_price_and_tax():
     """
     Get prices for all items we need !
     """
