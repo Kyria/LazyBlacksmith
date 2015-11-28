@@ -256,6 +256,33 @@
                         <tbody>
                             
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                <td colspan="3" class="title">Materials Total Cost</td>
+                                <td id="mat-total-price"></td>
+                            </tr>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                <td colspan="3" class="title">{{ product.product.name }} Sell Value</td>
+                                <td id="product-price"></td>
+                            </tr>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                <td colspan="3" class="title">Margin</td>
+                                <td id="margin"></td>
+                            </tr>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                <td colspan="3" class="title">% Margin</td>
+                                <td id="margin-percent"></td>
+                            </tr>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                <td colspan="3" class="title">% Markup</td>
+                                <td id="markup-percent"></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
 

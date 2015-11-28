@@ -177,7 +177,6 @@ def get_price_and_tax():
         else:
             market_order_crest = sell_orders_crest
 
-
         # loop over all items ID
         for item_id in json['item_list']:   
             # get order list of the current item     
@@ -201,5 +200,4 @@ def get_price_and_tax():
         return jsonify(item_prices_list)
     else:
         return 'Cannot call this page directly', 403
-
 

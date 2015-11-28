@@ -556,6 +556,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         var rowPrice = '<tr>';
         var rowTax = '<tr>';
         var iconColumn = '';
+        var matTotalPrice = 0;
         if(LazyBlacksmith.blueprint.manufacturing.useIcons) {
             iconColumn = '<td class="icon"><img src="@@ICON@@" alt="@@NAME@@" /></td>';
         }
@@ -566,8 +567,9 @@ LazyBlacksmith.blueprint.manufacturing = {
      
         matAndIcons = LazyBlacksmith.blueprint.manufacturing.getMaterialListAndIcon();
 
-        // fill summary qty table
+        // fill prices table
         for(var id in matAndIcons) {
+            matTotalPrice += prices[id] * matAndIcons[id].qty;
             html_price += rowPrice.replace(/@@ICON@@/g, matAndIcons[id].icon)
                                .replace(/@@NAME@@/g, matAndIcons[id].itemName)
                                .replace(/@@QTY@@/g, Humanize.intcomma(matAndIcons[id].qty))
@@ -576,7 +578,21 @@ LazyBlacksmith.blueprint.manufacturing = {
         }
         $('.materials-prices tbody').html(html_price);
 
+        // let's fill summary rows
+        var productPrice = prices[materialBom.resultId] * materialBom.resultTotalQty;
+        var margin = productPrice - matTotalPrice;
+        var marginPercent = (margin / productPrice) * 100;
+        var markupPercent = (margin / productPrice) * 100;
 
+        $('.materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(matTotalPrice, 2));
+        $('.materials-prices tfoot td#product-price').html(
+            Humanize.intcomma(productPrice, 2)
+        );
+        $('.materials-prices tfoot td#margin').html(Humanize.intcomma(margin, 2));
+        $('.materials-prices tfoot td#margin-percent').html(Humanize.intcomma(marginPercent, 2) + "%");
+        $('.materials-prices tfoot td#markup-percent').html(Humanize.intcomma(markupPercent, 2) + "%");
+
+        // fill tax tables
         html_price = rowTax.replace(/@@ICON@@/g, materialBom.resultIcon)
                            .replace(/@@NAME@@/g, materialBom.resultName)
                            .replace(/@@QTY@@/g, Humanize.intcomma(materialBom.resultTotalQty));
