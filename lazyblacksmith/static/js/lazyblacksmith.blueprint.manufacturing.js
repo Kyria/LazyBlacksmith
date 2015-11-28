@@ -582,7 +582,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         var productPrice = prices[materialBom.resultId] * materialBom.resultTotalQty;
         var margin = productPrice - matTotalPrice;
         var marginPercent = (margin / productPrice) * 100;
-        var markupPercent = (margin / productPrice) * 100;
+        var markupPercent = (margin / matTotalPrice) * 100;
 
         $('.materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(matTotalPrice, 2));
         $('.materials-prices tfoot td#product-price').html(
