@@ -15,6 +15,9 @@ USE_CCP_ICONS = False
 # - use https://pythonhosted.org/Flask-Cache/ to configure the cache you want
 CACHE_TYPE = 'null'
 
+# Celery
+CELERY_BROKER_URL='redis://localhost:6379/0'
+CELERY_RESULT_BACKEND='redis://localhost:6379/0'
 
 # CREST API Informations
 # -----------------------
