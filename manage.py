@@ -6,7 +6,7 @@ from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
 
 import config
-from lazyblacksmith.app_factory import create_app
+from lazyblacksmith.app import create_app
 from lazyblacksmith.models import db
 from lazyblacksmith.commands.sde_import import SdeImport
 
