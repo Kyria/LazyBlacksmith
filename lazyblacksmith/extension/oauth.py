@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from flask_oauthlib.client import OAuth
 
 import config
