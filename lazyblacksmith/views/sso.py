@@ -8,7 +8,7 @@ from flask.ext.login import current_user, login_user, logout_user, login_require
 from flask_oauthlib.client import OAuthException
 
 from lazyblacksmith.models import db, EveUser
-from lazyblacksmith.oauth import eve_oauth
+from lazyblacksmith.extension.oauth import eve_oauth
 from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.time import utcnow
 

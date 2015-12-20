@@ -2,7 +2,7 @@
 from flask import Blueprint
 from flask import render_template
 
-from lazyblacksmith.cache import cache
+from lazyblacksmith.extension.cache import cache
 
 template = Blueprint('template', __name__)
 
