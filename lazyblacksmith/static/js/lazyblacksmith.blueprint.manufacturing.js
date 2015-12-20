@@ -29,6 +29,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         'region': '10000002', 
         'typeOrder': 'buy', 
         'prices': {},
+        'adjusted': {},
     },
 
     // materials arrays
@@ -563,7 +564,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         rowPrice += iconColumn + '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td>' 
                                + '<td class="ppu price">@@PRICE@@</td><td class="total price">@@PRICE_TOTAL@@</td></tr>';
         rowTax += iconColumn + '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td>'
-                             + '<td class="tax price"></td></tr>';
+                             + '<td class="tax price">@@TAX@@</td></tr>';
      
         matAndIcons = LazyBlacksmith.blueprint.manufacturing.getMaterialListAndIcon();
 
@@ -600,6 +601,7 @@ LazyBlacksmith.blueprint.manufacturing = {
         for(var i in materialBom.BoMKeys) {
             bomId = materialBom.BoMKeys[i];
             if(materialBom.BoM[bomId].isManufactured) {
+                tax_price = 0;
                 html_price += rowTax.replace(/@@ICON@@/g, materialBom.BoM[bomId].icon)
                                     .replace(/@@NAME@@/g, materialBom.BoM[bomId].name)
                                     .replace(/@@QTY@@/g, Humanize.intcomma(materialBom.BoM[bomId].qtyJob)); 
@@ -644,17 +646,11 @@ LazyBlacksmith.blueprint.manufacturing = {
             data: JSON.stringify(data),
             dataType: 'json',
             success: function(jsonPrice) {
-                priceLoad.prices[priceLoad.region] = jsonPrice;
+                priceLoad.prices[priceLoad.region] = jsonPrice['price'];
+                priceLoad.adjusted = jsonPrice['adjusted'];
                 LazyBlacksmith.blueprint.manufacturing.updatePriceTables();
             },
         });
-        // get ALL items & qty
-        // ajax to get prices + adjusted + industry index
-        //      UNLESS we already got them !
-        // fill price table
-        // fill tax table
-        //      need to find each bp
-        //          for each bp, get BoM, calculate tax and display...
     },
 
     /**
