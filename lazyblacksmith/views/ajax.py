@@ -10,7 +10,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.login import current_user
 
-from lazyblacksmith.cache import cache
+from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivityProduct
@@ -20,6 +20,13 @@ from lazyblacksmith.models import Region
 from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_by_attr
 from lazyblacksmith.utils.crestutils import get_crest
+from lazyblacksmith.utils.crestutils import get_adjusted_price
+
+import time
+
+import gevent.monkey
+gevent.monkey.patch_all()
+import gevent
 
 ajax = Blueprint('ajax', __name__)
 
@@ -142,11 +149,10 @@ def get_price_and_tax():
     """
     if request.is_xhr:
         json = request.get_json()
-        crest = None
-        if current_user.is_authenticated:
-            crest = current_user.get_authed_crest()
-        else:
-            crest = get_crest()
+        crest = get_crest()
+
+        # get adjusted prices for after
+        adjusted_prices = get_adjusted_price()
 
         region = Region.query.get(json['region'])
         market_crest = (get_by_attr(get_all_items(crest.regions()), 'name', region.name))()
@@ -165,9 +171,15 @@ def get_price_and_tax():
             if order.price < product_min_sell:
                 sell_price_items = order.price
 
+
         # init final dict with the product price
         item_prices_list = {
-            json['product_id']: sell_price_items,
+            'price': {
+                json['product_id']: sell_price_items,
+            }, 
+            'adjusted': {
+                json['product_id']: adjusted_prices[json['product_id']]
+            }
         }
 
         # define which one we want (buy or sell)
@@ -178,13 +190,19 @@ def get_price_and_tax():
             market_order_crest = sell_orders_crest
 
         # loop over all items ID
-        for item_id in json['item_list']:   
-            # get order list of the current item     
-            price_items = get_all_items(
-                market_order_crest(
+        greenlets = []
+        for item_id in json['item_list']:
+            greenlets.append(
+                gevent.spawn(
+                    market_order_crest,
                     type = '%s%s/' % (item_type_url, item_id)
                 )
             )
+        gevent.joinall(greenlets)
+
+        for pycrest_object in greenlets:
+            price_items = get_all_items(pycrest_object.value)
+            item_id = price_items[0].type.id
 
             # get the right price for it (greatest if buy orders, lowest for sell orders)
             item_price = price_items[0].price
@@ -195,7 +213,8 @@ def get_price_and_tax():
                     item_price = order.price
 
             # add it to the dict
-            item_prices_list[item_id] = item_price
+            item_prices_list['price'][item_id] = item_price
+            item_prices_list['adjusted'][item_id] = adjusted_prices[item_id]
 
         return jsonify(item_prices_list)
     else:
