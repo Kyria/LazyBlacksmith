@@ -215,6 +215,10 @@ class Importer(object):
             JOIN invTypes i
                 ON  i.typeID = iam.typeID 
                 AND i.published = 1
+            GROUP BY
+                  iam.typeID
+                , iam.activityID
+                , iam.materialTypeID
         """)
         
         bulk_data = []
