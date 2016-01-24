@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 from flask import Flask, g, render_template
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CsrfProtect
 
 import flask_login
@@ -24,6 +23,7 @@ from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.extension.login_manager import login_manager
 from lazyblacksmith.extension.celery_app import celery_app
 
+
 def create_app(config_object):
     # app
     app = Flask(__name__.split('.')[0])
@@ -39,6 +39,7 @@ def create_app(config_object):
     # return app
     return app
 
+
 def register_blueprints(app):
     """ register blueprints & helper blueprints """
     app.register_blueprint(blueprint, url_prefix='/blueprint')
@@ -48,6 +49,7 @@ def register_blueprints(app):
     app.register_blueprint(sso, url_prefix='/sso')
     app.register_blueprint(home)
     app.register_blueprint(templatefilter)
+
 
 def register_extensions(app):
     """Register Flask extensions."""
@@ -59,6 +61,7 @@ def register_extensions(app):
     login_manager.init_app(app)
     celery_app.init_app(app)
 
+
 def register_errorhandlers(app):
     """Add errorhandlers to the app."""
     def render_error(error):
@@ -68,6 +71,7 @@ def register_errorhandlers(app):
 
     for errcode in [401, 404, 500]:
         app.errorhandler(errcode)(render_error)
+
 
 def register_before_requests(app):
     """Register before_request functions."""
@@ -84,6 +88,7 @@ def register_context_processors(app):
         except AttributeError:
             return {'user': None}
     app.context_processor(inject_user)
+
 
 def register_teardown_appcontext(app):
     """Register teardown_appcontext functions."""
