@@ -1,8 +1,11 @@
 # -*- encoding: utf-8 -*-
-# thanks, i need this for celery... really... 
+# thanks, i need this for celery... really...
 from __future__ import absolute_import
+
 import flask
+
 from celery import Celery
+
 
 class FlaskCelery(Celery):
 

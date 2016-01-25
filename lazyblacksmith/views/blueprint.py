@@ -1,13 +1,13 @@
 # -*- encoding: utf-8 -*-
-from flask import abort
 from flask import Blueprint
 from flask import render_template
 
-from lazyblacksmith.models import Item
 from lazyblacksmith.models import Activity
+from lazyblacksmith.models import Item
 from lazyblacksmith.models import Region
 
 blueprint = Blueprint('blueprint', __name__)
+
 
 @blueprint.route('/manufacturing/<int:item_id>')
 def manufacturing(item_id):
@@ -26,14 +26,14 @@ def manufacturing(item_id):
     for material in materials:
         if material.material.is_manufactured():
             has_manufactured_components = True
-            break;
+            break
 
     return render_template('blueprint/manufacturing.html', **{
-        'blueprint' : item,
+        'blueprint': item,
         'materials': materials,
-        'activity' : activity,
-        'product' : product,
-        'regions' : regions,
+        'activity': activity,
+        'product': product,
+        'regions': regions,
         'has_manufactured_components': has_manufactured_components,
     })
 
@@ -41,4 +41,3 @@ def manufacturing(item_id):
 @blueprint.route('/')
 def search():
     return render_template('blueprint/search.html')
-

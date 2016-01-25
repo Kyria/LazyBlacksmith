@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
 import humanize
 
-import jinja2
 import flask
+import jinja2
 
 templatefilter = flask.Blueprint('filters', __name__)
+
 
 @jinja2.contextfilter
 @templatefilter.app_template_filter()
@@ -28,6 +29,7 @@ def naturalday(context, value, format='%b %d'):
 @templatefilter.app_template_filter()
 def naturaltime(context, value, future=False, months=True):
     return humanize.naturaltime(value, future, months)
+
 
 @jinja2.contextfilter
 @templatefilter.app_template_filter()

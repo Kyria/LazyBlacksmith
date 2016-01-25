@@ -1,8 +1,9 @@
 # -*- encoding: utf-8 -*-
 from . import db
 
+
 class IndustryIndex(db.Model):
-    
+
     solarsystem_id = db.Column(db.Integer, db.ForeignKey('solar_system.id'), primary_key=True)
     activity = db.Column(db.Integer, primary_key=True, autoincrement=False)
     date = db.Column(db.DateTime(timezone=True), primary_key=True)

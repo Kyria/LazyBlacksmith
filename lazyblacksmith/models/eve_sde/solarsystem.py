@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from . import db
 
+
 class SolarSystem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
@@ -8,4 +9,3 @@ class SolarSystem(db.Model):
 
     region_id = db.Column(db.Integer, db.ForeignKey('region.id'))
     constellation_id = db.Column(db.Integer, db.ForeignKey('constellation.id'))
-    

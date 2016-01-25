@@ -3,9 +3,9 @@ from flask import Blueprint
 from flask import render_template
 
 from lazyblacksmith.extension.cache import cache
-from flask.ext.login import current_user
 
 home = Blueprint('home', __name__)
+
 
 @home.route("/")
 @cache.cached(timeout=3600*24)

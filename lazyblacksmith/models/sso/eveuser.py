@@ -1,14 +1,16 @@
 # -*- encoding: utf-8 -*-
-from flask.ext.login import UserMixin
-from sqlalchemy import func
-from lazyblacksmith.utils.crestutils import get_crest
-from lazyblacksmith.models.utcdatetime import UTCDateTime
-from lazyblacksmith.utils.time import utcnow
+from datetime import datetime
+
 from . import db
+from flask.ext.login import UserMixin
+from lazyblacksmith.models.utcdatetime import UTCDateTime
+from lazyblacksmith.utils.crestutils import get_crest
+from lazyblacksmith.utils.time import utcnow
+from sqlalchemy import func
 
 
 class EveUser(db.Model, UserMixin):
-    
+
     character_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     character_owner_hash = db.Column(db.String(255))
     character_name = db.Column(db.String(200))
@@ -45,6 +47,6 @@ class EveUser(db.Model, UserMixin):
                 self.access_token,
                 (self.access_token_expires_on - utcnow()).total_seconds(),
                 self.refresh_token
-            ) 
-                       
+            )
+
         return crest

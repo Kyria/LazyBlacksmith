@@ -1,14 +1,13 @@
 # -*- encoding: utf-8 -*-
-from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.script import Manager
 from flask.ext.migrate import Migrate
 from flask.ext.migrate import MigrateCommand
+from flask.ext.script import Manager
 
 import config
+
 from lazyblacksmith.app import create_app
-from lazyblacksmith.models import db
 from lazyblacksmith.commands.sde_import import SdeImport
+from lazyblacksmith.models import db
 
 app = create_app(config)
 

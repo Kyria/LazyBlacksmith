@@ -1,39 +1,36 @@
 # -*- encoding: utf-8 -*-
 from collections import OrderedDict
-from flask import abort
+
+import gevent.monkey
+
 from flask import Blueprint
 from flask import json
 from flask import jsonify
-from flask import render_template
 from flask import request
-from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
-from flask.ext.login import current_user
 
 from lazyblacksmith.extension.cache import cache
-from lazyblacksmith.models import Item
 from lazyblacksmith.models import Activity
-from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivityMaterial
-from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.models import Item
 from lazyblacksmith.models import Region
+from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.utils.crestutils import get_adjusted_price
 from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_by_attr
 from lazyblacksmith.utils.crestutils import get_crest
-from lazyblacksmith.utils.crestutils import get_adjusted_price
 
-import time
 
-import gevent.monkey
 gevent.monkey.patch_all()
-import gevent
 
 ajax = Blueprint('ajax', __name__)
 
+
 def is_not_ajax():
-    """ 
+    """
     Return True if request is not ajax
-    This function is used in @cache annotation to not cache direct call (http 403)
+    This function is used in @cache annotation
+    to not cache direct call (http 403)
     """
     return not request.is_xhr
 
@@ -57,11 +54,11 @@ def blueprint_search(name):
             ).all()
 
             data = []
-            for bp in blueprints: 
+            for bp in blueprints:
                 invention = 0
-                                      
+
                 data.append([bp.id, bp.name, invention])
-            
+
             # cache for 7 day as it does not change that often
             cache.set(cache_key, json.dumps(data), 24*3600*7)
 
@@ -82,32 +79,38 @@ def blueprint_bom(blueprint_id):
     """
     if request.is_xhr:
         blueprints = ActivityMaterial.query.filter_by(
-            item_id=blueprint_id, 
+            item_id=blueprint_id,
             activity=Activity.ACTIVITY_MANUFACTURING
         ).all()
 
         data = OrderedDict()
         for bp in blueprints:
 
-            # As some item cannot be manufactured, catch the exception 
+            # As some item cannot be manufactured, catch the exception
             try:
                 product = bp.material.product_for_activities
-                product = product.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
+                product = product.filter_by(
+                    activity=Activity.ACTIVITY_MANUFACTURING
+                ).one()
                 bp_final = product.blueprint
             except NoResultFound:
                 continue
 
-            activity = bp_final.activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
-            mats = bp_final.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).all()
+            activity = bp_final.activities.filter_by(
+                activity=Activity.ACTIVITY_MANUFACTURING
+            ).one()
 
+            mats = bp_final.activity_materials.filter_by(
+                activity=Activity.ACTIVITY_MANUFACTURING
+            ).all()
 
             if bp_final.id not in data:
                 data[bp_final.id] = {
-                    'id':bp_final.id,
-                    'icon':bp_final.icon_32(),
-                    'name':bp_final.name,
-                    'materials':[],
-                    'time':activity.time,
+                    'id': bp_final.id,
+                    'icon': bp_final.icon_32(),
+                    'name': bp_final.name,
+                    'materials': [],
+                    'time': activity.time,
                     'product_id': bp.material.id,
                     'product_name': bp.material.name,
                     'product_qty_per_run': product.quantity,
@@ -115,10 +118,10 @@ def blueprint_bom(blueprint_id):
 
             for mat in mats:
                 data[bp_final.id]['materials'].append({
-                    'id':mat.material.id,
-                    'name':mat.material.name,
-                    'quantity':mat.quantity,
-                    'icon':mat.material.icon_32(),
+                    'id': mat.material.id,
+                    'name': mat.material.name,
+                    'quantity': mat.quantity,
+                    'icon': mat.material.icon_32(),
                 })
 
         return jsonify(result=data.values())
@@ -176,7 +179,7 @@ def get_price_and_tax():
         item_prices_list = {
             'price': {
                 json['product_id']: sell_price_items,
-            }, 
+            },
             'adjusted': {
                 json['product_id']: adjusted_prices[json['product_id']]
             }

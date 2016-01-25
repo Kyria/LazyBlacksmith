@@ -1,11 +1,13 @@
-from sqlalchemy.types import TypeDecorator, DateTime
 import pytz
-from datetime import datetime
+
+from sqlalchemy.types import DateTime
+from sqlalchemy.types import TypeDecorator
+
 
 class UTCDateTime(TypeDecorator):
     """
     Thanks MySQL not to be able to manage timezone times...
-    So we extend DateTime to always store as UTC and 
+    So we extend DateTime to always store as UTC and
     """
     impl = DateTime
 

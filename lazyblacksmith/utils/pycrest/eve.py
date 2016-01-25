@@ -1,14 +1,14 @@
-import os
 import base64
+import os
 import time
 import zlib
 
 import requests
 
 from . import version
-from compat import bytes_, text_
+from compat import bytes_
+from compat import text_
 from errors import APIException
-from requests.adapters import HTTPAdapter
 
 try:
     from urllib.parse import urlparse, urlunparse, parse_qsl
@@ -20,10 +20,6 @@ try:
 except ImportError:  # pragma: no cover
     import cPickle as pickle
 
-try:
-    from urllib.parse import quote
-except ImportError:  # pragma: no cover
-    from urllib import quote
 import logging
 import re
 
@@ -253,9 +249,11 @@ class EVE(APIConnection):
         self.set_auth_values(res)
 
     def temptoken_authorize(self, access_token=None, expires_in=0, refresh_token=None):
-        self.set_auth_values({'access_token': access_token,
-                                 'refresh_token': refresh_token,
-                                 'expires_in': expires_in})
+        self.set_auth_values({
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'expires_in': expires_in
+        })
 
 
 class AuthedConnection(EVE):
@@ -282,6 +280,7 @@ class AuthedConnection(EVE):
         if self.refresh_token and int(time.time()) >= self.expires:
             self.refr_authorize(self.refresh_token)
         return self._session.delete(resource, params=params)
+
 
 class APIObject(object):
     def __init__(self, parent, connection):

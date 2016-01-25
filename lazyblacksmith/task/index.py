@@ -1,13 +1,10 @@
 # -*- encoding: utf-8 -*-
-import pycrest
-import datetime
-
-from lazyblacksmith.models import db
 from lazyblacksmith.models import IndustryIndex
-from lazyblacksmith.utils.crestutils import get_crest
+from lazyblacksmith.models import db
 from lazyblacksmith.utils.crestutils import get_all_items
-from lazyblacksmith.utils.crestutils import get_by_attr
+from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.time import utcnow
+
 
 def get_industry_index():
     """ Connect to the public CREST and get the industry indexes list. """
@@ -20,7 +17,7 @@ def get_industry_index():
     all_indexes = get_all_items(industry_system_page)
 
     # TODO: get the date from headers
-    # check if the data are not still from cache and if we don't already have them.  
+    # check if the data are not still from cache and if we don't already have them.
     date = utcnow()
 
     for index in all_indexes:
