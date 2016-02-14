@@ -15,7 +15,6 @@ from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
-from lazyblacksmith.utils.crestutils import get_adjusted_price
 from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_by_attr
 from lazyblacksmith.utils.crestutils import get_crest
@@ -222,4 +221,3 @@ def get_price_and_tax():
         return jsonify(item_prices_list)
     else:
         return 'Cannot call this page directly', 403
-

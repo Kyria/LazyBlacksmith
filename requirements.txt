@@ -13,3 +13,4 @@ humanize>=0.5.1
 requests>=2.8.1
 gevent>=1.1rc1
 celery
+ratelim

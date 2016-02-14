@@ -8,8 +8,10 @@ from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Constellation
 from lazyblacksmith.models import Item
+from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.task.adjusted_price import get_adjusted_price
 
 
 class Importer(object):
@@ -24,6 +26,7 @@ class Importer(object):
         Region,
         Constellation,
         SolarSystem,
+        ItemPrice,
     ]
 
     def __init__(self, sde_connection, lb_engine):
@@ -97,15 +100,20 @@ class Importer(object):
         added = 0
         total = 0
 
-        # get all data
+        # get all data, marketGroupID > 35k == dust514
         self.sde_cursor.execute("""
             SELECT
                   i.typeID
                 , i.typeName
                 , ib.maxProductionLimit
+                , i.marketGroupID
+                , ig.categoryID
+                , i.marketGroupID
             FROM invTypes i
             LEFT JOIN industryBlueprints ib
                 ON ib.typeID = i.typeID
+            JOIN invGroups ig
+                ON ig.groupID = i.groupID
             WHERE i.published=1
         """)
 
@@ -126,6 +134,8 @@ class Importer(object):
                 'id': id,
                 'name': data[0],
                 'max_production_limit': int(data[1]) if data[1] else None,
+                'market_group_id': int(data[2]) if data[2] else None,
+                'category_id': int(data[3]) if data[3] else None,
             }
             new.append(item)
             added += 1
@@ -207,7 +217,6 @@ class Importer(object):
                 , iam.quantity
                 , iam.activityID
                 , iam.materialTypeID
-                , i.typeName
             FROM industryActivityMaterials iam
             JOIN invTypes i
                 ON  i.typeID = iam.typeID
@@ -227,7 +236,7 @@ class Importer(object):
         for data in bulk_data:
             total += 1
 
-            if not data[0] or not data[1] or not data[2] or not data[3] or not data[4]:
+            if not data[0] or not data[1] or not data[2] or not data[3]:
                 continue
 
             activitymaterial = {
@@ -268,7 +277,6 @@ class Importer(object):
                 , iap.productTypeID
                 , iap.quantity
                 , iapr.probability
-                , i.typeName
             FROM IndustryActivityProducts iap
             LEFT JOIN IndustryActivityProbabilities iapr
                 ON iapr.typeID = iap.typeID
@@ -291,7 +299,7 @@ class Importer(object):
         for data in bulk_data:
             total += 1
 
-            if not data[0] or not data[1] or not data[2] or not data[3] or not data[5]:
+            if not data[0] or not data[1] or not data[2] or not data[3]:
                 print data
                 continue
 
@@ -331,7 +339,6 @@ class Importer(object):
                 , ias.activityID
                 , ias.skillID
                 , ias.level
-                , i.typeName
             FROM IndustryActivitySkills ias
             JOIN invTypes i
                 ON  i.typeID = ias.typeID
@@ -348,7 +355,7 @@ class Importer(object):
         for data in bulk_data:
             total += 1
 
-            if not data[0] or not data[1] or not data[2] or not data[3] or not data[4]:
+            if not data[0] or not data[1] or not data[2] or not data[3]:
                 print data
                 continue
 
@@ -519,3 +526,10 @@ class Importer(object):
             )
 
         return (added, total)
+
+    def import_itemprice(self):
+        """
+        Init ItemPrice table and
+        import item adjusted price into DB
+        """
+        return get_adjusted_price()

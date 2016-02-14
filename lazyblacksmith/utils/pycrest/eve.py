@@ -1,9 +1,9 @@
 import base64
 import os
+import ratelim
+import requests
 import time
 import zlib
-
-import requests
 
 from . import version
 from compat import bytes_

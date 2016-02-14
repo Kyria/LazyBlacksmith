@@ -9,6 +9,11 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     name = db.Column(db.String(100), nullable=True)
     max_production_limit = db.Column(db.Integer, nullable=True)
+    market_group_id = db.Column(db.Integer)
+    category_id = db.Column(db.Integer)
+
+    # price foreign key 1-1
+    price = db.relationship('ItemPrice', backref=db.backref('item', uselist=False))
 
     # foreign keys
     activities = db.relationship('Activity', backref='blueprint', lazy='dynamic')
