@@ -8,6 +8,8 @@ from lazyblacksmith.extension.celery_app import celery_app
 app = create_app(config)
 app.app_context().push()
 
+celery_app.init_app(app)
+
 celery_app.conf.update({
     'CELERYBEAT_SCHEDULE': {
         'adjusted-price': {
