@@ -37,3 +37,10 @@ CREST_USER_AGENT = 'LazyBlacksmith/%d' % version
 # Scope required for CREST
 # please do not touch this
 CREST_SCOPE = ['publicData']
+
+# Request per seconds for market order fetch (via CREST)
+# Max is 150rq/sec, but for all crest call, so better be
+# around 100-120 (we don't care about speed in our case)
+# If you got any problem (timeout / 503s), lower it :)
+# but if you don't know what is it, don't change it !
+CREST_REQ_RATE_LIM = 130

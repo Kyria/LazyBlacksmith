@@ -19,7 +19,7 @@ from gevent import monkey
 from gevent.pool import Pool
 
 monkey.patch_all()
-rate_limiter = RateLimiter(max_calls=60, period=1)
+rate_limiter = RateLimiter(max_calls=config.CREST_REQ_RATE_LIM / 2, period=1)
 
 
 def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is_buy_order):
@@ -66,7 +66,7 @@ def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is
         db.session.rollback()
 
 
-@celery_app.task()
+@celery_app.task
 def update_market_price():
     """Celery task to upgrade prices through CREST"""
     crest = get_crest()
@@ -79,7 +79,7 @@ def update_market_price():
     item_list = ItemAdjustedPrice.query.all()
 
     # number in pool is the max per second we want.
-    greenlet_pool = Pool(120)
+    greenlet_pool = Pool(config.CREST_REQ_RATE_LIM)
 
     # loop over regions
     for region in region_list:

@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.crestutils import get_all_items
@@ -6,6 +7,7 @@ from lazyblacksmith.utils.crestutils import get_crest
 from sqlalchemy.exc import IntegrityError
 
 
+@celery_app.task
 def get_adjusted_price():
     # crest stuff
     crest = get_crest()

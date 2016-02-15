@@ -11,7 +11,7 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
-from lazyblacksmith.task.adjusted_price import get_adjusted_price
+from lazyblacksmith.tasks.adjusted_price import get_adjusted_price
 
 
 class Importer(object):
