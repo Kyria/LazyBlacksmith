@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-from lazyblacksmith.models import ItemPrice
+from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_crest
@@ -17,7 +17,7 @@ def get_adjusted_price():
     count = len(item_adjusted_price)
     failed = 0
     # update existing
-    for item_price in ItemPrice.query.yield_per(100):
+    for item_price in ItemAdjustedPrice.query.yield_per(100):
         if item_price.item_id in item_adjusted_price:
             item_price.adjusted_price = item_adjusted_price[item_price.item_id][0]
             del item_adjusted_price[item_price.item_id]
@@ -26,7 +26,7 @@ def get_adjusted_price():
 
     for id, price in item_adjusted_price.items():
         try:
-            item_price = ItemPrice(item_id=id, adjusted_price=price[0])
+            item_price = ItemAdjustedPrice(item_id=id, price=price[0])
             db.session.add(item_price)
             db.session.commit()
         except IntegrityError:

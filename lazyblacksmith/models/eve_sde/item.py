@@ -14,6 +14,7 @@ class Item(db.Model):
 
     # price foreign key 1-1
     price = db.relationship('ItemPrice', backref=db.backref('item', uselist=False))
+    adjusted_price = db.relationship('ItemAdjustedPrice', backref=db.backref('item', uselist=False))
 
     # foreign keys
     activities = db.relationship('Activity', backref='blueprint', lazy='dynamic')

@@ -13,6 +13,7 @@ from .eve_sde.region import Region
 from .eve_sde.solarsystem import SolarSystem
 
 from .crest.industry_index import IndustryIndex
+from .crest.item_adjusted_price import ItemAdjustedPrice
 from .crest.item_price import ItemPrice
 
 from .sso.eveuser import EveUser

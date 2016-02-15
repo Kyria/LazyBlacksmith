@@ -1,4 +1,4 @@
-from lazyblacksmith import __version as version 
+from lazyblacksmith import __version as version
 
 DEBUG = True
 SECRET_KEY = 'YouNeedToChangeThis!'
@@ -15,6 +15,9 @@ USE_CCP_ICONS = False
 # - use https://pythonhosted.org/Flask-Cache/ to configure the cache you want
 CACHE_TYPE = 'null'
 
+# regions to get price from. (the forge, domain, sinq laison, heimatar)
+CREST_REGION_PRICE = [10000002, 10000032, 10000043, 10000030]
+
 # Celery
 CELERY_BROKER_URL='redis://localhost:6379/0'
 CELERY_RESULT_BACKEND='redis://localhost:6379/0'
@@ -25,7 +28,7 @@ CELERY_RESULT_BACKEND='redis://localhost:6379/0'
 CREST_SECRET_KEY = ''
 # Your client ID
 CREST_CLIENT_ID = ''
-# Redirect DNS. Only put the DNS, as the whole URL while be 
+# Redirect DNS. Only put the DNS, as the whole URL while be
 # constructed dynamically. (example: "localhost", "yourdomain.com")
 CREST_REDIRECT_DNS = ''
 # Custom user agent to identify yourself to CCP, in case of problems
