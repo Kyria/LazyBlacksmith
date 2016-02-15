@@ -2,6 +2,7 @@
 # thanks, i need this for celery... really...
 from __future__ import absolute_import
 
+import config
 import flask
 
 from celery import Celery
@@ -37,4 +38,4 @@ class FlaskCelery(Celery):
         self.app = app
         self.config_from_object(app.config)
 
-celery_app = FlaskCelery()
+celery_app = FlaskCelery(__name__.split('.')[0], config.CELERY_BROKER_URL)

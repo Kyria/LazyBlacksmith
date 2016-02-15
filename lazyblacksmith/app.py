@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
-from flask import Flask, g, render_template
+from flask import Flask
+from flask import g
+from flask import render_template
 from flask_wtf.csrf import CsrfProtect
 
 import flask_login
@@ -12,16 +14,16 @@ from lazyblacksmith.views.industry_index import industry
 from lazyblacksmith.views.sso import sso
 
 # helpers
-from lazyblacksmith.views.template import template
 from lazyblacksmith.utils.template_filter import templatefilter
+from lazyblacksmith.views.template import template
 
 # db
 from lazyblacksmith.models import db
 
 # extensions
 from lazyblacksmith.extension.cache import cache
-from lazyblacksmith.extension.login_manager import login_manager
 from lazyblacksmith.extension.celery_app import celery_app
+from lazyblacksmith.extension.login_manager import login_manager
 
 
 def create_app(config_object):
