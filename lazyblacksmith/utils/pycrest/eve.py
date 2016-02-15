@@ -1,6 +1,5 @@
 import base64
 import os
-import ratelim
 import requests
 import time
 import zlib
