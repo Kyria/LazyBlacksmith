@@ -11,7 +11,7 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
-from lazyblacksmith.tasks.adjusted_price import get_adjusted_price
+from lazyblacksmith.tasks.adjusted_price import update_adjusted_price
 
 
 class Importer(object):
@@ -532,4 +532,4 @@ class Importer(object):
         Init ItemPrice table and
         import item adjusted price into DB
         """
-        return get_adjusted_price()
+        return update_adjusted_price()

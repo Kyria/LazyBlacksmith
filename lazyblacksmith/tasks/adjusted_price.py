@@ -7,8 +7,8 @@ from lazyblacksmith.utils.crestutils import get_crest
 from sqlalchemy.exc import IntegrityError
 
 
-@celery_app.task
-def get_adjusted_price():
+@celery_app.task(name="schedule.update_adjusted_price")
+def update_adjusted_price():
     # crest stuff
     crest = get_crest()
     item_adjusted_price = {}

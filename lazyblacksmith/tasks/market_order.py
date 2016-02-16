@@ -66,7 +66,7 @@ def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is
         db.session.rollback()
 
 
-@celery_app.task
+@celery_app.task(name="schedule.update_market_price")
 def update_market_price():
     """Celery task to upgrade prices through CREST"""
     crest = get_crest()
