@@ -12,10 +12,6 @@ class Item(db.Model):
     market_group_id = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
 
-    # price foreign key 1-1
-    price = db.relationship('ItemPrice', backref=db.backref('item', uselist=False))
-    adjusted_price = db.relationship('ItemAdjustedPrice', backref=db.backref('item', uselist=False))
-
     # foreign keys
     activities = db.relationship('Activity', backref='blueprint', lazy='dynamic')
     activity_products = db.relationship('ActivityProduct', backref='blueprint', lazy='dynamic', foreign_keys='ActivityProduct.item_id')
