@@ -13,68 +13,50 @@ from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.pycrest.errors import APIException
 from requests.exceptions import Timeout
 
+import gevent
+
 from ratelimiter import RateLimiter
 
 from gevent import monkey
-from gevent.pool import Pool
 
 monkey.patch_all()
 rate_limiter = RateLimiter(max_calls=config.CREST_REQ_RATE_LIM / 2, period=1)
 
 
-def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is_buy_order):
+def crest_order_price(market_crest_url, type_url, item_id, region):
     """
     Get and return the orders <type> (sell|buy) from
     a given region for a given type
     """
 
-    raw_sql_query = """
-        INSERT INTO %s (item_id, region_id, sell_price, buy_price)
-        VALUES (%s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE %s = %s
-    """
-
     # call the crest page and extract all items from every pages if required
     try:
-        crest_orders = crest_url(type=type_url)
-        order_list = get_all_items(crest_orders)
+        buy_orders_crest = get_all_items(market_crest_url.marketBuyOrders(type=type_url))
+        sell_orders_crest = get_all_items(market_crest_url.marketSellOrders(type=type_url))
     except APIException as api_e:
         if "503" in str(api_e):
             print "[%s] Error 503 happened !" % time.strftime("%x %X")
         else:
             print "%s Unexpected error : %s " % (time.strftime("%x %X"), api_e)
+        return
     except Timeout:
         print "[%s] Error: timeout while getting price from crest !" % time.strftime("%x %X")
+        return
 
     # if no orders,
-    if not order_list:
+    if not sell_orders_crest or not buy_orders_crest:
         return
 
     # extract min/max
-    min_max = min_max_function(order_list, key=lambda order: order.price)
+    sell_price = min(sell_orders_crest, key=lambda order: order.price)
+    buy_price = max(buy_orders_crest, key=lambda order: order.price)
 
-    # update price
-    if is_buy_order:
-        db.engine.execute(raw_sql_query % (
-            ItemPrice.__tablename__,
-            item_id,
-            region.id,
-            'NULL',
-            min_max.price,
-            'buy_price',
-            min_max.price,
-        ))
-
-    else:
-        db.engine.execute(raw_sql_query % (
-            ItemPrice.__tablename__,
-            item_id,
-            region.id,
-            min_max.price,
-            'NULL',
-            'sell_price',
-            min_max.price,
-        ))
+    return {
+        'item_id': item_id,
+        'sell_price': sell_price,
+        'buy_price': buy_price,
+        'region_id': region.id,
+    }
 
 
 @celery_app.task(name="schedule.update_market_price")
@@ -90,13 +72,22 @@ def update_market_price():
     item_list = ItemAdjustedPrice.query.all()
 
     # number in pool is the max per second we want.
-    greenlet_pool = Pool(config.CREST_REQ_RATE_LIM)
+    greenlet_pool = []
+
+    raw_sql_query = """
+        INSERT INTO %s (item_id, region_id, sell_price, buy_price)
+        VALUES (:item_id, :region_id, :sell_price, :buy_price)
+        ON DUPLICATE KEY UPDATE sell_price = :sell_price, buy_price = :buy_price
+    """ % ItemPrice.__tablename__
 
     # loop over regions
     for region in region_list:
         market_crest = (get_by_attr(get_all_items(crest.regions()), 'name', region.name))()
-        buy_orders_crest = market_crest.marketBuyOrders
-        sell_orders_crest = market_crest.marketSellOrders
+        # donner market_crest en param
+        # récup sell et buy
+        # return dict avec tout dedans
+        # recup la liste de tous les order
+        # bulk insert.
 
         # loop over items
         for item in item_list:
@@ -105,25 +96,18 @@ def update_market_price():
             # use rate limited contexte to prevent too much greenlet spawn per seconds
             with rate_limiter:
                 # greenlet spawn buy order getter
-                greenlet_pool.spawn(
+                greenlet_pool.append(gevent.spawn(
                     crest_order_price,
-                    buy_orders_crest,
+                    market_crest,
                     type_url,
-                    max,
                     item.item_id,
-                    region,
-                    True
-                )
+                    region
+                ))
 
-                # greenlet spawn sell order getter
-                greenlet_pool.spawn(
-                    crest_order_price,
-                    sell_orders_crest,
-                    type_url,
-                    min,
-                    item.item_id,
-                    region,
-                    False
-                )
-
-    greenlet_pool.join()
+        gevent.joinall(greenlet_pool)
+        results = [greenlet.value for greenlet in greenlet_pool]
+        db.engine.execute(
+            raw_sql_query,
+            results
+        )
+        greenlet_pool = []
