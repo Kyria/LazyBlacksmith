@@ -4,36 +4,28 @@ from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_crest
-from sqlalchemy.exc import IntegrityError
 
 
 @celery_app.task(name="schedule.update_adjusted_price")
 def update_adjusted_price():
+    # get all items id we know ()
+
     # crest stuff
     crest = get_crest()
-    item_adjusted_price = {}
+    item_adjusted_price = []
+    count = 0
+
     marketPrice = get_all_items(crest.marketPrices())
     for itemPrice in marketPrice:
-        item_adjusted_price[int(itemPrice.type.id)] = (itemPrice.adjustedPrice, itemPrice.type.name)
+        count += 1
+        item_adjusted_price.append({
+            'item_id': itemPrice.type.id,
+            'price': itemPrice.adjustedPrice
+        })
 
-    count = len(item_adjusted_price)
-    failed = 0
-    # update existing
-    for item_price in ItemAdjustedPrice.query.yield_per(100):
-        if item_price.item_id in item_adjusted_price:
-            item_price.adjusted_price = item_adjusted_price[item_price.item_id][0]
-            del item_adjusted_price[item_price.item_id]
+    db.engine.execute(
+        ItemAdjustedPrice.__table__.insert(),
+        item_adjusted_price
+    )
 
-    db.session.commit()
-
-    for id, price in item_adjusted_price.items():
-        try:
-            item_price = ItemAdjustedPrice(item_id=id, price=price[0])
-            db.session.add(item_price)
-            db.session.commit()
-        except IntegrityError:
-            failed += 1
-            db.session.rollback()
-            # print "Error: (%s) %s" % (id, price[1])
-
-    return (count-failed, count)
+    return count, count
