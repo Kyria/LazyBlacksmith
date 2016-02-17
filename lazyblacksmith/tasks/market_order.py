@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import config
+import time
 
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.models import ItemAdjustedPrice
@@ -9,11 +10,10 @@ from lazyblacksmith.models import db
 from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_by_attr
 from lazyblacksmith.utils.crestutils import get_crest
-
+from lazyblacksmith.utils.pycrest.errors import APIException
+from requests.exceptions import Timeout
 
 from ratelimiter import RateLimiter
-
-from sqlalchemy.exc import IntegrityError
 
 from gevent import monkey
 from gevent.pool import Pool
@@ -28,9 +28,23 @@ def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is
     a given region for a given type
     """
 
+    raw_sql_query = """
+        INSERT INTO %s (item_id, region_id, sell_price, buy_price)
+        VALUES (%s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE %s = %s
+    """
+
     # call the crest page and extract all items from every pages if required
-    crest_orders = crest_url(type=type_url)
-    order_list = get_all_items(crest_orders)
+    try:
+        crest_orders = crest_url(type=type_url)
+        order_list = get_all_items(crest_orders)
+    except APIException as api_e:
+        if "503" in str(api_e):
+            print "[%s] Error 503 happened !" % time.strftime("%x %X")
+        else:
+            print "%s Unexpected error : %s " % (time.strftime("%x %X"), api_e)
+    except Timeout:
+        print "[%s] Error: timeout while getting price from crest !" % time.strftime("%x %X")
 
     # if no orders,
     if not order_list:
@@ -39,31 +53,28 @@ def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is
     # extract min/max
     min_max = min_max_function(order_list, key=lambda order: order.price)
 
-    # get item price from db
-    item_price = ItemPrice.query.get(item_id)
-
-    # if not in db, try to insert it
-    if not item_price:
-        try:
-            item_price = ItemPrice(item_id=item_id, region_id=region.id)
-            db.session.add(item_price)
-            db.session.commit()
-        except IntegrityError:
-            # another thread might have inserted it, so we get the object again
-            db.session.rollback()
-            item_price = ItemPrice.query.get(item_id)
-
     # update price
     if is_buy_order:
-        item_price.buy_price = min_max.price
-    else:
-        item_price.sell_price = min_max.price
+        db.engine.execute(raw_sql_query % (
+            ItemPrice.__tablename__,
+            item_id,
+            region.id,
+            None,
+            min_max.price,
+            'buy_price',
+            min_max.price,
+        ))
 
-    # and commit !
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
+    else:
+        db.engine.execute(raw_sql_query % (
+            ItemPrice.__tablename__,
+            item_id,
+            region.id,
+            min_max.price,
+            None,
+            'sell_price',
+            min_max.price,
+        ))
 
 
 @celery_app.task(name="schedule.update_market_price")
