@@ -8,6 +8,7 @@ from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Constellation
 from lazyblacksmith.models import Item
+from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
@@ -26,7 +27,7 @@ class Importer(object):
         Region,
         Constellation,
         SolarSystem,
-        ItemPrice,
+        ItemAdjustedPrice,
     ]
 
     def __init__(self, sde_connection, lb_engine):
@@ -83,6 +84,7 @@ class Importer(object):
         print "================="
         delete_order = list(self.IMPORT_ORDER)
         delete_order.reverse()
+        self.delete_table(ItemPrice.__tablename__)
         for table in delete_order:
             self.delete_table(table.__tablename__)
 
@@ -527,7 +529,7 @@ class Importer(object):
 
         return (added, total)
 
-    def import_itemprice(self):
+    def import_itemadjustedprice(self):
         """
         Init ItemPrice table and
         import item adjusted price into DB

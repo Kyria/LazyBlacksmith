@@ -13,12 +13,16 @@ celery_app.init_app(app)
 celery_app.conf.update({
     'CELERYBEAT_SCHEDULE': {
         'adjusted-price': {
-            'task': 'lazyblacksmith.tasks.adjusted_price.get_adjusted_price',
+            'task': 'schedule.update_adjusted_price',
             'schedule': crontab(hour=1, minute=30),
         },
         'item-market-price': {
-            'task': 'lazyblacksmith.tasks.market_order.update_market_price',
+            'task': 'schedule.update_market_price',
             'schedule': crontab(hour='*', minute=00),
         },
-    }
+    },
+    'CELERY_IMPORTS': [
+        'lazyblacksmith.tasks.adjusted_price',
+        'lazyblacksmith.tasks.market_order',
+    ]
 })
