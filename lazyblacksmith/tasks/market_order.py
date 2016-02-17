@@ -59,7 +59,7 @@ def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is
             ItemPrice.__tablename__,
             item_id,
             region.id,
-            None,
+            'NULL',
             min_max.price,
             'buy_price',
             min_max.price,
@@ -71,7 +71,7 @@ def crest_order_price(crest_url, type_url, min_max_function, item_id, region, is
             item_id,
             region.id,
             min_max.price,
-            None,
+            'NULL',
             'sell_price',
             min_max.price,
         ))
