@@ -35,15 +35,15 @@ def crest_order_price(market_crest_url, type_url, item_id, region):
         sell_orders_crest = get_all_items(market_crest_url.marketSellOrders(type=type_url))
     except APIException as api_e:
         if "503" in str(api_e):
-            print "[%s] Error 503 happened !" % time.strftime("%x %X")
+            print "[%s] Error 503 happened ! Item ID: %s" % (time.strftime("%x %X"), item_id)
         else:
-            print "%s Unexpected error : %s " % (time.strftime("%x %X"), api_e)
-        return
+            print "%s Unexpected error. Item ID:  %s " % (time.strftime("%x %X"), item_id)
+        return None
     except Timeout:
-        print "[%s] Error: timeout while getting price from crest !" % time.strftime("%x %X")
-        return
+        print "[%s] Error: timeout while getting price from crest ! Item ID: %s" % (time.strftime("%x %X"), item_id)
+        return None
 
-    # if no orders,
+    # if no orders found...
     if not sell_orders_crest or not buy_orders_crest:
         return
 
@@ -53,8 +53,8 @@ def crest_order_price(market_crest_url, type_url, item_id, region):
 
     return {
         'item_id': item_id,
-        'sell_price': sell_price,
-        'buy_price': buy_price,
+        'sell_price': sell_price.price,
+        'buy_price': buy_price.price,
         'region_id': region.id,
     }
 
@@ -105,7 +105,7 @@ def update_market_price():
                 ))
 
         gevent.joinall(greenlet_pool)
-        results = [greenlet.value for greenlet in greenlet_pool]
+        results = [greenlet.value for greenlet in greenlet_pool if greenlet.value]
         db.engine.execute(
             raw_sql_query,
             results
