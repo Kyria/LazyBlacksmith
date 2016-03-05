@@ -10,6 +10,7 @@ from lazyblacksmith.utils.crestutils import get_crest
 def update_adjusted_price():
     # delete everything from table first.
     db.engine.execute("DELETE FROM %s" % ItemAdjustedPrice.__tablename__)
+    db.session.commit()
 
     # crest stuff
     crest = get_crest()
@@ -28,5 +29,6 @@ def update_adjusted_price():
         ItemAdjustedPrice.__table__.insert(),
         item_adjusted_price
     )
+    db.session.commit()
 
     return count, count
