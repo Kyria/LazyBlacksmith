@@ -52,12 +52,12 @@ def crest_order_price(market_crest_url, type_url, item_id, region):
         return None
 
     # if no orders found...
-    if not sell_orders_crest or not buy_orders_crest:
+    if not sell_orders_crest and not buy_orders_crest:
         return
 
     # extract min/max
-    sell_price = min(sell_orders_crest, key=lambda order: order.price)
-    buy_price = max(buy_orders_crest, key=lambda order: order.price)
+    sell_price = min(sell_orders_crest, key=lambda order: order.price) if sell_orders_crest else 0.0
+    buy_price = max(buy_orders_crest, key=lambda order: order.price) if buy_orders_crest else 0.0
 
     return {
         'item_id': item_id,
