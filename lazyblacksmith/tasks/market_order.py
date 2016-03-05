@@ -59,17 +59,12 @@ def crest_order_price(market_crest_url, type_url, item_id, region):
     sell_price = min(sell_orders_crest, key=lambda order: order.price)
     buy_price = max(buy_orders_crest, key=lambda order: order.price)
 
-    db.engine.execute(
-        raw_sql_query % (
-            ItemPrice.__tablename__,
-            item_id,
-            region.id,
-            sell_price.price,
-            buy_price.price,
-            sell_price.price,
-            buy_price.price,
-        )
-    )
+    return {
+        'item_id': item_id,
+        'sell_price': sell_price.price,
+        'buy_price': buy_price.price,
+        'region_id': region.id,
+    }
 
 
 @celery_app.task(name="schedule.update_market_price")
@@ -86,6 +81,7 @@ def update_market_price():
 
     # number in pool is the max concurrent session we can open (20).
     greenlet_pool = Pool(20)
+    greenlet_list = []
 
     # loop over regions
     for region in region_list:
@@ -98,12 +94,29 @@ def update_market_price():
             # use rate limited contexte to prevent too much greenlet spawn per seconds
             with rate_limiter:
                 # greenlet spawn buy order getter
-                greenlet_pool.spawn(
-                    crest_order_price,
-                    market_crest,
-                    type_url,
-                    item.item_id,
-                    region
+                greenlet_list.append(
+                    greenlet_pool.spawn(
+                        crest_order_price,
+                        market_crest,
+                        type_url,
+                        item.item_id,
+                        region
+                    )
                 )
 
-        greenlet_pool.join()
+        gevent.joinall(greenlet_pool)
+        for greenlet in greenlet_pool:
+            if greenlet.value:
+                db.engine.execute(
+                    raw_sql_query % (
+                        ItemPrice.__tablename__,
+                        greenlet.value['item_id'],
+                        greenlet.value['region_id'],
+                        greenlet.value['sell_price'],
+                        greenlet.value['buy_price'],
+                        greenlet.value['sell_price'],
+                        greenlet.value['buy_price'],
+                    )
+                )
+
+        greenlet_pool = []
