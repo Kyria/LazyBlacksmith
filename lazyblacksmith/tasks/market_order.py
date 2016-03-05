@@ -76,9 +76,9 @@ def update_market_price():
 
     raw_sql_query = """
         INSERT INTO %s (item_id, region_id, sell_price, buy_price)
-        VALUES (:item_id, :region_id, :sell_price, :buy_price)
-        ON DUPLICATE KEY UPDATE sell_price = :sell_price, buy_price = :buy_price
-    """ % ItemPrice.__tablename__
+        VALUES (%s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE sell_price = %s, buy_price = %s
+    """
 
     # loop over regions
     for region in region_list:
@@ -105,9 +105,17 @@ def update_market_price():
                 ))
 
         gevent.joinall(greenlet_pool)
-        results = [greenlet.value for greenlet in greenlet_pool if greenlet.value]
-        db.engine.execute(
-            raw_sql_query,
-            results
-        )
+        for greenlet in greenlet_pool:
+            if greenlet.value:
+                db.engine.execute(
+                    raw_sql_query % (
+                        ItemPrice.__tablename__,
+                        greenlet.value['item_id'],
+                        greenlet.value['region_id'],
+                        greenlet.value['sell_price'],
+                        greenlet.value['buy_price'],
+                        greenlet.value['sell_price'],
+                        greenlet.value['buy_price'],
+                    )
+                )
         greenlet_pool = []
