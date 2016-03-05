@@ -104,8 +104,8 @@ def update_market_price():
                     )
                 )
 
-        gevent.joinall(greenlet_pool)
-        for greenlet in greenlet_pool:
+        greenlet_pool.join()
+        for greenlet in greenlet_list:
             if greenlet.value:
                 db.engine.execute(
                     raw_sql_query % (
@@ -119,4 +119,4 @@ def update_market_price():
                     )
                 )
 
-        greenlet_pool = []
+        greenlet_list = []
