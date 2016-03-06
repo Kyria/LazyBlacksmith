@@ -32,7 +32,7 @@ def upgrade():
     sa.Column('buy_price', sa.Numeric(precision=17, scale=2, decimal_return_scale=2), nullable=True),
     sa.ForeignKeyConstraint(['item_id'], ['item.id'], ),
     sa.ForeignKeyConstraint(['region_id'], ['region.id'], ),
-    sa.PrimaryKeyConstraint('item_id')
+    sa.PrimaryKeyConstraint('item_id', 'region_id')
     )
     op.add_column(u'item', sa.Column('category_id', sa.Integer(), nullable=True))
     op.add_column(u'item', sa.Column('market_group_id', sa.Integer(), nullable=True))
