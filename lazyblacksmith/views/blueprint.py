@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
+import config
+
 from flask import Blueprint
 from flask import render_template
-
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Region
@@ -18,7 +19,11 @@ def manufacturing(item_id):
     activity = item.activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
     materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
     product = item.activity_products.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
-    regions = Region.query.filter_by(wh=False)
+    regions = Region.query.filter(
+        Region.id.in_(config.CREST_REGION_PRICE)
+    ).filter_by(
+        wh=False
+    )
 
     # is any of the materials manufactured ?
     has_manufactured_components = False
