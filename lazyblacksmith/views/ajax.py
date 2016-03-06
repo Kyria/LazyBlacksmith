@@ -13,11 +13,8 @@ from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import Item
-from lazyblacksmith.models import Region
+from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
-from lazyblacksmith.utils.crestutils import get_all_items
-from lazyblacksmith.utils.crestutils import get_by_attr
-from lazyblacksmith.utils.crestutils import get_crest
 
 
 gevent.monkey.patch_all()
@@ -144,6 +141,7 @@ def solarsystems():
     else:
         return 'Cannot call this page directly', 403
 
+
 @ajax.route('/crest/get_price', methods=['POST'])
 def get_price_and_tax():
     """
@@ -151,6 +149,23 @@ def get_price_and_tax():
     """
     if request.is_xhr:
         json = request.get_json()
-        return jsonify(None)
+
+        item_list = json['item_list']
+        item_list.append(json['product_id'])
+
+        item_price = ItemPrice.query.filter_by(
+            region_id=json['region']
+        ).filter(
+            ItemPrice.item_id.in_(item_list)
+        )
+
+        item_price_list = {}
+        for price in item_price:
+            item_price_list[price.item_id] = {
+                'sell': price.sell_price,
+                'buy': price.buy_price,
+            }
+
+        return jsonify(price=item_price_list)
     else:
         return 'Cannot call this page directly', 403
