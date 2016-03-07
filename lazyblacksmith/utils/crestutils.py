@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import config
 
+from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.utils.pycrest import EVE
 
 
@@ -13,6 +14,7 @@ def get_crest():
             config.CREST_REDIRECT_DNS, '/sso/crest/callback'
         ),
         user_agent=config.CREST_USER_AGENT,
+        cache=cache,
     )
     crest()
     return crest
