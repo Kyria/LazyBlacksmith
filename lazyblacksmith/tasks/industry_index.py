@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.crestutils import get_all_items
@@ -6,20 +7,15 @@ from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.time import utcnow
 
 
-def get_industry_index():
+@celery_app.task(name="schedule.update_industry_indexes")
+def update_industry_index():
     """ Connect to the public CREST and get the industry indexes list. """
     crest = get_crest()
-    industry_system_page = crest.industry.systems()
+    all_indexes = get_all_items(crest.industry.systems())
 
     insert_index_list = []
 
-    # get all indexes
-    all_indexes = get_all_items(industry_system_page)
-
-    # TODO: get the date from headers
-    # check if the data are not still from cache and if we don't already have them.
     date = utcnow()
-
     for index in all_indexes:
         solar_system = index.solarSystem.id
 
