@@ -18,11 +18,16 @@ celery_app.conf.update({
         },
         'item-market-price': {
             'task': 'schedule.update_market_price',
+            'schedule': crontab(hour='*/2', minute=00),
+        },
+        'industry-index': {
+            'task': 'schedule.update_industry_indexes',
             'schedule': crontab(hour='*', minute=00),
         },
     },
     'CELERY_IMPORTS': [
         'lazyblacksmith.tasks.adjusted_price',
         'lazyblacksmith.tasks.market_order',
+        'lazyblacksmith.tasks.industry_index',
     ]
 })

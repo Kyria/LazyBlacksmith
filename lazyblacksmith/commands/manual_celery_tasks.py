@@ -3,12 +3,14 @@ from flask.ext.script import Command
 from flask.ext.script import Option
 
 from lazyblacksmith.tasks.adjusted_price import update_adjusted_price
+from lazyblacksmith.tasks.industry_index import update_industry_index
 from lazyblacksmith.tasks.market_order import update_market_price
 
 
 class ManualCeleryTasks(Command):
     """
     Manually trigger tasks.
+    -a : Action in update_adjusted_price, update_market_price, update_industry_index
     """
 
     option_list = (
@@ -23,3 +25,5 @@ class ManualCeleryTasks(Command):
             update_adjusted_price()
         if action == 'update_market_price':
             update_market_price()
+        if action == 'update_industry_index':
+            update_industry_index()
