@@ -93,7 +93,7 @@ class DictCache(APICache):
 
 
 class APIConnection(object):
-    def __init__(self, additional_headers=None, user_agent=None, cache_dir=None, cache='dict'):
+    def __init__(self, additional_headers=None, user_agent=None, cache_dir=None, cache=None):
         # Set up a Requests Session
         session = requests.Session()
         if additional_headers is None:
@@ -118,15 +118,11 @@ class APIConnection(object):
                 self.cache = cache  # Inherit from parents
             elif isinstance(cache, type):
                 self.cache = cache()  # Instantiate a new cache
-            else:
-                self.cache = cache
         elif cache_dir:
             self.cache_dir = cache_dir
             self.cache = FileCache(self.cache_dir)
-        elif cache == 'dict':
-            self.cache = DictCache()
         else:
-            self.cache = None
+            self.cache = DictCache()
 
         self.current_headers = {}
 
@@ -148,17 +144,16 @@ class APIConnection(object):
             prms[key] = params[key]
 
         # check cache
-        if self.cache:
-            key = (resource, frozenset(self._session.headers.items()), frozenset(prms.items()))
-            cached = self.cache.get(key)
-            if cached and cached['cached_until'] > time.time():
-                logger.debug('Cache hit for resource %s (params=%s)', resource, prms)
-                return cached
-            elif cached:
-                logger.debug('Cache stale for resource %s (params=%s)', resource, prms)
-                self.cache.invalidate(key)
-            else:
-                logger.debug('Cache miss for resource %s (params=%s', resource, prms)
+        key = (resource, frozenset(self._session.headers.items()), frozenset(prms.items()))
+        cached = self.cache.get(key)
+        if cached and cached['cached_until'] > time.time():
+            logger.debug('Cache hit for resource %s (params=%s)', resource, prms)
+            return cached
+        elif cached:
+            logger.debug('Cache stale for resource %s (params=%s)', resource, prms)
+            self.cache.invalidate(key)
+        else:
+            logger.debug('Cache miss for resource %s (params=%s', resource, prms)
 
         logger.debug('Getting resource %s (params=%s)', resource, prms)
         res = self._session.get(resource, params=prms, headers=headers)
@@ -177,8 +172,7 @@ class APIConnection(object):
         expires = self._get_expires(res)
         if expires > 0:
             ret.update({'cached_until': time.time() + expires})
-            if self.cache:
-                self.cache.put(key, ret)
+            self.cache.put(key, ret)
 
         return ret
 
