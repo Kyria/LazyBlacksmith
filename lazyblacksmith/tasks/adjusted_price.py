@@ -9,7 +9,7 @@ from lazyblacksmith.utils.crestutils import get_crest
 @celery_app.task(name="schedule.update_adjusted_price")
 def update_adjusted_price():
     # delete everything from table first.
-    db.engine.execute("DELETE FROM %s" % ItemAdjustedPrice.__tablename__)
+    db.engine.execute("TRUNCATE TABLE %s" % ItemAdjustedPrice.__tablename__)
     db.session.commit()
 
     # crest stuff

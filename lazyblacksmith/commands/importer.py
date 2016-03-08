@@ -73,7 +73,7 @@ class Importer(object):
         Delete the content of the given table in the LB database
         """
         print "Deleting rows from %s " % table
-        self.lb_engine.execute("DELETE FROM %s" % table)
+        self.lb_engine.execute("TRUNCATE TABLE %s" % table)
 
     def delete_all(self):
         """

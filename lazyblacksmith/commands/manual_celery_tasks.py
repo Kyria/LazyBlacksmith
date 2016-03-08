@@ -14,7 +14,7 @@ class ManualCeleryTasks(Command):
     """
 
     option_list = (
-        Option('--action', '-a', dest='action', default=None, help='Action. update_adjusted_price, update_market_price'),
+        Option('--action', '-a', dest='action', default=None, help='Action. update_adjusted_price, update_market_price, update_industry_index'),
     )
 
     def run(self, action):
