@@ -13,12 +13,8 @@ from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import Item
-from lazyblacksmith.models import Region
+from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
-from lazyblacksmith.utils.crestutils import get_adjusted_price
-from lazyblacksmith.utils.crestutils import get_all_items
-from lazyblacksmith.utils.crestutils import get_by_attr
-from lazyblacksmith.utils.crestutils import get_crest
 
 
 gevent.monkey.patch_all()
@@ -145,6 +141,7 @@ def solarsystems():
     else:
         return 'Cannot call this page directly', 403
 
+
 @ajax.route('/crest/get_price', methods=['POST'])
 def get_price_and_tax():
     """
@@ -152,74 +149,23 @@ def get_price_and_tax():
     """
     if request.is_xhr:
         json = request.get_json()
-        crest = get_crest()
 
-        # get adjusted prices for after
-        adjusted_prices = get_adjusted_price()
+        item_list = json['item_list']
+        item_list.append(json['product_id'])
 
-        region = Region.query.get(json['region'])
-        market_crest = (get_by_attr(get_all_items(crest.regions()), 'name', region.name))()
-        buy_orders_crest = market_crest.marketBuyOrders
-        sell_orders_crest = market_crest.marketSellOrders
-        item_type_url = crest.itemTypes.href
-
-        # get price for main item
-        sell_price_items = get_all_items(
-            sell_orders_crest(
-                type = '%s%s/' % (item_type_url, json['product_id'])
-            )
+        item_price = ItemPrice.query.filter_by(
+            region_id=json['region']
+        ).filter(
+            ItemPrice.item_id.in_(item_list)
         )
-        product_min_sell = sell_price_items[0].price
-        for order in sell_price_items:
-            if order.price < product_min_sell:
-                sell_price_items = order.price
 
-
-        # init final dict with the product price
-        item_prices_list = {
-            'price': {
-                json['product_id']: sell_price_items,
-            },
-            'adjusted': {
-                json['product_id']: adjusted_prices[json['product_id']]
+        item_price_list = {}
+        for price in item_price:
+            item_price_list[price.item_id] = {
+                'sell': price.sell_price,
+                'buy': price.buy_price,
             }
-        }
 
-        # define which one we want (buy or sell)
-        market_order_crest = None
-        if json['buysell'] == 'buy':
-            market_order_crest = buy_orders_crest
-        else:
-            market_order_crest = sell_orders_crest
-
-        # loop over all items ID
-        greenlets = []
-        for item_id in json['item_list']:
-            greenlets.append(
-                gevent.spawn(
-                    market_order_crest,
-                    type = '%s%s/' % (item_type_url, item_id)
-                )
-            )
-        gevent.joinall(greenlets)
-
-        for pycrest_object in greenlets:
-            price_items = get_all_items(pycrest_object.value)
-            item_id = price_items[0].type.id
-
-            # get the right price for it (greatest if buy orders, lowest for sell orders)
-            item_price = price_items[0].price
-            for order in price_items:
-                if json['buysell'] == 'buy' and order.price > item_price:
-                    item_price = order.price
-                elif json['buysell'] == 'sell' and order.price < item_price:
-                    item_price = order.price
-
-            # add it to the dict
-            item_prices_list['price'][item_id] = item_price
-            item_prices_list['adjusted'][item_id] = adjusted_prices[item_id]
-
-        return jsonify(item_prices_list)
+        return jsonify(price=item_price_list)
     else:
         return 'Cannot call this page directly', 403
-

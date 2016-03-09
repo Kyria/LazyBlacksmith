@@ -1,14 +1,14 @@
 import base64
 import os
+import requests
 import time
 import zlib
-
-import requests
 
 from . import version
 from compat import bytes_
 from compat import text_
 from errors import APIException
+from requests.adapters import HTTPAdapter
 
 try:
     from urllib.parse import urlparse, urlunparse, parse_qsl
@@ -104,6 +104,13 @@ class APIConnection(object):
             "User-Agent": user_agent,
         })
         session.headers.update(additional_headers)
+        session.mount(
+            'https://public-crest.eveonline.com',
+            HTTPAdapter(
+                pool_connections=20,
+                pool_maxsize=20,
+            )
+        )
 
         self._session = session
         if cache:

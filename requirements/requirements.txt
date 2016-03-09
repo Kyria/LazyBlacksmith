@@ -1,0 +1,17 @@
+flask>=0.10.1
+MySQL-python>=1.2.5
+pytz>=2015.2
+sqlalchemy>=1.0.3
+Flask-cache>=0.13.1
+Flask-OAuthlib
+Flask-Login
+Flask-Migrate>=1.4.0
+Flask-Script>=2.0.5
+Flask-WTF>=0.11
+alembic>=0.7.6
+humanize>=0.5.1
+requests>=2.8.1
+gevent>=1.1rc1
+celery
+ratelimiter
+simplejson

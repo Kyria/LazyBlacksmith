@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 import config
 
-from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.utils.pycrest import EVE
 
 
@@ -33,16 +32,3 @@ def get_all_items(page):
         page = page.next()
         ret.extend(page.items)
     return ret
-
-
-@cache.cached(timeout=3600*24)
-def get_adjusted_price():
-    crest = get_crest()
-
-    item_adjusted_price = {}
-
-    marketPrice = get_all_items(crest.marketPrices())
-    for itemPrice in marketPrice:
-        item_adjusted_price[itemPrice.type.id] = itemPrice.adjustedPrice
-
-    return item_adjusted_price

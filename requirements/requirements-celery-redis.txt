@@ -1,0 +1,3 @@
+# if required for redis celery
+celerybeat-redis
+celery[redis]
