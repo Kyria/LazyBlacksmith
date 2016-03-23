@@ -542,7 +542,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         // calculate price per material and display it
         for(var id in materialQuantityList) {
-            var price = (id in prices) ? prices[id][priceLoad.typeOrder] : 0;
+            var price = (id in prices) ? prices[id][priceData.typeOrder] : 0;
             var materialPrice = price * materialQuantityList[id].qty;
             materialTotalPrice += materialPrice;
 
