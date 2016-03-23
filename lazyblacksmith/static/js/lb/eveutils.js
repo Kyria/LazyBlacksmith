@@ -1,6 +1,5 @@
-"use strict";
-
 var eveUtils = (function() {
+    "use strict";
     /**
      * Calculate the adjusted quantity
      * @param quantity the base quantity of material
@@ -64,4 +63,4 @@ var eveUtils = (function() {
         calculateJobTime: calculateJobTime,
     }
 
-})()
+})();

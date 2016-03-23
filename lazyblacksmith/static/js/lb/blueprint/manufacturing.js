@@ -1,6 +1,5 @@
-"use strict";
-
 var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
+    "use strict";
 
     // template variables
     var tplSublistBlock = '';

@@ -1,6 +1,5 @@
-"use strict";
-
 var lb = (function($, utils) {
+    "use strict";
     // all modules
     var modules = {};
 

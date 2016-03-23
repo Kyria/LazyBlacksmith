@@ -1,6 +1,6 @@
-"use strict";
-
 var searchBlueprint = (function ($, lb) {
+    "use strict";
+
     var blueprintBodyResult = '#searchBlueprintResult tbody';
     var noResultMessage = '<tr><td colspan="2">No results.</td></tr>';
     var resultBtn = '<a href="@@LINK@@" class="btn btn-default btn-xs pull-right">@@NAME@@</a> ';
@@ -96,6 +96,6 @@ var searchBlueprint = (function ($, lb) {
         run: run,
     }
 
-}) (jQuery, lb)
+}) (jQuery, lb);
 
 lb.registerModule('searchBlueprint', searchBlueprint);

@@ -1,6 +1,5 @@
-"use strict";
-
 var utils = (function() {
+    "use strict";
     var durationToString = function(duration) {
         var days = Math.floor(duration / (24 * 3600));
         var duration = duration % (24 * 3600)
