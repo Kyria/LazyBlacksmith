@@ -555,7 +555,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         // fill footer rows (total, margin, markup...)
         var productPrice = (materialsData.productItemId in prices) ? prices[materialsData.productItemId]['sell'] : 0.0;
-        productPrice *= materialsData.materials[materialsData.productItemId].resultTotalQty;
+        productPrice *= materialsData.materials[materialsData.productItemId].qtyJob;
 
         var margin = productPrice - materialTotalPrice;
         var marginPercent = (productPrice > 0) ? (margin / productPrice) * 100 : 0;
