@@ -828,6 +828,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         // only update when on summary / price tables
         if(tab == "#tab-price" || tab == "#tab-summary") {
+            // wait until materials are fully loaded
+            if(!isMaterialListLoaded && options.hasManufacturedComponent) {
+                return;
+            }
             _updateSummaryTabs();
         }
     };
