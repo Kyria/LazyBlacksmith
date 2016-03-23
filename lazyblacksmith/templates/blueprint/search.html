@@ -4,11 +4,11 @@
 
 {% block js %}
     <script>
-        LazyBlacksmith.blueprint.blueprintSearchUrl             = '{{ url_for('ajax.blueprint_search', name='0000') }}';
-        LazyBlacksmith.blueprint.blueprintInventionUrl          = '';
-        LazyBlacksmith.blueprint.blueprintManufacturingUrl      = '{{ url_for('blueprint.manufacturing', item_id='999999999') }}';
-        LazyBlacksmith.blueprint.blueprintResearchUrl           = '';
-        LazyBlacksmith.setLoader(LazyBlacksmith.blueprint);
+        lb.urls.searchUrl           = '{{ url_for('ajax.blueprint_search', name='0000') }}';
+        lb.urls.inventionUrl        = false;
+        lb.urls.manufacturingUrl    = '{{ url_for('blueprint.manufacturing', item_id='999999999') }}';
+        lb.urls.researchUrl         = false;
+        lb.run('searchBlueprint');
     </script>
 {% endblock %}
 
