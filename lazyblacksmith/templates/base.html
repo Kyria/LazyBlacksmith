@@ -9,7 +9,7 @@
     <meta name="description" content="Tool for eve online industry">
     <meta name="author" content="G. (Kyria) Bisch">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <title>Lazy Blacksmith {% block title %}{% endblock %}</title>
 
 {% if config.DEBUG %}
@@ -56,19 +56,19 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="container-fluid">
         {% block content %}{% endblock %}
         </div>
     </div>
-    
+
     <footer class="footer">
         <div class="container-fluid">
             <span class="text-muted"><a href="https://github.com/Kyria/LazyBlacksmith#readme">LazyB.</a> &copy; Kyria.</span>
         </div>
     </footer>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  
+
     {% block modal %}{% endblock %}
 {% if config.DEBUG %}
     <script src="{{ url_for('static', filename='js/less.min.js') }}"></script>
@@ -89,16 +89,16 @@
     <script src="{{ url_for('static', filename='js/jquery/jquery-ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/humanize.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/typeahead.bundle.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/misc/bootstrap-switch.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lazyblacksmith.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lazyblacksmith.blueprint.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lazyblacksmith.blueprint.manufacturing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/misc/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lb/eveutils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lb/lb.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lb/blueprint/search.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lb/blueprint/manufacturing.js') }}"></script>
 {% else %}
     <script src="{{ url_for('static', filename='js/lazybl-combined.min.js') }}"></script>
 {% endif %}
 
 {% block js %}{% endblock %}
-    <script>$(document).ready(LazyBlacksmith.load);</script>
 
 </body>
 </html>
