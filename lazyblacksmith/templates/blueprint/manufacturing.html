@@ -4,32 +4,35 @@
 
 {% block js %}
     <script>
-        LazyBlacksmith.setLoader(LazyBlacksmith.blueprint.manufacturing);
-        LazyBlacksmith.blueprint.manufacturing.systemUrls = "{{ url_for('ajax.solarsystems') }}";
-        LazyBlacksmith.blueprint.manufacturing.materialBOMUrl = "{{ url_for('ajax.blueprint_bom', blueprint_id=blueprint.id) }}";
-        LazyBlacksmith.blueprint.manufacturing.priceUrl = "{{ url_for('ajax.get_price_and_tax') }}";
-        LazyBlacksmith.blueprint.manufacturing.tplSublistBlockUrl = "{{ url_for('template.manufacturing_sublist_block') }}";
-        LazyBlacksmith.blueprint.manufacturing.tplSublistRowUrl = "{{ url_for('template.manufacturing_sublist_row') }}";
- 
-        LazyBlacksmith.blueprint.manufacturing.hasManufacturedComponent = {% if has_manufactured_components %}true{% else %}false{% endif %};
-        LazyBlacksmith.blueprint.manufacturing.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
+        lb.urls.systemUrls          = "{{ url_for('ajax.solarsystems') }}";
+        lb.urls.materialBOMUrl      = "{{ url_for('ajax.blueprint_bom', blueprint_id=blueprint.id) }}";
+        lb.urls.priceUrl            = "{{ url_for('ajax.get_price_and_tax') }}";
+        lb.urls.tplSublistBlockUrl  = "{{ url_for('template.manufacturing_sublist_block') }}";
+        lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
 
-        LazyBlacksmith.blueprint.manufacturing.materialBom.resultId = {{ product.product.id }};
-        LazyBlacksmith.blueprint.manufacturing.materialBom.resultIcon = '{{ product.product.icon_32() }}';
-        LazyBlacksmith.blueprint.manufacturing.materialBom.resultName = '{{ product.product.name }}';
-        LazyBlacksmith.blueprint.manufacturing.materialBom.resultQtyPerRun = {{ product.quantity }};
-        LazyBlacksmith.blueprint.manufacturing.materialBom.resultTimePerRun = {{ activity.time }};
-        LazyBlacksmith.blueprint.manufacturing.materialBom.resultTotalTime = {{ activity.time }};
-        LazyBlacksmith.blueprint.manufacturing.materialBom.resultTotalQty = {{ product.quantity }};
-        LazyBlacksmith.blueprint.manufacturing.materialBom.BoM = {};
-        LazyBlacksmith.blueprint.manufacturing.materialBom.BoMKeys = [];
+        manufacturingBlueprint.options.hasManufacturedComponent = {% if has_manufactured_components %}true{% else %}false{% endif %};
+        manufacturingBlueprint.options.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
+        manufacturingBlueprint.materialsData.productItemId = {{ product.product.id }};
+
+        manufacturingBlueprint.materialsData.materials[{{ product.product.id }}] = {
+            'id': {{ product.product.id }},
+            'isManufactured': true,
+            'resultQtyPerRun': {{ product.quantity }},
+            'qtyRequiredPerRun': {{ product.quantity }},
+            'qtyAdjusted': {{ product.quantity }},
+            'qtyJob': {{ product.quantity }},
+            'timePerRun': {{ activity.time }},
+            'timeTotal': {{ activity.time }},
+            'name': '{{ product.product.name }}',
+            'icon': '{{ product.product.icon_32() }}',
+        };
 
         {% for material in materials.all() %}
-        LazyBlacksmith.blueprint.manufacturing.materialBom.BoMKeys.push({{ material.material.id }});
-        LazyBlacksmith.blueprint.manufacturing.materialBom.BoM[{{ material.material.id }}] = {
+        manufacturingBlueprint.materialsData.componentIdList.push({{ material.material.id }});
+        manufacturingBlueprint.materialsData.materials[{{ material.material.id }}] = {
             'id': {{ material.material.id }},
             'isManufactured': {% if material.material.is_manufactured() %}true{% else %}false{% endif %},
-            'qtyPerRun': -1,
+            'resultQtyPerRun': -1,
             'qtyRequiredPerRun': {{ material.quantity }},
             'qtyAdjusted': {{ material.quantity }},
             'qtyJob': {{ material.quantity }},
@@ -38,11 +41,17 @@
             'runs': -1,
             'name': '{{ material.material.name }}',
             'icon': '{{ material.material.icon_32() }}',
-            'BoM': {},
-            'BoMKeys': [],
+            'materials': {},
+            'componentIdList': [],
+            'materialEfficiency': 10,
+            'timeEfficiency': 20,
+            'manufacturingSystem': 'Jita',
+            'facility': 0,
+            'tax': 0.0,
         };
         {% endfor %}
 
+        lb.run('manufacturingBlueprint');
     </script>
 {% endblock %}
 
@@ -90,7 +99,7 @@
                             TE Level (<span id="TE-Level">0%</span>)<br>
                             <div id="TE"></div>
                         </div>
-                    </div>                    
+                    </div>
                     <div class="well">
                         <div>
                             Industry (<span id="industry-level-display">0</span>)<br>
@@ -100,29 +109,29 @@
                             Adv. Industry (<span id="adv-industry-level-display">0</span>)<br>
                             <div id="adv-industry-level"></div>
                         </div>
-                    </div>                    
+                    </div>
                     <div class="well">
                         <div>
-                            T2 Science 1 
+                            T2 Science 1
                             <span class='small' data-toggle="tooltip" data-placement="top" title="First science skill required (example: Laser Engineering, Molecular Engineering, Mechanical Engineering...)">
-                                <i class="fa fa-question-circle"></i> 
-                            </span> 
+                                <i class="fa fa-question-circle"></i>
+                            </span>
                             (<span id="t2-science1-display">0</span>)<br>
                             <div id="t2-science1"></div>
                         </div>
                         <div>
-                            T2 Science 2 
+                            T2 Science 2
                             <span class='small' data-toggle="tooltip" data-placement="top" title="Second science skill required (example: Laser Engineering, Molecular Engineering, Mechanical Engineering...)">
                                 <i class="fa fa-question-circle"></i>
-                            </span> 
+                            </span>
                             (<span id="t2-science2-display">0</span>)<br>
                             <div id="t2-science2"></div>
                         </div>
                         <div>
-                            T2 Industry 
+                            T2 Industry
                             <span class='small' data-toggle="tooltip" data-placement="top" title="T2 Ship Manufacturing Skill (example: Frigate Construction, Cruiser Construction...)">
                                 <i class="fa fa-question-circle"></i>
-                            </span> 
+                            </span>
                             (<span id="t2-level-display">0</span>)<br>
                             <div id="t2-level"></div>
                         </div>
@@ -133,11 +142,11 @@
                     <div class="row">
                         <div class="col-xs-10">
                             <h4>
-                                {{ blueprint.name }} 
+                                {{ blueprint.name }}
                                 <span class="small">
-                                    ({{ product.product.name }} x 
-                                    <span id="qty-required-{{ product.product.id }}">{{ product.quantity|intcomma }}</span>) -  
-                                    <strong>Time per run: </strong><span class="time-per-run">{{ activity.time|duration }}</span> - 
+                                    ({{ product.product.name }} x
+                                    <span id="qty-required-{{ product.product.id }}">{{ product.quantity|intcomma }}</span>) -
+                                    <strong>Time per run: </strong><span class="time-per-run">{{ activity.time|duration }}</span> -
                                     <strong>Total time: </strong><span class="total-time">{{ activity.time|duration }}</span>
                                 </span>
                             </h4>
@@ -180,21 +189,29 @@
                     </div>
                 </div>
             </div>
-            
+
             {% if has_manufactured_components %}
             <div class="row fade tab-pane" id="tab-subcomp">
                 <div class="col-md-12">
                     <strong>Loading materials... please wait a second</strong>
                 </div>
             </div>
-            {% endif %} 
-            
+            {% endif %}
+
             <div class="row fade tab-pane" id="tab-summary">
                 <div class="col-md-6">
                     <h4>
-                        Material requirements 
+                        Material requirements
+
                         {% if has_manufactured_components %}
-                            <input type="checkbox" id="display-sub-components-summary"/>
+                        <span class="raw-component-btn">
+                            <span id="raw-components" data-toggle="buttons">
+                                <label class="btn btn-danger btn-xs">
+                                    <input type="checkbox" autocomplete="off">
+                                    Raw components: <span class="state">NO</span>
+                                </label>
+                            </span>
+                        </span>
                         {% endif %}
                     </h4>
                     <table class="table table-condensed materials-requirement table-hover table-striped">
@@ -206,7 +223,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                         </tbody>
                     </table>
                 </div>
@@ -224,24 +241,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                         </tbody>
                     </table>
                     </table>
                 </div>
             </div>
-            
+
             <div class="row fade tab-pane" id="tab-price">
                 <div class="col-md-6">
                     <h4>
-                        Material Prices                     
+                        Material Prices
                         <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#priceConfigModal">
                             <i class="fa fa-cog"></i>
-                        </button>                 
-
-                        {% if has_manufactured_components %}
-                            <strong><input type="checkbox" id="display-sub-components-price"/></strong>
-                        {% endif %}
+                        </button>
+                        <span class="raw-component-btn"></span>
                     </h4>
                     <table class="table table-condensed materials-prices table-hover table-striped">
                         <thead>
@@ -254,7 +268,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                         </tbody>
                         <tfoot>
                             <tr>
@@ -288,10 +302,10 @@
 
                 <div class="col-md-6">
                     <h4>
-                        Industry Taxes 
+                        Industry Taxes
                         <span class='small' data-toggle="tooltip" data-placement="top" title="Industry taxes may be wrong, as they will take the highest prices possible. Never forget to double check !">
                                 <i class="fa fa-exclamation-circle"></i>
-                        </span> 
+                        </span>
                     </h4>
                     <table class="table table-condensed materials-taxes table-hover table-striped">
                         <thead>
@@ -303,7 +317,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                         </tbody>
                     </table>
                 </div>
@@ -316,7 +330,7 @@
 {% endblock %}
 
 {% block modal %}
-<!-- Prices config modals --> 
+<!-- Prices config modals -->
 <div class="modal fade" role="dialog" id="priceConfigModal" aria-labelledby="priceConfigModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -359,7 +373,7 @@
     </div>
 </div>
 
-<!-- Sub component config modals --> 
+<!-- Sub component config modals -->
 <div class="modal fade" role="dialog" id="subComponentBpConfigModal" aria-labelledby="subComponentBpConfigModal" aria-hidden="true" data-bp-id="">
     <div class="modal-dialog">
         <div class="modal-content">
