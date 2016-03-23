@@ -51,9 +51,13 @@ def blueprint_search(name):
 
             data = []
             for bp in blueprints:
-                invention = 0
+                invention = False
 
-                data.append([bp.id, bp.name, invention])
+                data.append({
+                    'id': bp.id,
+                    'name': bp.name,
+                    'invention': invention
+                })
 
             # cache for 7 day as it does not change that often
             cache.set(cache_key, json.dumps(data), 24*3600*7)
@@ -151,7 +155,6 @@ def get_price_and_tax():
         json = request.get_json()
 
         item_list = json['item_list']
-        item_list.append(json['product_id'])
 
         item_price = ItemPrice.query.filter_by(
             region_id=json['region']
