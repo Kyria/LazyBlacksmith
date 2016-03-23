@@ -22,7 +22,7 @@ module.exports = function (grunt) {
 
         concat: {
             bootstrap: {
-                src: [                    
+                src: [
                     'lazyblacksmith/static/js/bootstrap/modal.js',
                     'lazyblacksmith/static/js/bootstrap/tooltip.js',
                     'lazyblacksmith/static/js/bootstrap/popover.js',
@@ -48,8 +48,8 @@ module.exports = function (grunt) {
                     'lazyblacksmith/static/js/bootstrap.js',
                     'lazyblacksmith/static/js/jquery/*.js',
                     'lazyblacksmith/static/js/misc/*.js',
-                    'lazyblacksmith/static/js/lazyblacksmith.js',
-                    'lazyblacksmith/static/js/lazyblacksmith.*.js',
+                    'lazyblacksmith/static/js/lb/*.js',
+                    'lazyblacksmith/static/js/lb/*/*.js',
                 ],
                 dest: 'lazyblacksmith/static/js/lazybl-combined.min.js'
             }
