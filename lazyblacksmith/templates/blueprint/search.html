@@ -5,9 +5,9 @@
 {% block js %}
     <script>
         lb.urls.searchUrl           = '{{ url_for('ajax.blueprint_search', name='0000') }}';
-        lb.urls.inventionUrl        = false;
+        lb.urls.inventionUrl        = '';
         lb.urls.manufacturingUrl    = '{{ url_for('blueprint.manufacturing', item_id='999999999') }}';
-        lb.urls.researchUrl         = false;
+        lb.urls.researchUrl         = '';
         lb.run('searchBlueprint');
     </script>
 {% endblock %}
