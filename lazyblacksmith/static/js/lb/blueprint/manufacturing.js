@@ -281,7 +281,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      */
     var _getComponentMaterials = function() {
         if(isMaterialListLoaded || !options.hasManufacturedComponent) {
-            return;
+            return _generateMaterialListQuantity();
         }
         if(tplSublistBlock == '' || tplSublistRow == '') {
             // if any template is not yet set, try again in 1sec
