@@ -37,11 +37,13 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
     // item price data and index
     var priceData = {
-        currentRegion: '10000002',
-        typeOrder: 'buy',
+        isLoaded: false,
         prices: {},
         adjusted: {},
-        industryIndex: {},
+
+        // item configs
+        items: {},
+        itemList: [],
     };
 
     var materialsData = {
@@ -86,194 +88,135 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
 
     // -------------------------------------------------
-    // Functions (no events, no event functions)
+    // Material list generators and ajax getters
     //
 
     /**
-     * Update main blueprint components.
+     * generate the material list with quantity for all main materials
+     * or only components, depending on the settings we have.
+     *
      * @private
+     * @return the list of objects for each materials, including id, name, qty
      */
-    var _updateMaterial = function() {
+    var _generateMaterialListQuantity = function() {
+        var materialList = {};
+        var onlySubComponents = (useComponents && options.hasManufacturedComponent);
+
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
 
-            var facility = parseInt($('#facility').val());
-            var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
-                material.qtyRequiredPerRun,
-                options.materialEfficiency,
-                assemblyStats[options.facility].me
-            );
-            var quantityJob = eveUtils.calculateJobQuantity(
-                quantityAdjusted,
-                options.runs
-            );
+            // we want all material, or at least, those that cannot be manufactured (PI, moongoo...)
+            if(!material.isManufactured || !onlySubComponents) {
+                materialList[material.id] = materialList[material.id] || {
+                    qty: 0,
+                    name: material.name,
+                    icon: material.icon
+                };
+                materialList[material.id].qty += material.qtyJob;
 
-            var selector = '.main-list tr.material[data-id="' + material.id + '"]';
-            $(selector + ' td[data-name="quantity-adjusted"]').html(Humanize.intcomma(quantityAdjusted, 2));
-            $(selector + ' td[data-name="quantity-job"]').html(Humanize.intcomma(quantityJob));
-
-            material.qtyAdjusted = quantityAdjusted;
-            material.qtyJob = quantityJob;
+            } else {
+                for(var j in material.componentIdList) {
+                    var subMaterial = material.materials[material.componentIdList[j]];
+                    materialList[subMaterial.id] = materialList[subMaterial.id] || {
+                        qty: 0,
+                        name: subMaterial.name,
+                        icon: subMaterial.icon
+                    };
+                    materialList[subMaterial.id].qty += subMaterial.qtyJob;
+                }
+            }
         }
-
-        _updateComponentMaterial();
-        _updateComponentTime();
-        _generateMaterialListQuantity();
+        materialQuantityList = materialList;
     };
 
+
     /**
-     * Update compenents bill of materials.
+     * Generate the item price list for configs.
+     * The list will have the following order for the ease of configs:
+     * - product
+     * - components
+     * - subcomponents
+     */
+    var _generateMaterialListPrice = function() {
+        priceData.itemList.push(materialsData.productItemId);
+        priceData.items[materialsData.productItemId] = {
+            'type': 'sell',
+            'region': 10000002,
+            'id': materialsData.productItemId,
+            'name': materialsData.materials[materialsData.productItemId].name,
+            'icon': materialsData.materials[materialsData.productItemId].icon,
+        }
+
+        var subComponentList = [];
+        var subComponents = {};
+
+        for(var i in materialsData.componentIdList) {
+            var material = materialsData.materials[materialsData.componentIdList[i]];
+
+            if($.inArray(material.id, priceData.itemList) == -1) {
+                priceData.itemList.push(material.id);
+                priceData.items[material.id] = {
+                    'type': 'buy',
+                    'region': 10000002,
+                    'id': material.id,
+                    'name': material.name,
+                    'icon': material.icon,
+                };
+            }
+
+            if(material.isManufactured) {
+                for(var j in material.componentIdList) {
+                    var subMaterial = material.materials[material.componentIdList[j]];
+
+                    if($.inArray(subMaterial.id, subComponentList) == -1
+                       && $.inArray(subMaterial.id, priceData.itemList) == -1) {
+                        subComponentList.push(subMaterial.id);
+                        subComponents[subMaterial.id] = {
+                            'type': 'buy',
+                            'region': 10000002,
+                            'id': subMaterial.id,
+                            'name': subMaterial.name,
+                            'icon': subMaterial.icon,
+                        };
+                    }
+                }
+            }
+        }
+
+        $.merge(priceData.itemList, subComponentList);
+        $.extend(true, priceData.items, subComponents);
+        _initPriceModalContent();
+    };
+
+
+    /**
+     * Get market price for items
      * @private
      */
-    var _updateComponentMaterial = function() {
-        if(!isMaterialListLoaded || !options.hasManufacturedComponent) {
+    var _getAllPrices = function() {
+        if(priceData.isLoaded) {
+            return _updatePriceTable();
+        }
+
+        if(priceData.itemList.length == 0) {
             return;
         }
 
-        for(var i in materialsData.componentIdList) {
-            var material = materialsData.materials[materialsData.componentIdList[i]];
-
-            // if it's not a manufactured material, we stop here
-            if(!material.isManufactured) {
-                continue;
-            }
-
-            var runs = Math.ceil(
-                material.qtyJob / material.resultQtyPerRun
-            );
-            material.runs = runs;
-
-            $('.sub-list-'+ material.id +' .run-required').html(runs);
-            $('.sub-list-'+ material.id +' .qty-required').html(material.qtyJob);
-
-            // update the sub comps (if there are some :)) for this material
-            for(var j in material.componentIdList) {
-                var subMaterial = material.materials[material.componentIdList[j]];
-
-                var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
-                    subMaterial.qtyRequiredPerRun,
-                    material.materialEfficiency,
-                    assemblyStats[material.facility].me
-                );
-                var quantityJob = eveUtils.calculateJobQuantity(
-                    quantityAdjusted,
-                    material.runs
-                );
-
-                subMaterial.qtyAdjusted = quantityAdjusted;
-                subMaterial.qtyJob = quantityJob;
-
-                var selector = '.sub-list-'+ material.id +' tr.material[data-id="'+ subMaterial.id +'"]';
-                $(selector + ' td[data-name="quantity-adjusted"]').html(Humanize.intcomma(quantityAdjusted, 2));
-                $(selector + ' td[data-name="quantity-job"]').html(Humanize.intcomma(quantityJob));
-
-            }
-        }
+        // get the prices
+        $.ajax({
+            url: lb.urls.priceUrl,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({'item_list': priceData.itemList}),
+            dataType: 'json',
+            success: function(jsonPrice) {
+                priceData.prices = jsonPrice['prices'];
+                priceData.isLoaded = true;
+                _updatePriceTable();
+            },
+        });
     };
 
-    /**
-     * Update main blueprint times. Always called by update material function.
-     * @private
-     */
-    var _updateTime = function() {
-        var time = eveUtils.calculateJobTime(
-            materialsData.materials[materialsData.productItemId].timePerRun,
-            options.runs,
-            assemblyStats[options.facility].te,
-            options.timeEfficiency,
-            options.industryLvl, options.advancedIndustryLvl,
-            options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
-            true
-        );
-
-        materialsData.materials[materialsData.productItemId].timeTotal = time;
-
-        var time_text = utils.durationToString(time);
-        $('.main-list .total-time').html(time_text);
-    };
-
-    /**
-     * Update component blueprints times. Always called by update components material function.
-     * @private
-     */
-    var _updateComponentTime = function() {
-        if(!isMaterialListLoaded || !options.hasManufacturedComponent) {
-            return;
-        }
-
-        for(var i in materialsData.componentIdList) {
-            var material = materialsData.materials[materialsData.componentIdList[i]];
-
-            if(!material.isManufactured) {
-                continue;
-            }
-
-            var time = eveUtils.calculateJobTime(
-                material.timePerRun,
-                material.runs,
-                assemblyStats[material.facility].te,
-                material.timeEfficiency,
-                options.industryLvl, options.advancedIndustryLvl,
-                0, 0, 0,
-                false
-            );
-
-            material.timeTotal = time;
-
-            var time_text = utils.durationToString(time);
-            $('.sub-list-' + material.id + ' .total-time').html(time_text);
-        }
-    };
-
-    /**
-     * Update component factory informations (from modal)
-     * @private
-     */
-    var _updateComponentInformations = function(allComponents) {
-        // init values
-        var selector;
-        var components;
-        if(allComponents) {
-            components = materialsData.componentIdList;
-        } else {
-            components = [parseInt($('#componentModalBpName').attr('data-bp-id'))];
-        }
-
-        // get data
-        var tax = $('#modal-tax').val();
-        var system = $('#modal-system').val();
-        var ME = parseInt($('#Modal-ME-Level').text());
-        var TE = parseInt($('#Modal-TE-Level').text());
-        var facility = parseInt($('#modal-facility').find(':selected').val());
-
-        for(var i in components) {
-            var componentId = components[i];
-            materialsData.materials[componentId].manufacturingSystem = system;
-            materialsData.materials[componentId].facility = facility;
-            materialsData.materials[componentId].tax = tax;
-            materialsData.materials[componentId].materialEfficiency = ME;
-            materialsData.materials[componentId].timeEfficiency = TE;
-            _updateComponentBpInfoDisplay(componentId);
-        }
-
-        _updateComponentMaterial();
-        _updateComponentTime();
-        _generateMaterialListQuantity();
-        $('#componentModalBpName').modal('hide');
-    };
-
-    /**
-     * update component factory informations in the page
-     * @private
-     * @param the id of the blueprint we update
-     */
-    var _updateComponentBpInfoDisplay = function(id) {
-        $('.sub-list-'+ id +' .system').html(materialsData.materials[id].manufacturingSystem);
-        $('.sub-list-'+ id +' .tax').html(Humanize.intcomma(materialsData.materials[id].tax,2));
-        $('.sub-list-'+ id +' .me').html(materialsData.materials[id].materialEfficiency);
-        $('.sub-list-'+ id +' .te').html(materialsData.materials[id].timeEfficiency);
-        $('.sub-list-'+ id +' .facility').html(assemblyStats[materialsData.materials[id].facility].name);
-    };
 
     /**
      * Get the list of materials for the given blueprint
@@ -281,7 +224,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      */
     var _getComponentMaterials = function() {
         if(isMaterialListLoaded || !options.hasManufacturedComponent) {
-            return _generateMaterialListQuantity();
+            _generateMaterialListPrice();
+            _generateMaterialListQuantity();
+            return;
         }
         if(tplSublistBlock == '' || tplSublistRow == '') {
             // if any template is not yet set, try again in 1sec
@@ -365,97 +310,218 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
                                      .replace(/@@BOM@@/g, rows);
             }
 
-            isMaterialListLoaded = true;
             $('#tab-subcomp').html(html);
 
             // update material quantity list
             _generateMaterialListQuantity();
+
+            // generate the material list for prices
+            _generateMaterialListPrice();
+
+            isMaterialListLoaded = true;
 
             // update tables
             _updateSummaryTabs();
         });
     };
 
+
+    // -------------------------------------------------
+    // Functions (no events, no event functions)
+    //
+
+
     /**
-     * Get market price for items
+     * Update main blueprint components.
      * @private
      */
-    var _getAllPrices = function() {
-        if(priceData.currentRegion in priceData.prices) {
-            _updatePriceTable();
+    var _updateMaterial = function() {
+        for(var i in materialsData.componentIdList) {
+            var material = materialsData.materials[materialsData.componentIdList[i]];
+
+            var facility = parseInt($('#facility').val());
+            var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
+                material.qtyRequiredPerRun,
+                options.materialEfficiency,
+                assemblyStats[options.facility].me
+            );
+            var quantityJob = eveUtils.calculateJobQuantity(
+                quantityAdjusted,
+                options.runs
+            );
+
+            var selector = '.main-list tr.material[data-id="' + material.id + '"]';
+            $(selector + ' td[data-name="quantity-adjusted"]').html(Humanize.intcomma(quantityAdjusted, 2));
+            $(selector + ' td[data-name="quantity-job"]').html(Humanize.intcomma(quantityJob));
+
+            material.qtyAdjusted = quantityAdjusted;
+            material.qtyJob = quantityJob;
+        }
+
+        _updateComponentMaterial();
+        _updateComponentTime();
+        _generateMaterialListQuantity();
+    };
+
+
+    /**
+     * Update compenents bill of materials.
+     * @private
+     */
+    var _updateComponentMaterial = function() {
+        if(!isMaterialListLoaded || !options.hasManufacturedComponent) {
             return;
         }
 
-        var data = {
-            'buysell': priceData.typeOrder,
-            'region': priceData.currentRegion,
-            'item_list': [materialsData.productItemId],
-        }
-
-        // create the list of component ids
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
-            data.item_list.push(material.id);
 
+            // if it's not a manufactured material, we stop here
+            if(!material.isManufactured) {
+                continue;
+            }
+
+            var runs = Math.ceil(
+                material.qtyJob / material.resultQtyPerRun
+            );
+            material.runs = runs;
+
+            $('.sub-list-'+ material.id +' .run-required').html(runs);
+            $('.sub-list-'+ material.id +' .qty-required').html(material.qtyJob);
+
+            // update the sub comps (if there are some :)) for this material
             for(var j in material.componentIdList) {
-                var subBomId = material.componentIdList[j];
-                if($.inArray(subBomId, data.item_list) == -1) {
-                    data.item_list.push(subBomId);
-                }
+                var subMaterial = material.materials[material.componentIdList[j]];
+
+                var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
+                    subMaterial.qtyRequiredPerRun,
+                    material.materialEfficiency,
+                    assemblyStats[material.facility].me
+                );
+                var quantityJob = eveUtils.calculateJobQuantity(
+                    quantityAdjusted,
+                    material.runs
+                );
+
+                subMaterial.qtyAdjusted = quantityAdjusted;
+                subMaterial.qtyJob = quantityJob;
+
+                var selector = '.sub-list-'+ material.id +' tr.material[data-id="'+ subMaterial.id +'"]';
+                $(selector + ' td[data-name="quantity-adjusted"]').html(Humanize.intcomma(quantityAdjusted, 2));
+                $(selector + ' td[data-name="quantity-job"]').html(Humanize.intcomma(quantityJob));
+
             }
         }
-
-        // get the prices
-        $.ajax({
-            url: lb.urls.priceUrl,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            dataType: 'json',
-            success: function(jsonPrice) {
-                priceData.prices[priceData.currentRegion] = jsonPrice['price'];
-                _updatePriceTable();
-            },
-        });
     };
+
 
     /**
-     * generate the material list with quantity for all main materials
-     * or only components, depending on the settings we have.
-     *
+     * Update main blueprint times. Always called by update material function.
      * @private
-     * @return the list of objects for each materials, including id, name, qty
      */
-    var _generateMaterialListQuantity = function() {
-        var materialList = {};
-        var onlySubComponents = (useComponents && options.hasManufacturedComponent);
+    var _updateTime = function() {
+        var time = eveUtils.calculateJobTime(
+            materialsData.materials[materialsData.productItemId].timePerRun,
+            options.runs,
+            assemblyStats[options.facility].te,
+            options.timeEfficiency,
+            options.industryLvl, options.advancedIndustryLvl,
+            options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
+            true
+        );
+
+        materialsData.materials[materialsData.productItemId].timeTotal = time;
+
+        var time_text = utils.durationToString(time);
+        $('.main-list .total-time').html(time_text);
+    };
+
+
+    /**
+     * Update component blueprints times. Always called by update components material function.
+     * @private
+     */
+    var _updateComponentTime = function() {
+        if(!isMaterialListLoaded || !options.hasManufacturedComponent) {
+            return;
+        }
 
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
 
-            // we want all material, or at least, those that cannot be manufactured (PI, moongoo...)
-            if(!material.isManufactured || !onlySubComponents) {
-                materialList[material.id] = materialList[material.id] || {
-                    qty: 0,
-                    name: material.name,
-                    icon: material.icon
-                };
-                materialList[material.id].qty += material.qtyJob;
-
-            } else {
-                for(var j in material.componentIdList) {
-                    var subMaterial = material.materials[material.componentIdList[j]];
-                    materialList[subMaterial.id] = materialList[subMaterial.id] || {
-                        qty: 0,
-                        name: subMaterial.name,
-                        icon: subMaterial.icon
-                    };
-                    materialList[subMaterial.id].qty += subMaterial.qtyJob;
-                }
+            if(!material.isManufactured) {
+                continue;
             }
+
+            var time = eveUtils.calculateJobTime(
+                material.timePerRun,
+                material.runs,
+                assemblyStats[material.facility].te,
+                material.timeEfficiency,
+                options.industryLvl, options.advancedIndustryLvl,
+                0, 0, 0,
+                false
+            );
+
+            material.timeTotal = time;
+
+            var time_text = utils.durationToString(time);
+            $('.sub-list-' + material.id + ' .total-time').html(time_text);
         }
-        materialQuantityList = materialList;
     };
+
+
+    /**
+     * Update component factory informations (from modal)
+     * @private
+     */
+    var _updateComponentInformations = function(allComponents) {
+        // init values
+        var selector;
+        var components;
+        if(allComponents) {
+            components = materialsData.componentIdList;
+        } else {
+            components = [parseInt($('#componentModalBpName').attr('data-bp-id'))];
+        }
+
+        // get data
+        var tax = $('#modal-tax').val();
+        var system = $('#modal-system').val();
+        var ME = parseInt($('#Modal-ME-Level').text());
+        var TE = parseInt($('#Modal-TE-Level').text());
+        var facility = parseInt($('#modal-facility').find(':selected').val());
+
+        for(var i in components) {
+            var componentId = components[i];
+            materialsData.materials[componentId].manufacturingSystem = system;
+            materialsData.materials[componentId].facility = facility;
+            materialsData.materials[componentId].tax = tax;
+            materialsData.materials[componentId].materialEfficiency = ME;
+            materialsData.materials[componentId].timeEfficiency = TE;
+            _updateComponentBpInfoDisplay(componentId);
+        }
+
+        _updateComponentMaterial();
+        _updateComponentTime();
+        _generateMaterialListQuantity();
+        $('#componentModalBpName').modal('hide');
+    };
+
+
+    /**
+     * update component factory informations in the page
+     * @private
+     * @param the id of the blueprint we update
+     */
+    var _updateComponentBpInfoDisplay = function(id) {
+        $('.sub-list-'+ id +' .system').html(materialsData.materials[id].manufacturingSystem);
+        $('.sub-list-'+ id +' .tax').html(Humanize.intcomma(materialsData.materials[id].tax,2));
+        $('.sub-list-'+ id +' .me').html(materialsData.materials[id].materialEfficiency);
+        $('.sub-list-'+ id +' .te').html(materialsData.materials[id].timeEfficiency);
+        $('.sub-list-'+ id +' .facility').html(assemblyStats[materialsData.materials[id].facility].name);
+    };
+
 
     /**
      * Update all tables from summary and price tables.
@@ -463,6 +529,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      * @todo uncomment adjusted price
      */
     var _updateSummaryTabs = function() {
+        // wait until materials are fully loaded
+        if(!isMaterialListLoaded && options.hasManufacturedComponent) {
+            return;
+        }
         _updateMaterialSummaryTable();
         _updateTimeTable();
         _getAllPrices();
@@ -522,11 +592,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
     /**
      * Update the price list with total etc in the price tab.
-     * Only called by _getAllPrices
+     * Only called by _getAllPrices and price modal
      * @private
      */
     var _updatePriceTable = function() {
-        var prices = priceData.prices[priceData.currentRegion];
+        var prices = priceData.prices;
+        var itemPrice = priceData.items;
         var iconColumn = '';
         if(options.useIcons) {
             iconColumn = '<td class="icon"><img src="@@ICON@@" alt="@@NAME@@" /></td>';
@@ -541,7 +612,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         // calculate price per material and display it
         for(var id in materialQuantityList) {
-            var price = (id in prices) ? prices[id][priceData.typeOrder] : 0;
+            var itemPrice =  priceData.items[id];
+            var priceRegion = priceData.prices[itemPrice.region];
+            var price = (priceRegion != undefined && id in priceRegion) ? priceRegion[id][itemPrice.type] : 0;
+
             var materialPrice = price * materialQuantityList[id].qty;
             materialTotalPrice += materialPrice;
 
@@ -554,7 +628,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $('.materials-prices tbody').html(output);
 
         // fill footer rows (total, margin, markup...)
-        var productPrice = (materialsData.productItemId in prices) ? prices[materialsData.productItemId]['sell'] : 0.0;
+        var itemPrice =  priceData.items[materialsData.productItemId];
+        var priceRegion = priceData.prices[itemPrice.region];
+        var productPrice = (priceRegion != undefined
+                            && materialsData.productItemId in priceRegion) ? priceRegion[materialsData.productItemId]['sell'] : 0;
         productPrice *= materialsData.materials[materialsData.productItemId].qtyJob;
 
         var margin = productPrice - materialTotalPrice;
@@ -618,6 +695,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         );
     };
 
+
     /**
      * Init tooltips
      * @private
@@ -625,6 +703,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _initTooltip = function() {
         $('[data-toggle="tooltip"]').tooltip();
     };
+
 
     /**
      * Init input fields
@@ -643,6 +722,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $("#raw-components input[type='checkbox']").on('change', _componentButtonOnStateChange);
     };
 
+
     /**
      * Init tab event actions
      * @private
@@ -655,6 +735,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             }
         ).on('shown.bs.tab', _tabOnShow);
     };
+
 
     /**
      * Init typeahead objects
@@ -685,6 +766,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             source: systems.ttAdapter(),
         });
     };
+
 
     /**
      * Init all sliders on the page
@@ -725,6 +807,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         });
     };
 
+
     /**
      * Init all sliders on the page
      * @private
@@ -758,11 +841,51 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         $('#modal-price-apply').on('click',
             function() {
-               _getAllPrices();
+               _updatePriceTable();
             }
         );
     };
 
+
+    /**
+     * Init the content of the price modal
+     * @private
+     */
+    var _initPriceModalContent = function() {
+        var tplOriginal = $('#priceConfigModal .modal-config-price tbody .price-config-row').detach();
+        var output = "";
+
+        for(var i in priceData.itemList) {
+            var tpl = tplOriginal.clone();
+            var item = priceData.items[priceData.itemList[i]];
+
+            // ugly way to do this, because of DOM (as it's not already on the page, it won't display as changed with .val())
+            tpl.find('.modal-order option[value="' + item.type + '"]').attr('selected', true);
+            tpl.find('.modal-region option[value="' + item.region + '"]').attr('selected', true);
+            output += tpl.prop('outerHTML').replace(/@@ID@@/g, item.id)
+                                           .replace(/@@NAME@@/g, item.name)
+                                           .replace(/@@ICON@@/g, item.icon);
+        }
+        $('#priceConfigModal .modal-config-price tbody').html(output);
+        _initPirceModalEvent();
+    }
+
+    /**
+     * [_initPirceModalEvent description]
+     * @private
+     */
+    var _initPirceModalEvent = function() {
+        // add check event when we click on the table cell, for easier use
+        $('.checkbox-cell').on('click', function() {
+            var checkbox = $(this).find('input[type="checkbox"]');
+            checkbox.prop('checked', !checkbox.prop('checked'));
+        });
+
+        // but we need to stop event propagation when we click on the checkbox
+        $('.checkbox-cell input[type="checkbox"]').on('click', function(event) {
+            event.stopPropagation();
+        });
+    }
 
     // -------------------------------------------------
     // Events functions
@@ -790,6 +913,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         return false;
     };
 
+
     /**
      * Function called on event change for 'run' text field
      * Replace the text input value with an integer (if it's anything else)
@@ -799,6 +923,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $(this).val(options.runs);
         return false;
     };
+
 
     /**
      * Function called on event show for tabs
@@ -828,13 +953,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         // only update when on summary / price tables
         if(tab == "#tab-price" || tab == "#tab-summary") {
-            // wait until materials are fully loaded
-            if(!isMaterialListLoaded && options.hasManufacturedComponent) {
-                return;
-            }
             _updateSummaryTabs();
         }
     };
+
 
     /**
      * Function called on event update on the material efficiency slider
@@ -846,6 +968,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _updateMaterial();
     };
 
+
     /**
      * Function called on event update on the time efficiency slider
      * @private
@@ -856,6 +979,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _updateTime();
     };
 
+
     /**
      * Function called on event update on the material efficiency slider
      * in the modal window
@@ -865,6 +989,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $('#Modal-ME-Level').html(ui.value);
     };
 
+
     /**
      * Function called on event update on the time efficiency slider
      * in the modal window
@@ -873,6 +998,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _modalTimeEfficiencyOnUpdate = function(event, ui) {
         $('#Modal-TE-Level').html(ui.value);
     };
+
 
     /**
      * Function called on event update on the skill level sliders
@@ -922,6 +1048,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _updateComponentInformations(false);
     };
 
+
     /**
      * Proxy function for apply all click event in modal
      * @call updateComponentInformations
@@ -930,6 +1057,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _onModalBpApplyAll = function() {
         _updateComponentInformations(true);
     };
+
 
     /**
      * Update button "raw components" state and update tables

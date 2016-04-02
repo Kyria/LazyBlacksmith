@@ -23,9 +23,11 @@
 .materials-list-summary {
     text-align: right;
 }
-.materials-requirement > tbody > tr , 
-.materials-prices > tbody > tr , 
-.materials-taxes > tbody > tr , 
+
+.modal-config-price > tbody > tr,
+.materials-requirement > tbody > tr ,
+.materials-prices > tbody > tr ,
+.materials-taxes > tbody > tr ,
 .materials-time > tbody > tr {
     > td {
         vertical-align: middle;
@@ -41,11 +43,30 @@
             text-align: right;
             padding-right: 20px;
             width: 20%;
+        };
+        &.checkbox-cell {
+            width: 25px;
+            cursor: pointer;
+
+            > input[type='checkbox'] {
+                cursor: pointer;
+            }
         }
     };
 }
+.modal-config-price > thead > tr > th {
+    &.checkbox-cell {
+        width: 25px;
+        cursor: pointer;
 
-.materials-prices > tfoot , .materials-taxes > tfoot  {
+        > input[type='checkbox'] {
+            cursor: pointer;
+        }
+    }
+}
+
+
+.materials-prices > tfoot, .materials-taxes > tfoot  {
     > tr:nth-child(odd) {
         > td,
         > th {
@@ -75,7 +96,7 @@
         }
     };
 }
- 
+
 
 
 #bp-tabs {

@@ -156,19 +156,20 @@ def get_price_and_tax():
 
         item_list = json['item_list']
 
-        item_price = ItemPrice.query.filter_by(
-            region_id=json['region']
-        ).filter(
+        item_price = ItemPrice.query.filter(
             ItemPrice.item_id.in_(item_list)
         )
 
         item_price_list = {}
         for price in item_price:
-            item_price_list[price.item_id] = {
+            if price.region_id not in item_price_list:
+                item_price_list[price.region_id] = {}
+
+            item_price_list[price.region_id][price.item_id] = {
                 'sell': price.sell_price,
                 'buy': price.buy_price,
             }
 
-        return jsonify(price=item_price_list)
+        return jsonify(prices=item_price_list)
     else:
         return 'Cannot call this page directly', 403
