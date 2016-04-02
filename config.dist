@@ -16,12 +16,12 @@ USE_CCP_ICONS = False
 CACHE_TYPE = 'null'
 
 # regions to get price from. (the forge, domain, sinq laison, heimatar)
-CREST_REGION_PRICE = [10000002, 10000032, 10000043, 10000030]
+CREST_REGION_PRICE = [10000002, 10000032, 10000043, 10000042, 10000030]
 
 # Celery
-BROKER_BACKEND='redis'
-BROKER_URL='redis://localhost:6379/0'
-CELERY_RESULT_BACKEND='redis://localhost:6379/0'
+BROKER_BACKEND = 'redis'
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # CREST API Informations
 # -----------------------
