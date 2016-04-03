@@ -378,7 +378,11 @@
                         </thead>
                         <tbody>
                             <tr class="price-config-row" data-id="@@ID@@">
-                                {% if config.USE_CCP_ICONS -%}<td>@@ICON@@</td>{%- endif %}
+                                {% if config.USE_CCP_ICONS -%}
+                                <td class="icon">
+                                    <img src="@@ICON@@" alt="@@NAME@@">
+                                </td>
+                                {%- endif %}
                                 <td>@@NAME@@</td>
                                 <td>
                                     <select name="modal-region" class="form-control input-sm modal-region">
