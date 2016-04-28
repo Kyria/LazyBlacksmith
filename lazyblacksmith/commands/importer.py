@@ -303,7 +303,6 @@ class Importer(object):
             total += 1
 
             if not data[0] or not data[1] or not data[2] or not data[3]:
-                print data
                 continue
 
             activityproduct = {
@@ -359,7 +358,6 @@ class Importer(object):
             total += 1
 
             if not data[0] or not data[1] or not data[2] or not data[3]:
-                print data
                 continue
 
             activityskill = {
