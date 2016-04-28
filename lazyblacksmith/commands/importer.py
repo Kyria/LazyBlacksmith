@@ -7,11 +7,13 @@ from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Constellation
+from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.tasks.adjusted_price import update_adjusted_price
+from lazyblacksmith.tasks.industry_index import update_industry_index
 
 
 class Importer(object):
@@ -27,6 +29,7 @@ class Importer(object):
         Constellation,
         SolarSystem,
         ItemAdjustedPrice,
+        IndustryIndex,
     ]
 
     def __init__(self, sde_connection, lb_engine):
@@ -533,3 +536,8 @@ class Importer(object):
         """
         return update_adjusted_price()
 
+    def import_industryindex(self):
+        """
+        import industry index into DB
+        """
+        return update_industry_index()
