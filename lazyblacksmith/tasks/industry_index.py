@@ -32,3 +32,5 @@ def update_industry_index():
         insert_index_list
     )
     db.session.commit()
+
+    return (len(insert_index_list), len(insert_index_list))
