@@ -108,7 +108,7 @@ class APIConnection(object):
             'https://public-crest.eveonline.com',
             HTTPAdapter(
                 pool_connections=20,
-                pool_maxsize=20,
+                pool_maxsize=150,
             )
         )
 
