@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-from flask.ext.login import LoginManager
+from flask_login import LoginManager
 from lazyblacksmith.models import EveUser
 
 

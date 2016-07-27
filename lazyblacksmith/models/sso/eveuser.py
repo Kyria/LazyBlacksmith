@@ -2,7 +2,7 @@
 from datetime import datetime
 
 from . import db
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from lazyblacksmith.models.utcdatetime import UTCDateTime
 from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.time import utcnow

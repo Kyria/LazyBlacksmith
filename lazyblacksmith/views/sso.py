@@ -9,10 +9,10 @@ from flask import redirect
 from flask import request
 from flask import session
 from flask import url_for
-from flask.ext.login import current_user
-from flask.ext.login import login_required
-from flask.ext.login import login_user
-from flask.ext.login import logout_user
+from flask_login import current_user
+from flask_login import login_required
+from flask_login import login_user
+from flask_login import logout_user
 from flask_oauthlib.client import OAuthException
 
 from lazyblacksmith.extension.oauth import eve_oauth
