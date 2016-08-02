@@ -32,7 +32,7 @@ def crest_order_price(region_crest, region_id, item_id_list):
         item_id = order.type
         
         # values if we already have this item in database or not
-        if item_id in item_id_list[stmt_type]:
+        if item_id in item_id_list:
             stmt_type = 'update' 
             region_id_label = 'u_region_id'
             item_id_label = 'u_item_id' 
@@ -42,7 +42,7 @@ def crest_order_price(region_crest, region_id, item_id_list):
             item_id_label = 'item_id'
         
         # do we already looped on this item ?
-        if item_id not in item_list:
+        if item_id not in item_list[stmt_type]:
             item_list[stmt_type][item_id] = {
                 'sell_price': None,
                 'buy_price': 0,
