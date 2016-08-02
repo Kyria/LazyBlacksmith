@@ -32,7 +32,7 @@ def crest_order_price(region_crest, region_id, item_id_list):
         item_id = order.type
         
         # values if we already have this item in database or not
-        if item_id in item_id_list:
+        if item_id in item_id_list[stmt_type]:
             stmt_type = 'update' 
             region_id_label = 'u_region_id'
             item_id_label = 'u_item_id' 
