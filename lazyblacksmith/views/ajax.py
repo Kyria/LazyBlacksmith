@@ -1,8 +1,6 @@
 # -*- encoding: utf-8 -*-
 from collections import OrderedDict
 
-import gevent.monkey
-
 from flask import Blueprint
 from flask import json
 from flask import jsonify
@@ -15,9 +13,6 @@ from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
-
-
-gevent.monkey.patch_all()
 
 ajax = Blueprint('ajax', __name__)
 
