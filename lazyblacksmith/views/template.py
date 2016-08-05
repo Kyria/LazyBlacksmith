@@ -17,3 +17,8 @@ def manufacturing_sublist_block():
 @cache.cached(timeout=3600*24)
 def manufacturing_sublist_row():
     return render_template('template/manufacturing-sublist-row.html')
+
+@template.route("/manufacturing/price/modal")
+@cache.cached(timeout=3600*24)
+def manufacturing_modal_price():
+    return render_template('template/manufacturing-modal-price.html')

@@ -4,6 +4,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     // template variables
     var tplSublistBlock = '';
     var tplSublistRow = '';
+    var tplModalPrice = '';
 
     // page options
     var options = {
@@ -33,6 +34,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         // template links
         tplSublistBlockUrl: false,
         tplSublistRowUrl: false,
+        tplModalPriceUrl: false,
     });
 
     // item price data and index
@@ -61,6 +63,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var isMaterialListLoaded = false;
     var useComponents = false;
     var lastTab = "#tab-summary";
+    var modalPriceUpdatePrice = true;
 
     // assembly informations
     var assemblyStats = [
@@ -693,6 +696,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $.get(lb.urls.tplSublistRowUrl,
             function(tpl) { tplSublistRow = tpl; }
         );
+        $.get(lb.urls.tplModalPriceUrl,
+            function(tpl) { tplModalPrice = tpl; }
+        );
+
+        
     };
 
 
@@ -838,12 +846,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         $('#modal-apply').on('click', _onModalBpApplyOne);
         $('#modal-apply-all').on('click', _onModalBpApplyAll);
-
-        $('#modal-price-apply').on('click',
-            function() {
-               _updatePriceTable();
-            }
-        );
     };
 
 
@@ -852,41 +854,129 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      * @private
      */
     var _initPriceModalContent = function() {
-        var tplOriginal = $('#priceConfigModal .modal-config-price tbody .price-config-row').detach();
-        var output = "";
+        if(tplModalPrice == '' || !priceData.isLoaded) {
+            // if any template is not yet set, try again in 1sec
+            return setTimeout(_initPriceModalContent, 1000);
+        }
+
+        var output = $("");
 
         for(var i in priceData.itemList) {
-            var tpl = tplOriginal.clone();
             var item = priceData.items[priceData.itemList[i]];
 
-            // ugly way to do this, because of DOM (as it's not already on the page, it won't display as changed with .val())
-            tpl.find('.modal-order option[value="' + item.type + '"]').attr('selected', true);
-            tpl.find('.modal-region option[value="' + item.region + '"]').attr('selected', true);
-            output += tpl.prop('outerHTML').replace(/@@ID@@/g, item.id)
-                                           .replace(/@@NAME@@/g, item.name)
-                                           .replace(/@@ICON@@/g, item.icon);
+            var tpl = tplModalPrice.replace(/@@ID@@/g, item.id)
+                                   .replace(/@@NAME@@/g, item.name)
+                                   .replace(/@@ICON@@/g, item.icon);
+             
+            tpl = $(tpl);
+            // need to use attr for checked and selected as when we display it, we lost the "prop" value...
+            tpl.find('.modal-order-type .btn-' + item.type).button('toggle');
+            //tpl.find('.modal-order-type .btn-' + item.type + ' input').prop('checked', true);
+            
+            // clone the list of region, unselect any, select the correct region..
+            tpl.find('.modal-region').append($('#modal-region-all > option').clone());
+            //tpl.find('.modal-region option:selected').removeAttr("selected");
+            tpl.find('.modal-region').val(item.region);
+            //tpl.find('.modal-region option[value="' + item.region + '"]').prop('selected', true);
+            
+            // get the current price
+            var currentPrice = Humanize.intcomma(priceData.prices[item.region][item.id][item.type], 2);
+            tpl.attr('title', currentPrice + ' ISK');
+            
+            // add to the output
+            $('#priceConfigModal .modal-config-price tbody').append(tpl);
         }
-        $('#priceConfigModal .modal-config-price tbody').html(output);
-        _initPirceModalEvent();
-    }
+        //$('#priceConfigModal .modal-config-price tbody').html(output);
+        _initPriceModalEvent();
+    };
 
     /**
      * [_initPirceModalEvent description]
      * @private
      */
-    var _initPirceModalEvent = function() {
+    var _initPriceModalEvent = function() {
         // add check event when we click on the table cell, for easier use
-        $('.checkbox-cell').on('click', function() {
+        $('.checkbox-cell').on('click', function(event) {
             var checkbox = $(this).find('input[type="checkbox"]');
             checkbox.prop('checked', !checkbox.prop('checked'));
+
+            if(checkbox.attr('id') == 'modal-price-checkall') {
+                _checkboxPriceToggleAllOnChange(event, checkbox);
+            }
         });
 
         // but we need to stop event propagation when we click on the checkbox
         $('.checkbox-cell input[type="checkbox"]').on('click', function(event) {
             event.stopPropagation();
         });
-    }
 
+        // check them all
+        $('#modal-price-checkall').on('change', _checkboxPriceToggleAllOnChange);
+
+        // price tooltips !
+        $('[data-toggle="tooltip"]').tooltip()
+        
+        // change price
+        $('.modal-region').on('change', _priceChangeOnTypeRegionChange);
+        $('.modal-order-type .btn input').on('change', _priceChangeOnTypeRegionChange);
+        
+        // apply to all select action, using checked rows
+        $('#modal-order-type-apply-all').on('click', function(event) { 
+            var typeOrder = $('#modal-order-all').val();
+            modalPriceUpdatePrice = false;
+
+            $('.modal-config-price tbody .checkbox-cell input:checked').each(function() {
+                var id = $(this).attr('data-id');
+                $('.price-config-row[data-id="' + id + '"] .modal-order-type .btn-' + typeOrder).button('toggle');
+                $('.price-config-row[data-id="' + id + '"]').tooltip('hide');
+            });
+            
+            modalPriceUpdatePrice = true;
+            _updatePriceTable();
+        });
+        
+        $('#modal-region-apply-all').on('click', function(event) { 
+            var region = $('#modal-region-all').val();
+            modalPriceUpdatePrice = false;
+            
+            $('.modal-config-price tbody .checkbox-cell input:checked').each(function(event) {
+                var id = $(this).attr('data-id');
+                $('.modal-region[data-id="' + id + '"]').val(region).change();
+                $('.price-config-row[data-id="' + id + '"]').tooltip('hide');
+            });
+            
+            modalPriceUpdatePrice = true;
+            _updatePriceTable();
+        });
+        
+    };
+
+    /**
+     * Change price for specified item and update all blueprint prices
+     * @private
+     */
+    var _priceChangeOnTypeRegionChange = function(event) {
+        // get data
+        var item = priceData.items[$(this).attr('data-id')]
+        var newRegion = $('.modal-region[data-id="' + item.id + '"]').val()
+        var newType = $('.modal-order-type .btn input[data-id="' + item.id + '"]:checked').val()
+        
+        // update item infos
+        item.region = newRegion;
+        item.type = newType;
+        
+        // now get the price and display it 
+        var currentPrice = priceData.prices[item.region][item.id];
+        currentPrice = (currentPrice === undefined) ? 0 : currentPrice[item.type];
+        currentPrice = Humanize.intcomma(currentPrice, 2);
+        $('.price-config-row[data-id="' + item.id + '"]').attr('data-original-title', currentPrice + ' ISK')
+                                                         .tooltip('fixTitle')
+                                                         .tooltip('show');
+        if(modalPriceUpdatePrice) {
+            _updatePriceTable();
+        }
+    }
+    
     // -------------------------------------------------
     // Events functions
     //
@@ -1083,6 +1173,17 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _updateSummaryTabs();
     };
 
+    /**
+     * (Un)Check all checkbox in price modal
+     * when the "check all" checkbox is used
+     * @param checkbox jQuery Object which contains the checkbox to check
+     * @private
+     */
+    var _checkboxPriceToggleAllOnChange = function(event, checkbox) {
+        checkbox = typeof checkbox !== 'undefined' ?  checkbox : $(this);
+        var state = checkbox.prop('checked');
+        $('.modal-config-price tbody .checkbox-cell input').prop('checked', state);
+    };
 
     /**
      * Runner function
@@ -1094,7 +1195,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _initSliders();
 
         // check all required urls (so we don't have to do it later)
-        if(!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl || !lb.urls.tplSublistBlockUrl || !lb.urls.tplSublistRowUrl) {
+        if(!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl 
+            || !lb.urls.tplSublistBlockUrl || !lb.urls.tplSublistRowUrl || !lb.urls.tplModalPriceUrl) {
             alert('Error, some URL are missing, this application cannot work properly without them.');
             return;
         }

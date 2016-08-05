@@ -9,6 +9,7 @@
         lb.urls.priceUrl            = "{{ url_for('ajax.get_price_and_tax') }}";
         lb.urls.tplSublistBlockUrl  = "{{ url_for('template.manufacturing_sublist_block') }}";
         lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
+        lb.urls.tplModalPriceUrl    = "{{ url_for('template.manufacturing_modal_price') }}";
 
         manufacturingBlueprint.options.hasManufacturedComponent = {% if has_manufactured_components %}true{% else %}false{% endif %};
         manufacturingBlueprint.options.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
@@ -331,7 +332,7 @@
 
 {% block modal %}
 <!-- Prices config modals -->
-<div class="modal fade" role="dialog" id="priceConfigModal" aria-labelledby="priceConfigModal" aria-hidden="true">
+<div class="modal fade" role="dialog" id="priceConfigModal" aria-labelledby="priceConfigModal" aria-hidden="true" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -343,12 +344,12 @@
                         <div class="input-group">
                             <select name="modal-region-all" id="modal-region-all" class="form-control input-sm">
                                 <option disabled selected>Select a region</option>
-                                    {% for region in regions %}
-                                    <option value="{{ region.id }}">{{ region.name }}</option>
-                                    {% endfor %}
+                                {% for region in regions %}
+                                <option value="{{ region.id }}">{{ region.name }}</option>
+                                {% endfor %}
                             </select>
                             <span class="input-group-btn">
-                                <button class="btn btn-sm btn-primary" type="button">Apply to selected</button>
+                                <button class="btn btn-sm btn-primary" id="modal-region-apply-all" type="button">Apply to selected</button>
                             </span>
                         </div>
                     </div>
@@ -359,7 +360,7 @@
                                 <option value="sell">Use sell orders</option>
                             </select>
                             <span class="input-group-btn">
-                                <button class="btn btn-sm btn-primary" type="button">Apply to selected</button>
+                                <button class="btn btn-sm btn-primary" id="modal-order-type-apply-all" type="button">Apply to selected</button>
                             </span>
                         </div>
                     </div>
@@ -372,41 +373,16 @@
                                 {% if config.USE_CCP_ICONS -%}<th class="icon">&nbsp;</th>{%- endif %}
                                 <th>Name</th>
                                 <th style="width:25%">Price region</th>
-                                <th style="width:25%">Order type</th>
+                                <th style="width:95px">Order type</th>
                                 <th class="checkbox-cell"><input type="checkbox" id="modal-price-checkall"/></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="price-config-row" data-id="@@ID@@">
-                                {% if config.USE_CCP_ICONS -%}
-                                <td class="icon">
-                                    <img src="@@ICON@@" alt="@@NAME@@">
-                                </td>
-                                {%- endif %}
-                                <td>@@NAME@@</td>
-                                <td>
-                                    <select name="modal-region" class="form-control input-sm modal-region">
-                                        {% for region in regions %}
-                                        <option value="{{ region.id }}">{{ region.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td>
-                                    <select name="modal-order" class="form-control input-sm modal-order">
-                                        <option value="buy">Use buy orders</option>
-                                        <option value="sell">Use sell orders</option>
-                                    </select>
-                                </td>
-                                <td class="checkbox-cell">
-                                    <input type="checkbox" data-id="@@ID@@"/>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="modal-price-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>

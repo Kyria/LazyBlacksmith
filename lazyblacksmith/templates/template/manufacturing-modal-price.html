@@ -1,0 +1,28 @@
+    <tr class="price-config-row" data-id="@@ID@@" data-container="body" data-toggle="tooltip" data-placement="top" title="">
+        {% if config.USE_CCP_ICONS -%}
+        <td class="icon">
+            <img src="@@ICON@@" alt="@@NAME@@">
+        </td>
+        {%- endif %}
+        <td>@@NAME@@</td>
+        <td>
+            <select name="modal-region" class="form-control input-sm modal-region" data-id="@@ID@@">
+                <!-- Region list -->
+            </select>
+        </td>
+        <td>
+            <div>
+                <div class="btn-group modal-order-type" data-toggle="buttons">
+                    <label class="btn btn-default btn-sm btn-sell">
+                        <input type="radio" name="modal-order-type-@@ID@@" data-id="@@ID@@" autocomplete="off" value="sell">Sell
+                    </label>
+                    <label class="btn btn-default btn-sm btn-buy">
+                        <input type="radio" name="modal-order-type-@@ID@@" data-id="@@ID@@" autocomplete="off" value="buy">Buy
+                    </label>
+                </div>
+            </div>
+        </td>
+        <td class="checkbox-cell">
+            <input type="checkbox" data-id="@@ID@@"/>
+        </td>
+    </tr>
