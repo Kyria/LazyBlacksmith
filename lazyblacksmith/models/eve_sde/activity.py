@@ -27,3 +27,7 @@ class Activity(db.Model):
     @classmethod
     def get_activity_name(cls, activity):
         return cls.ACTIVITIES[activity]
+
+    @classmethod
+    def check_activity_existence(cls, activity):
+        return activity in cls.ACTIVITIES

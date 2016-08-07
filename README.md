@@ -1,18 +1,17 @@
 # LazyBlacksmith
-An EVE Online Industry application for lazy people. 
+An EVE Online Industry application for lazy people.
 
 ## About
-LazyBlacksmith is a flask application allowing people to get informations about industry in eveonline. 
+LazyBlacksmith is a flask application allowing people to get informations about industry in eveonline.
 
-#### Current features
-* Blueprint manufacture informations including components required
+#### Features
+* Blueprint manufacture informations including components required and installation costs
+ * Use CREST market price / adjusted price for costs
+ * Use CREST industry index for installation fee
 
 #### TODO
 * Blueprint research and inventions informations
-* Give price everywhere (especially manufacturing)
-* Current Industry Indexes, with history (only since the installation)
-* Calculate industry taxes (I wish it never exists)
-* Things. 
+* Things.
 
 ## Requirements
 * Python 2.7
@@ -26,7 +25,7 @@ LazyBlacksmith is a flask application allowing people to get informations about 
 
 ## Installation
 
-Comin'... one day or another :) 
+Comin'... one day or another :)
 
 ## Contact
 Guillaume B.
@@ -35,7 +34,7 @@ Guillaume B.
 
 ## CCP Icons
 
-If you set ```USE_CCP_ICONS = True``` you need to download the files "EVE_VERSION_Types.zip" from CCP Toolkit ; http://community.eveonline.com/community/fansites/toolkit/ and then 
+If you set ```USE_CCP_ICONS = True``` you need to download the files "EVE_VERSION_Types.zip" from CCP Toolkit ; https://developers.eveonline.com/resource/resources and then
 move the files into ```lazyblacksmith/static/ccp/``` (as a result, you should have ```lazyblacksmith/static/ccp/Types/files.png```)
 
 ## LazyBlacksmith License
@@ -66,7 +65,3 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-## CCP Licence
-
-Going to be added. 

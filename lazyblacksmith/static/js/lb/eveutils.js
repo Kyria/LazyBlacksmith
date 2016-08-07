@@ -55,8 +55,6 @@ var eveUtils = (function() {
         return time;
     };
 
-
-
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
         calculateJobQuantity: calculateJobQuantity,

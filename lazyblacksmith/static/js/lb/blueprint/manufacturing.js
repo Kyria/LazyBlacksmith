@@ -15,7 +15,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         materialEfficiency: 0,
         timeEfficiency: 0,
         runs: 1,
-        facility: 0,
 
         // skill infos
         industryLvl: 0,
@@ -30,6 +29,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         systemUrls: false,
         materialBOMUrl: false,
         priceUrl: false,
+        adjustedPriceUrl: false,
 
         // template links
         tplSublistBlockUrl: false,
@@ -46,7 +46,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         // item configs
         items: {},
         itemList: [],
+
+        totalCost: 0,
+        totalInstallationCost: 0,
     };
+
+    var costIndex = {};
 
     var materialsData = {
         // produced item id
@@ -205,15 +210,16 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             return;
         }
 
+        var url = lb.urls.priceUrl.replace(/111111111111/, priceData.itemList.join(','));
+
         // get the prices
         $.ajax({
-            url: lb.urls.priceUrl,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({'item_list': priceData.itemList}),
+            url: url,
+            type: 'GET',
             dataType: 'json',
             success: function(jsonPrice) {
                 priceData.prices = jsonPrice['prices'];
+                priceData.adjusted = jsonPrice['adjusted'];
                 priceData.isLoaded = true;
                 _updatePriceTable();
             },
@@ -233,7 +239,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         }
         if(tplSublistBlock == '' || tplSublistRow == '') {
             // if any template is not yet set, try again in 1sec
-            return setTimeout(_getComponentMaterials, 1000);
+            return setTimeout(_getComponentMaterials, 100);
         }
         $.getJSON(lb.urls.materialBOMUrl, function(materialListResult) {
             var materialList = materialListResult['result'];
@@ -306,7 +312,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
                                      .replace(/@@QTY@@/g, material.qtyJob)
                                      .replace(/@@RUN@@/g, material.runs)
                                      .replace(/@@SYSTEM@@/g, material.manufacturingSystem)
-                                     .replace(/@@TAX@@/g, Humanize.intcomma(material.tax,2))
                                      .replace(/@@FACILITY_NAME@@/g, assemblyStats[material.facility].name)
                                      .replace(/@@ACTIVITY_TIME_HUMAN@@/g, timeHuman)
                                      .replace(/@@ACTIVITY_TIME_TOTAL@@/g, timeTotalHuman)
@@ -329,6 +334,44 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     };
 
 
+    /**
+     * Get the indexes of the missing solar systems
+     * @private
+     */
+    var _getSystemCostIndex = function() {
+        if((!isMaterialListLoaded && options.hasManufacturedComponent) || !priceData.isLoaded) {
+            // if any required data is not yet set, try again in 1sec
+            return setTimeout(_getSystemCostIndex, 100);
+        }
+
+        var materialList = $.merge([materialsData.productItemId], materialsData.componentIdList);
+        var systemList = [];
+
+        for(var i in materialList) {
+            var system = materialsData.materials[materialList[i]].manufacturingSystem;
+            if(!(system in costIndex) && $.inArray(system,systemList) == -1) {
+                systemList.push(system);
+            }
+        }
+
+        if(systemList.length == 0) {
+            return _updateTaxTable();
+        }
+
+        var url = lb.urls.adjustedPriceUrl.replace(/111111111111/, systemList.join(','));
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(jsonIndex) {
+                $.extend(costIndex, jsonIndex['index']);
+                _updateTaxTable();
+            },
+        });
+
+    }
+
     // -------------------------------------------------
     // Functions (no events, no event functions)
     //
@@ -346,7 +389,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
                 material.qtyRequiredPerRun,
                 options.materialEfficiency,
-                assemblyStats[options.facility].me
+                assemblyStats[materialsData.materials[materialsData.productItemId].facility].me
             );
             var quantityJob = eveUtils.calculateJobQuantity(
                 quantityAdjusted,
@@ -426,7 +469,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         var time = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
             options.runs,
-            assemblyStats[options.facility].te,
+            assemblyStats[materialsData.materials[materialsData.productItemId].facility].te,
             options.timeEfficiency,
             options.industryLvl, options.advancedIndustryLvl,
             options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
@@ -489,7 +532,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         }
 
         // get data
-        var tax = $('#modal-tax').val();
         var system = $('#modal-system').val();
         var ME = parseInt($('#Modal-ME-Level').text());
         var TE = parseInt($('#Modal-TE-Level').text());
@@ -499,7 +541,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             var componentId = components[i];
             materialsData.materials[componentId].manufacturingSystem = system;
             materialsData.materials[componentId].facility = facility;
-            materialsData.materials[componentId].tax = tax;
             materialsData.materials[componentId].materialEfficiency = ME;
             materialsData.materials[componentId].timeEfficiency = TE;
             _updateComponentBpInfoDisplay(componentId);
@@ -519,7 +560,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      */
     var _updateComponentBpInfoDisplay = function(id) {
         $('.sub-list-'+ id +' .system').html(materialsData.materials[id].manufacturingSystem);
-        $('.sub-list-'+ id +' .tax').html(Humanize.intcomma(materialsData.materials[id].tax,2));
         $('.sub-list-'+ id +' .me').html(materialsData.materials[id].materialEfficiency);
         $('.sub-list-'+ id +' .te').html(materialsData.materials[id].timeEfficiency);
         $('.sub-list-'+ id +' .facility').html(assemblyStats[materialsData.materials[id].facility].name);
@@ -539,7 +579,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _updateMaterialSummaryTable();
         _updateTimeTable();
         _getAllPrices();
-        //_getAdjustedPrices();
     };
 
 
@@ -631,31 +670,20 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $('.materials-prices tbody').html(output);
 
         // fill footer rows (total, margin, markup...)
-        var itemPrice =  priceData.items[materialsData.productItemId];
-        var priceRegion = priceData.prices[itemPrice.region];
-        var productPrice = (priceRegion != undefined
-                            && materialsData.productItemId in priceRegion) ? priceRegion[materialsData.productItemId]['sell'] : 0;
-        productPrice *= materialsData.materials[materialsData.productItemId].qtyJob;
-
-        var margin = productPrice - materialTotalPrice;
-        var marginPercent = (productPrice > 0) ? (margin / productPrice) * 100 : 0;
-        var markupPercent = (productPrice > 0) ? (margin / materialTotalPrice) * 100 : 0;
-
-        $('.materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(materialTotalPrice, 2));
-        $('.materials-prices tfoot td#product-price').html(Humanize.intcomma(productPrice, 2));
-        $('.materials-prices tfoot td#margin').html(Humanize.intcomma(margin, 2));
-        $('.materials-prices tfoot td#margin-percent').html(Humanize.intcomma(marginPercent, 2) + "%");
-        $('.materials-prices tfoot td#markup-percent').html(Humanize.intcomma(markupPercent, 2) + "%");
+        priceData.totalCost = materialTotalPrice;
+        _getSystemCostIndex();
     };
 
 
     /**
      * Update the price list with total etc in the price tab.
-     * Only called by _getAdjustedPrices and _getSystemCostIndex
-     * @TODO calculate tax
+     * Only called by _getSystemCostIndex
      * @private
      */
     var _updateTaxTable = function() {
+        var onlySubComponents = (useComponents && options.hasManufacturedComponent);
+        var totalInstallationCost = 0;
+
         var iconColumn = '';
         if(options.useIcons) {
             iconColumn = '<td class="icon"><img src="@@ICON@@" alt="@@NAME@@" /></td>';
@@ -664,21 +692,88 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
                    + '<td class="quantity">@@QTY@@</td>'
                    + '<td class="tax price">@@TAX@@</td></tr>';
 
-        var output = "";
-        var materialList = $.merge([materialsData.productItemId], materialsData.componentIdList);
+        // set the main blueprint
+        var taxPrice = _calculateBaseCost(materialsData.productItemId);
+        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].manufacturingSystem];
+        totalInstallationCost += taxPrice;
 
-        for(var i in materialList) {
-            material = materialsData.materials[materialList[i]];
+        var output = rowTax.replace(/@@ICON@@/g, materialsData.materials[materialsData.productItemId].icon)
+                           .replace(/@@NAME@@/g, materialsData.materials[materialsData.productItemId].name)
+                           .replace(/@@TAX@@/g, Humanize.intcomma(taxPrice,2))
+                           .replace(/@@QTY@@/g, Humanize.intcomma(materialsData.materials[materialsData.productItemId].qtyJob));
+
+        // display the tax for components
+        for(var i in materialsData.componentIdList) {
+            var material = materialsData.materials[materialsData.componentIdList[i]];
+
             if(material.isManufactured) {
-                var tax_price = 0;
+                var taxPrice = _calculateBaseCost(material.id);
+                taxPrice *= 1.1 * costIndex[material.manufacturingSystem];
+
                 output += rowTax.replace(/@@ICON@@/g, material.icon)
                                 .replace(/@@NAME@@/g, material.name)
-                                .replace(/@@TAX@@/g, tax_price)
+                                .replace(/@@TAX@@/g, Humanize.intcomma(taxPrice,2))
                                 .replace(/@@QTY@@/g, Humanize.intcomma(material.qtyJob));
+
+                if(onlySubComponents) {
+                    totalInstallationCost += taxPrice;
+                }
             }
         }
         $('.materials-taxes tbody').html(output);
+
+        priceData.totalInstallationCost = totalInstallationCost;
+        _updateMarginMarkupTable();
     };
+
+
+    /**
+     * Update the margin/markup part of the price table using all required data
+     * @private
+     */
+    var _updateMarginMarkupTable = function() {
+        var itemPrice =  priceData.items[materialsData.productItemId];
+        var priceRegion = priceData.prices[itemPrice.region];
+        var productPrice = (priceRegion != undefined
+                            && materialsData.productItemId in priceRegion) ? priceRegion[materialsData.productItemId]['sell'] : 0;
+        productPrice *= materialsData.materials[materialsData.productItemId].qtyJob;
+
+        var margin = productPrice - priceData.totalCost - priceData.totalInstallationCost;
+        var marginPercent = (productPrice > 0) ? (margin / productPrice) * 100 : 0;
+        var markupPercent = (productPrice > 0) ? (margin / priceData.totalCost) * 100 : 0;
+
+        $('.materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(priceData.totalCost, 2));
+        $('.materials-prices tfoot td#product-price').html(Humanize.intcomma(productPrice, 2));
+        $('.materials-prices tfoot td#installation-cost').html(Humanize.intcomma(priceData.totalInstallationCost, 2));
+        $('.materials-prices tfoot td#margin').html(Humanize.intcomma(margin, 2));
+        $('.materials-prices tfoot td#margin-percent').html(Humanize.intcomma(marginPercent, 2) + "%");
+        $('.materials-prices tfoot td#markup-percent').html(Humanize.intcomma(markupPercent, 2) + "%");
+    }
+
+
+    /**
+     * Calculate the base cost for installation fee
+     * @param  material_id the id of the material we want to job cost
+     * @private
+     */
+    var _calculateBaseCost = function(material_id) {
+        var material;
+        var runs;
+        if(material_id == materialsData.productItemId) {
+            material = materialsData;
+            runs = options.runs
+        } else {
+            material = materialsData.materials[material_id];
+            runs = materialsData.materials[material_id].runs;
+        }
+
+        var baseCost = 0;
+        for(var i in material.componentIdList) {
+            var component = material.materials[material.componentIdList[i]];
+            baseCost += component.qtyRequiredPerRun * priceData.adjusted[component.id];
+        }
+        return baseCost * runs;
+    }
 
 
     // -------------------------------------------------
@@ -699,8 +794,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $.get(lb.urls.tplModalPriceUrl,
             function(tpl) { tplModalPrice = tpl; }
         );
-
-        
     };
 
 
@@ -718,11 +811,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      * @private
      */
     var _initInputs = function() {
+
         $('#runs').on('keyup', _runsOnKeyUp)
                   .on('change', _runOnChange);
 
         $('#facility').on('change', function() {
-            options.facility = parseInt($('#facility').val());
+            materialsData.materials[materialsData.productItemId].facility = parseInt($('#facility').val());
             _updateTime();
             _updateMaterial();
         });
@@ -763,11 +857,16 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         });
         systems.initialize();
 
+        var typeaheadEventSelector = "change typeahead:selected typeahead:autocompleted";
         $('#system').typeahead(null,{
             name: 'system',
             displayKey: 'name',
             source: systems.ttAdapter(),
+        }).on(typeaheadEventSelector, function(event, suggestion) {
+            materialsData.materials[materialsData.productItemId].manufacturingSystem = $(this).typeahead('val');
+            _getSystemCostIndex();
         });
+
         $('#modal-system').typeahead(null,{
             name: 'system',
             displayKey: 'name',
@@ -828,14 +927,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
             var system = materialsData.materials[id].manufacturingSystem;
             var facility = materialsData.materials[id].facility;
-            var tax = materialsData.materials[id].tax;
 
             var me = materialsData.materials[id].materialEfficiency;
             var te = materialsData.materials[id].timeEfficiency;
 
             $('#componentModalBpName').html(name);
             $('#componentModalBpName').attr('data-bp-id', id);
-            $('#modal-tax').val(tax);
             $('#modal-system').val(system);
             $('#modal-facility option[value='+facility+']').prop('selected',true);
             $('#ModalME').slider("option", "value", me);
@@ -856,7 +953,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _initPriceModalContent = function() {
         if(tplModalPrice == '' || !priceData.isLoaded) {
             // if any template is not yet set, try again in 1sec
-            return setTimeout(_initPriceModalContent, 1000);
+            return setTimeout(_initPriceModalContent, 100);
         }
 
         var output = $("");
@@ -867,28 +964,29 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             var tpl = tplModalPrice.replace(/@@ID@@/g, item.id)
                                    .replace(/@@NAME@@/g, item.name)
                                    .replace(/@@ICON@@/g, item.icon);
-             
+
             tpl = $(tpl);
             // need to use attr for checked and selected as when we display it, we lost the "prop" value...
             tpl.find('.modal-order-type .btn-' + item.type).button('toggle');
             //tpl.find('.modal-order-type .btn-' + item.type + ' input').prop('checked', true);
-            
+
             // clone the list of region, unselect any, select the correct region..
             tpl.find('.modal-region').append($('#modal-region-all > option').clone());
             //tpl.find('.modal-region option:selected').removeAttr("selected");
             tpl.find('.modal-region').val(item.region);
             //tpl.find('.modal-region option[value="' + item.region + '"]').prop('selected', true);
-            
+
             // get the current price
             var currentPrice = Humanize.intcomma(priceData.prices[item.region][item.id][item.type], 2);
             tpl.attr('title', currentPrice + ' ISK');
-            
+
             // add to the output
             $('#priceConfigModal .modal-config-price tbody').append(tpl);
         }
         //$('#priceConfigModal .modal-config-price tbody').html(output);
         _initPriceModalEvent();
     };
+
 
     /**
      * [_initPirceModalEvent description]
@@ -915,13 +1013,13 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         // price tooltips !
         $('[data-toggle="tooltip"]').tooltip()
-        
+
         // change price
         $('.modal-region').on('change', _priceChangeOnTypeRegionChange);
         $('.modal-order-type .btn input').on('change', _priceChangeOnTypeRegionChange);
-        
+
         // apply to all select action, using checked rows
-        $('#modal-order-type-apply-all').on('click', function(event) { 
+        $('#modal-order-type-apply-all').on('click', function(event) {
             var typeOrder = $('#modal-order-all').val();
             modalPriceUpdatePrice = false;
 
@@ -930,53 +1028,27 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
                 $('.price-config-row[data-id="' + id + '"] .modal-order-type .btn-' + typeOrder).button('toggle');
                 $('.price-config-row[data-id="' + id + '"]').tooltip('hide');
             });
-            
+
             modalPriceUpdatePrice = true;
             _updatePriceTable();
         });
-        
-        $('#modal-region-apply-all').on('click', function(event) { 
+
+        $('#modal-region-apply-all').on('click', function(event) {
             var region = $('#modal-region-all').val();
             modalPriceUpdatePrice = false;
-            
+
             $('.modal-config-price tbody .checkbox-cell input:checked').each(function(event) {
                 var id = $(this).attr('data-id');
                 $('.modal-region[data-id="' + id + '"]').val(region).change();
                 $('.price-config-row[data-id="' + id + '"]').tooltip('hide');
             });
-            
+
             modalPriceUpdatePrice = true;
             _updatePriceTable();
         });
-        
     };
 
-    /**
-     * Change price for specified item and update all blueprint prices
-     * @private
-     */
-    var _priceChangeOnTypeRegionChange = function(event) {
-        // get data
-        var item = priceData.items[$(this).attr('data-id')]
-        var newRegion = $('.modal-region[data-id="' + item.id + '"]').val()
-        var newType = $('.modal-order-type .btn input[data-id="' + item.id + '"]:checked').val()
-        
-        // update item infos
-        item.region = newRegion;
-        item.type = newType;
-        
-        // now get the price and display it 
-        var currentPrice = priceData.prices[item.region][item.id];
-        currentPrice = (currentPrice === undefined) ? 0 : currentPrice[item.type];
-        currentPrice = Humanize.intcomma(currentPrice, 2);
-        $('.price-config-row[data-id="' + item.id + '"]').attr('data-original-title', currentPrice + ' ISK')
-                                                         .tooltip('fixTitle')
-                                                         .tooltip('show');
-        if(modalPriceUpdatePrice) {
-            _updatePriceTable();
-        }
-    }
-    
+
     // -------------------------------------------------
     // Events functions
     //
@@ -1186,6 +1258,33 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     };
 
     /**
+     * Change price for specified item and update all blueprint prices
+     * @private
+     */
+    var _priceChangeOnTypeRegionChange = function(event) {
+        // get data
+        var item = priceData.items[$(this).attr('data-id')]
+        var newRegion = $('.modal-region[data-id="' + item.id + '"]').val()
+        var newType = $('.modal-order-type .btn input[data-id="' + item.id + '"]:checked').val()
+
+        // update item infos
+        item.region = newRegion;
+        item.type = newType;
+
+        // now get the price and display it
+        var currentPrice = priceData.prices[item.region][item.id];
+        currentPrice = (currentPrice === undefined) ? 0 : currentPrice[item.type];
+        currentPrice = Humanize.intcomma(currentPrice, 2);
+        $('.price-config-row[data-id="' + item.id + '"]').attr('data-original-title', currentPrice + ' ISK')
+                                                         .tooltip('fixTitle')
+                                                         .tooltip('show');
+        if(modalPriceUpdatePrice) {
+            _updatePriceTable();
+        }
+    };
+
+
+    /**
      * Runner function
      */
     var run = function() {
@@ -1195,7 +1294,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _initSliders();
 
         // check all required urls (so we don't have to do it later)
-        if(!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl 
+        if(!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl || !lb.urls.adjustedPriceUrl
             || !lb.urls.tplSublistBlockUrl || !lb.urls.tplSublistRowUrl || !lb.urls.tplModalPriceUrl) {
             alert('Error, some URL are missing, this application cannot work properly without them.');
             return;
@@ -1226,6 +1325,3 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 })(jQuery, lb, utils, eveUtils, Humanize, JSON);
 
 lb.registerModule('manufacturingBlueprint', manufacturingBlueprint);
-
-
-// tax: station cost multiplier : 0.98
