@@ -11,6 +11,7 @@ from lazyblacksmith.utils.crestutils import get_all_items
 from lazyblacksmith.utils.crestutils import get_by_attr
 from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.pycrest.errors import APIException
+from lazyblacksmith.utils.time import utcnow
 from requests.exceptions import Timeout
 
 from ratelimiter import RateLimiter
@@ -48,6 +49,7 @@ def crest_order_price(region_crest, region_id, item_id_list):
                 'buy_price': 0,
                 region_id_label: region_id,
                 item_id_label: item_id,
+                'update_at': utcnow()
             }
             
         if not order.buy:
