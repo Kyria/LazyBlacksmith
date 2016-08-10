@@ -52,6 +52,7 @@ def blueprint_search(name):
             data = []
             for bp in blueprints:
                 invention = False
+                # TODO: check if this can be invented.
 
                 data.append({
                     'id': bp.id,
@@ -224,3 +225,39 @@ def get_index_activity(solar_system_names, activity):
         return jsonify(index=index_list)
     else:
         return 'This activity does not exist', 500
+
+
+@ajax.route('/item/search/<string:name>', methods=['GET'])
+def item_search(name):
+    """
+    Return JSON result for a specific search
+    name is the request name.
+    """
+    if request.is_xhr:
+        cache_key = 'item:search:%s' % (name.lower().replace(" ", ""),)
+
+        data = cache.get(cache_key)
+        if data is None:
+            items = Item.query.filter(
+                Item.name.ilike('%'+name.lower()+'%'),
+            ).order_by(
+                Item.name.asc()
+            ).all()
+
+            data = []
+            for item in items:
+                data.append({
+                    'id': item.id,
+                    'name': item.name,
+                    'icon': item.icon_32(),
+                })
+
+            # cache for 7 day as it does not change that often
+            cache.set(cache_key, json.dumps(data), 24*3600*7)
+
+        else:
+            data = json.loads(data)
+
+        return jsonify(result=data)
+    else:
+        return 'Cannot call this page directly', 403

@@ -11,6 +11,7 @@ from lazyblacksmith.views.ajax import ajax
 from lazyblacksmith.views.blueprint import blueprint
 from lazyblacksmith.views.home import home
 from lazyblacksmith.views.industry_index import industry
+from lazyblacksmith.views.price import price
 from lazyblacksmith.views.sso import sso
 
 # helpers
@@ -49,6 +50,7 @@ def register_blueprints(app):
     app.register_blueprint(template, url_prefix='/template')
     app.register_blueprint(industry, url_prefix='/industry_index')
     app.register_blueprint(sso, url_prefix='/sso')
+    app.register_blueprint(price, url_prefix='/price')
     app.register_blueprint(home)
     app.register_blueprint(templatefilter)
 

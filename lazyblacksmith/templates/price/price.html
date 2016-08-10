@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}:: Item Prices{% endblock %}
+
+{% block js %}
+    <script>
+        lb.urls.priceUrl        = "{{ url_for('ajax.get_price', item_list='0000') }}";
+        lb.urls.itemSearchUrl   = "{{ url_for('ajax.item_search', name='0000') }}";
+
+        itemPriceLookup.useIcons =  {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
+        {% for region in regions -%}
+        itemPriceLookup.regions[{{ region.id }}] = "{{ region.name }}";
+        {% endfor %}
+
+        lb.run('itemPriceLookup');
+    </script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="well">
+            <div>
+                Item Name<br>
+                <input id="itemSearch" type="text" class="form-control input-sm" placeholder="Enter the item name">
+            </div>
+            <br>
+            <div class="list-group" id="resultList">
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9" id="content">
+        <div class="row">
+            <div class="col-xs-10">
+                <h4 id="item-name"></h4>
+            </div>
+            <div class="col-xs-2 text-right" id="item-icon"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-condensed price-list table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Region</th>
+                            <th>Min Sell</th>
+                            <th>Max Buy</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
