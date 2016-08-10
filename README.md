@@ -8,6 +8,7 @@ LazyBlacksmith is a flask application allowing people to get informations about 
 * Blueprint manufacture informations including components required and installation costs
  * Use CREST market price / adjusted price for costs
  * Use CREST industry index for installation fee
+* Get and compare item price over all regions
 
 #### TODO
 * Blueprint research and inventions informations
@@ -20,7 +21,7 @@ LazyBlacksmith is a flask application allowing people to get informations about 
 * Virtualenv (recommended)
 * Cache system (eg. python-memcached or redis-cache) (recommanded)
 * Database connectors depending on the one you use (MySQL 5.6+,...)
-* See [requirements.txt](requirements.txt) for other requirements
+* See [requirements.txt](requirements/) for other requirements
 * Eve Online Icons (see CCP Icons part)
 
 ## Installation
