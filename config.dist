@@ -1,51 +1,147 @@
 from lazyblacksmith import __version as version
 
+# Application configurations
+# ------------------------------------------------------
 DEBUG = True
 SECRET_KEY = 'YouNeedToChangeThis!'
 PORT = 5015
 HOST = '127.0.0.1'
 
-# flask configs
+# ------------------------------------------------------
+# Database configuration
+# ------------------------------------------------------
 SQLALCHEMY_DATABASE_URI = 'mysql://username:password@server/db'
 
-# application config
+# ------------------------------------------------------
+# Lazyblacksmith/CCP config
+# ------------------------------------------------------
 USE_CCP_ICONS = False
 
-# cache configuration
-# - use https://pythonhosted.org/Flask-Cache/ to configure the cache you want
+# ------------------------------------------------------
+# cache configuration : use
+# https://pythonhosted.org/Flask-Cache/
+# to configure the cache you want
+# ------------------------------------------------------
 CACHE_TYPE = 'null'
 
-# regions to get price from. (the forge, domain, sinq laison, heimatar)
-CREST_REGION_PRICE = [10000002, 10000032, 10000043, 10000042, 10000030]
-
-# Celery
+# ------------------------------------------------------
+# Celery configs
+# ------------------------------------------------------
 BROKER_BACKEND = 'redis'
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
+
 # CREST API Informations
-# -----------------------
+# ------------------------------------------------------
 # Your crest secret key
+# ------------------------------------------------------
 CREST_SECRET_KEY = ''
+
+# ------------------------------------------------------
 # Your client ID
+# ------------------------------------------------------
 CREST_CLIENT_ID = ''
+
+# ------------------------------------------------------
 # Redirect DNS. Only put the DNS, as the whole URL while be
 # constructed dynamically. (example: "localhost", "yourdomain.com")
+# ------------------------------------------------------
 CREST_REDIRECT_DNS = ''
+
+# ------------------------------------------------------
 # Custom user agent to identify yourself to CCP, in case of problems
 # None for default
+# ------------------------------------------------------
 CREST_USER_AGENT = 'LazyBlacksmith/%d' % version
+
+# ------------------------------------------------------
 # Scope required for CREST
 # please do not touch this
+# ------------------------------------------------------
 CREST_SCOPE = ['publicData']
 
+# ------------------------------------------------------
 # Request per seconds for market order fetch (via CREST)
 # Max is 150rq/sec, but for all crest call, so better be
 # around 100-120 (we don't care about speed in our case)
 # If you got any problem (timeout / 503s), lower it :)
 # but if you don't know what is it, don't change it !
+# ------------------------------------------------------
 CREST_REQ_RATE_LIM = 130
 
+# ------------------------------------------------------
+# regions to get price from. (all 64 regions in k-space)
+# ------------------------------------------------------
+CREST_REGION_PRICE = [
+    10000001,
+    10000002,
+    10000003,
+    10000005,
+    10000006,
+    10000007,
+    10000008,
+    10000009,
+    10000010,
+    10000011,
+    10000012,
+    10000013,
+    10000014,
+    10000015,
+    10000016,
+    10000018,
+    10000020,
+    10000021,
+    10000022,
+    10000023,
+    10000025,
+    10000027,
+    10000028,
+    10000029,
+    10000030,
+    10000031,
+    10000032,
+    10000033,
+    10000034,
+    10000035,
+    10000036,
+    10000037,
+    10000038,
+    10000039,
+    10000040,
+    10000041,
+    10000042,
+    10000043,
+    10000044,
+    10000045,
+    10000046,
+    10000047,
+    10000048,
+    10000049,
+    10000050,
+    10000051,
+    10000052,
+    10000053,
+    10000054,
+    10000055,
+    10000056,
+    10000057,
+    10000058,
+    10000059,
+    10000060,
+    10000061,
+    10000062,
+    10000063,
+    10000064,
+    10000065,
+    10000066,
+    10000067,
+    10000068,
+    10000069
+]
+
+# ------------------------------------------------------
 # DO NOT EDIT
 # Fix deprecated/warning from flask-sqlalchemy
-SQLALCHEMY_TRACK_MODIFICATIONS=True
+# ------------------------------------------------------
+SQLALCHEMY_TRACK_MODIFICATIONS = True
