@@ -15,7 +15,9 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.utils.time import utcnow
 
+import humanize
 
 ajax = Blueprint('ajax', __name__)
 
@@ -163,9 +165,11 @@ def get_price(item_list):
             if price.region_id not in item_price_list:
                 item_price_list[price.region_id] = {}
 
+            update_delta = price.updated_at - utcnow()
             item_price_list[price.region_id][price.item_id] = {
                 'sell': price.sell_price,
                 'buy': price.buy_price,
+                'updated_at': humanize.naturaltime(update_delta),
             }
 
         # get all items adjusted price
