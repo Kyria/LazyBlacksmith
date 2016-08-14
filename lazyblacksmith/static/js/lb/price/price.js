@@ -1,6 +1,7 @@
 var itemPriceLookup = (function ($, lb, Humanize) {
     "use strict";
 
+    var sorting = [[1,1]];
     var regions = {};
 
     var options = {
@@ -112,6 +113,8 @@ var itemPriceLookup = (function ($, lb, Humanize) {
                     output += "<td>" + prices[regionId][item_id].updated_at + "</td></tr>";
                 }
                 $('.price-list tbody').html(output);
+                $(".price-list").trigger("update")
+                $(".price-list").trigger("sorton",[sorting]);
             },
         });
 
@@ -135,6 +138,34 @@ var itemPriceLookup = (function ($, lb, Humanize) {
                 itemOldValue = $(this).val();
             }
         );
+
+        // overwrite still to match ours
+        $.tablesorter.themes.bootstrap = {
+            table        : '',
+            caption      : 'caption',
+            header       : '',
+            sortNone     : '',
+            sortAsc      : '',
+            sortDesc     : '',
+            active       : '',
+            hover        : '',
+            icons        : '',
+            iconSortNone : 'fa fa-sort',
+            iconSortAsc  : 'fa fa-sort-asc',
+            iconSortDesc : 'fa fa-sort-desc',
+            filterRow    : '',
+            footerRow    : '',
+            footerCells  : '',
+            even         : '',
+            odd          : ''
+        };
+
+
+        $('.price-list').tablesorter({
+            theme: "bootstrap",
+            headerTemplate : '{content} {icon}',
+            widgets : ["uitheme"],
+        });
     };
 
 
