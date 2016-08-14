@@ -7,7 +7,7 @@
         lb.urls.priceUrl        = "{{ url_for('ajax.get_price', item_list='0000') }}";
         lb.urls.itemSearchUrl   = "{{ url_for('ajax.item_search', name='0000') }}";
 
-        itemPriceLookup.useIcons =  {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
+        itemPriceLookup.options.useIcons =  {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
         {% for region in regions -%}
         itemPriceLookup.regions[{{ region.id }}] = "{{ region.name }}";
         {% endfor %}
@@ -19,15 +19,16 @@
 {% block content %}
 <div class="row">
     <div class="col-md-3">
-        <div class="well">
-            <div>
-                Item Name<br>
-                <input id="itemSearch" type="text" class="form-control input-sm" placeholder="Enter the item name">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Search Item</h3>
             </div>
-            <br>
-            <div class="list-group" id="resultList">
+            <div class="panel-body">
+                <input id="itemSearch" type="text" class="form-control input-sm" placeholder="Item name">
             </div>
         </div>
+
+        <div class="list-group" id="resultList"></div>
     </div>
 
     <div class="col-md-9" id="content">

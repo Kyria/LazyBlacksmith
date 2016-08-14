@@ -2,7 +2,10 @@ var itemPriceLookup = (function ($, lb, Humanize) {
     "use strict";
 
     var regions = {};
-    var useIcons = false;
+
+    var options = {
+        useIcons: false,
+    }
 
     $.extend(lb.urls, {
         priceUrl: false,
@@ -68,7 +71,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
 
                 // update headers and image
                 $('#item-name').html($(this).attr('data-name'));
-                if(useIcons) {
+                if(options.useIcons) {
                     $('#item-icon').html("<img src='" + $(this).attr('data-icon') + "' alt='icon' />");
                 }
 
@@ -138,7 +141,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
     return {
         run: run,
         regions: regions,
-        useIcons: useIcons,
+        options: options,
     }
 
 }) (jQuery, lb, Humanize);
