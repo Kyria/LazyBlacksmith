@@ -113,9 +113,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
                     output += "<td>" + prices[regionId][item_id].updated_at + "</td></tr>";
                 }
                 $('.price-list tbody').html(output);
-                $(".price-list").trigger("update");
-                $(".price-list").trigger("sortReset");
-                $(".price-list").trigger("sorton",[sorting]);
+                $(".price-list").trigger("update",[sorting]);
             },
         });
 
