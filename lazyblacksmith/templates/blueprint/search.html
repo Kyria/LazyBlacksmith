@@ -4,7 +4,7 @@
 
 {% block js %}
     <script>
-        lb.urls.searchUrl           = '{{ url_for('ajax.blueprint_search', name='0000') }}';
+        lb.urls.searchUrl           = '{{ url_for('ajax_eve_sde.blueprint_search', name='0000') }}';
         lb.urls.inventionUrl        = '';
         lb.urls.manufacturingUrl    = '{{ url_for('blueprint.manufacturing', item_id='999999999') }}';
         lb.urls.researchUrl         = '';
@@ -13,23 +13,25 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-lg-6 col-md-6">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Search Blueprint</h3>
-        </div>
-        <div class="panel-body">
-            <input id="blueprint" type="text" class="form-control" placeholder="Item name">
-            <br />
-            <table class="table table-striped table-hover" id="searchBlueprintResult">
-                <thead>
-                    <th>Blueprint Name</th>
-                    <th>&nbsp;</th>
-                </thead>
-                <tbody>
-                    <td colspan="2">No results</td>
-                </tbody>
-            </table>
+<div class="row">
+    <div class="col-lg-6 col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Search Blueprint</h3>
+            </div>
+            <div class="panel-body">
+                <input id="blueprint" type="text" class="form-control" placeholder="Item name">
+                <br />
+                <table class="table table-striped table-hover" id="searchBlueprintResult">
+                    <thead>
+                        <th>Blueprint Name</th>
+                        <th>&nbsp;</th>
+                    </thead>
+                    <tbody>
+                        <td colspan="2">No results</td>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

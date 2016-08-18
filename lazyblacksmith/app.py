@@ -7,11 +7,11 @@ from flask_wtf.csrf import CsrfProtect
 import flask_login
 
 # blueprint stuff
-from lazyblacksmith.views.ajax import ajax
-from lazyblacksmith.views.blueprint import blueprint
+from lazyblacksmith.views import ajax_eve_sde
+from lazyblacksmith.views import ajax_crest
+from lazyblacksmith.views import blueprint
+from lazyblacksmith.views import price
 from lazyblacksmith.views.home import home
-from lazyblacksmith.views.industry_index import industry
-from lazyblacksmith.views.price import price
 from lazyblacksmith.views.sso import sso
 
 # helpers
@@ -45,10 +45,10 @@ def create_app(config_object):
 
 def register_blueprints(app):
     """ register blueprints & helper blueprints """
+    app.register_blueprint(ajax_crest, url_prefix='/ajax/crest')
+    app.register_blueprint(ajax_eve_sde, url_prefix='/ajax/evesde')
     app.register_blueprint(blueprint, url_prefix='/blueprint')
-    app.register_blueprint(ajax, url_prefix='/ajax')
     app.register_blueprint(template, url_prefix='/template')
-    app.register_blueprint(industry, url_prefix='/industry_index')
     app.register_blueprint(sso, url_prefix='/sso')
     app.register_blueprint(price, url_prefix='/price')
     app.register_blueprint(home)

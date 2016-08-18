@@ -4,10 +4,10 @@
 
 {% block js %}
     <script>
-        lb.urls.systemUrls          = "{{ url_for('ajax.solarsystems') }}";
-        lb.urls.materialBOMUrl      = "{{ url_for('ajax.blueprint_bom', blueprint_id=blueprint.id) }}";
-        lb.urls.priceUrl            = "{{ url_for('ajax.get_price', item_list=111111111111) }}";
-        lb.urls.adjustedPriceUrl    = "{{ url_for('ajax.get_index_activity', activity=1, solar_system_names=111111111111) }}";
+        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
+        lb.urls.materialBOMUrl      = "{{ url_for('ajax_eve_sde.blueprint_bom', blueprint_id=blueprint.id) }}";
+        lb.urls.priceUrl            = "{{ url_for('ajax_crest.get_price', item_list=111111111111) }}";
+        lb.urls.adjustedPriceUrl    = "{{ url_for('ajax_crest.get_index_activity', activity=1, solar_system_names=111111111111) }}";
         lb.urls.tplSublistBlockUrl  = "{{ url_for('template.manufacturing_sublist_block') }}";
         lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
         lb.urls.tplModalPriceUrl    = "{{ url_for('template.manufacturing_modal_price') }}";

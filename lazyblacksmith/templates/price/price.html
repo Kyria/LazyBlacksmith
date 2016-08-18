@@ -4,8 +4,8 @@
 
 {% block js %}
     <script>
-        lb.urls.priceUrl        = "{{ url_for('ajax.get_price', item_list='0000') }}";
-        lb.urls.itemSearchUrl   = "{{ url_for('ajax.item_search', name='0000') }}";
+        lb.urls.priceUrl        = "{{ url_for('ajax_crest.get_price', item_list='0000') }}";
+        lb.urls.itemSearchUrl   = "{{ url_for('ajax_eve_sde.item_search', name='0000') }}";
 
         itemPriceLookup.options.useIcons =  {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
         {% for region in regions -%}
