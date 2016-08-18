@@ -1,4 +1,8 @@
 # -*- encoding: utf-8 -*-
+# local blueprints
+from .home import home
+from .sso import sso
+from .template import template
 
 # import blueprints from eve industry
 from industry.blueprint import blueprint

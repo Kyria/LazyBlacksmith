@@ -11,12 +11,12 @@ from lazyblacksmith.views import ajax_eve_sde
 from lazyblacksmith.views import ajax_crest
 from lazyblacksmith.views import blueprint
 from lazyblacksmith.views import price
-from lazyblacksmith.views.home import home
-from lazyblacksmith.views.sso import sso
+from lazyblacksmith.views import home
+from lazyblacksmith.views import sso
+from lazyblacksmith.views import template
 
 # helpers
 from lazyblacksmith.utils.template_filter import templatefilter
-from lazyblacksmith.views.template import template
 
 # db
 from lazyblacksmith.models import db
