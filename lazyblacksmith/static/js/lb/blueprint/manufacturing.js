@@ -29,7 +29,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         systemUrls: false,
         materialBOMUrl: false,
         priceUrl: false,
-        adjustedPriceUrl: false,
+        indexActivityUrl: false,
 
         // template links
         tplSublistBlockUrl: false,
@@ -358,7 +358,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             return _updateTaxTable();
         }
 
-        var url = lb.urls.adjustedPriceUrl.replace(/111111111111/, systemList.join(','));
+        var url = lb.urls.indexActivityUrl.replace(/111111111111/, systemList.join(','));
 
         $.ajax({
             url: url,
@@ -1294,7 +1294,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         _initSliders();
 
         // check all required urls (so we don't have to do it later)
-        if(!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl || !lb.urls.adjustedPriceUrl
+        if(!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl || !lb.urls.indexActivityUrl
             || !lb.urls.tplSublistBlockUrl || !lb.urls.tplSublistRowUrl || !lb.urls.tplModalPriceUrl) {
             alert('Error, some URL are missing, this application cannot work properly without them.');
             return;

@@ -1,34 +1,198 @@
 {% extends "base.html" %}
 
-{% block title %}:: ME/TE Research{% endblock %}
+{% block title %}:: Copy/Research :: {{ blueprint.name }}{% endblock %}
 
 {% block js %}
-    <script>
-        LazyBlacksmith.setLoader(LazyBlacksmith.blueprint);
+    <script>        
+        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
+        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', activity=1, solar_system_names=111111111111) }}";
+
+        researchBlueprint.options.baseCost = {{ base_cost }};
+        researchBlueprint.options.baseCopyTime = {{ activity_copy.time }};
+        researchBlueprint.options.baseMeTime = {{ activity_material.time }};
+        researchBlueprint.options.baseTeTime = {{ activity_time.time }};
+        researchBlueprint.options.maxRunPerCopy = {{ blueprint.max_production_limit }};
+
+        researchBlueprint.options.indexes["Jita"] = {};
+        {% for activity, index in index_list.iteritems() -%}
+        researchBlueprint.options.indexes["Jita"][{{ activity }}] = {{ index }};
+        {% endfor %}
+        
+        lb.run('researchBlueprint');
     </script>
 {% endblock %}
 
+
+        
 {% block content %}
-<div class="col-lg-6 col-md-6">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Search Blueprint</h3>
+<div class="row">
+    <div class="col-md-2">
+        <div class="well">
+            <div>
+                Facility<br>
+                <select name="facility" id="facility" class="form-control input-sm">
+                    <option value="0" selected>Station</option>
+                    <option value="1">Laboratory</option>
+                    <option value="2">Hyasyoda Laboratory</option>
+                </select>
+            </div>
+            <div>
+                System<br>
+                <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
+            </div>
         </div>
-        <div class="panel-body">
-            <input id="blueprint" type="text" class="form-control" placeholder="Item name">
-            <br />
-            <table class="table table-striped table-hover" id="searchBlueprintResult">
-                <thead>
-                    <th>Blueprint Name</th>
-                    <th>&nbsp;</th>
-                </thead>
-                <tbody>
-                    <td colspan="2">No results</td>
-                </tbody>
-            </table>
+        <div class="well">
+            <div>
+                Current ME Level (<span id="ME-Level">0%</span>)<br>
+                <div id="ME"></div>
+            </div>
+            <div>
+                Current TE Level (<span id="TE-Level">0%</span>)<br>
+                <div id="TE"></div>
+            </div>
+        </div>
+        <div class="well">
+            <div>
+                Number of copy<br>
+                <input id="copy-number" type="text" class="form-control input-sm" value="1">
+            </div>
+            <div>
+                Runs/copy (max: {{ blueprint.max_production_limit }})<br>
+                <input id="run-per-copy" type="text" class="form-control input-sm" value="1">
+            </div>
+        </div>
+        <div class="well">
+            <div>
+                ME Implant<br>
+                <select name="meImplant" id="meImplant" class="form-control input-sm">
+                    <option value="0" selected>None</option>
+                    <option value="0.99">MY-701</option>
+                    <option value="0.97">MY-703</option>
+                    <option value="0.95">MY-705</option>
+                </select>
+            </div>
+            <div>
+                TE Implant<br>
+                <select name="teImplant" id="teImplant" class="form-control input-sm">
+                    <option value="0" selected>None</option>
+                    <option value="0.99">RR-601</option>
+                    <option value="0.97">RR-603</option>
+                    <option value="0.95">RR-605</option>
+                </select>
+            </div>
+            <div>
+                Copy Implant<br>
+                <select name="copyImplant" id="copyImplant" class="form-control input-sm">
+                    <option value="0" selected>None</option>
+                    <option value="0.99">SC-801</option>
+                    <option value="0.97">SC-803</option>
+                    <option value="0.95">SC-805</option>
+                </select>
+            </div>
+        </div>
+        <div class="well">
+            <div>
+                Adv. Industry (<span id="adv-industry-level-display">0</span>)<br>
+                <div id="adv-industry-level"></div>
+            </div>
+            <div>
+                Research (<span id="research-level-display">0</span>)<br>
+                <div id="research-level"></div>
+            </div>
+            <div>
+                Science (<span id="science-level-display">0</span>)<br>
+                <div id="science-level"></div>
+            </div>
+            <div>
+                Metallurgy (<span id="metallurgy-level-display">0</span>)<br>
+                <div id="metallurgy-level"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-10">
+        <div class="row">
+            <div class="col-xs-10">
+                <h4 id="item-name">{{ blueprint.name }}</h4>
+            </div>
+            <div class="col-xs-2 text-right" id="item-icon">
+                <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs" id="tab-links" role="tablist">
+                    <li class="active"><a href="#me-tab">Material Efficiency</a></li>
+                    <li><a href="#te-tab">Time Efficiency</a></li>
+                    <li><a href="#copy-tab">Copy</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="fade in active tab-pane" id="me-tab">
+                        <table class="me-list table table-condensed table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Level</th>
+                                    <th>Time</th>
+                                    <th>Time from current level</th>
+                                    <th>Installation Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for level in range(1,11) -%}
+                                {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
+                                {% set research_duration = activity_material.time * level_modifier %}
+                                {% set research_cost = "%0.2f" % (base_cost * index_list[4] * 0.02 * level_modifier) %}
+                                <tr>
+                                    <td>{{ level }}</td>
+                                    <td>{{ research_duration | duration }}</td>
+                                    <td>{{ research_duration | duration }}</td>
+                                    <td>{{ research_cost | float | intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+                    </div>
+                    
+                    
+                    
+                    <div class="fade tab-pane" id="te-tab">
+                        <table class="te-list table table-condensed table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Level</th>
+                                    <th>Time</th>
+                                    <th>Time from current level</th>
+                                    <th>Installation Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for level in range(1,11) -%}
+                                {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
+                                {% set research_duration = activity_material.time * level_modifier %}
+                                {% set research_cost = "%0.2f" % (base_cost * index_list[3] * 0.02 * level_modifier) %}
+                                <tr>
+                                    <td>{{ level }}</td>
+                                    <td>{{ research_duration | duration }}</td>
+                                    <td>{{ research_duration | duration }}</td>
+                                    <td>{{ research_cost | float | intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+
+                    </div>
+                    
+                    
+                    <div class="fade tab-pane" id="copy-tab">
+                        
+                    </div>
+                    
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
 
 
 {% endblock %}

@@ -53,7 +53,7 @@ var searchBlueprint = (function ($, lb) {
                 var researchLink = lb.urls.researchUrl.replace(/999999999/, data[item].id);
 
                 var invention = (data[item].invention) ? resultBtn.replace(/@@LINK@@/, inventionLink).replace(/@@NAME@@/, 'Invention') : '';
-                var research = resultBtn.replace(/@@LINK@@/, researchLink).replace(/@@NAME@@/, 'Research ME/TE');
+                var research = resultBtn.replace(/@@LINK@@/, researchLink).replace(/@@NAME@@/, 'Research/Copy');
                 var manufacturing = resultBtn.replace(/@@LINK@@/, manufacturingLink).replace(/@@NAME@@/, 'Manufacture');
 
                 htmlResult += "<tr><td>" + data[item].name + '</td><td>' + manufacturing + research + invention + '</td></tr>';

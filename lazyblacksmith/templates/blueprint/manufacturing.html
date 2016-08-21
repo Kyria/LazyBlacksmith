@@ -7,7 +7,7 @@
         lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
         lb.urls.materialBOMUrl      = "{{ url_for('ajax_eve_sde.blueprint_bom', blueprint_id=blueprint.id) }}";
         lb.urls.priceUrl            = "{{ url_for('ajax_crest.get_price', item_list=111111111111) }}";
-        lb.urls.adjustedPriceUrl    = "{{ url_for('ajax_crest.get_index_activity', activity=1, solar_system_names=111111111111) }}";
+        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', activity=1, solar_system_names=111111111111) }}";
         lb.urls.tplSublistBlockUrl  = "{{ url_for('template.manufacturing_sublist_block') }}";
         lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
         lb.urls.tplModalPriceUrl    = "{{ url_for('template.manufacturing_modal_price') }}";
@@ -61,6 +61,14 @@
 {% block content %}
 <div class="row">
     <div class="col-md-12">
+        <div class="row">
+            <div class="col-xs-10">
+                <h4 id="item-name">{{ blueprint.name }}</h4>
+            </div>
+            <div class="col-xs-2 text-right" id="item-icon"><img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}" /></div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist" id="bp-tabs">
             <li class="active"><a href="#tab-bp">Blueprint</a></li>
             {% if has_manufactured_components %}<li id='subcomp-tab'><a href="#tab-subcomp">Components Blueprints</a></li>{% endif %}
