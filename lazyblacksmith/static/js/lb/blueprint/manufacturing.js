@@ -1,6 +1,8 @@
 var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     "use strict";
 
+    var ACTIVITY_MANUFACTURING = 1;
+    
     // template variables
     var tplSublistBlock = '';
     var tplSublistRow = '';
@@ -694,7 +696,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         // set the main blueprint
         var taxPrice = _calculateBaseCost(materialsData.productItemId);
-        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].manufacturingSystem];
+        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].manufacturingSystem][ACTIVITY_MANUFACTURING];
         totalInstallationCost += taxPrice;
 
         var output = rowTax.replace(/@@ICON@@/g, materialsData.materials[materialsData.productItemId].icon)
@@ -708,7 +710,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
             if(material.isManufactured) {
                 var taxPrice = _calculateBaseCost(material.id);
-                taxPrice *= 1.1 * costIndex[material.manufacturingSystem];
+                taxPrice *= 1.1 * costIndex[material.manufacturingSystem][ACTIVITY_MANUFACTURING];
 
                 output += rowTax.replace(/@@ICON@@/g, material.icon)
                                 .replace(/@@NAME@@/g, material.name)
