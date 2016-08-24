@@ -5,7 +5,7 @@
 {% block js %}
     <script>        
         lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
-        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', activity=1, solar_system_names=111111111111) }}";
+        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', solar_system_names=111111) }}";
 
         researchBlueprint.options.baseCost = {{ base_cost }};
         researchBlueprint.options.baseCopyTime = {{ activity_copy.time }};
@@ -65,7 +65,7 @@
             <div>
                 ME Implant<br>
                 <select name="meImplant" id="meImplant" class="form-control input-sm">
-                    <option value="0" selected>None</option>
+                    <option value="1.00" selected>None</option>
                     <option value="0.99">MY-701</option>
                     <option value="0.97">MY-703</option>
                     <option value="0.95">MY-705</option>
@@ -74,7 +74,7 @@
             <div>
                 TE Implant<br>
                 <select name="teImplant" id="teImplant" class="form-control input-sm">
-                    <option value="0" selected>None</option>
+                    <option value="1.00" selected>None</option>
                     <option value="0.99">RR-601</option>
                     <option value="0.97">RR-603</option>
                     <option value="0.95">RR-605</option>
@@ -83,7 +83,7 @@
             <div>
                 Copy Implant<br>
                 <select name="copyImplant" id="copyImplant" class="form-control input-sm">
-                    <option value="0" selected>None</option>
+                    <option value="1.00" selected>None</option>
                     <option value="0.99">SC-801</option>
                     <option value="0.97">SC-803</option>
                     <option value="0.95">SC-805</option>
@@ -127,6 +127,8 @@
                     <li><a href="#copy-tab">Copy</a></li>
                 </ul>
                 <div class="tab-content">
+                
+                    <!-- ME Tab -->
                     <div class="fade in active tab-pane" id="me-tab">
                         <table class="me-list table table-condensed table-hover table-striped">
                             <thead>
@@ -142,23 +144,22 @@
                                 {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
                                 {% set research_duration = activity_material.time * level_modifier %}
                                 {% set research_cost = "%0.2f" % (base_cost * index_list[4] * 0.02 * level_modifier) %}
-                                <tr>
-                                    <td>{{ level }}</td>
-                                    <td>{{ research_duration | duration }}</td>
-                                    <td>{{ research_duration | duration }}</td>
-                                    <td>{{ research_cost | float | intcomma }}</td>
+                                <tr id="ME-{{ level }}">
+                                    <td class="level">{{ level }}</td>
+                                    <td class="total">{{ research_duration | duration }}</td>
+                                    <td class="delta">{{ research_duration | duration }}</td>
+                                    <td class="price">{{ research_cost | float | intcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>  
                     </div>
                     
-                    
-                    
+                    <!-- TE Tab -->                     
                     <div class="fade tab-pane" id="te-tab">
                         <table class="te-list table table-condensed table-hover table-striped">
                             <thead>
-                                <tr>
+                                <tr>                                   
                                     <th>Level</th>
                                     <th>Time</th>
                                     <th>Time from current level</th>
@@ -170,11 +171,11 @@
                                 {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
                                 {% set research_duration = activity_material.time * level_modifier %}
                                 {% set research_cost = "%0.2f" % (base_cost * index_list[3] * 0.02 * level_modifier) %}
-                                <tr>
-                                    <td>{{ level }}</td>
-                                    <td>{{ research_duration | duration }}</td>
-                                    <td>{{ research_duration | duration }}</td>
-                                    <td>{{ research_cost | float | intcomma }}</td>
+                                <tr id="TE-{{ level }}">
+                                    <td class="level">{{ level }}</td>
+                                    <td class="total">{{ research_duration | duration }}</td>
+                                    <td class="delta">{{ research_duration | duration }}</td>
+                                    <td class="price">{{ research_cost | float | intcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -182,9 +183,19 @@
 
                     </div>
                     
-                    
+                    <!-- Copy Tab -->
                     <div class="fade tab-pane" id="copy-tab">
-                        
+                        <table class="copy-data table table-condensed table-hover table-striped">
+                            <tr>
+                                <th>Copy time</th>
+                                <td class="copy-time">{{ activity_copy.time | duration }}</td>
+                            </tr>
+                            <tr>
+                                <th>Installation Cost</th>
+                                {% set copy_cost = "%0.2f" % (base_cost * index_list[5] * 0.02) -%}
+                                <td class="copy-cost">{{ copy_cost | float | intcomma }}</td>
+                            </tr>
+                        </table>
                     </div>
                     
                 </div>

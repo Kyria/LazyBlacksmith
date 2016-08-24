@@ -1,12 +1,6 @@
 var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     "use strict"
 
-    // researchTime = baseResearchTime * timeModifier * levelModifier / 105
-    // researchFee = baseJobCost * systemCostIndex * 0.02 * levelModifier / 105
-    // copyTime = baseCopyTime * runs * runsPerCopy * timeModifier
-    // copyFee = baseJobCost * systemCostIndex * 0.02 * runs * runsPerCopy
-    // timeModifier = implant * factory * skills
-    // levelModifier = 250*2^(1,25*<level>-2,5)
     var ACTIVITY_RESEARCHING_TIME_EFFICIENCY = 3;
     var ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY = 4;
     var ACTIVITY_COPYING = 5;
@@ -30,9 +24,9 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         advancedIndustryLevel: 0,
         
         // implants
-        meImplant: 0,
-        teImplant: 0,
-        copyImplant: 0,
+        meImplant: 1.00,
+        teImplant: 1.00,
+        copyImplant: 1.00,
         
         // facility
         facility: 0,
@@ -75,8 +69,102 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         },
     ];
     
-   
+    /**
+     * Get the indexes of the missing solar systems
+     * @private
+     */
+    var _getSystemCostIndex = function() {
+        if(options.system in options.indexes) {
+            _updateResearchTimeAndCost();
+            _updateCopyTimeAndCost();
+            return;
+        }
+        
+        var url = lb.urls.indexActivityUrl.replace(/111111/, options.system);
 
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(jsonIndex) {
+                $.extend(options.indexes, jsonIndex['index']);
+                _updateResearchTimeAndCost();
+                _updateCopyTimeAndCost();
+            },
+        });
+
+    }
+
+    var _updateCopyTimeAndCost = function() {
+        var copyTime = eveUtils.calculateCopyTime(
+            options.baseCopyTime, 
+            options.copyNumber, 
+            options.runPerCopy, 
+            facilityStats[options.facility].copy,
+            options.copyImplant,
+            options.scienceLevel,
+            options.advancedIndustryLevel
+        );
+        
+        var copyCost = eveUtils.calculateCopyInstallationCost(
+            options.baseCost, 
+            options.indexes[options.system][ACTIVITY_COPYING], 
+            options.copyNumber, 
+            options.runPerCopy
+        );
+        
+        $('.copy-time').html(utils.durationToString(copyTime));
+        $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
+    }
+   
+    var _updateResearchTimeAndCost = function() {
+        var MEDelta = 0;
+        var TEDelta = 0;
+        for(var level = 1; level <= 10; level++) {
+            var METime = eveUtils.calculateResearchTime(
+                options.baseMeTime,
+                level,
+                facilityStats[options.facility].me,
+                options.meImplant,
+                options.metallurgyLevel,
+                options.advancedIndustryLevel
+            );
+            var MECost = eveUtils.calculateResearchInstallationCost(
+                options.baseCost, 
+                options.indexes[options.system][ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY], 
+                level
+            );
+            var TETime = eveUtils.calculateResearchTime(
+                options.baseTeTime,
+                level,
+                facilityStats[options.facility].te,
+                options.teImplant,
+                options.researchLevel,
+                options.advancedIndustryLevel
+            );
+            var TECost = eveUtils.calculateResearchInstallationCost(
+                options.baseCost, 
+                options.indexes[options.system][ACTIVITY_RESEARCHING_TIME_EFFICIENCY], 
+                level
+            );
+            if(options.materialEfficiency >= level) {
+                MEDelta = METime;
+            }
+            if((options.timeEfficiency / 2) >= level) {
+                TEDelta = TETime;
+            }
+            _updateResearchTables(METime, MECost, MEDelta, TETime, TECost, TEDelta, level);
+        }
+    }
+    
+    var _updateResearchTables = function(METime, MECost, MEDelta, TETime, TECost, TEDelta, level) {
+        $('#ME-' + level + ' .total').html(utils.durationToString(METime));
+        $('#ME-' + level + ' .delta').html(utils.durationToString(METime - MEDelta));
+        $('#ME-' + level + ' .price').html(Humanize.intcomma(MECost, 2));
+        $('#TE-' + level + ' .total').html(utils.durationToString(TETime));
+        $('#TE-' + level + ' .delta').html(utils.durationToString(TETime - TEDelta));
+        $('#TE-' + level + ' .price').html(Humanize.intcomma(TECost, 2));
+    }
 
     /**
      * Init input fields
@@ -93,18 +181,23 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         $('#facility').on('change', function() {
             options.facility = parseInt($('#facility').val());
+            _updateResearchTimeAndCost();
+            _updateCopyTimeAndCost();
         });              
 
         $('#meImplant').on('change', function() {
             options.meImplant = parseFloat($('#meImplant').val());
+            _updateResearchTimeAndCost();
         });              
 
         $('#teImplant').on('change', function() {
             options.teImplant = parseFloat($('#teImplant').val());
+            _updateResearchTimeAndCost();
         });
         
         $('#copyImplant').on('change', function() {
             options.copyImplant = parseFloat($('#copyImplant').val());
+            _updateCopyTimeAndCost();
         });
     };
 
@@ -115,6 +208,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             options.copyNumber = parseInt($(this).val());
         }
         $(this).val(options.copyNumber);
+        _updateCopyTimeAndCost();
     }
     
     var _copyNumberOnChange = function(event) {
@@ -131,6 +225,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             options.runPerCopy = parseInt($(this).val());
         }
         $(this).val(options.runPerCopy);
+        _updateCopyTimeAndCost();
     }
     
     var _runPerCopyOnChange = function(event) {
@@ -163,6 +258,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             source: systems.ttAdapter(),
         }).on(typeaheadEventSelector, function(event, suggestion) {
             options.system = $(this).typeahead('val');
+            _getSystemCostIndex();
         });
     };
 
@@ -200,6 +296,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _materialEfficiencyOnUpdate = function(event, ui) {
         $('#ME-Level').html(ui.value+"%");
         options.materialEfficiency = parseInt(ui.value);
+        _updateResearchTimeAndCost();
     };
 
 
@@ -210,6 +307,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _timeEfficiencyOnUpdate = function(event, ui) {
         $('#TE-Level').html(ui.value+"%");
         options.timeEfficiency = parseInt(ui.value);
+        _updateResearchTimeAndCost();
     };
 
     
@@ -223,7 +321,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         switch(id) {
             case 'adv-industry-level':
-                options.advancedIndustryLvl = value;
+                options.advancedIndustryLevel = value;
                 $('#adv-industry-level-display').html(value);
                 break;
 
@@ -242,6 +340,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
                 $('#metallurgy-level-display').html(value);
                 break;
         };
+        _updateResearchTimeAndCost();
+        _updateCopyTimeAndCost();
     };
     
     

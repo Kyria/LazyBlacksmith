@@ -97,7 +97,32 @@
     };
 }
 
+.copy-data {
+    width: 300px;
+    margin: 20px auto;
+    tbody td {
+        text-align: right;
+    }
+}
+.te-list, .me-list {
+    width: 75%;
+    margin: 20px auto;
 
+    thead th {
+        text-align: center;
+    }
+    
+    tbody {
+        text-align: right;
+        .level {
+            width: 50px;
+        };
+        .total, .delta, .price {
+            width: 33.33%; /* older browsers fallback */
+            width: calc(100% / 3);
+        };
+    };
+}
 
 #bp-tabs {
     margin-bottom:15px;
@@ -134,3 +159,4 @@ body {
     margin-top: 9px;
     margin-right: 15px;
 }
+
