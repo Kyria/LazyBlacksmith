@@ -69,6 +69,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         },
     ];
     
+    
     /**
      * Get the indexes of the missing solar systems
      * @private
@@ -93,8 +94,14 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             },
         });
 
-    }
+    };
 
+    
+    /**
+     * Get new copy time and price and update table
+     * Called by events
+     * @private
+     */
     var _updateCopyTimeAndCost = function() {
         var copyTime = eveUtils.calculateCopyTime(
             options.baseCopyTime, 
@@ -115,8 +122,14 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         
         $('.copy-time').html(utils.durationToString(copyTime));
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
-    }
+    };
    
+    
+    /**
+     * Get research time and cost and update table for each ME/TE level
+     * Called by events
+     * @private
+     */
     var _updateResearchTimeAndCost = function() {
         var MEDelta = 0;
         var TEDelta = 0;
@@ -155,8 +168,14 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             }
             _updateResearchTables(METime, MECost, MEDelta, TETime, TECost, TEDelta, level);
         }
-    }
+    };
     
+    
+    /**
+     * Update ME/TE tables
+     * Called by _updateResearchTimeAndCost
+     * @private
+     */
     var _updateResearchTables = function(METime, MECost, MEDelta, TETime, TECost, TEDelta, level) {
         $('#ME-' + level + ' .total').html(utils.durationToString(METime));
         $('#ME-' + level + ' .delta').html(utils.durationToString(METime - MEDelta));
@@ -164,8 +183,9 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         $('#TE-' + level + ' .total').html(utils.durationToString(TETime));
         $('#TE-' + level + ' .delta').html(utils.durationToString(TETime - TEDelta));
         $('#TE-' + level + ' .price').html(Humanize.intcomma(TECost, 2));
-    }
+    };
 
+    
     /**
      * Init input fields
      * @private
@@ -201,6 +221,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         });
     };
 
+    
+    /**
+     * Copy Number on keyup event
+     * @private
+     */
     var _copyNumberOnKeyUp = function(event) {
         if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
             options.copyNumber = 1;
@@ -209,13 +234,21 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         }
         $(this).val(options.copyNumber);
         _updateCopyTimeAndCost();
-    }
-    
+    };
+       
+    /**
+     * Copy Number on change event
+     * @private
+     */ 
     var _copyNumberOnChange = function(event) {
         $(this).val(options.copyNumber);
         return false; 
-    }
+    };
     
+    /**
+     * Run per copy on keyup event
+     * @private
+     */
     var _runPerCopyOnKeyUp = function(event) {
         if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
             options.runPerCopy = 1;
@@ -226,12 +259,18 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         }
         $(this).val(options.runPerCopy);
         _updateCopyTimeAndCost();
-    }
+    };
     
+    
+    /**
+     * Run per copy on change event
+     * @private
+     */
     var _runPerCopyOnChange = function(event) {
         $(this).val(options.runPerCopy);
         return false;
-    }
+    };
+    
     
     /**
      * Init typeahead objects
@@ -288,6 +327,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             slide: _skillOnUpdate,
         });
     };
+    
     
     /**
      * Function called on event update on the material efficiency slider
