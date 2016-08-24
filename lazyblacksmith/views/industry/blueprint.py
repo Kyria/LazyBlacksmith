@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import config
+from math import ceil
 
 from flask import Blueprint
 from flask import render_template
@@ -7,6 +8,7 @@ from lazyblacksmith.models import Activity
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
+from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 
@@ -67,13 +69,34 @@ def research_and_copy(item_id):
         activity=Activity.ACTIVITY_COPYING
     ).one()
 
-    # calculate baseCost
+    # calculate baseCost and build cost per ME
     base_cost = 0.0
+    cost_per_me = {}
     materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
     for material in materials:
         item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
         base_cost += item_adjusted_price.price * material.quantity
+        
+        # build cost
+        price = ItemPrice.query.filter(
+            ItemPrice.item_id == material.material_id,
+            ItemPrice.region_id == 10000002,
+        ).one()
+        for level in xrange(0, 11):
+            if level not in cost_per_me:
+                cost_per_me[level] = {
+                    'job_price_run': 0,
+                    'job_price_max_run': 0,
+                }
+            me_bonus = (1.00 - level / 100.00)
+            adjusted_quantity = max(1, me_bonus * material.quantity)
+            job_price_run = max(1, ceil(adjusted_quantity)) * price.buy_price
+            job_price_max_run = max(item.max_production_limit, ceil(item.max_production_limit * adjusted_quantity)) * price.buy_price
+            
+            cost_per_me[level]['job_price_run'] += job_price_run
+            cost_per_me[level]['job_price_max_run'] += job_price_max_run
 
+        
     # base solar system : 30000142 = Jita
     indexes = IndustryIndex.query.filter(
         IndustryIndex.solarsystem_id == 30000142,
@@ -96,6 +119,7 @@ def research_and_copy(item_id):
         'activity_copy': activity_copy,
         'base_cost': base_cost,
         'index_list': index_list,
+        'cost_per_me': cost_per_me,
     })
 
 

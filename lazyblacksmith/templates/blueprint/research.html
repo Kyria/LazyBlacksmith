@@ -123,6 +123,7 @@
             <div class="col-md-12">
                 <ul class="nav nav-tabs" id="tab-links" role="tablist">
                     <li class="active"><a href="#me-tab">Material Efficiency</a></li>
+                    <li><a href="#me-eff-tab">Cost / ME</a></li>
                     <li><a href="#te-tab">Time Efficiency</a></li>
                     <li><a href="#copy-tab">Copy</a></li>
                 </ul>
@@ -153,6 +154,93 @@
                                 {% endfor %}
                             </tbody>
                         </table>  
+                    </div>
+                   
+                    <!-- ME Tab -->
+                    <div class="fade tab-pane" id="me-eff-tab">
+                        <table class="me-profit table table-condensed table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Level</th>
+                                    <th>
+                                        Build Cost
+                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Based on The Forge prices. Values may be inaccurate but the only goal is to provide a comparison between build costs for each ME level, when built in station.">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                        </span>
+                                    </th>
+                                    <th colspan="2">Profit / ME 0%</th>
+                                    <th colspan="2">Profit / Previous ME</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set run_delta = cost_per_me[0]['job_price_run'] -%}
+                                {% for level in range(0,11) -%}
+                                <tr id="ME-profit-{{ level }}">
+                                    {% set delta_run = cost_per_me[0]['job_price_run'] - cost_per_me[level]['job_price_run'] -%}
+                                    {% set delta_me = run_delta - cost_per_me[level]['job_price_run'] -%}
+                                    {% set delta_run_pc = "%0.3f" % (delta_run / cost_per_me[0]['job_price_run'] * 100) -%}
+                                    {% set delta_me_pc = "%0.3f" % (delta_me / run_delta * 100) -%}
+                                    <td class="level">{{ level }}</td>
+                                    <td>{{ cost_per_me[level]['job_price_run'] | intcomma }}</td>
+                                    <td class="delta">{{ delta_run | intcomma }}</td>
+                                    <td class="price-percent">{{ delta_run_pc | float | intcomma }}%</td>
+                                    <td class="delta">{{ delta_me | intcomma }}</td>
+                                    <td class="price-percent">{{ delta_me_pc | float | intcomma }}%</td>
+                                </tr>
+                                {% set run_delta = cost_per_me[level]['job_price_run'] -%}
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+
+                        <table class="me-profit table table-condensed table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Level</th>
+                                    <th>
+                                        Build Cost (max BPC run)
+                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Same as build cost, but using max run to test adjusted quantities.">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                        </span>
+                                    </th>
+                                    <th colspan="2">
+                                        Profit / ME 0% (max BPC run)
+                                        <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                        </span>
+                                    
+                                    </th>
+                                    <th colspan="2">
+                                        Profit / Previous ME (max BPC run)
+                                        <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                        </span>
+                                    
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set run_delta_max = cost_per_me[0]['job_price_max_run'] -%}
+                                {% for level in range(0,11) -%}
+                                <tr id="ME-profit-{{ level }}">
+                                    {% set build_cost_max = "%0.2f" % (cost_per_me[level]['job_price_max_run'] / blueprint.max_production_limit) -%}
+                                    {% set delta_max_me = "%0.2f" % ((run_delta_max - cost_per_me[level]['job_price_max_run']) / blueprint.max_production_limit) -%}
+                                    {% set delta_max_run = "%0.2f" % ((cost_per_me[0]['job_price_max_run'] - cost_per_me[level]['job_price_max_run']) / blueprint.max_production_limit) -%}
+                                    {% set delta_max_me = delta_max_me | float -%}
+                                    {% set delta_max_run = delta_max_run | float -%}
+                                    {% set delta_max_run_pc = "%0.3f" % (delta_max_run / cost_per_me[0]['job_price_max_run'] * blueprint.max_production_limit * 100) -%}
+                                    {% set delta_max_me_pc = "%0.3f" % (delta_max_me / run_delta_max * blueprint.max_production_limit * 100) -%}
+                                    <td class="level">{{ level }}</td>
+                                    <td>{{ build_cost_max | float | intcomma }}</td>
+                                    <td class="delta">{{ delta_max_run | intcomma }}</td>
+                                    <td class="price-percent">{{ delta_max_run_pc | float | intcomma }}%</td>
+                                    <td class="delta">{{ delta_max_me | intcomma }}</td>
+                                    <td class="price-percent">{{ delta_max_me_pc | float | intcomma }}%</td>
+                                </tr>
+                                {% set run_delta_max = cost_per_me[level]['job_price_max_run'] -%}
+                                {% endfor %}
+                            </tbody>
+                        </table>  
+
                     </div>
                     
                     <!-- TE Tab -->                     

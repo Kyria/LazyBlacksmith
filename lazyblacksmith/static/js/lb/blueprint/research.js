@@ -396,6 +396,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             e.preventDefault()
             $(this).tab('show')
         });
+        $('[data-toggle="tooltip"]').tooltip();
         
         // check all required urls (so we don't have to do it later)
         if(!lb.urls.systemUrls || !lb.urls.indexActivityUrl) {
