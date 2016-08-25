@@ -144,7 +144,7 @@
                                 {% for level in range(1,11) -%}
                                 {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
                                 {% set research_duration = activity_material.time * level_modifier %}
-                                {% set research_cost = "%0.2f" % (base_cost * index_list[4] * 0.02 * level_modifier) %}
+                                {% set research_cost = "%0.2f" % (base_cost * index_list[4] * 0.02 * level_modifier * 1.1) %}
                                 <tr id="ME-{{ level }}">
                                     <td class="level">{{ level }}</td>
                                     <td class="total">{{ research_duration | duration }}</td>
@@ -258,7 +258,7 @@
                                 {% for level in range(1,11) -%}
                                 {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
                                 {% set research_duration = activity_material.time * level_modifier %}
-                                {% set research_cost = "%0.2f" % (base_cost * index_list[3] * 0.02 * level_modifier) %}
+                                {% set research_cost = "%0.2f" % (base_cost * index_list[3] * 0.02 * level_modifier * 1.1) %}
                                 <tr id="TE-{{ level }}">
                                     <td class="level">{{ level }}</td>
                                     <td class="total">{{ research_duration | duration }}</td>

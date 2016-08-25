@@ -145,7 +145,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             var MECost = eveUtils.calculateResearchInstallationCost(
                 options.baseCost, 
                 options.indexes[options.system][ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY], 
-                level
+                level,
+                1.1
             );
             var TETime = eveUtils.calculateResearchTime(
                 options.baseTeTime,
@@ -158,7 +159,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             var TECost = eveUtils.calculateResearchInstallationCost(
                 options.baseCost, 
                 options.indexes[options.system][ACTIVITY_RESEARCHING_TIME_EFFICIENCY], 
-                level
+                level,
+                1.1
             );
             if(options.materialEfficiency >= level) {
                 MEDelta = METime;

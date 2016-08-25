@@ -85,9 +85,9 @@ var eveUtils = (function() {
      * @param systemCostIndex the system cost index modifier (float)
      * @return the research cost 
      */
-    var calculateResearchInstallationCost = function(baseCost, systemCostIndex, level) {
+    var calculateResearchInstallationCost = function(baseCost, systemCostIndex, level, tax) {
         var levelModifier = (250 * Math.pow(2, (1.25 * level - 2.5))) / 105;
-        return baseCost * systemCostIndex * 0.02 * levelModifier;
+        return baseCost * systemCostIndex * 0.02 * levelModifier * tax;
     }
     
     /**
@@ -121,8 +121,8 @@ var eveUtils = (function() {
      * @param systemCostIndex the system cost index modifier (float)
      * @return the copy cost 
      */
-    var calculateCopyInstallationCost = function(baseCost, systemCostIndex, runs, runPerCopy) {
-        return baseCost * systemCostIndex * 0.02 * runs * runPerCopy;
+    var calculateCopyInstallationCost = function(baseCost, systemCostIndex, runs, runPerCopy, tax) {
+        return baseCost * systemCostIndex * 0.02 * runs * runPerCopy * tax;
     }
 
     return {
