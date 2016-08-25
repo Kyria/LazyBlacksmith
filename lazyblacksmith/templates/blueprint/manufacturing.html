@@ -90,51 +90,49 @@
                             Runs <br>
                             <input id="runs" type="text" class="form-control input-sm" value="1">
                         </div>
-                        <div>
+                        <div class="slider">
                             ME Level (<span id="ME-Level">0%</span>)<br>
                             <div id="ME"></div>
                         </div>
-                        <div>
+                        <div class="slider">
                             TE Level (<span id="TE-Level">0%</span>)<br>
                             <div id="TE"></div>
                         </div>
                     </div>
                     <div class="well">
-                        <div>
+                        <div class="slider">
                             Industry (<span id="industry-level-display">0</span>)<br>
                             <div id="industry-level"></div>
                         </div>
-                        <div>
+                        <div class="slider">
                             Adv. Industry (<span id="adv-industry-level-display">0</span>)<br>
                             <div id="adv-industry-level"></div>
                         </div>
                     </div>
+
+                    {% if science_skill | length > 0 or t2_manufacturing_skill is not none %}
                     <div class="well">
-                        <div>
-                            T2 Science 1
-                            <span class='small' data-toggle="tooltip" data-placement="top" title="First science skill required (example: Laser Engineering, Molecular Engineering, Mechanical Engineering...)">
-                                <i class="fa fa-question-circle"></i>
-                            </span>
+                        {% if science_skill | length > 0 %}
+                        <div class="slider">
+                            {{ science_skill[0] or "T2 Science 1" }}
                             (<span id="t2-science1-display">0</span>)<br>
                             <div id="t2-science1"></div>
                         </div>
-                        <div>
-                            T2 Science 2
-                            <span class='small' data-toggle="tooltip" data-placement="top" title="Second science skill required (example: Laser Engineering, Molecular Engineering, Mechanical Engineering...)">
-                                <i class="fa fa-question-circle"></i>
-                            </span>
+                        <div class="slider">
+                            {{ science_skill[1] or "T2 Science 2" }}
                             (<span id="t2-science2-display">0</span>)<br>
                             <div id="t2-science2"></div>
                         </div>
-                        <div>
-                            T2 Industry
-                            <span class='small' data-toggle="tooltip" data-placement="top" title="T2 Ship Manufacturing Skill (example: Frigate Construction, Cruiser Construction...)">
-                                <i class="fa fa-question-circle"></i>
-                            </span>
+                        {% endif %}
+                        {% if t2_manufacturing_skill is not none %}
+                        <div class="slider">
+                            {{ t2_manufacturing_skill or "T2 Industry" }}
                             (<span id="t2-level-display">0</span>)<br>
                             <div id="t2-level"></div>
                         </div>
+                        {% endif %}
                     </div>
+                    {% endif %}
 
                 </div>
                 <div class="col-md-10 main-list">

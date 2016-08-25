@@ -39,8 +39,10 @@ def blueprint_search(name):
 
             data = []
             for bp in blueprints:
-                invention = False
-                # TODO: check if this can be invented.
+                invention_product = bp.activity_products.filter_by(
+                    activity=Activity.ACTIVITY_INVENTION
+                ).first()
+                invention = False if invention_product is None else True
 
                 data.append({
                     'id': bp.id,

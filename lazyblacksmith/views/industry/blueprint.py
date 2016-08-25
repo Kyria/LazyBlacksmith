@@ -5,6 +5,7 @@ from math import ceil
 from flask import Blueprint
 from flask import render_template
 from lazyblacksmith.models import Activity
+from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
@@ -29,7 +30,23 @@ def manufacturing(item_id):
     ).filter_by(
         wh=False
     )
+    
+    # get science skill name, if applicable
+    manufacturing_skills = item.activity_skills.filter_by(
+        activity = Activity.ACTIVITY_MANUFACTURING,
+    ).filter(
+        ActivitySkill.skill_id != 3380 # industry
+    )
 
+    science_skill = []
+    t2_manufacturing_skill = None
+    for activity_skill in manufacturing_skills:
+        if activity_skill.skill.market_group_id == 369:
+            t2_manufacturing_skill = activity_skill.skill.name
+        
+        if activity_skill.skill.market_group_id == 375:
+            science_skill.append(activity_skill.skill.name)
+    
     # is any of the materials manufactured ?
     has_manufactured_components = False
 
@@ -45,6 +62,8 @@ def manufacturing(item_id):
         'product': product,
         'regions': regions,
         'has_manufactured_components': has_manufactured_components,
+        't2_manufacturing_skill': t2_manufacturing_skill,
+        'science_skill': science_skill,
     })
 
 
@@ -122,8 +141,3 @@ def research_and_copy(item_id):
         'cost_per_me': cost_per_me,
     })
 
-
-# researchTime = baseResearchTime * timeModifier * levelModifier / 105
-# researchFee = baseJobCost * systemCostIndex * 0.02 * levelModifier / 105
-# copyTime = baseCopyTime * runs * runsPerCopy * timeModifier
-# copyFee = baseJobCost * systemCostIndex * 0.02 * runs * runsPerCopy
