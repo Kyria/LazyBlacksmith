@@ -117,7 +117,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             options.baseCost, 
             options.indexes[options.system][ACTIVITY_COPYING], 
             options.copyNumber, 
-            options.runPerCopy
+            options.runPerCopy,
+            1.1
         );
         
         $('.copy-time').html(utils.durationToString(copyTime));
@@ -231,10 +232,10 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _copyNumberOnKeyUp = function(event) {
         if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
             options.copyNumber = 1;
+            $(this).val(options.copyNumber);
         } else {
             options.copyNumber = parseInt($(this).val());
         }
-        $(this).val(options.copyNumber);
         _updateCopyTimeAndCost();
     };
        
@@ -254,12 +255,13 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _runPerCopyOnKeyUp = function(event) {
         if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
             options.runPerCopy = 1;
+            $(this).val(options.runPerCopy);
         } else if($(this).val() > options.maxRunPerCopy) {
             options.runPerCopy = options.maxRunPerCopy;
+            $(this).val(options.runPerCopy);
         } else {
             options.runPerCopy = parseInt($(this).val());
         }
-        $(this).val(options.runPerCopy);
         _updateCopyTimeAndCost();
     };
     

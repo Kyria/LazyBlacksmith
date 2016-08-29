@@ -10,7 +10,8 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
     var options = {
         // base values
-        baseCost: 0,
+        copyBaseCost: 0,
+        inventionBaseCost: 0,
         baseCopyTime: 0,
         baseInventionTime: 0,
         // indexes
@@ -31,9 +32,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         // facility
         facility: 0,
         // copy data
-        copyNumber: 1,
-        runPerCopy: 1,
-        maxRunPerCopy: 1,
+        runs: 1,
         // system
         system: "Jita",
     };
@@ -57,10 +56,10 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             "invention": 0.5,
             "name": 'Laboratory',
         },
-        { // Hyasyoda Laboratory
-            "copy": 0.6,
+        { // experimental lab
+            "copy": 1.0,
             "invention": 1.0,
-            "name": 'Hyasyoda Laboratory',
+            "name": 'Experimental Laboratory',
         },
     ];
 
@@ -98,8 +97,8 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     var _updateCopyTimeAndCost = function() {
         var copyTime = eveUtils.calculateCopyTime(
             options.baseCopyTime, 
-            options.copyNumber, 
-            options.runPerCopy, 
+            options.runs, 
+            1, 
             facilityStats[options.facility].copy,
             options.copyImplant,
             options.scienceLevel,
@@ -107,10 +106,10 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         );
         
         var copyCost = eveUtils.calculateCopyInstallationCost(
-            options.baseCost, 
+            options.copyBaseCost, 
             options.indexes[options.system][ACTIVITY_COPYING], 
-            options.copyNumber, 
-            options.runPerCopy,
+            options.runs, 
+            1,
             1.1
         );
         
@@ -125,12 +124,8 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      */
     var _initInputs = function() {
         // checks and update on copy numbers
-        $('#copy-number').on('keyup', _copyNumberOnKeyUp)
-                         .on('change', _copyNumberOnChange);
-                         
-        $('#run-per-copy').on('keyup', _runPerCopyOnKeyUp)
-                          .on('change', _runPerCopyOnChange);
-                          
+        $('#invention-number').on('keyup', _inventionNumberOnKeyUp)
+                         .on('change', _inventionNumberOnChange);                        
 
         $('#facility').on('change', function() {
             options.facility = parseInt($('#facility').val());
@@ -148,13 +143,13 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      * Copy Number on keyup event
      * @private
      */
-    var _copyNumberOnKeyUp = function(event) {
+    var _inventionNumberOnKeyUp = function(event) {
         if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
-            options.copyNumber = 1;
+            options.runs = 1;
         } else {
-            options.copyNumber = parseInt($(this).val());
+            options.runs = parseInt($(this).val());
         }
-        $(this).val(options.copyNumber);
+        $(this).val(options.runs);
         _updateCopyTimeAndCost();
     };
        
@@ -162,37 +157,10 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
      * Copy Number on change event
      * @private
      */ 
-    var _copyNumberOnChange = function(event) {
-        $(this).val(options.copyNumber);
+    var _inventionNumberOnChange = function(event) {
+        $(this).val(options.runs);
         return false; 
-    };
-    
-    /**
-     * Run per copy on keyup event
-     * @private
-     */
-    var _runPerCopyOnKeyUp = function(event) {
-        if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
-            options.runPerCopy = 1;
-        } else if($(this).val() > options.maxRunPerCopy) {
-            options.runPerCopy = options.maxRunPerCopy;
-        } else {
-            options.runPerCopy = parseInt($(this).val());
-        }
-        $(this).val(options.runPerCopy);
-        _updateCopyTimeAndCost();
-    };
-    
-    
-    /**
-     * Run per copy on change event
-     * @private
-     */
-    var _runPerCopyOnChange = function(event) {
-        $(this).val(options.runPerCopy);
-        return false;
-    };
-    
+    };   
     
     /**
      * Init typeahead objects
@@ -286,7 +254,9 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             e.preventDefault()
             $(this).tab('show')
         });
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({
+            container: 'body',
+        });
         
         // check all required urls (so we don't have to do it later)
         if(!lb.urls.systemUrls || !lb.urls.indexActivityUrl) {

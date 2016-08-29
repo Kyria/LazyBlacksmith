@@ -9,9 +9,9 @@
         lb.urls.priceUrl            = "{{ url_for('ajax_crest.get_price', item_list=111111) }}";
         lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', solar_system_names=111111) }}";
 
-        inventionBlueprint.options.baseCost = {{ base_cost }};
-        inventionBlueprint.options.baseCopyTime = {{ activity_copy.time }};
-        inventionBlueprint.options.maxRunPerCopy = {{ blueprint.max_production_limit }};
+        inventionBlueprint.options.inventionBaseCost = {{ invention_base_cost }};
+        inventionBlueprint.options.copyBaseCost = {{ copy_base_cost }};
+        inventionBlueprint.options.baseCopyTime = {% if activity_copy is not none %}{{ activity_copy.time }}{% else %}0{% endif %};
 
         inventionBlueprint.options.indexes["Jita"] = {};
         {% for activity, index in index_list.iteritems() -%}
@@ -30,12 +30,12 @@
                 Facility<br>
                 <select name="facility" id="facility" class="form-control input-sm">
                     <option value="0" selected>Station</option>
-                    <option value="1">Laboratory</option>
-                    <option value="2">Hyasyoda Laboratory</option>
+                    <option value="1">Design Laboratory</option>
+                    <option value="2">Experimental Laboratory</option>
                 </select>
             </div>
             <div>
-                Invention / Copy System<br>
+                System<br>
                 <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
             </div>
         </div>
@@ -65,14 +65,10 @@
                     </option>
                     {% endfor %}
                 </select>
-            </div>     
-            <div>
-                Number of copy<br>
-                <input id="copy-number" type="text" class="form-control input-sm" value="1">
             </div>
             <div>
-                Runs/copy (max: {{ blueprint.max_production_limit }})<br>
-                <input id="run-per-copy" type="text" class="form-control input-sm" value="1">
+                Number of inventions<br>
+                <input id="invention-number" type="text" class="form-control input-sm" value="1">
             </div>
         </div>
         <div class="well">
@@ -80,12 +76,15 @@
                 Adv. Industry (<span id="adv-industry-level-display">0</span>)<br>
                 <div id="adv-industry-level"></div>
             </div>
+            {% if activity_copy is not none %}
             <div class="slider">
                 Science (<span id="science-level-display">0</span>)<br>
                 <div id="science-level"></div>
             </div>
+            {% endif %}
         </div>
-        <div class="well">       
+        <div class="well">     
+            {% if activity_copy is not none %}
             <div>
                 Copy Implant<br>
                 <select name="copyImplant" id="copyImplant" class="form-control input-sm">
@@ -95,6 +94,7 @@
                     <option value="0.95">SC-805</option>
                 </select>
             </div>
+            {% endif %}
             <div class="slider">
                 {{ datacore_skills[0] }}
                 (<span id="datacore1-display">0</span>)<br>
@@ -126,62 +126,87 @@
         <div class="row">
             <div class="col-md-6">
                 <table class="invention-data table table-condensed table-hover table-striped">
+                    <thead>
+                        <th colspan="2">Activity Time</th>
+                    </thead>
                     <tbody>
+                        {% if activity_copy is not none %}
                         <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Blueprint copy time</td>
-                            <td class="copy-time">{{ activity_copy.time | duration }}</td>
+                            <td class="title">BPO Copy</td>
+                            <td class="data copy-time">{{ activity_copy.time | duration }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td class="title">Invention</td>
+                            <td class="data invention-time">{{ activity_invention.time | duration }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                
+                <table class="invention-data table table-condensed table-hover table-striped">
+                    <thead>
+                        <th colspan="2">Outputs</th>
+                    </thead>
+                    <tbody>                
+                        <tr>
+                            <td class="title">Success Probability</td>
+                            <td class="data invention-probability">{{ (invention_products[0].probability * 100) | intcomma }}%</td>
                         </tr>
                         <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Invention Time</td>
-                            <td class="invention-time">{{ activity_invention.time | duration }}</td>
-                        </tr>
-                        <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Invention Probability</td>
-                            <td class="invention-probability">{{ (invention_products[0].probability * 100) | intcomma }}%</td>
-                        </tr>
-                        <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Output Blueprint</td>
-                            <td class="output">
-                                {% for inv_prod in invention_products -%}
-                                {% if config.USE_CCP_ICONS -%}
+                            <td class="title">Blueprint</td>
+                            <td class="data output">
+                            {% for inv_prod in invention_products -%}
+                            {% if config.USE_CCP_ICONS -%}
                                 <img src="{{ inv_prod.product.icon_32() }}" title="{{- inv_prod.product.name }}" data-toggle="tooltip" data-placement="top" alt="{{ inv_prod.product.name }}">
-                                {%- else -%}
+                                {%- if (loop.index) % 6 == 0 %}<br>{% endif %}
+                            {%- else -%}
                                 {{- inv_prod.product.name }}<br>
-                                {%- endif %}
-                                {% endfor %}
+                            {%- endif %}
+                            {% endfor %}
                             </td>
                         </tr>
                         <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Output Stats (Runs / ME / TE)</td>
-                            <td class="invention-probability">{{ invention_products[0].product.max_production_limit }} / 2% / 4%</td>
-                        </tr>                        <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Copy Installation Cost</td>
-                            {% set copy_cost = "%0.2f" % (base_cost * index_list[5] * 0.02 * 1.1) -%}
-                            <td class="copy-cost">{{ copy_cost | float | intcomma }}</td>
+                            <td class="title">Stats (Runs / ME / TE)</td>
+                            <td class="data invention-probability">{{ invention_products[0].quantity }} / 2% / 4%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                
+                <table class="invention-data table table-condensed table-hover table-striped">
+                    <thead>
+                        <th colspan="2">Invention Costs</th>
+                    </thead>
+                    <tbody>            
+                        {% if activity_copy is not none %}
+                        <tr>
+                            <td class="title">BPO Copy</td>
+                            {% set copy_cost = "%0.2f" % (copy_base_cost * index_list[5] * 0.02 * 1.1) -%}
+                            <td class="data copy-cost">{{ copy_cost | float | intcomma }}</td>
+                        </tr>
+                        {% else %}
+                        {% set copy_cost = "0" %}
+                        {% endif %}
+                        <tr>
+                            <td class="title">Invention Installation</td>
+                            {% set invention_cost = "%0.2f" % (invention_base_cost * index_list[8] * 0.02 * 1.1) -%}
+                            <td class="data invention-install-cost">{{ invention_cost | float | intcomma }}</td>
                         </tr>
                         <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Invention Installation Cost</td>
-                            {% set copy_cost = "%0.2f" % (base_cost * index_list[8] * 0.02 * 1.1) -%}
-                            <td class="invention-install-cost">{{ copy_cost | float | intcomma }}</td>
+                            {% set invention_total_cost = (copy_cost | float) + (invention_cost | float) -%}
+                            <td class="title">Total Cost</td>
+                            <td class="data invention-total-cost">{{ invention_total_cost | intcomma }}</td>
                         </tr>
                         <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Invention Total Cost</td>
-                            <td class="invention-total-cost">{{ copy_cost | float | intcomma }}</td>
+                            <td class="title">Total Cost with Probability</td>
+                            <td class="data invention-total-cost-proba">{{ ("%0.2f" % (invention_total_cost / invention_products[0].probability)) | intcomma }}</td>
                         </tr>
                         <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Output Manufacturing Per Run</td>
-                            <td class="output-cost">{{ copy_cost | float | intcomma }}</td>
+                            <td class="title">Output Cost Per Run</td>
+                            <td class="data output-cost">0</td>
                         </tr>
-                    </tfoot>
+                    </tbody>
                 </table>
             </div>
             <div class="col-md-6">

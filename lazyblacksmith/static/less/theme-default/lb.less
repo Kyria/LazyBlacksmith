@@ -107,6 +107,14 @@
     };
 }
 
+.copy-data {
+    width: 300px;
+    margin: 20px auto;
+    tbody td {
+        text-align: right;
+    }
+}
+ 
 .me-profit {
     width: 75%;
     margin: 20px auto;
@@ -125,6 +133,24 @@
         }
         .delta {
             width: 25%;
+        }
+    };
+}
+
+.invention-data {
+    > thead > tr > th {
+        text-align: center;
+    };
+    
+     > tbody > tr > td {
+        vertical-align: middle;
+        &.title {
+            width: 50%;
+            font-weight: bold;
+        };
+        &.data {
+            text-align: right;
+            padding-right: 20px;
         }
     };
 }

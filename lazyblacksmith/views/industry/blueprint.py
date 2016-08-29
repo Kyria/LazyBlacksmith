@@ -152,8 +152,8 @@ def research(item_id):
     })
 
 
-@blueprint.route('/invention_copy/<int:item_id>')
-def invention_copy(item_id):
+@blueprint.route('/invention/<int:item_id>')
+def invention(item_id):
     item = Item.query.get(item_id)
 
     if item is None or item.max_production_limit is None:
@@ -162,7 +162,7 @@ def invention_copy(item_id):
     # global activity 
     activity_copy = item.activities.filter_by(
         activity=Activity.ACTIVITY_COPYING
-    ).one()
+    ).first()
     
     activity_invention = item.activities.filter_by(
         activity=Activity.ACTIVITY_INVENTION
@@ -182,9 +182,19 @@ def invention_copy(item_id):
     ).all()
     
     # copy stuff
-    copy_materials = item.activity_materials.filter_by(
-        activity=Activity.ACTIVITY_COPYING
-    ).all()
+    copy_base_cost = 0.0
+    copy_materials = []
+    if activity_copy is not None:
+        copy_materials = item.activity_materials.filter_by(
+            activity=Activity.ACTIVITY_COPYING
+        ).all()
+        
+        # copy base cost, as it's different from the invention
+        materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
+        for material in materials:
+            item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
+            copy_base_cost += item_adjusted_price.price * material.quantity
+
 
     # loop through skills for display as we need to do the difference
     # between both skills (not the same bonuses in invention probability)
@@ -196,12 +206,17 @@ def invention_copy(item_id):
         else:
             encryption_skill = s.skill.name
     
-    # calculate baseCost
-    base_cost = 0.0
-    materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
+    # calculate baseCost for invention
+    invention_base_cost = 0.0
+    materials = item.activity_products.filter_by(
+        activity=Activity.ACTIVITY_INVENTION
+    ).first().product.activity_materials.filter_by(
+        activity=Activity.ACTIVITY_MANUFACTURING
+    )
+    
     for material in materials:
         item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
-        base_cost += item_adjusted_price.price * material.quantity
+        invention_base_cost += item_adjusted_price.price * material.quantity
  
     # base solar system : 30000142 = Jita
     indexes = IndustryIndex.query.filter(
@@ -249,7 +264,8 @@ def invention_copy(item_id):
         'blueprint': item,
         'activity_copy': activity_copy,
         'activity_invention': activity_invention,
-        'base_cost': base_cost,
+        'copy_base_cost': copy_base_cost,
+        'invention_base_cost': invention_base_cost,
         'datacore_skills': datacore_skills,
         'decryptors': decryptors,
         'encryption_skill': encryption_skill,
