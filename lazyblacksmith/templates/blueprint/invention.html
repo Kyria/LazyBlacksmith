@@ -1,35 +1,224 @@
 {% extends "base.html" %}
 
-{% block title %}:: Invention{% endblock %}
+{% block title %}:: Search blueprint{% endblock %}
 
 {% block js %}
     <script>
-        LazyBlacksmith.setLoader(LazyBlacksmith.blueprint);
+        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
+        lb.urls.manufacturingUrl    = "{{ url_for('blueprint.manufacturing', item_id='111111') }}";
+        lb.urls.priceUrl            = "{{ url_for('ajax_crest.get_price', item_list=111111) }}";
+        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', solar_system_names=111111) }}";
+
+        inventionBlueprint.options.baseCost = {{ base_cost }};
+        inventionBlueprint.options.baseCopyTime = {{ activity_copy.time }};
+        inventionBlueprint.options.maxRunPerCopy = {{ blueprint.max_production_limit }};
+
+        inventionBlueprint.options.indexes["Jita"] = {};
+        {% for activity, index in index_list.iteritems() -%}
+        inventionBlueprint.options.indexes["Jita"][{{ activity }}] = {{ index }};
+        {% endfor %}
+        
+        lb.run('inventionBlueprint');
     </script>
 {% endblock %}
 
 {% block content %}
-<div class="col-lg-6 col-md-6">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Search Blueprint</h3>
+<div class="row">
+    <div class="col-md-3 c">
+        <div class="well">
+            <div>
+                Facility<br>
+                <select name="facility" id="facility" class="form-control input-sm">
+                    <option value="0" selected>Station</option>
+                    <option value="1">Laboratory</option>
+                    <option value="2">Hyasyoda Laboratory</option>
+                </select>
+            </div>
+            <div>
+                Invention / Copy System<br>
+                <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
+            </div>
         </div>
-        <div class="panel-body">
-            <input id="blueprint" type="text" class="form-control" placeholder="Item name">
-            <br />
-            <table class="table table-striped table-hover" id="searchBlueprintResult">
-                <thead>
-                    <th>Blueprint Name</th>
-                    <th>&nbsp;</th>
-                </thead>
-                <tbody>
-                    <td colspan="2">No results</td>
-                </tbody>
-            </table>
+        <div class="well">   
+            <div>
+                Price Data<br>
+                <select name="region" id="region" class="form-control input-sm">
+                    <option disabled selected>Select a region</option>
+                    {% for region in regions -%}
+                    <option value="{{ region.id }}" {% if region.id == 10000002 -%}selected{% endif %}>{{ region.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="order-type" id="order-type" class="form-control input-sm">
+                    <option value="buy" selected>Use buy orders</option>
+                    <option value="sell">Use sell orders</option>
+                </select>
+            </div>
+        </div>
+        <div class="well">   
+            <div>
+                Decryptor (Chance / ME / TE / Runs)<br>
+                <select name="decryptor" id="decryptor" class="form-control input-sm">
+                    <option selected value="0">None</option>
+                    {% for decryptor in decryptors -%}
+                    <option value="{{ decryptor.item_id }}">
+                        {{ decryptor.item.name }} ({{ (decryptor.probability_multiplier - 1) * 100}}% / {{ decryptor.material_modifier }} / {{ decryptor.time_modifier }} / {{ decryptor.run_modifier }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>     
+            <div>
+                Number of copy<br>
+                <input id="copy-number" type="text" class="form-control input-sm" value="1">
+            </div>
+            <div>
+                Runs/copy (max: {{ blueprint.max_production_limit }})<br>
+                <input id="run-per-copy" type="text" class="form-control input-sm" value="1">
+            </div>
+        </div>
+        <div class="well">
+            <div class="slider">
+                Adv. Industry (<span id="adv-industry-level-display">0</span>)<br>
+                <div id="adv-industry-level"></div>
+            </div>
+            <div class="slider">
+                Science (<span id="science-level-display">0</span>)<br>
+                <div id="science-level"></div>
+            </div>
+        </div>
+        <div class="well">       
+            <div>
+                Copy Implant<br>
+                <select name="copyImplant" id="copyImplant" class="form-control input-sm">
+                    <option value="1.00" selected>None</option>
+                    <option value="0.99">SC-801</option>
+                    <option value="0.97">SC-803</option>
+                    <option value="0.95">SC-805</option>
+                </select>
+            </div>
+            <div class="slider">
+                {{ datacore_skills[0] }}
+                (<span id="datacore1-display">0</span>)<br>
+                <div id="datacore1-level"></div>
+            </div>
+            <div class="slider">
+                {{ datacore_skills[1] }}
+                (<span id="datacore2-display">0</span>)<br>
+                <div id="datacore2-level"></div>
+            </div>
+            <div class="slider">
+                {{ encryption_skill }}
+                (<span id="encryption-display">0</span>)<br>
+                <div id="encryption-level"></div>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-xs-10">
+                <h4 id="item-name">{{ blueprint.name }}</h4>
+            </div>
+            <div class="col-xs-2 text-right" id="item-icon">
+                <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="invention-data table table-condensed table-hover table-striped">
+                    <tbody>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Blueprint copy time</td>
+                            <td class="copy-time">{{ activity_copy.time | duration }}</td>
+                        </tr>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Invention Time</td>
+                            <td class="invention-time">{{ activity_invention.time | duration }}</td>
+                        </tr>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Invention Probability</td>
+                            <td class="invention-probability">{{ (invention_products[0].probability * 100) | intcomma }}%</td>
+                        </tr>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Output Blueprint</td>
+                            <td class="output">
+                                {% for inv_prod in invention_products -%}
+                                {% if config.USE_CCP_ICONS -%}
+                                <img src="{{ inv_prod.product.icon_32() }}" title="{{- inv_prod.product.name }}" data-toggle="tooltip" data-placement="top" alt="{{ inv_prod.product.name }}">
+                                {%- else -%}
+                                {{- inv_prod.product.name }}<br>
+                                {%- endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Output Stats (Runs / ME / TE)</td>
+                            <td class="invention-probability">{{ invention_products[0].product.max_production_limit }} / 2% / 4%</td>
+                        </tr>                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Copy Installation Cost</td>
+                            {% set copy_cost = "%0.2f" % (base_cost * index_list[5] * 0.02 * 1.1) -%}
+                            <td class="copy-cost">{{ copy_cost | float | intcomma }}</td>
+                        </tr>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Invention Installation Cost</td>
+                            {% set copy_cost = "%0.2f" % (base_cost * index_list[8] * 0.02 * 1.1) -%}
+                            <td class="invention-install-cost">{{ copy_cost | float | intcomma }}</td>
+                        </tr>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Invention Total Cost</td>
+                            <td class="invention-total-cost">{{ copy_cost | float | intcomma }}</td>
+                        </tr>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Output Manufacturing Per Run</td>
+                            <td class="output-cost">{{ copy_cost | float | intcomma }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="materials-prices table table-condensed table-hover table-striped">
+                    <thead>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Price Per Unit</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for inv_mat in invention_materials %}
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td class="icon"><img src="{{ inv_mat.material.icon_32() }}" alt="{{ inv_mat.material.name }}"></td>{%- endif %}
+                            <td>{{ inv_mat.material.name }}</td>
+                            <td class="quantity">{{ inv_mat.quantity }}</td>
+                            <td class="ppu price">0.00</td>
+                            <td class="total price">0.00</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    
+                    <tfoot>
+                        <tr>
+                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                            <td colspan="3" class="title">Total Material Cost</td>
+                            <td class="invention-total-cost">0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-
-
 {% endblock %}
 

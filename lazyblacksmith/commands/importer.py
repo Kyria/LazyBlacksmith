@@ -7,6 +7,7 @@ from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Constellation
+from lazyblacksmith.models import Decryptor
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
@@ -23,6 +24,7 @@ class Importer(object):
     IMPORT_ORDER = [
         Item,
         OreRefining,
+        Decryptor,
         Activity,
         ActivityMaterial,
         ActivityProduct,
@@ -153,7 +155,109 @@ class Importer(object):
             )
 
         return (added, total)
+   
+    def import_orerefining(self):    
+        """
+        Import ore (ice / ore) refining data 
+       
+        CCP Table : invTypeMaterials
+        """
+        added = 0
+        total = 0
 
+        # get all data
+        self.sde_cursor.execute("""
+            SELECT it1.typeID
+                  ,it2.typeID
+                  ,quantity 
+            FROM invTypeMaterials itm 
+            JOIN invTypes it1 ON it1.typeid = itm.typeid
+            JOIN invTypes it2 ON itm.materialtypeid = it2.typeid
+            JOIN invGroups ig ON ig.groupID = it1.groupID
+            WHERE ig.categoryID = 25
+                AND it2.groupID = 18
+                AND it1.published = 1
+        """)
+
+        new = []
+        for row in self.sde_cursor:
+            total += 1
+
+            if not row[0] or not row[1] or not row[2]:
+                continue
+
+            ore_refining = {
+                'ore_id': int(row[0]),
+                'material_id': int(row[1]),
+                'quantity': int(row[2]),
+            }
+
+            new.append(ore_refining)
+            added += 1
+
+        # then create the new blueprints if they exist
+        if new:
+            self.lb_engine.execute(
+                OreRefining.__table__.insert(),
+                new
+            )
+
+        return (added, total)
+
+    def import_decryptor(self):
+        """
+        Import the decryptor stats in a specific table.
+
+        CCP Table : dgmTypeAttributes, invTypes
+        """
+        added = 0
+        total = 0
+
+        # get all data
+        self.sde_cursor.execute("""
+            SELECT 
+                i.typeID,
+                COALESCE(dta2.valueInt,dta2.valueFloat) multiplier,
+                COALESCE(dta3.valueInt,dta3.valueFloat) me,
+                COALESCE(dta4.valueInt,dta4.valueFloat) te,
+                COALESCE(dta5.valueInt,dta5.valueFloat) runs
+            FROM invTypes i
+            JOIN dgmTypeAttributes dta2 ON (dta2.typeid = i.typeid AND dta2.attributeID = 1112)
+            JOIN dgmTypeAttributes dta3 ON (dta3.typeid = i.typeid AND dta3.attributeID = 1113)
+            JOIN dgmTypeAttributes dta4 ON (dta4.typeid = i.typeid AND dta4.attributeID = 1114)
+            JOIN dgmTypeAttributes dta5 ON (dta5.typeid = i.typeid AND dta5.attributeID = 1124)
+            WHERE i.groupID = 1304
+        """)
+
+        # for each decryptor from SDE, check valid data and import them.
+        new = []
+        for data in self.sde_cursor:
+            total += 1
+
+            if not data[0]:
+                continue
+
+            decryptor = {
+                'item_id': int(data[0]),
+                'probability_multiplier': float(data[1]),
+                'material_modifier': int(data[2]),
+                'time_modifier': int(data[3]),
+                'run_modifier': int(data[4]),
+            }
+
+
+            new.append(decryptor)
+            added += 1
+
+        # then create the new blueprints if they exist
+        if new:
+            self.lb_engine.execute(
+                Decryptor.__table__.insert(),
+                new
+            )
+
+        return (added, total)
+    
     def import_activity(self):
         """
         Import blueprints activity time from SDE to our database.
@@ -530,56 +634,6 @@ class Importer(object):
 
         return (added, total)
         
-        
-    def import_orerefining(self):    
-        """
-        Import ore (ice / ore) refining data 
-       
-        CCP Table : invTypeMaterials
-        """
-        added = 0
-        total = 0
-
-        # get all data
-        self.sde_cursor.execute("""
-            SELECT it1.typeID
-                  ,it2.typeID
-                  ,quantity 
-            FROM invTypeMaterials itm 
-            JOIN invTypes it1 ON it1.typeid = itm.typeid
-            JOIN invTypes it2 ON itm.materialtypeid = it2.typeid
-            JOIN invGroups ig ON ig.groupID = it1.groupID
-            WHERE ig.categoryID = 25
-                AND it2.groupID = 18
-                AND it1.published = 1
-        """)
-
-        new = []
-        for row in self.sde_cursor:
-            total += 1
-
-            if not row[0] or not row[1] or not row[2]:
-                continue
-
-            ore_refining = {
-                'ore_id': int(row[0]),
-                'material_id': int(row[1]),
-                'quantity': int(row[2]),
-            }
-
-            new.append(ore_refining)
-            added += 1
-
-        # then create the new blueprints if they exist
-        if new:
-            self.lb_engine.execute(
-                OreRefining.__table__.insert(),
-                new
-            )
-
-        return (added, total)
-
-
     def import_itemadjustedprice(self):
         """
         import item adjusted price into DB

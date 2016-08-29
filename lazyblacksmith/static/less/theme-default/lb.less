@@ -70,44 +70,43 @@
 }
 
 
-.materials-prices > tfoot, .materials-taxes > tfoot  {
-    > tr:nth-child(odd) {
-        > td,
-        > th {
-          background-color: darken(@table-bg-accent, 1%);
-        }
-    };
-    > tr:nth-child(even) {
-        > td,
-        > th {
-          background-color: darken(#FFF, 1%);
-        }
-    };
-    > tr:hover {
-        > td,
-        > th {
-          background-color: darken(@table-bg-accent, 3%);
-        }
-    };
-    > tr {
-        > td {
-            text-align: right;
-            padding-right: 20px;
-
-            &.title {
-                font-weight: bold;
-            };
-        }
-    };
-}
-
-.copy-data {
-    width: 300px;
-    margin: 20px auto;
-    tbody td {
-        text-align: right;
+.materials-prices, .materials-taxes {
+    > thead > tr > th {
+       text-align: center;
     }
+    > tfoot  {
+        > tr:nth-child(odd) {
+            > td,
+            > th {
+              background-color: darken(@table-bg-accent, 1%);
+            }
+        };
+        > tr:nth-child(even) {
+            > td,
+            > th {
+              background-color: darken(#FFF, 1%);
+            }
+        };
+        > tr:hover {
+            > td,
+            > th {
+              background-color: darken(@table-bg-accent, 3%);
+            }
+        };
+        > tr {
+            > td {
+                text-align: right;
+                padding-right: 20px;
+                vertical-align: middle;
+
+                &.title {
+                    font-weight: bold;
+                };
+            }
+        };
+    };
 }
+
 .me-profit {
     width: 75%;
     margin: 20px auto;

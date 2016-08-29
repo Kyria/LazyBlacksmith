@@ -5,9 +5,9 @@
 {% block js %}
     <script>
         lb.urls.searchUrl           = '{{ url_for('ajax_eve_sde.blueprint_search', name='0000') }}';
-        lb.urls.inventionUrl        = '';
+        lb.urls.inventionUrl        = '{{ url_for('blueprint.invention_copy', item_id='999999999') }}';
         lb.urls.manufacturingUrl    = '{{ url_for('blueprint.manufacturing', item_id='999999999') }}';
-        lb.urls.researchUrl         = '{{ url_for('blueprint.research_and_copy', item_id='999999999') }}';
+        lb.urls.researchUrl         = '{{ url_for('blueprint.research', item_id='999999999') }}';
         lb.run('searchBlueprint');
     </script>
 {% endblock %}
