@@ -83,6 +83,7 @@ var eveUtils = (function() {
      * @param baseCost the base research cost
      * @param level the level we want to reach
      * @param systemCostIndex the system cost index modifier (float)
+     * @param tax the facility tax
      * @return the research cost 
      */
     var calculateResearchInstallationCost = function(baseCost, systemCostIndex, level, tax) {
@@ -119,12 +120,57 @@ var eveUtils = (function() {
      * @param run the number of copy
      * @param runPerCopy the number of run per copy
      * @param systemCostIndex the system cost index modifier (float)
+     * @param tax the facility tax
      * @return the copy cost 
      */
     var calculateCopyInstallationCost = function(baseCost, systemCostIndex, runs, runPerCopy, tax) {
         return baseCost * systemCostIndex * 0.02 * runs * runPerCopy * tax;
     }
 
+    /**
+     * Calculate the invention probability and return the value as decimal
+     *
+     * @param baseProbability the blueprint base invention probability
+     * @param encryptionLevel the level of <faction> encryption
+     * @param datacore1Level the level of the first datacore type skill
+     * @param datacore2Level the level of the second datacore type skill
+     * @param decryptorModifier the decryptor modifier
+     * @return the new percentage
+     */
+    var calculateInventionProbability = function(baseProbability, encryptionLevel,
+                                            datacore1Level, datacore2Level, decryptorModifier) {
+        var skillModifier = 1 + encryptionLevel / 40 + (datacore1Level + datacore2Level) / 30;
+        return baseProbability * skillModifier * decryptorModifier;
+    }
+   
+    /**
+     * Calculate the invention time
+     *
+     * @param baseInventionTime the base invention time
+     * @param facilityModifier the facility bonus for invention
+     * @param advancedIndustryLevel the level of advanced Industry
+     * @return the new time in second
+     */
+    var calculateInventionTime = function(baseInventionTime, facilityModifier, advancedIndustryLevel) {
+        return baseInventionTime * facilityModifier * (1 - 0.03 * advancedIndustryLevel);
+    }
+    
+    /**
+     * Calculate the invention installation cost with the given data
+     *
+     * @param baseCost the base invention cost
+     * @param run the number of invention runs
+     * @param tax the facility tax
+     * @param systemCostIndex the system cost index modifier (float)
+     * @return the invention cost 
+     */
+    var calculateInventionCost = function(baseCost, systemCostIndex, runs, tax) {
+        return baseCost * systemCostIndex * runs * 0.02 * tax;
+    }
+    
+    
+    
+    
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
         calculateJobQuantity: calculateJobQuantity,
@@ -133,6 +179,9 @@ var eveUtils = (function() {
         calculateResearchInstallationCost: calculateResearchInstallationCost,
         calculateCopyTime: calculateCopyTime,
         calculateCopyInstallationCost: calculateCopyInstallationCost,
+        calculateInventionProbability: calculateInventionProbability,
+        calculateInventionTime: calculateInventionTime,
+        calculateInventionCost: calculateInventionCost,
     }
 
 })();

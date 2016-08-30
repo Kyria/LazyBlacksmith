@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from collections import OrderedDict
+from math import ceil
 
 from flask import Blueprint
 from flask import json
@@ -12,6 +13,7 @@ from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import Item
+from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.utils.time import utcnow
 
@@ -171,3 +173,37 @@ def item_search(name):
         return jsonify(result=data)
     else:
         return 'Cannot call this page directly', 403
+
+
+@ajax_eve_sde.route('/item/buildcost/<int:blueprint_id>/<int:region_id>/<string:material_efficiency>', methods=['GET'])    
+def build_cost_item(material_efficiency, blueprint_id, region_id, methods=['GET']):
+    """
+    Return JSON with the list of all costs for the given blueprint
+    and all the material efficiency level
+    """
+    material_list = ActivityMaterial.query.filter_by(
+        item_id=blueprint_id,
+        activity=Activity.ACTIVITY_MANUFACTURING
+    ).all()
+
+    me_list = material_efficiency.split(',')
+    build_cost = {}
+    for mat in material_list:
+        try:
+            price = ItemPrice.query.filter(
+                ItemPrice.region_id == region_id,
+                ItemPrice.item_id == mat.material_id,
+            ).one()
+        except NoResultFound:
+            continue
+        
+        for ume in me_list:
+            me = int(ume)
+            if me not in build_cost:
+                build_cost[me] = 0
+            quantity = max(1, ceil(mat.quantity * (1.00-me/100.00)));
+            price_value = price.sell_price if price.sell_price is not None else price.buy_price
+            build_cost[me] += quantity * price_value
+    
+    return jsonify({'prices':build_cost, 'region': region_id})
+        

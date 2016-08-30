@@ -1,4 +1,4 @@
-var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
+var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     "use strict"
 
     var ACTIVITY_RESEARCHING_TIME_EFFICIENCY = 3;
@@ -424,6 +424,6 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         // functions
         run: run,
     };
-})(jQuery, lb, utils, eveUtils, Humanize, JSON);
+})(jQuery, lb, utils, eveUtils, Humanize);
 
 lb.registerModule('researchBlueprint', researchBlueprint);

@@ -1,4 +1,4 @@
-var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
+var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     "use strict";
 
     var ACTIVITY_MANUFACTURING = 1;
@@ -1324,6 +1324,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         // functions
         run: run,
     };
-})(jQuery, lb, utils, eveUtils, Humanize, JSON);
+})(jQuery, lb, utils, eveUtils, Humanize);
 
 lb.registerModule('manufacturingBlueprint', manufacturingBlueprint);

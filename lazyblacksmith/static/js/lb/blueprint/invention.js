@@ -1,21 +1,20 @@
-var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
+var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     "use strict"
-    // inventionTime = baseInventionTime ∗ facilityModifier ∗ (1 − 0.03 ∗ AdvancedIndustryLevel)
-    // jobFee = baseJobCost ∗ systemCostIndex ∗ 0.02 ∗ runs
-    // inventionChance = baseChance ∗ SkillModif ier ∗ DecryptorModif ier
-    // SkillModif ier = 1 + EncryptionLevel/40 + (Datacore1Level + Datacore2Level)/30
 
     var ACTIVITY_COPYING = 5;
     var ACTIVITY_INVENTION = 8;
 
     var options = {
+        blueprintId: 0,
         // base values
         copyBaseCost: 0,
         inventionBaseCost: 0,
         baseCopyTime: 0,
         baseInventionTime: 0,
-        // indexes
-        indexes: {},
+        baseInventionProbability: 0,
+        baseOutputRun: 1,
+        baseOutputME: 2,
+        baseOutputTE: 4,
         
         // copy speed (5%)
         scienceLevel: 0,
@@ -33,16 +32,44 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         facility: 0,
         // copy data
         runs: 1,
+        // decryptor
+        decryptor: 0,
         // system
         system: "Jita",
+        region: 10000002,
     };
 
     $.extend(lb.urls, {
         systemUrls: false,
         indexActivityUrl: false,
-        manufacturingUrl: false,
         priceUrl: false,
     });
+    
+    var matData = {
+        idList: [],
+        materials: {},
+    };
+    
+    var decryptorList = [];
+    var decryptorData = {
+        idList: [],
+        items: {}
+    };
+    // base decryptor for "no decryptor selected"
+    decryptorData.items[0] = {
+        name: 'Decryptor',
+        probability: 1.00,
+        me: 0,
+        te: 0,
+        run: 0,
+    }
+    
+    var indexes = {};
+    var priceData = {
+        prices: {},
+        isLoaded: false,
+    };
+    var outputPrices = false;
 
     // assembly informations
     var facilityStats = [
@@ -63,14 +90,68 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         },
     ];
 
+    // Ajax calls
+    // -----------
+    
+    /**
+     * Get market price for items
+     * @private
+     */
+    var _getAllPrices = function() {
+        if(priceData.isLoaded) {
+            return _updateInventionData();
+        }
+
+        if(matData.idList.length == 0) {
+            return;
+        }
+
+        var itemList = matData.idList.concat(decryptorData.idList)
+        
+        var url = lb.urls.priceUrl.replace(/111111/, itemList.join(','));
+
+        // get the prices
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(jsonPrice) {
+                priceData.prices = jsonPrice['prices'];
+                priceData.isLoaded = true;
+                _updateInventionData();
+            },
+        });
+    };
+    
+    /**
+     * Get the output price (manufacturing cost) of product
+     * to be able to compare every inventions together
+     * @private
+     */
+    var _getOutputPrices = function(callback) { 
+        if(outputPrices) {
+            return;
+        }
+        // get the prices
+        $.ajax({
+            url: lb.urls.buildCostUrl,
+            type: 'GET',
+            dataType: 'json',
+            success: function(jsonPrice) {
+                outputPrices = jsonPrice['prices'];
+                callback();
+            },
+        });
+
+    }
     
     /**
      * Get the indexes of the missing solar systems
      * @private
      */
     var _getSystemCostIndex = function() {
-        if(options.system in options.indexes) {
-            _updateCopyTimeAndCost();
+        if(options.system in indexes) {
+            _updateInventionData();
             return;
         }
         
@@ -81,20 +162,48 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             type: 'GET',
             dataType: 'json',
             success: function(jsonIndex) {
-                $.extend(options.indexes, jsonIndex['index']);
-                _updateCopyTimeAndCost();
+                $.extend(indexes, jsonIndex['index']);
+                _updateInventionData();
             },
         });
 
     };
 
+    // Visual updates
+    // ---------------
     
     /**
-     * Get new copy time and price and update table
-     * Called by events
+     * Get the invention data updated (costs, probabilities, time)
      * @private
      */
-    var _updateCopyTimeAndCost = function() {
+    var _updateInventionData = function() {
+        if(!priceData.isLoaded) {
+            return setTimeout(_updateInventionData, 100);;
+        }
+        if(!outputPrices) {
+            return _getOutputPrices(_updateInventionData);
+        }
+        
+        var newProbability = eveUtils.calculateInventionProbability(
+            options.baseInventionProbability, 
+            options.encryptionLevel,
+            options.datacoreLevel1, 
+            options.datacoreLevel2, 
+            decryptorData.items[options.decryptor].probability
+        );
+        var inventionTime = eveUtils.calculateInventionTime(
+            options.baseInventionTime, 
+            facilityStats[options.facility].invention, 
+            options.advancedIndustryLevel
+        );
+        
+        var inventionCost = eveUtils.calculateInventionCost(
+            options.inventionBaseCost, 
+            indexes[options.system][ACTIVITY_INVENTION], 
+            options.runs, 
+            1.1
+        );
+        
         var copyTime = eveUtils.calculateCopyTime(
             options.baseCopyTime, 
             options.runs, 
@@ -107,16 +216,84 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         
         var copyCost = eveUtils.calculateCopyInstallationCost(
             options.copyBaseCost, 
-            options.indexes[options.system][ACTIVITY_COPYING], 
+            indexes[options.system][ACTIVITY_COPYING], 
             options.runs, 
             1,
             1.1
         );
+       
+       var outputRuns = options.baseOutputRun + decryptorData.items[options.decryptor].run;
+       var outputME = options.baseOutputME + decryptorData.items[options.decryptor].me;
+       var outputTE = options.baseOutputTE + decryptorData.items[options.decryptor].te;
+       
+       _updateTables(
+            newProbability, 
+            inventionTime, 
+            inventionCost, 
+            copyTime, 
+            copyCost,
+            outputRuns,
+            outputME,
+            outputTE
+        );
+    }
+    
+    /**
+     * Update all the tables with the new data
+     * @private
+     */
+    var _updateTables = function(newProbability, inventionTime, inventionCost, copyTime, copyCost, outputRuns, outputME, outputTE) {
+        var materialPrice = 0;
+        for(var i in matData.idList) {
+            var mat = matData.materials[matData.idList[i]];
+            var quantity = mat.quantity * options.runs;
+            
+            var price = 0;
+            if(options.region in priceData.prices && mat.id in priceData.prices[options.region]) {
+                price = priceData.prices[options.region][mat.id].buy;
+                price = (price == 0) ? priceData.prices[options.region][mat.id].sell : price;
+            } 
+            materialPrice += quantity * price;
+
+            $('#mat-' + mat.id + ' .quantity').html(Humanize.intcomma(quantity, 0));
+            $('#mat-' + mat.id + ' .ppu').html(Humanize.intcomma(price, 2));
+            $('#mat-' + mat.id + ' .total').html(Humanize.intcomma(quantity * price, 2));
+        }
+        
+        var quantity = (options.decryptor == 0) ? 0 : options.runs;
+        var price = 0;
+        if(options.decryptor != 0 && options.region in priceData.prices && options.decryptor in priceData.prices[options.region]) {
+            price = priceData.prices[options.region][options.decryptor].buy;
+            price = (price == 0) ? priceData.prices[options.region][options.decryptor].sell : price;
+        } 
+        materialPrice += quantity * price;
+
+        $('#mat-decryptor .quantity').html(Humanize.intcomma(quantity, 0));
+        $('#mat-decryptor .ppu').html(Humanize.intcomma(price, 2));
+        $('#mat-decryptor .total').html(Humanize.intcomma(quantity * price, 2));
+        $('#mat-decryptor .name').html(decryptorData.items[options.decryptor].name);
+
+        var inventionTotalPriceProba = (inventionCost + materialPrice + copyCost) / newProbability;
+        $('.invention-material-cost').html(Humanize.intcomma(materialPrice, 2));
+        $('.invention-install-cost').html(Humanize.intcomma(inventionCost, 2));
+        $('.invention-total-cost').html(Humanize.intcomma(inventionCost + materialPrice + copyCost, 2));
+        $('.invention-total-cost-proba').html(Humanize.intcomma(inventionTotalPriceProba, 2));
+        $('.invention-time').html(utils.durationToString(inventionTime));
+        $('.invention-probability').html(Humanize.intcomma(newProbability * 100, 2) + '%');
+        $('.output-qty').html(outputRuns);
+        $('.output-me').html(outputME);
+        $('.output-te').html(outputTE);
+        
+        $('.output-cost').html(Humanize.intcomma(outputPrices[outputME], 2));
+        $('.output-cost-invention').html(Humanize.intcomma(outputPrices[outputME] + inventionTotalPriceProba / (outputRuns * options.runs), 2));
         
         $('.copy-time').html(utils.durationToString(copyTime));
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
     };
-   
+
+    
+    // EVENTS
+    // ------
    
     /**
      * Init input fields
@@ -129,15 +306,24 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
 
         $('#facility').on('change', function() {
             options.facility = parseInt($('#facility').val());
-            _updateCopyTimeAndCost();
+            _updateInventionData();
+        });  
+        
+        $('#region').on('change', function() {
+            options.region = parseInt($('#region').val());
+            _updateInventionData();
+        });       
+        
+        $('#decryptor').on('change', function() {
+            options.decryptor = parseInt($('#decryptor').val());
+            _updateInventionData();
         });              
         
         $('#copyImplant').on('change', function() {
             options.copyImplant = parseFloat($('#copyImplant').val());
-            _updateCopyTimeAndCost();
+            _updateInventionData();
         });
     };
-
     
     /**
      * Copy Number on keyup event
@@ -150,7 +336,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             options.runs = parseInt($(this).val());
         }
         $(this).val(options.runs);
-        _updateCopyTimeAndCost();
+        _updateInventionData();
     };
        
     /**
@@ -191,7 +377,6 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
         });
     };
 
-
     /**
      * Init all sliders on the page
      * @private
@@ -225,21 +410,21 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
                 break;
 
             case 'encryption-level':
-                options.metallurgyLevel = value;
+                options.encryptionLevel = value;
                 $('#encryption-level-display').html(value);
                 break;
                 
             case 'datacore1-level':
-                options.metallurgyLevel = value;
+                options.datacoreLevel1 = value;
                 $('#datacore1-level-display').html(value);
                 break;
                 
             case 'datacore2-level':
-                options.metallurgyLevel = value;
+                options.datacoreLevel2 = value;
                 $('#datacore2-level-display').html(value);
                 break;
         };
-        _updateCopyTimeAndCost();
+        _updateInventionData();
     };
     
     
@@ -254,19 +439,20 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
             e.preventDefault()
             $(this).tab('show')
         });
+        
         $('[data-toggle="tooltip"]').tooltip({
             container: 'body',
         });
         
         // check all required urls (so we don't have to do it later)
-        if(!lb.urls.systemUrls || !lb.urls.indexActivityUrl) {
+        if(!lb.urls.systemUrls || !lb.urls.priceUrl || !lb.urls.indexActivityUrl) {
             alert('Error, some URL are missing, this application cannot work properly without them.');
             return;
         }
 
         // other init that require ajax call
         _initTypeahead();
-        
+        _getAllPrices();
     };
 
 
@@ -276,10 +462,13 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize, JSON) {
     return {
         // required objects
         options: options,
+        matData: matData,
+        indexes: indexes,
+        decryptorData: decryptorData,
 
         // functions
         run: run,
     };
-})(jQuery, lb, utils, eveUtils, Humanize, JSON);
+})(jQuery, lb, utils, eveUtils, Humanize);
 
 lb.registerModule('inventionBlueprint', inventionBlueprint);
