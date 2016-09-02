@@ -102,6 +102,11 @@
 {% else %}
     <script src="{{ url_for('static', filename='js/lazybl-combined.min.js') }}"></script>
 {% endif %}
+    <script>
+        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', solar_system_names='SYSTEM_LIST_TO_REPLACE') }}";
+        lb.urls.priceUrl            = "{{ url_for('ajax_crest.get_price', item_list='ITEM_LIST_TO_REPLACE') }}";
+        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
+    </script>
 
 {% block js %}{% endblock %}
 

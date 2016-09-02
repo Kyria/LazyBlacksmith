@@ -80,22 +80,14 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateCopyTimeAndCost();
             return;
         }
-        
-        var url = lb.urls.indexActivityUrl.replace(/111111/, options.system);
 
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: function(jsonIndex) {
-                $.extend(options.indexes, jsonIndex['index']);
-                _updateResearchTimeAndCost();
-                _updateCopyTimeAndCost();
-            },
+        eveUtils.getSystemCostIndex(options.system, function(jsonIndex) {
+            $.extend(options.indexes, jsonIndex['index']);
+            _updateResearchTimeAndCost();
+            _updateCopyTimeAndCost();
         });
-
     };
-
+    
     
     /**
      * Get new copy time and price and update table
@@ -281,25 +273,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      * @private
      */
     var _initTypeahead = function() {
-        var systems = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            limit: 10,
-            prefetch: {
-                url: lb.urls.systemUrls,
-                filter: function(listResult) {
-                    return $.map(listResult['result'], function(system) { return { name: system }; });
-                }
-            }
-        });
-        systems.initialize();
-
-        var typeaheadEventSelector = "change typeahead:selected typeahead:autocompleted";
-        $('#system').typeahead(null,{
-            name: 'system',
-            displayKey: 'name',
-            source: systems.ttAdapter(),
-        }).on(typeaheadEventSelector, function(event, suggestion) {
+        eveUtils.initTypeahead('#system', function(event, suggestion) {
             options.system = $(this).typeahead('val');
             _getSystemCostIndex();
         });

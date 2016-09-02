@@ -169,7 +169,69 @@ var eveUtils = (function() {
     }
     
     
+    /**
+     * Generic ajax get call, without data parameters with json dataType as result
+     */
+    var ajaxGetCallJson = function(url, callback) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: callback,
+        }); 
+    };
     
+    /**
+     *
+     */
+    var getSystemCostIndex = function(systemList, callback) {
+        var systems = ($.isArray(systemList)) ? systemList.join(',') : systemList;
+        var url = lb.urls.indexActivityUrl.replace(/SYSTEM_LIST_TO_REPLACE/, systems);
+        ajaxGetCallJson(url, callback);
+
+    };    
+    
+    /**
+     *
+     */
+    var getItemPrices = function(itemList, callback) {
+        var items = ($.isArray(itemList)) ? itemList.join(',') : itemList;
+        var url = lb.urls.priceUrl.replace(/ITEM_LIST_TO_REPLACE/, items);
+        ajaxGetCallJson(url, callback);
+    };    
+
+        
+    var _getSystemBloodHound = function() {
+        var systems = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            limit: 10,
+            prefetch: {
+                url: lb.urls.systemUrls,
+                filter: function(listResult) {
+                    return $.map(listResult['result'], function(system) { return { name: system }; });
+                }
+            }
+        });
+        systems.initialize();
+        return systems;
+    };
+
+    
+    var initTypeahead = function(cssSelector, callback) {
+        var systems = _getSystemBloodHound();
+
+        var typeaheadEventSelector = "change typeahead:selected typeahead:autocompleted";
+        var typeahead = $(cssSelector).typeahead(null,{
+            name: 'system',
+            displayKey: 'name',
+            source: systems.ttAdapter(),
+        });
+
+        if(callback) {
+            typeahead.on(typeaheadEventSelector, callback); 
+        }
+    };
     
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
@@ -182,6 +244,12 @@ var eveUtils = (function() {
         calculateInventionProbability: calculateInventionProbability,
         calculateInventionTime: calculateInventionTime,
         calculateInventionCost: calculateInventionCost,
-    }
+        
+        // ajax stuff
+        ajaxGetCallJson: ajaxGetCallJson,
+        getSystemCostIndex: getSystemCostIndex,
+        getItemPrices: getItemPrices,
+        initTypeahead: initTypeahead,
+    };
 
 })();

@@ -4,9 +4,6 @@
 
 {% block js %}
     <script>        
-        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
-        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', solar_system_names=111111) }}";
-
         researchBlueprint.options.baseCost = {{ base_cost }};
         researchBlueprint.options.baseCopyTime = {{ activity_copy.time }};
         researchBlueprint.options.baseMeTime = {{ activity_material.time }};

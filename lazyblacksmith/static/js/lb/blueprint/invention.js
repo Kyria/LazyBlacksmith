@@ -41,8 +41,8 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
 
     $.extend(lb.urls, {
         systemUrls: false,
-        indexActivityUrl: false,
-        priceUrl: false,
+        manufacturingUrl: false,
+        buildCostUrl: false,
     });
     
     var matData = {
@@ -107,21 +107,14 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         }
 
         var itemList = matData.idList.concat(decryptorData.idList)
-        
-        var url = lb.urls.priceUrl.replace(/111111/, itemList.join(','));
 
-        // get the prices
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: function(jsonPrice) {
-                priceData.prices = jsonPrice['prices'];
-                priceData.isLoaded = true;
-                _updateInventionData();
-            },
+        eveUtils.getItemPrices(itemList, function(jsonPrice) {
+            priceData.prices = jsonPrice['prices'];
+            priceData.isLoaded = true;
+            _updateInventionData();
         });
     };
+    
     
     /**
      * Get the output price (manufacturing cost) of product
@@ -132,18 +125,13 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         if(outputPrices) {
             return;
         }
-        // get the prices
-        $.ajax({
-            url: lb.urls.buildCostUrl,
-            type: 'GET',
-            dataType: 'json',
-            success: function(jsonPrice) {
-                outputPrices = jsonPrice['prices'];
-                callback();
-            },
+        
+        eveUtils.ajaxGetCallJson(lb.urls.buildCostUrl, function(jsonPrice) {
+            outputPrices = jsonPrice['prices'];
+            callback();
         });
-
     }
+    
     
     /**
      * Get the indexes of the missing solar systems
@@ -154,20 +142,13 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateInventionData();
             return;
         }
-        
-        var url = lb.urls.indexActivityUrl.replace(/111111/, options.system);
 
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: function(jsonIndex) {
-                $.extend(indexes, jsonIndex['index']);
-                _updateInventionData();
-            },
+        eveUtils.getSystemCostIndex(options.system, function(jsonIndex) {
+            $.extend(indexes, jsonIndex['index']);
+            _updateInventionData();
         });
-
     };
+    
 
     // Visual updates
     // ---------------
@@ -353,30 +334,13 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      * @private
      */
     var _initTypeahead = function() {
-        var systems = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            limit: 10,
-            prefetch: {
-                url: lb.urls.systemUrls,
-                filter: function(listResult) {
-                    return $.map(listResult['result'], function(system) { return { name: system }; });
-                }
-            }
-        });
-        systems.initialize();
-
-        var typeaheadEventSelector = "change typeahead:selected typeahead:autocompleted";
-        $('#system').typeahead(null,{
-            name: 'system',
-            displayKey: 'name',
-            source: systems.ttAdapter(),
-        }).on(typeaheadEventSelector, function(event, suggestion) {
+        eveUtils.initTypeahead('#system', function(event, suggestion) {
             options.system = $(this).typeahead('val');
             _getSystemCostIndex();
         });
     };
 
+    
     /**
      * Init all sliders on the page
      * @private
@@ -445,7 +409,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         });
         
         // check all required urls (so we don't have to do it later)
-        if(!lb.urls.systemUrls || !lb.urls.priceUrl || !lb.urls.indexActivityUrl) {
+        if(!lb.urls.manufacturingUrl || !lb.urls.buildCostUrl) {
             alert('Error, some URL are missing, this application cannot work properly without them.');
             return;
         }

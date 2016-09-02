@@ -212,23 +212,15 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             return;
         }
 
-        var url = lb.urls.priceUrl.replace(/111111111111/, priceData.itemList.join(','));
-
-        // get the prices
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: function(jsonPrice) {
-                priceData.prices = jsonPrice['prices'];
-                priceData.adjusted = jsonPrice['adjusted'];
-                priceData.isLoaded = true;
-                _updatePriceTable();
-            },
+        eveUtils.getItemPrices(priceData.itemList, function(jsonPrice) {
+            priceData.prices = jsonPrice['prices'];
+            priceData.adjusted = jsonPrice['adjusted'];
+            priceData.isLoaded = true;
+            _updatePriceTable();
         });
     };
-
-
+    
+    
     /**
      * Get the list of materials for the given blueprint
      * @private
@@ -360,19 +352,17 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             return _updateTaxTable();
         }
 
-        var url = lb.urls.indexActivityUrl.replace(/111111111111/, systemList.join(','));
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: function(jsonIndex) {
-                $.extend(costIndex, jsonIndex['index']);
-                _updateTaxTable();
-            },
-        });
-
-    }
+        eveUtils.getSystemCostIndex(systemList, _getSystemCostIndexCallback);
+    };
+    
+    /**
+     * GetSystemCostIndex callback function
+     * @private
+     */
+    var _getSystemCostIndexCallback = function(jsonIndex) {
+        $.extend(costIndex, jsonIndex['index']);
+        _updateTaxTable();
+    };
 
     // -------------------------------------------------
     // Functions (no events, no event functions)
@@ -846,34 +836,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      * @private
      */
     var _initTypeahead = function() {
-        var systems = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            limit: 10,
-            prefetch: {
-                url: lb.urls.systemUrls,
-                filter: function(listResult) {
-                    return $.map(listResult['result'], function(system) { return { name: system }; });
-                }
-            }
-        });
-        systems.initialize();
-
-        var typeaheadEventSelector = "change typeahead:selected typeahead:autocompleted";
-        $('#system').typeahead(null,{
-            name: 'system',
-            displayKey: 'name',
-            source: systems.ttAdapter(),
-        }).on(typeaheadEventSelector, function(event, suggestion) {
+        eveUtils.initTypeahead('#system', function(event, suggestion) {
             materialsData.materials[materialsData.productItemId].manufacturingSystem = $(this).typeahead('val');
             _getSystemCostIndex();
         });
-
-        $('#modal-system').typeahead(null,{
-            name: 'system',
-            displayKey: 'name',
-            source: systems.ttAdapter(),
-        });
+        eveUtils.initTypeahead('#modal-system');
     };
 
 
