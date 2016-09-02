@@ -352,18 +352,13 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             return _updateTaxTable();
         }
 
-        eveUtils.getSystemCostIndex(systemList, _getSystemCostIndexCallback);
+        eveUtils.getSystemCostIndex(systemList, function(jsonIndex) {
+            $.extend(costIndex, jsonIndex['index']);
+            _updateTaxTable();
+        });
     };
     
-    /**
-     * GetSystemCostIndex callback function
-     * @private
-     */
-    var _getSystemCostIndexCallback = function(jsonIndex) {
-        $.extend(costIndex, jsonIndex['index']);
-        _updateTaxTable();
-    };
-
+    
     // -------------------------------------------------
     // Functions (no events, no event functions)
     //
@@ -836,11 +831,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      * @private
      */
     var _initTypeahead = function() {
-        eveUtils.initTypeahead('#system', function(event, suggestion) {
+        eveUtils.initSolarSystemTypeahead('#system', function(event, suggestion) {
             materialsData.materials[materialsData.productItemId].manufacturingSystem = $(this).typeahead('val');
             _getSystemCostIndex();
         });
-        eveUtils.initTypeahead('#modal-system');
+        eveUtils.initSolarSystemTypeahead('#modal-system');
     };
 
 

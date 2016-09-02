@@ -273,7 +273,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      * @private
      */
     var _initTypeahead = function() {
-        eveUtils.initTypeahead('#system', function(event, suggestion) {
+        eveUtils.initSolarSystemTypeahead('#system', function(event, suggestion) {
             options.system = $(this).typeahead('val');
             _getSystemCostIndex();
         });

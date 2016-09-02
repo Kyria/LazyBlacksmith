@@ -171,6 +171,8 @@ var eveUtils = (function() {
     
     /**
      * Generic ajax get call, without data parameters with json dataType as result
+     * @param url the url to call
+     * @param callback function to call when ajax call succeed
      */
     var ajaxGetCallJson = function(url, callback) {
         $.ajax({
@@ -182,7 +184,9 @@ var eveUtils = (function() {
     };
     
     /**
-     *
+     * Proxy function to get system cost indexes from backend
+     * @param systemList the array of system names
+     * @param callback function to call when ajax call succeed
      */
     var getSystemCostIndex = function(systemList, callback) {
         var systems = ($.isArray(systemList)) ? systemList.join(',') : systemList;
@@ -192,7 +196,9 @@ var eveUtils = (function() {
     };    
     
     /**
-     *
+     * Proxy function to get item prices from backend
+     * @param itemList the array of item ID
+     * @param callback function to call when ajax call succeed
      */
     var getItemPrices = function(itemList, callback) {
         var items = ($.isArray(itemList)) ? itemList.join(',') : itemList;
@@ -200,7 +206,10 @@ var eveUtils = (function() {
         ajaxGetCallJson(url, callback);
     };    
 
-        
+    /**
+     * Init the bloodhound for the typeahead
+     * @private
+     */
     var _getSystemBloodHound = function() {
         var systems = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
@@ -217,8 +226,12 @@ var eveUtils = (function() {
         return systems;
     };
 
-    
-    var initTypeahead = function(cssSelector, callback) {
+    /**
+     * Init solar system typeahead fields
+     * @param cssSelector where to apply to the typeahead
+     * @param callback function to call when suggestion selected (can be null)
+     */
+    var initSolarSystemTypeahead = function(cssSelector, callback) {
         var systems = _getSystemBloodHound();
 
         var typeaheadEventSelector = "change typeahead:selected typeahead:autocompleted";
@@ -249,7 +262,7 @@ var eveUtils = (function() {
         ajaxGetCallJson: ajaxGetCallJson,
         getSystemCostIndex: getSystemCostIndex,
         getItemPrices: getItemPrices,
-        initTypeahead: initTypeahead,
+        initSolarSystemTypeahead: initSolarSystemTypeahead,
     };
 
 })();
