@@ -79,8 +79,8 @@ def update_market_price():
         Region.id.in_(config.CREST_REGION_PRICE)
     ).all()
 
-    print "Total | Delta | Insert | Update | Region"
-    print "-----------------------------------------"
+    print "Total | Delta | Delta SQL | Insert | Update | Region"
+    print "----------------------------------------------------"
     time_start = time.time()
 
     for region in region_list:
@@ -96,6 +96,7 @@ def update_market_price():
         with rate_limiter:
             item_list = crest_order_price(region_crest, region.id, item_id_list)
 
+        time_delta_sql = time.time()
         # check if we have any update to do
         if len(item_list['update']) > 0:
             update_stmt = ItemPrice.__table__.update() \
@@ -114,9 +115,10 @@ def update_market_price():
                 item_list['insert'].values()
             )
 
-        print '%0.2fs | %0.2fs | %d | %d | %s' % (
+        print '%0.2fs | %0.2fs | %0.2fs | %d | %d | %s' % (
             time.time() - time_start,
-            time.time() - time_delta,
+            time_delta_sql - time_delta,
+            time.time() - time_delta_sql,
             len(item_list['insert']),
             len(item_list['update']),
             region.name
