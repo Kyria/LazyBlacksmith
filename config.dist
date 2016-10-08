@@ -19,7 +19,7 @@ USE_CCP_ICONS = False
 
 # ------------------------------------------------------
 # cache configuration : use
-# https://pythonhosted.org/Flask-Cache/
+# https://pythonhosted.org/Flask-Caching/
 # to configure the cache you want
 # ------------------------------------------------------
 CACHE_TYPE = 'null'
