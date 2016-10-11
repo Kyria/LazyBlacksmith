@@ -15,7 +15,7 @@ module.exports = function (grunt) {
             },
             LazyBlacksmith: {
                 src: [
-                    'lazyblacksmith/*.py',
+                    'lazyblacksmith/**/*.py',
                 ]
             },
         },
@@ -79,6 +79,5 @@ module.exports = function (grunt) {
 
     // Default task(s).
     grunt.registerTask('default', ['concat', 'uglify', 'less']);
-
-    grunt.loadNpmTasks('grunt-flake8');
+    grunt.registerTask('flake8', ['flake8']);
 };
