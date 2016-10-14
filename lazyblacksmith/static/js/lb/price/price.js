@@ -9,7 +9,6 @@ var itemPriceLookup = (function ($, lb, Humanize) {
     }
 
     $.extend(lb.urls, {
-        priceUrl: false,
         itemSearchUrl: false,
     });
 
@@ -96,29 +95,23 @@ var itemPriceLookup = (function ($, lb, Humanize) {
         if(!$.isNumeric(item_id)) {
             return false;
         }
-        var url = lb.urls.priceUrl.replace(/0000/, item_id);
 
-        // get the prices
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: function(jsonPrice) {
-                var prices = jsonPrice['prices'];
-                var output = "";
-                for(var regionId in prices) {
-                    output += "<tr><td>" + regions[regionId] + "</td>";
-                    output += "<td>" + Humanize.intcomma(prices[regionId][item_id].sell, 2) + "</td>";
-                    output += "<td>" + Humanize.intcomma(prices[regionId][item_id].buy, 2) + "</td>";
-                    output += "<td>" + prices[regionId][item_id].updated_at + "</td></tr>";
-                }
-                $('.price-list tbody').html(output);
-                $(".price-list").trigger("update",[sorting]);
-            },
+        eveUtils.getItemPrices(item_id, function(jsonPrice) {
+            var prices = jsonPrice['prices'];
+            var output = "";
+            for(var regionId in prices) {
+                output += "<tr><td>" + regions[regionId] + "</td>";
+                output += "<td>" + Humanize.intcomma(prices[regionId][item_id].sell, 2) + "</td>";
+                output += "<td>" + Humanize.intcomma(prices[regionId][item_id].buy, 2) + "</td>";
+                output += "<td>" + prices[regionId][item_id].updated_at + "</td></tr>";
+            }
+            $('.price-list tbody').html(output);
+            $(".price-list").trigger("update",[sorting]);
         });
 
     }
 
+    
     /**
      * Runner function
      */

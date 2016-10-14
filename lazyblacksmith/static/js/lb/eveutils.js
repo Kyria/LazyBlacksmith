@@ -169,7 +169,82 @@ var eveUtils = (function() {
     }
     
     
+    /**
+     * Generic ajax get call, without data parameters with json dataType as result
+     * @param url the url to call
+     * @param callback function to call when ajax call succeed
+     */
+    var ajaxGetCallJson = function(url, callback) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: callback,
+        }); 
+    };
     
+    /**
+     * Proxy function to get system cost indexes from backend
+     * @param systemList the array of system names
+     * @param callback function to call when ajax call succeed
+     */
+    var getSystemCostIndex = function(systemList, callback) {
+        var systems = ($.isArray(systemList)) ? systemList.join(',') : systemList;
+        var url = lb.urls.indexActivityUrl.replace(/SYSTEM_LIST_TO_REPLACE/, systems);
+        ajaxGetCallJson(url, callback);
+
+    };    
+    
+    /**
+     * Proxy function to get item prices from backend
+     * @param itemList the array of item ID
+     * @param callback function to call when ajax call succeed
+     */
+    var getItemPrices = function(itemList, callback) {
+        var items = ($.isArray(itemList)) ? itemList.join(',') : itemList;
+        var url = lb.urls.priceUrl.replace(/ITEM_LIST_TO_REPLACE/, items);
+        ajaxGetCallJson(url, callback);
+    };    
+
+    /**
+     * Init the bloodhound for the typeahead
+     * @private
+     */
+    var _getSystemBloodHound = function() {
+        var systems = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            limit: 10,
+            prefetch: {
+                url: lb.urls.systemUrls,
+                filter: function(listResult) {
+                    return $.map(listResult['result'], function(system) { return { name: system }; });
+                }
+            }
+        });
+        systems.initialize();
+        return systems;
+    };
+
+    /**
+     * Init solar system typeahead fields
+     * @param cssSelector where to apply to the typeahead
+     * @param callback function to call when suggestion selected (can be null)
+     */
+    var initSolarSystemTypeahead = function(cssSelector, callback) {
+        var systems = _getSystemBloodHound();
+
+        var typeaheadEventSelector = "change typeahead:selected typeahead:autocompleted";
+        var typeahead = $(cssSelector).typeahead(null,{
+            name: 'system',
+            displayKey: 'name',
+            source: systems.ttAdapter(),
+        });
+
+        if(callback) {
+            typeahead.on(typeaheadEventSelector, callback); 
+        }
+    };
     
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
@@ -182,6 +257,12 @@ var eveUtils = (function() {
         calculateInventionProbability: calculateInventionProbability,
         calculateInventionTime: calculateInventionTime,
         calculateInventionCost: calculateInventionCost,
-    }
+        
+        // ajax stuff
+        ajaxGetCallJson: ajaxGetCallJson,
+        getSystemCostIndex: getSystemCostIndex,
+        getItemPrices: getItemPrices,
+        initSolarSystemTypeahead: initSolarSystemTypeahead,
+    };
 
 })();

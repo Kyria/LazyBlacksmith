@@ -168,6 +168,9 @@ class Importer(object):
         # get all data
         self.sde_cursor.execute("""
             SELECT it1.typeID
+                  ,it1.volume
+                  ,it1.portionSize
+                  ,it1.marketGroupID
                   ,it2.typeID
                   ,quantity 
             FROM invTypeMaterials itm 
@@ -175,7 +178,6 @@ class Importer(object):
             JOIN invTypes it2 ON itm.materialtypeid = it2.typeid
             JOIN invGroups ig ON ig.groupID = it1.groupID
             WHERE ig.categoryID = 25
-                AND it2.groupID = 18
                 AND it1.published = 1
         """)
 
@@ -183,13 +185,33 @@ class Importer(object):
         for row in self.sde_cursor:
             total += 1
 
-            if not row[0] or not row[1] or not row[2]:
+            if not row[0] or not row[2] or not row[5]:
                 continue
+                
+            ore_id = int(row[0])
+            volume = int(row[1])
+            batch = int(row[2])
+            market_group_id = int(row[3])
+            material_id = int(row[4])
+            quantity = int(row[5])
+            
+            # if volume = 100 and marketGroupId = 1855 (Ice), it's some compressed Ice
+            # if portionSize = 1 and marketGroupID != 1855, it's some compressed ore
+            ice = False
+            compressed = False
+            if market_group_id == 1855:
+                ice = True
+                compressed = (volume == 100)
+            else:
+                compressed = (batch == 1)
 
             ore_refining = {
-                'ore_id': int(row[0]),
-                'material_id': int(row[1]),
-                'quantity': int(row[2]),
+                'ore_id': ore_id,
+                'material_id': material_id,
+                'quantity': quantity,
+                'batch': batch,
+                'is_compressed': compressed,
+                'is_ice': ice,
             }
 
             new.append(ore_refining)

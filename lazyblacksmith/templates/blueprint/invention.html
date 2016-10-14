@@ -4,10 +4,7 @@
 
 {% block js %}
     <script>
-        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
         lb.urls.manufacturingUrl    = "{{ url_for('blueprint.manufacturing', item_id='111111') }}";
-        lb.urls.priceUrl            = "{{ url_for('ajax_crest.get_price', item_list=111111) }}";
-        lb.urls.indexActivityUrl    = "{{ url_for('ajax_crest.get_index_activity', solar_system_names=111111) }}";
         lb.urls.buildCostUrl        = "{{ url_for('ajax_eve_sde.build_cost_item', material_efficiency='0,1,2,3,4,5', blueprint_id=invention_products[0].product_id, region_id=10000002) }}";
         
         {{ blueprint.item_id }}
