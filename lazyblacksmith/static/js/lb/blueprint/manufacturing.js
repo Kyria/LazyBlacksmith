@@ -941,8 +941,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             //tpl.find('.modal-region option[value="' + item.region + '"]').prop('selected', true);
 
             // get the current price
-            var currentPrice = Humanize.intcomma(priceData.prices[item.region][item.id][item.type], 2);
-            tpl.attr('title', currentPrice + ' ISK');
+            var currentPrice = (priceData.prices[item.region][item.id]) ? priceData.prices[item.region][item.id][item.type] : 0;
+            tpl.attr('title', Humanize.intcomma(currentPrice, 2) + ' ISK');
 
             // add to the output
             $('#priceConfigModal .modal-config-price tbody').append(tpl);
