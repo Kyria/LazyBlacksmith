@@ -6,7 +6,7 @@ from lazyblacksmith.utils.pycrest import EVE
 from requests.adapters import HTTPAdapter
 
 
-def get_crest(cache=LbCache):
+def get_crest(cache=LbCache()):
     """ Return a CREST object initialized """
     transport_adapter = HTTPAdapter(
         pool_connections=20,
