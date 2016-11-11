@@ -1,9 +1,25 @@
 # -*- encoding: utf-8 -*-
 import config
 
-from lazyblacksmith.extension.cache import LbCache
+from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.utils.pycrest import EVE
+from lazyblacksmith.utils.pycrest.cache import APICache
+
 from requests.adapters import HTTPAdapter
+
+
+class LbCache(APICache):
+    """ Custom APICache implementation for Lazyblacksmith
+        used in pycrest
+    """
+    def put(self, key, value):
+        cache.set(key, value)
+
+    def get(self, key):
+        return cache.get(key)
+
+    def invalidate(self, key):
+        cache.delete(key)
 
 
 def get_crest(cache=LbCache()):

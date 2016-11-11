@@ -1,16 +1,7 @@
 # -*- encoding: utf-8 -*-
-from collections import OrderedDict
-
 from flask import Blueprint
-from flask import json
 from flask import jsonify
 from flask import request
-from sqlalchemy.orm.exc import NoResultFound
-
-from . import is_not_ajax
-from lazyblacksmith.extension.cache import cache
-from lazyblacksmith.models import Activity
-from lazyblacksmith.models import ActivityMaterial
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice

@@ -6,15 +6,6 @@ from flask_wtf.csrf import CsrfProtect
 
 import flask_login
 
-# blueprint stuff
-from lazyblacksmith.views import ajax_eve_sde
-from lazyblacksmith.views import ajax_crest
-from lazyblacksmith.views import blueprint
-from lazyblacksmith.views import price
-from lazyblacksmith.views import home
-from lazyblacksmith.views import sso
-from lazyblacksmith.views import template
-
 # helpers
 from lazyblacksmith.utils.template_filter import templatefilter
 
@@ -44,6 +35,15 @@ def create_app(config_object):
 
 
 def register_blueprints(app):
+    # blueprint import, only here because of exts
+    from lazyblacksmith.views import ajax_crest
+    from lazyblacksmith.views import ajax_eve_sde
+    from lazyblacksmith.views import blueprint
+    from lazyblacksmith.views import home
+    from lazyblacksmith.views import price
+    from lazyblacksmith.views import sso
+    from lazyblacksmith.views import template
+
     """ register blueprints & helper blueprints """
     app.register_blueprint(ajax_crest, url_prefix='/ajax/crest')
     app.register_blueprint(ajax_eve_sde, url_prefix='/ajax/evesde')
