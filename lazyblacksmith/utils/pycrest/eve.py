@@ -126,7 +126,7 @@ class APIConnection(object):
                 resource,
                 res.status_code,
                 res.json()
-                )
+            )
 
         ret = res.json()
 
@@ -153,7 +153,7 @@ class APIConnection(object):
                 resource,
                 res.status_code,
                 res.json()
-                )
+            )
 
         return {}
 
@@ -166,7 +166,7 @@ class APIConnection(object):
                 resource,
                 res.status_code,
                 res.json()
-                )
+            )
 
         return {}
 
@@ -179,7 +179,7 @@ class APIConnection(object):
                 resource,
                 res.status_code,
                 res.json()
-                )
+            )
 
         return {}
 
@@ -247,10 +247,10 @@ class EVE(APIConnection):
             headers=headers)
         if res.status_code != 200:
             raise APIException(
-                        resource,
-                        res.status_code,
-                        res.json()
-                        )
+                resource,
+                res.status_code,
+                res.json()
+            )
 
         return res.json()
 

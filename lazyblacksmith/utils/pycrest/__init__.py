@@ -11,4 +11,4 @@ logger.addHandler(NullHandler())
 
 version = "0.0.5"
 
-from .eve import EVE
+from .eve import EVE  # noqa

@@ -57,7 +57,7 @@ class Importer(object):
 
         added, total = f()
 
-        print '%d/%d (%0.2fs)' % (added, total,  time.time() - start)
+        print '%d/%d (%0.2fs)' % (added, total, time.time() - start)
 
     def import_all(self):
         """
@@ -72,7 +72,7 @@ class Importer(object):
         """
         Import the given table from the SDE
         """
-        self.time_func(table, getattr(self, "import_"+table))
+        self.time_func(table, getattr(self, "import_" + table))
 
     def delete_table(self, table):
         """
@@ -155,11 +155,11 @@ class Importer(object):
             )
 
         return (added, total)
-   
-    def import_orerefining(self):    
+
+    def import_orerefining(self):
         """
-        Import ore (ice / ore) refining data 
-       
+        Import ore (ice / ore) refining data
+
         CCP Table : invTypeMaterials
         """
         added = 0
@@ -172,8 +172,8 @@ class Importer(object):
                   ,it1.portionSize
                   ,it1.marketGroupID
                   ,it2.typeID
-                  ,quantity 
-            FROM invTypeMaterials itm 
+                  ,quantity
+            FROM invTypeMaterials itm
             JOIN invTypes it1 ON it1.typeid = itm.typeid
             JOIN invTypes it2 ON itm.materialtypeid = it2.typeid
             JOIN invGroups ig ON ig.groupID = it1.groupID
@@ -187,14 +187,14 @@ class Importer(object):
 
             if not row[0] or not row[2] or not row[5]:
                 continue
-                
+
             ore_id = int(row[0])
             volume = int(row[1])
             batch = int(row[2])
             market_group_id = int(row[3])
             material_id = int(row[4])
             quantity = int(row[5])
-            
+
             # if volume = 100 and marketGroupId = 1855 (Ice), it's some compressed Ice
             # if portionSize = 1 and marketGroupID != 1855, it's some compressed ore
             ice = False
@@ -237,7 +237,7 @@ class Importer(object):
 
         # get all data
         self.sde_cursor.execute("""
-            SELECT 
+            SELECT
                 i.typeID,
                 COALESCE(dta2.valueInt,dta2.valueFloat) multiplier,
                 COALESCE(dta3.valueInt,dta3.valueFloat) me,
@@ -267,7 +267,6 @@ class Importer(object):
                 'run_modifier': int(data[4]),
             }
 
-
             new.append(decryptor)
             added += 1
 
@@ -279,7 +278,7 @@ class Importer(object):
             )
 
         return (added, total)
-    
+
     def import_activity(self):
         """
         Import blueprints activity time from SDE to our database.
@@ -655,7 +654,7 @@ class Importer(object):
             )
 
         return (added, total)
-        
+
     def import_itemadjustedprice(self):
         """
         import item adjusted price into DB

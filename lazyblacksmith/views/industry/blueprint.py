@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 import config
+
 from math import ceil
 
-from flask import abort
 from flask import Blueprint
+from flask import abort
 from flask import render_template
-from lazyblacksmith.utils.time import utcnow
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Decryptor
@@ -14,7 +14,6 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
-from lazyblacksmith.models import SolarSystem
 
 blueprint = Blueprint('blueprint', __name__)
 
@@ -25,10 +24,10 @@ def manufacturing(item_id):
     Display the manufacturing page with all data
     """
     item = Item.query.get(item_id)
-    
+
     if item is None or item.max_production_limit is None:
         abort(404)
-    
+
     activity = item.activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
     materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
     product = item.activity_products.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
@@ -37,12 +36,12 @@ def manufacturing(item_id):
     ).filter_by(
         wh=False
     )
-    
+
     # get science skill name, if applicable
     manufacturing_skills = item.activity_skills.filter_by(
-        activity = Activity.ACTIVITY_MANUFACTURING,
+        activity=Activity.ACTIVITY_MANUFACTURING,
     ).filter(
-        ActivitySkill.skill_id != 3380 # industry
+        ActivitySkill.skill_id != 3380  # industry
     )
 
     science_skill = []
@@ -50,10 +49,10 @@ def manufacturing(item_id):
     for activity_skill in manufacturing_skills:
         if activity_skill.skill.market_group_id == 369:
             t2_manufacturing_skill = activity_skill.skill.name
-        
+
         if activity_skill.skill.market_group_id == 375:
             science_skill.append(activity_skill.skill.name)
-    
+
     # is any of the materials manufactured ?
     has_manufactured_components = False
 
@@ -82,7 +81,7 @@ def search():
 @blueprint.route('/research_copy/<int:item_id>')
 def research(item_id):
     item = Item.query.get(item_id)
-    
+
     if item is None or item.max_production_limit is None:
         abort(404)
 
@@ -97,7 +96,7 @@ def research(item_id):
     activity_copy = item.activities.filter_by(
         activity=Activity.ACTIVITY_COPYING
     ).one()
-    
+
     # calculate baseCost and build cost per ME
     base_cost = 0.0
     cost_per_me = {}
@@ -105,7 +104,7 @@ def research(item_id):
     for material in materials:
         item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
         base_cost += item_adjusted_price.price * material.quantity
-        
+
         # build cost
         price = ItemPrice.query.filter(
             ItemPrice.item_id == material.material_id,
@@ -121,11 +120,10 @@ def research(item_id):
             adjusted_quantity = max(1, me_bonus * material.quantity)
             job_price_run = max(1, ceil(adjusted_quantity)) * price.buy_price
             job_price_max_run = max(item.max_production_limit, ceil(item.max_production_limit * adjusted_quantity)) * price.buy_price
-            
+
             cost_per_me[level]['job_price_run'] += job_price_run
             cost_per_me[level]['job_price_max_run'] += job_price_max_run
 
-        
     # base solar system : 30000142 = Jita
     indexes = IndustryIndex.query.filter(
         IndustryIndex.solarsystem_id == 30000142,
@@ -135,7 +133,7 @@ def research(item_id):
             Activity.ACTIVITY_RESEARCHING_TIME_EFFICIENCY,
         ])
     )
-    
+
     index_list = {}
     for index in indexes:
         index_list[index.activity] = index.cost_index
@@ -158,29 +156,29 @@ def invention(item_id):
 
     if item is None or item.max_production_limit is None:
         abort(404)
-       
-    # global activity 
+
+    # global activity
     activity_copy = item.activities.filter_by(
         activity=Activity.ACTIVITY_COPYING
     ).first()
-    
+
     activity_invention = item.activities.filter_by(
         activity=Activity.ACTIVITY_INVENTION
     ).one()
-    
+
     # invention stuff
     invention_materials = item.activity_materials.filter_by(
         activity=Activity.ACTIVITY_INVENTION
     ).all()
-    
+
     invention_products = item.activity_products.filter_by(
         activity=Activity.ACTIVITY_INVENTION
     ).all()
-    
+
     invention_skills = item.activity_skills.filter_by(
         activity=Activity.ACTIVITY_INVENTION
     ).all()
-    
+
     # copy stuff
     copy_base_cost = 0.0
     copy_materials = []
@@ -188,13 +186,12 @@ def invention(item_id):
         copy_materials = item.activity_materials.filter_by(
             activity=Activity.ACTIVITY_COPYING
         ).all()
-        
+
         # copy base cost, as it's different from the invention
         materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
         for material in materials:
             item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
             copy_base_cost += item_adjusted_price.price * material.quantity
-
 
     # loop through skills for display as we need to do the difference
     # between both skills (not the same bonuses in invention probability)
@@ -205,7 +202,7 @@ def invention(item_id):
             datacore_skills.append(s.skill.name)
         else:
             encryption_skill = s.skill.name
-    
+
     # calculate baseCost for invention
     invention_base_cost = 0.0
     materials = item.activity_products.filter_by(
@@ -213,11 +210,11 @@ def invention(item_id):
     ).first().product.activity_materials.filter_by(
         activity=Activity.ACTIVITY_MANUFACTURING
     )
-    
+
     for material in materials:
         item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
         invention_base_cost += item_adjusted_price.price * material.quantity
- 
+
     # base solar system : 30000142 = Jita
     indexes = IndustryIndex.query.filter(
         IndustryIndex.solarsystem_id == 30000142,
@@ -226,19 +223,19 @@ def invention(item_id):
             Activity.ACTIVITY_INVENTION,
         ])
     )
-    
+
     index_list = {}
     for index in indexes:
         index_list[index.activity] = index.cost_index
-        
+
     # get decryptor
     decryptors = Decryptor.query.all()
-    
+
     # get price for all materials, for The Forge as default
     item_price_list = {}
     item_id_list = [d.item_id for d in decryptors]
     item_id_list += [m.material_id for m in invention_materials + copy_materials]
-    
+
     price_list = ItemPrice.query.filter(
         ItemPrice.item_id.in_(item_id_list),
         ItemPrice.region_id == 10000002,

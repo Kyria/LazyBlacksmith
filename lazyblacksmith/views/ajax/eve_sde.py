@@ -32,7 +32,7 @@ def blueprint_search(name):
         data = cache.get(cache_key)
         if data is None:
             blueprints = Item.query.filter(
-                Item.name.ilike('%'+name.lower()+'%'),
+                Item.name.ilike('%' + name.lower() + '%'),
                 Item.max_production_limit.isnot(None)
             ).order_by(
                 Item.name.asc()
@@ -52,7 +52,7 @@ def blueprint_search(name):
                 })
 
             # cache for 7 day as it does not change that often
-            cache.set(cache_key, json.dumps(data), 24*3600*7)
+            cache.set(cache_key, json.dumps(data), 24 * 3600 * 7)
 
         else:
             data = json.loads(data)
@@ -63,7 +63,7 @@ def blueprint_search(name):
 
 
 @ajax_eve_sde.route('/blueprint/bom/<int:blueprint_id>', methods=['GET'])
-@cache.memoize(timeout=3600*24*7, unless=is_not_ajax)
+@cache.memoize(timeout=3600 * 24 * 7, unless=is_not_ajax)
 def blueprint_bom(blueprint_id):
     """
     Return JSON with the list of all bill of material for
@@ -123,7 +123,7 @@ def blueprint_bom(blueprint_id):
 
 
 @ajax_eve_sde.route('/solarsystem/list', methods=['GET'])
-@cache.cached(timeout=3600*24*7, unless=is_not_ajax)
+@cache.cached(timeout=3600 * 24 * 7, unless=is_not_ajax)
 def solarsystems():
     """
     Return JSON result with system list (ID,Name)
@@ -150,7 +150,7 @@ def item_search(name):
         data = cache.get(cache_key)
         if data is None:
             items = Item.query.filter(
-                Item.name.ilike('%'+name.lower()+'%'),
+                Item.name.ilike('%' + name.lower() + '%'),
             ).order_by(
                 Item.name.asc()
             ).all()
@@ -164,7 +164,7 @@ def item_search(name):
                 })
 
             # cache for 7 day as it does not change that often
-            cache.set(cache_key, json.dumps(data), 24*3600*7)
+            cache.set(cache_key, json.dumps(data), 24 * 3600 * 7)
 
         else:
             data = json.loads(data)
@@ -203,7 +203,7 @@ def build_cost_item(material_efficiency, blueprint_id, region_id):
             me = int(ume)
             if me not in build_cost:
                 build_cost[me] = 0
-            quantity = max(1, ceil(mat.quantity * (1.00-me/100.00)))
+            quantity = max(1, ceil(mat.quantity * (1.00 - me / 100.00)))
             price_value = price.sell_price if price.sell_price is not None else price.buy_price
             build_cost[me] += quantity * price_value
 
