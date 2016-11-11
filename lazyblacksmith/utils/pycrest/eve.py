@@ -1,9 +1,12 @@
 import base64
 import requests
 import time
-from pycrest import version
-from pycrest.compat import bytes_, text_
-from pycrest.errors import APIException, UnsupportedHTTPMethodException
+
+from . import version
+from .compat import bytes_
+from .compat import text_
+from .errors import APIException
+from .errors import UnsupportedHTTPMethodException
 from requests.adapters import HTTPAdapter
 try:
     from urllib.parse import urlparse, urlunparse, parse_qsl
@@ -16,7 +19,10 @@ except ImportError:  # pragma: no cover
     from urllib import quote
 import logging
 import re
-from pycrest.cache import DictCache, APICache, DummyCache
+
+from .cache import APICache
+from .cache import DictCache
+from .cache import DummyCache
 
 logger = logging.getLogger("pycrest.eve")
 cache_re = re.compile(r'max-age=([0-9]+)')
