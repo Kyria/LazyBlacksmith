@@ -73,7 +73,7 @@ def crest_order_price(region_crest, region_id, item_id_list):
 @celery_app.task(name="schedule.update_market_price")
 def update_market_price():
     """Celery task to upgrade prices through CREST"""
-    crest = get_crest()
+    crest = get_crest(cache=None)
 
     region_list = Region.query.filter(
         Region.id.in_(config.CREST_REGION_PRICE)

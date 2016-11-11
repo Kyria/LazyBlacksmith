@@ -21,6 +21,7 @@ import humanize
 
 ajax_crest = Blueprint('ajax_crest', __name__)
 
+
 @ajax_crest.route('/get_price/<string:item_list>', methods=['GET'])
 def get_price(item_list):
     """
@@ -85,8 +86,7 @@ def get_index_activity(solar_system_names):
 
     if industry_index is None or len(industry_index) == 0:
         return 'There is no index with SolarSystem(%s)' % (
-            solar_system_names,
-            activity
+            solar_system_names
         ), 404
 
     # and then put that index list into a dict[solar_system_name] = cost_index
@@ -98,5 +98,3 @@ def get_index_activity(solar_system_names):
         index_list[ss][index.activity] = index.cost_index
 
     return jsonify(index=index_list)
-
-
