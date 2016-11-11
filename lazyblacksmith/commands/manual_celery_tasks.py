@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
-from flask.ext.script import Command
-from flask.ext.script import Option
+from flask_script import Command
+from flask_script import Option
 
 from lazyblacksmith.tasks.adjusted_price import update_adjusted_price
 from lazyblacksmith.tasks.industry_index import update_industry_index

@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 import sqlite3
 
-from flask.ext.script import Command
-from flask.ext.script import Option
+from flask_script import Command
+from flask_script import Option
 
 from lazyblacksmith.commands.importer import Importer
 from lazyblacksmith.models import db
