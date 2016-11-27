@@ -277,6 +277,11 @@
                             </tr>
                             <tr>
                                 {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                <td colspan="3" class="title">Unit Cost</td>
+                                <td id="total-cost-per-unit"></td>
+                            </tr>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
                                 <td colspan="3" class="title">{{ product.product.name }} Sell Value</td>
                                 <td id="product-price"></td>
                             </tr>

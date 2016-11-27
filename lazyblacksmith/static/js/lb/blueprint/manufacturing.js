@@ -2,7 +2,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     "use strict";
 
     var ACTIVITY_MANUFACTURING = 1;
-    
+
     // template variables
     var tplSublistBlock = '';
     var tplSublistRow = '';
@@ -219,8 +219,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updatePriceTable();
         });
     };
-    
-    
+
+
     /**
      * Get the list of materials for the given blueprint
      * @private
@@ -357,8 +357,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateTaxTable();
         });
     };
-    
-    
+
+
     // -------------------------------------------------
     // Functions (no events, no event functions)
     //
@@ -656,7 +656,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         }
         $('.materials-prices tbody').html(output);
 
-        // fill footer rows (total, margin, markup...)
         priceData.totalCost = materialTotalPrice;
         _getSystemCostIndex();
     };
@@ -723,13 +722,16 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         var priceRegion = priceData.prices[itemPrice.region];
         var productPrice = (priceRegion != undefined
                             && materialsData.productItemId in priceRegion) ? priceRegion[materialsData.productItemId]['sell'] : 0;
-        productPrice *= materialsData.materials[materialsData.productItemId].qtyJob;
 
-        var margin = productPrice - priceData.totalCost - priceData.totalInstallationCost;
+        totalCost = priceData.totalCost + priceData.totalInstallationCost
+        unitCost = totalCost / materialsData.materials[materialsData.productItemId].qtyJob;
+
+        var margin = productPrice - totalCost;
         var marginPercent = (productPrice > 0) ? (margin / productPrice) * 100 : 0;
-        var markupPercent = (productPrice > 0) ? (margin / priceData.totalCost) * 100 : 0;
+        var markupPercent = (productPrice > 0) ? (margin / totalCost) * 100 : 0;
 
         $('.materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(priceData.totalCost, 2));
+        $('.materials-prices tfoot td#total-cost-per-unit').html(Humanize.intcomma(unitCost, 2));
         $('.materials-prices tfoot td#product-price').html(Humanize.intcomma(productPrice, 2));
         $('.materials-prices tfoot td#installation-cost').html(Humanize.intcomma(priceData.totalInstallationCost, 2));
         $('.materials-prices tfoot td#margin').html(Humanize.intcomma(margin, 2));
