@@ -723,8 +723,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         var productPrice = (priceRegion != undefined
                             && materialsData.productItemId in priceRegion) ? priceRegion[materialsData.productItemId]['sell'] : 0;
 
-        totalCost = priceData.totalCost + priceData.totalInstallationCost
-        unitCost = totalCost / materialsData.materials[materialsData.productItemId].qtyJob;
+        var totalCost = priceData.totalCost + priceData.totalInstallationCost
+        var unitCost = totalCost / materialsData.materials[materialsData.productItemId].qtyJob;
 
         var margin = productPrice - totalCost;
         var marginPercent = (productPrice > 0) ? (margin / productPrice) * 100 : 0;
