@@ -4,6 +4,7 @@ import config
 from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.utils.pycrest import EVE
 from lazyblacksmith.utils.pycrest.cache import APICache
+from lazyblacksmith.utils.pycrest.errors import APIException
 
 from requests.adapters import HTTPAdapter
 
@@ -39,7 +40,10 @@ def get_crest(cache=LbCache()):
         cache=cache,
         transport_adapter=transport_adapter,
     )
-    crest()
+    try:
+        crest()
+    except APIException as e:
+        print('Crest init failed: %s' % e)
     return crest
 
 
