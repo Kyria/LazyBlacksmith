@@ -725,9 +725,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
 
         var totalCost = priceData.totalCost + priceData.totalInstallationCost
         var unitCost = totalCost / materialsData.materials[materialsData.productItemId].qtyJob;
+        var totalProductPrice = productPrice * materialsData.materials[materialsData.productItemId].qtyJob;
 
-        var margin = productPrice - totalCost;
-        var marginPercent = (productPrice > 0) ? (margin / productPrice) * 100 : 0;
+        var margin = totalProductPrice - totalCost;
+        var marginPercent = (productPrice > 0) ? (margin / totalProductPrice) * 100 : 0;
         var markupPercent = (productPrice > 0) ? (margin / totalCost) * 100 : 0;
 
         $('.materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(priceData.totalCost, 2));
