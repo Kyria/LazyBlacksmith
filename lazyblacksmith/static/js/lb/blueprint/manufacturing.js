@@ -126,8 +126,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
 
     var structureRigs = [
         { // No rig bonus
-            'me': 1.0,
-            'te': 1.0,
+            'me': 0,
+            'te': 0,
             "meta": "None",
         },
         { // t1 rig bonus
