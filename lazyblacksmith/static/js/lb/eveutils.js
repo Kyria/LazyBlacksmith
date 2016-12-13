@@ -7,8 +7,11 @@ var eveUtils = (function() {
      * @param facilityBonus the material bonus for the facility
      * @return the adjusted quantity (float)
      */
-    var calculateAdjustedQuantity = function(quantity, materialEfficiency, facilityBonus) {
+    var calculateAdjustedQuantity = function(quantity, materialEfficiency, facilityBonus, rigBonus, rigMultiplier, isStructure) {
         var materialBonus = (1.00-materialEfficiency/100.00);
+        if(isStructure) {
+            materialBonus *= 1-(rigBonus * rigMultiplier);
+        }
         return Math.max(1.00, quantity * materialBonus * facilityBonus);
     };
 
@@ -42,7 +45,7 @@ var eveUtils = (function() {
     var calculateJobTime = function(timePerUnit, runs, facilityTimeBonus, timeEfficiency,
                             industrySkillLevel, advancedIndustrySkillLevel,
                             t2ConstructionSkillLevel, primaryScienceSkillLevel, secondaryScienceSkilllevel,
-                            useT2Time) {
+                            rigBonus, rigMultiplier, isStructure, useT2Time) {
         var timeBonus = (1.00-timeEfficiency/100.00);
         var time = timePerUnit * timeBonus * facilityTimeBonus * runs;
         time *= (1 - industrySkillLevel * 0.04);
@@ -52,9 +55,12 @@ var eveUtils = (function() {
             time *= (1 - primaryScienceSkillLevel * 0.01);
             time *= (1 - secondaryScienceSkilllevel * 0.01);
         }
+        if(isStructure) {
+            time *= 1 - (rigBonus * rigMultiplier);
+        }
         return time;
     };
-    
+
     /**
      * Calculate the research time (ME/TE) with the given data
      *
@@ -64,19 +70,19 @@ var eveUtils = (function() {
      * @param implantModifier the implant modifier (float)
      * @param researchSkilllevel the research skill level (metallurgy or research)
      * @param advancedIndustryLevel the advanced industry skill level
-     * @return the research time in seconds 
+     * @return the research time in seconds
      */
-    var calculateResearchTime = function(baseResearchTime, level, factoryModifier, 
+    var calculateResearchTime = function(baseResearchTime, level, factoryModifier,
                                     implantModifier, researchSkilllevel, advancedIndustryLevel) {
         var timeModifier = factoryModifier * implantModifier;
         timeModifier *= (1.00 - researchSkilllevel * 0.05);
         timeModifier *= (1.00 - advancedIndustryLevel * 0.03);
-        
+
         var levelModifier = (250 * Math.pow(2, (1.25 * level - 2.5))) / 105;
-        
+
         return timeModifier * baseResearchTime * levelModifier;
     }
-    
+
     /**
      * Calculate the research installation cost (ME/TE) with the given data
      *
@@ -84,13 +90,13 @@ var eveUtils = (function() {
      * @param level the level we want to reach
      * @param systemCostIndex the system cost index modifier (float)
      * @param tax the facility tax
-     * @return the research cost 
+     * @return the research cost
      */
     var calculateResearchInstallationCost = function(baseCost, systemCostIndex, level, tax) {
         var levelModifier = (250 * Math.pow(2, (1.25 * level - 2.5))) / 105;
         return baseCost * systemCostIndex * 0.02 * levelModifier * tax;
     }
-    
+
     /**
      * Calculate the copy time with the given data
      *
@@ -99,20 +105,20 @@ var eveUtils = (function() {
      * @param runPerCopy the number of run per copy
      * @param factoryModifier the factory modifier (float)
      * @param implantModifier the implant modifier (float)
-     * @param scienceSkillLevel the science skill level 
+     * @param scienceSkillLevel the science skill level
      * @param advancedIndustryLevel the advanced industry skill level
-     * @return the research time in seconds 
+     * @return the research time in seconds
      */
-    var calculateCopyTime = function(baseCopyTime, runs, runPerCopy, 
-                                factoryModifier, implantModifier, 
+    var calculateCopyTime = function(baseCopyTime, runs, runPerCopy,
+                                factoryModifier, implantModifier,
                                 scienceSkillLevel, advancedIndustryLevel) {
         var timeModifier = factoryModifier * implantModifier;
         timeModifier *= (1.00 - scienceSkillLevel * 0.05);
         timeModifier *= (1.00 - advancedIndustryLevel * 0.03);
-        
+
         return timeModifier * baseCopyTime * runPerCopy * runs;
     }
-    
+
     /**
      * Calculate the copy installation cost with the given data
      *
@@ -121,7 +127,7 @@ var eveUtils = (function() {
      * @param runPerCopy the number of run per copy
      * @param systemCostIndex the system cost index modifier (float)
      * @param tax the facility tax
-     * @return the copy cost 
+     * @return the copy cost
      */
     var calculateCopyInstallationCost = function(baseCost, systemCostIndex, runs, runPerCopy, tax) {
         return baseCost * systemCostIndex * 0.02 * runs * runPerCopy * tax;
@@ -142,7 +148,7 @@ var eveUtils = (function() {
         var skillModifier = 1 + encryptionLevel / 40 + (datacore1Level + datacore2Level) / 30;
         return baseProbability * skillModifier * decryptorModifier;
     }
-   
+
     /**
      * Calculate the invention time
      *
@@ -154,7 +160,7 @@ var eveUtils = (function() {
     var calculateInventionTime = function(baseInventionTime, facilityModifier, advancedIndustryLevel) {
         return baseInventionTime * facilityModifier * (1 - 0.03 * advancedIndustryLevel);
     }
-    
+
     /**
      * Calculate the invention installation cost with the given data
      *
@@ -162,13 +168,13 @@ var eveUtils = (function() {
      * @param run the number of invention runs
      * @param tax the facility tax
      * @param systemCostIndex the system cost index modifier (float)
-     * @return the invention cost 
+     * @return the invention cost
      */
     var calculateInventionCost = function(baseCost, systemCostIndex, runs, tax) {
         return baseCost * systemCostIndex * runs * 0.02 * tax;
     }
-    
-    
+
+
     /**
      * Generic ajax get call, without data parameters with json dataType as result
      * @param url the url to call
@@ -180,9 +186,9 @@ var eveUtils = (function() {
             type: 'GET',
             dataType: 'json',
             success: callback,
-        }); 
+        });
     };
-    
+
     /**
      * Proxy function to get system cost indexes from backend
      * @param systemList the array of system names
@@ -193,8 +199,8 @@ var eveUtils = (function() {
         var url = lb.urls.indexActivityUrl.replace(/SYSTEM_LIST_TO_REPLACE/, systems);
         ajaxGetCallJson(url, callback);
 
-    };    
-    
+    };
+
     /**
      * Proxy function to get item prices from backend
      * @param itemList the array of item ID
@@ -204,7 +210,7 @@ var eveUtils = (function() {
         var items = ($.isArray(itemList)) ? itemList.join(',') : itemList;
         var url = lb.urls.priceUrl.replace(/ITEM_LIST_TO_REPLACE/, items);
         ajaxGetCallJson(url, callback);
-    };    
+    };
 
     /**
      * Init the bloodhound for the typeahead
@@ -242,10 +248,10 @@ var eveUtils = (function() {
         });
 
         if(callback) {
-            typeahead.on(typeaheadEventSelector, callback); 
+            typeahead.on(typeaheadEventSelector, callback);
         }
     };
-    
+
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
         calculateJobQuantity: calculateJobQuantity,
@@ -257,7 +263,7 @@ var eveUtils = (function() {
         calculateInventionProbability: calculateInventionProbability,
         calculateInventionTime: calculateInventionTime,
         calculateInventionCost: calculateInventionCost,
-        
+
         // ajax stuff
         ajaxGetCallJson: ajaxGetCallJson,
         getSystemCostIndex: getSystemCostIndex,

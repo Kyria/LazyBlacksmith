@@ -26,6 +26,9 @@
             'icon': '{{ product.product.icon_32() }}',
             'manufacturingSystem': 'Jita',
             'facility': 0,
+            'structureTeRig': 0,
+            'structureMeRig': 0,
+            'structureSecStatus': 'h',
         };
 
         {% for material in materials.all() %}
@@ -48,6 +51,9 @@
             'timeEfficiency': 20,
             'manufacturingSystem': 'Jita',
             'facility': 0,
+            'structureTeRig': 0,
+            'structureMeRig': 0,
+            'structureSecStatus': 'h',
         };
         {% endfor %}
 
@@ -75,6 +81,37 @@
                                 <option value="1">Assembly Array</option>
                                 <option value="2">Thukker Component Array</option>
                                 <option value="3">Rapid Assembly Array</option>
+                                <option value="4">Raitaru (M-EC)</option>
+                                <option value="5">Azbel (L-EC)</option>
+                                <option value="6">Sotiyo (XL-EC)</option>
+                                <option value="7">Other Structures</option>
+                            </select>
+                        </div>
+                        <div class="structure-configs" style="display: none;">
+                            Structure Rigs<br>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <select name="structure-me-rig" id="structure-me-rig" class="form-control input-sm">
+                                        <option value="0">No ME Rig</option>
+                                        <option value="1">T1 ME Rig</option>
+                                        <option value="2">T2 ME Rig</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <select name="structure-te-rig" id="structure-te-rig" class="form-control input-sm">
+                                        <option value="0">No TE Rig</option>
+                                        <option value="1">T1 TE Rig</option>
+                                        <option value="2">T2 TE Rig</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="structure-configs" style="display: none;">
+                            Security Status<br>
+                            <select name="structure-sec-status" id="structure-sec-status" class="form-control input-sm">
+                                <option value="h">High Sec</option>
+                                <option value="l">Low Sec</option>
+                                <option value="n">Nullsec / Wormhole</option>
                             </select>
                         </div>
                         <div>
@@ -415,6 +452,38 @@
                                         <option value="1">Assembly Array</option>
                                         <option value="2">Thukker Component Array</option>
                                         <option value="3">Rapid Assembly Array</option>
+                                        <option value="4">Raitaru (M-EC)</option>
+                                        <option value="5">Azbel (L-EC)</option>
+                                        <option value="6">Sotiyo (XL-EC)</option>
+                                        <option value="7">Other Structures</option>
+                                    </select>
+                                </div>
+
+                                <div class="modal-structure-configs" style="display: none;">
+                                    Structure Rigs<br>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6">
+                                            <select name="modal-structure-me-rig" id="modal-structure-me-rig" class="form-control input-sm">
+                                                <option value="0">No ME Rig</option>
+                                                <option value="1">T1 ME Rig</option>
+                                                <option value="2">T2 ME Rig</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6">
+                                            <select name="modal-structure-te-rig" id="modal-structure-te-rig" class="form-control input-sm">
+                                                <option value="0">No TE Rig</option>
+                                                <option value="1">T1 TE Rig</option>
+                                                <option value="2">T2 TE Rig</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-structure-configs" style="display: none;">
+                                    Security Status<br>
+                                    <select name="modal-structure-sec-status" id="modal-structure-sec-status" class="form-control input-sm">
+                                        <option value="h">High Sec</option>
+                                        <option value="l">Low Sec</option>
+                                        <option value="n">Nullsec / Wormhole</option>
                                     </select>
                                 </div>
                                 <div>
