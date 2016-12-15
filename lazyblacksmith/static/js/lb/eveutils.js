@@ -5,6 +5,9 @@ var eveUtils = (function() {
      * @param quantity the base quantity of material
      * @param materialEfficiency the ME level of the blueprint
      * @param facilityBonus the material bonus for the facility
+     * @param rigBonus the bonus given from the structure rig
+     * @param rigMultiplier the multiplier for the rig bonus, depending on security status
+     * @param isStructure true if the facility is a structure (EC/Other), trigger the use of rig bonus
      * @return the adjusted quantity (float)
      */
     var calculateAdjustedQuantity = function(quantity, materialEfficiency, facilityBonus, rigBonus, rigMultiplier, isStructure) {
@@ -38,6 +41,9 @@ var eveUtils = (function() {
      * @param t2ConstructionSkillLevel the <object> construction skill level (frig, cruiser, capitals...)
      * @param primaryScienceSkillLevel the primary science skill level
      * @param secondaryScienceSkilllevel the secondary science skill level
+     * @param rigBonus the bonus given from the structure rig
+     * @param rigMultiplier the multiplier for the rig bonus, depending on security status
+     * @param isStructure true if the facility is a structure (EC/Other), trigger the use of rig bonus
      * @param useT2Time should we use t2 times
      * @return the manufacturing time
      *
