@@ -589,9 +589,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         var TE = parseInt($('#Modal-TE-Level').text());
         var facility = parseInt($('#modal-facility').val());
 
-        var structureMeRig = parseInt($('#modal-structure-me-rig').val());
-        var structureTeRig = parseInt($('#modal-structure-te-rig').val());
-        var structureSecStatus = $('#modal-structure-sec-status').val();
+        var structureMeRig = parseInt($('#modal-structure-me-rig input:checked').val());
+        var structureTeRig = parseInt($('#modal-structure-te-rig input:checked').val());
+        var structureSecStatus = $('#modal-structure-sec-status input:checked').val();
 
         for(var i in components) {
             var componentId = components[i];
@@ -905,17 +905,17 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateTime();
             _updateMaterial();
         });
-        $('#structure-me-rig').on('change', function() {
-            materialsData.materials[materialsData.productItemId].structureMeRig = parseInt($('#structure-me-rig').val());
+        $("#structure-sec-status input[type='radio']").on('change', function() {
+            materialsData.materials[materialsData.productItemId].structureSecStatus = $(this).val();
+            _updateTime();
             _updateMaterial();
         });
-        $('#structure-te-rig').on('change', function() {
-            materialsData.materials[materialsData.productItemId].structureTeRig = parseInt($('#structure-te-rig').val())
+        $("#structure-te-rig input[type='radio']").on('change', function() {
+            materialsData.materials[materialsData.productItemId].structureTeRig = parseInt($(this).val())
             _updateTime();
         });
-        $('#structure-sec-status').on('change', function() {
-            materialsData.materials[materialsData.productItemId].structureSecStatus = $('#structure-sec-status').val();
-            _updateTime();
+        $("#structure-me-rig input[type='radio']").on('change', function() {
+            materialsData.materials[materialsData.productItemId].structureMeRig = parseInt($(this).val());
             _updateMaterial();
         });
 
@@ -1015,13 +1015,14 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             var me = materialsData.materials[id].materialEfficiency;
             var te = materialsData.materials[id].timeEfficiency;
 
+
             $('#componentModalBpName').html(name);
             $('#componentModalBpName').attr('data-bp-id', id);
             $('#modal-system').val(system);
             $('#modal-facility option[value='+facility+']').prop('selected',true);
-            $('#modal-structure-me-rig option[value='+structureMeRig+']').prop('selected',true);
-            $('#modal-structure-te-rig option[value='+structureTeRig+']').prop('selected',true);
-            $('#modal-structure-sec-status option[value='+structureSecStatus+']').prop('selected',true);
+            $('#modal-structure-me-rig input[value='+structureMeRig+']').parent().button("toggle");
+            $('#modal-structure-te-rig input[value='+structureTeRig+']').parent().button("toggle");
+            $('#modal-structure-sec-status input[value='+structureSecStatus+']').parent().button("toggle");
 
             $('#ModalME').slider("option", "value", me);
             $('#ModalTE').slider("option", "value", te);

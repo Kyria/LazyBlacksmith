@@ -72,7 +72,7 @@
         </ul>
         <div class="tab-content">
             <div class="row fade in active tab-pane" id="tab-bp">
-                <div class="col-md-3 col-sm-3">
+                <div class="col-md-3 col-sm-4">
                     <div class="well">
                         <div>
                             Facility<br>
@@ -87,33 +87,45 @@
                                 <option value="7">Other Structures</option>
                             </select>
                         </div>
-                        <div class="structure-configs" style="display: none;">
-                            Structure Rigs<br>
-                            <div class="row">
-                                <div class="col-md-6 col-sm-6">
-                                    <select name="structure-me-rig" id="structure-me-rig" class="form-control input-sm">
-                                        <option value="0">No ME Rig</option>
-                                        <option value="1">T1 ME Rig</option>
-                                        <option value="2">T2 ME Rig</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 col-sm-6">
-                                    <select name="structure-te-rig" id="structure-te-rig" class="form-control input-sm">
-                                        <option value="0">No TE Rig</option>
-                                        <option value="1">T1 TE Rig</option>
-                                        <option value="2">T2 TE Rig</option>
-                                    </select>
-                                </div>
+                        <div class="structure-configs" style="display: none; margin-top:5px">
+                            Rigs <br>
+                            <div class="btn-group" id="structure-me-rig" data-toggle="buttons" style="width:100%">
+                                <label class="btn btn-sm btn-default col-xs-4 active">
+                                    <input type="radio" name="structure-me-rig" autocomplete="off" value="0" checked>No ME
+                                </label>
+                                <label class="btn btn-sm btn-default col-xs-4">
+                                    <input type="radio" name="structure-me-rig" autocomplete="off" value="1">T1 ME
+                                </label>
+                                <label class="btn btn-sm btn-default col-xs-4">
+                                    <input type="radio" name="structure-me-rig" autocomplete="off" value="2">T2 ME
+                                </label>
+                            </div>
+                            <div class="btn-group" id="structure-te-rig" data-toggle="buttons" style="width:100%">
+                                <label class="btn btn-sm btn-default col-xs-4 active">
+                                    <input type="radio" name="structure-te-rig" autocomplete="off" value="0" checked>No TE
+                                </label>
+                                <label class="btn btn-sm btn-default col-xs-4">
+                                    <input type="radio" name="structure-te-rig" autocomplete="off" value="1">T1 TE
+                                </label>
+                                <label class="btn btn-sm btn-default col-xs-4">
+                                    <input type="radio" name="structure-te-rig" autocomplete="off" value="2">T2 TE
+                                </label>
+                            </div>
+                            System Security<br>
+                            <div class="btn-group" id="structure-sec-status" data-toggle="buttons" style="width:100%">
+                                <label class="btn btn-sm btn-default active col-xs-4">
+                                    <input type="radio" name="structure-sec-status" autocomplete="off" value="h" checked>HS
+                                </label>
+                                <label class="btn btn-sm btn-default col-xs-4">
+                                    <input type="radio" name="structure-sec-status" autocomplete="off" value="l">LS
+                                </label>
+                                <label class="btn btn-sm btn-default col-xs-4">
+                                    <input type="radio" name="structure-sec-status" autocomplete="off" value="n">NS/WH
+                                </label>
                             </div>
                         </div>
-                        <div class="structure-configs" style="display: none;">
-                            Security Status<br>
-                            <select name="structure-sec-status" id="structure-sec-status" class="form-control input-sm">
-                                <option value="h">High Sec</option>
-                                <option value="l">Low Sec</option>
-                                <option value="n">Nullsec / Wormhole</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div class="well">
                         <div>
                             System<br>
                             <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
@@ -169,7 +181,7 @@
                     {% endif %}
 
                 </div>
-                <div class="col-md-9 col-sm-9 main-list">
+                <div class="col-md-9 col-sm-8 main-list">
                     <div class="row">
                         <div class="col-xs-10">
                             <h4>
@@ -459,33 +471,45 @@
                                     </select>
                                 </div>
 
-                                <div class="modal-structure-configs" style="display: none;">
-                                    Structure Rigs<br>
-                                    <div class="row">
-                                        <div class="col-md-6 col-sm-6">
-                                            <select name="modal-structure-me-rig" id="modal-structure-me-rig" class="form-control input-sm">
-                                                <option value="0">No ME Rig</option>
-                                                <option value="1">T1 ME Rig</option>
-                                                <option value="2">T2 ME Rig</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 col-sm-6">
-                                            <select name="modal-structure-te-rig" id="modal-structure-te-rig" class="form-control input-sm">
-                                                <option value="0">No TE Rig</option>
-                                                <option value="1">T1 TE Rig</option>
-                                                <option value="2">T2 TE Rig</option>
-                                            </select>
-                                        </div>
+                                <div class="modal-structure-configs" style="display: none; margin-top:5px">
+                                    Rigs <br>
+                                    <div class="btn-group" id="modal-structure-me-rig" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default col-xs-4 active">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0" checked>No ME
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="1">T1 ME
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2">T2 ME
+                                        </label>
+                                    </div>
+                                    <div class="btn-group" id="modal-structure-te-rig" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default col-xs-4 active">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0" checked>No TE
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="1">T1 TE
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="2">T2 TE
+                                        </label>
+                                    </div>
+                                    System Security<br>
+                                    <div class="btn-group" id="modal-structure-sec-status" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default active col-xs-4">
+                                            <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="h" checked>HS
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="l">LS
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="n">NS/WH
+                                        </label>
                                     </div>
                                 </div>
-                                <div class="modal-structure-configs" style="display: none;">
-                                    Security Status<br>
-                                    <select name="modal-structure-sec-status" id="modal-structure-sec-status" class="form-control input-sm">
-                                        <option value="h">High Sec</option>
-                                        <option value="l">Low Sec</option>
-                                        <option value="n">Nullsec / Wormhole</option>
-                                    </select>
-                                </div>
+                            </div>
+                            <div class="well">
                                 <div>
                                     System<br>
                                     <input id="modal-system" type="text" class="form-control input-sm typeahead" value="Jita">
