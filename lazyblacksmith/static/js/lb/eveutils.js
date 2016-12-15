@@ -76,13 +76,21 @@ var eveUtils = (function() {
      * @param implantModifier the implant modifier (float)
      * @param researchSkilllevel the research skill level (metallurgy or research)
      * @param advancedIndustryLevel the advanced industry skill level
+     * @param rigBonus the bonus given from the structure rig
+     * @param rigMultiplier the multiplier for the rig bonus, depending on security status
+     * @param isStructure true if the facility is a structure (EC/Other), trigger the use of rig bonus
      * @return the research time in seconds
      */
     var calculateResearchTime = function(baseResearchTime, level, factoryModifier,
-                                    implantModifier, researchSkilllevel, advancedIndustryLevel) {
+                                    implantModifier, researchSkilllevel, advancedIndustryLevel,
+                                    rigBonus, rigMultiplier, isStructure) {
         var timeModifier = factoryModifier * implantModifier;
         timeModifier *= (1.00 - researchSkilllevel * 0.05);
         timeModifier *= (1.00 - advancedIndustryLevel * 0.03);
+
+        if(isStructure) {
+            timeModifier *= 1 - (rigBonus * rigMultiplier);
+        }
 
         var levelModifier = (250 * Math.pow(2, (1.25 * level - 2.5))) / 105;
 
@@ -113,14 +121,22 @@ var eveUtils = (function() {
      * @param implantModifier the implant modifier (float)
      * @param scienceSkillLevel the science skill level
      * @param advancedIndustryLevel the advanced industry skill level
+     * @param rigBonus the bonus given from the structure rig
+     * @param rigMultiplier the multiplier for the rig bonus, depending on security status
+     * @param isStructure true if the facility is a structure (EC/Other), trigger the use of rig bonus
      * @return the research time in seconds
      */
     var calculateCopyTime = function(baseCopyTime, runs, runPerCopy,
                                 factoryModifier, implantModifier,
-                                scienceSkillLevel, advancedIndustryLevel) {
+                                scienceSkillLevel, advancedIndustryLevel,
+                                rigBonus, rigMultiplier, isStructure) {
         var timeModifier = factoryModifier * implantModifier;
         timeModifier *= (1.00 - scienceSkillLevel * 0.05);
         timeModifier *= (1.00 - advancedIndustryLevel * 0.03);
+
+        if(isStructure) {
+            timeModifier *= 1 - (rigBonus * rigMultiplier);
+        }
 
         return timeModifier * baseCopyTime * runPerCopy * runs;
     }
@@ -161,10 +177,18 @@ var eveUtils = (function() {
      * @param baseInventionTime the base invention time
      * @param facilityModifier the facility bonus for invention
      * @param advancedIndustryLevel the level of advanced Industry
+     * @param rigBonus the bonus given from the structure rig
+     * @param rigMultiplier the multiplier for the rig bonus, depending on security status
+     * @param isStructure true if the facility is a structure (EC/Other), trigger the use of rig bonus
      * @return the new time in second
      */
-    var calculateInventionTime = function(baseInventionTime, facilityModifier, advancedIndustryLevel) {
-        return baseInventionTime * facilityModifier * (1 - 0.03 * advancedIndustryLevel);
+    var calculateInventionTime = function(baseInventionTime, facilityModifier, advancedIndustryLevel,
+                                          rigBonus, rigMultiplier, isStructure) {
+        var timeModifier = 1;
+        if(isStructure) {
+            timeModifier *= 1 - (rigBonus * rigMultiplier);
+        }
+        return baseInventionTime * facilityModifier * (1 - 0.03 * advancedIndustryLevel) * timeModifier;
     }
 
     /**
