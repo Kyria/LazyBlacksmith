@@ -1162,7 +1162,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         } else {
             $(structConfClass).hide();
         }
-    }
+    };
 
 
     /**

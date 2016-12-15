@@ -15,7 +15,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         baseOutputRun: 1,
         baseOutputME: 2,
         baseOutputTE: 4,
-        
+
         // copy speed (5%)
         scienceLevel: 0,
         // adv industry (3%)
@@ -24,10 +24,10 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         datacoreLevel1: 0,
         datacoreLevel2: 0,
         encryptionLevel: 0,
-        
+
         // implants
         copyImplant: 1.00,
-        
+
         // facility
         facility: 0,
         // copy data
@@ -37,6 +37,11 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         // system
         system: "Jita",
         region: 10000002,
+
+        // structure configs
+        structureInventionRig: 0,
+        structureCopyRig: 0,
+        structureSecStatus: 'h',
     };
 
     $.extend(lb.urls, {
@@ -44,12 +49,12 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         manufacturingUrl: false,
         buildCostUrl: false,
     });
-    
+
     var matData = {
         idList: [],
         materials: {},
     };
-    
+
     var decryptorList = [];
     var decryptorData = {
         idList: [],
@@ -63,7 +68,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         te: 0,
         run: 0,
     }
-    
+
     var indexes = {};
     var priceData = {
         prices: {},
@@ -77,22 +82,70 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             "copy": 1.0,
             "invention": 1.0,
             "name": 'Station',
+            "structure": false,
         },
         { // Laboratory
             "copy": 0.6,
             "invention": 0.5,
             "name": 'Laboratory',
+            "structure": false,
         },
         { // experimental lab
             "copy": 1.0,
             "invention": 1.0,
             "name": 'Experimental Laboratory',
+            "structure": false,
+        },
+        {
+            "copy": 0.85,
+            "invention": 0.85,
+            "name": 'Raitaru',
+            "structure": true,
+        },
+        {
+            "copy": 0.80,
+            "invention": 0.80,
+            "name": 'Azbel',
+            "structure": true,
+        },
+        {
+            "copy": 0.70,
+            "invention": 0.70,
+            "name": 'Sotiyo',
+            "structure": true,
+        },
+        { // station
+            "copy": 1.0,
+            "invention": 1.0,
+            "name": 'Other Structures',
+            "structure": true,
         },
     ];
 
+    var structureRigs = [
+        { // No rig bonus
+            'bonus': 0,
+            "meta": "None",
+        },
+        { // t1 rig bonus
+            'bonus': 0.20,
+            "meta": "T1",
+        },
+        { // t2 rig bonus
+            'bonus': 0.24,
+            "meta": "T2",
+        }
+    ];
+
+    var structureSecStatusMultiplier = {
+        'h': 1.0,  // High Sec
+        'l': 1.9,  // Low Sec
+        'n': 2.1,  // Null Sec / WH
+    };
+
     // Ajax calls
     // -----------
-    
+
     /**
      * Get market price for items
      * @private
@@ -114,25 +167,25 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateInventionData();
         });
     };
-    
-    
+
+
     /**
      * Get the output price (manufacturing cost) of product
      * to be able to compare every inventions together
      * @private
      */
-    var _getOutputPrices = function(callback) { 
+    var _getOutputPrices = function(callback) {
         if(outputPrices) {
             return;
         }
-        
+
         eveUtils.ajaxGetCallJson(lb.urls.buildCostUrl, function(jsonPrice) {
             outputPrices = jsonPrice['prices'];
             callback();
         });
     }
-    
-    
+
+
     /**
      * Get the indexes of the missing solar systems
      * @private
@@ -148,11 +201,11 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateInventionData();
         });
     };
-    
+
 
     // Visual updates
     // ---------------
-    
+
     /**
      * Get the invention data updated (costs, probabilities, time)
      * @private
@@ -164,61 +217,67 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         if(!outputPrices) {
             return _getOutputPrices(_updateInventionData);
         }
-        
+
         var newProbability = eveUtils.calculateInventionProbability(
-            options.baseInventionProbability, 
+            options.baseInventionProbability,
             options.encryptionLevel,
-            options.datacoreLevel1, 
-            options.datacoreLevel2, 
+            options.datacoreLevel1,
+            options.datacoreLevel2,
             decryptorData.items[options.decryptor].probability
         );
         var inventionTime = eveUtils.calculateInventionTime(
-            options.baseInventionTime, 
-            facilityStats[options.facility].invention, 
-            options.advancedIndustryLevel
+            options.baseInventionTime,
+            facilityStats[options.facility].invention,
+            options.advancedIndustryLevel,
+            structureRigs[options.structureInventionRig].bonus,
+            structureSecStatusMultiplier[options.structureSecStatus],
+            facilityStats[options.facility].structure
         );
-        
+
         var inventionCost = eveUtils.calculateInventionCost(
-            options.inventionBaseCost, 
-            indexes[options.system][ACTIVITY_INVENTION], 
-            options.runs, 
+            options.inventionBaseCost,
+            indexes[options.system][ACTIVITY_INVENTION],
+            options.runs,
             1.1
         );
-        
+
         var copyTime = eveUtils.calculateCopyTime(
-            options.baseCopyTime, 
-            options.runs, 
-            1, 
+            options.baseCopyTime,
+            options.runs,
+            1,
             facilityStats[options.facility].copy,
             options.copyImplant,
             options.scienceLevel,
-            options.advancedIndustryLevel
+            options.advancedIndustryLevel,
+            structureRigs[options.structureCopyRig].bonus,
+            structureSecStatusMultiplier[options.structureSecStatus],
+            facilityStats[options.facility].structure
         );
-        
+
         var copyCost = eveUtils.calculateCopyInstallationCost(
-            options.copyBaseCost, 
-            indexes[options.system][ACTIVITY_COPYING], 
-            options.runs, 
+            options.copyBaseCost,
+            indexes[options.system][ACTIVITY_COPYING],
+            options.runs,
             1,
             1.1
         );
-       
+
        var outputRuns = options.baseOutputRun + decryptorData.items[options.decryptor].run;
        var outputME = options.baseOutputME + decryptorData.items[options.decryptor].me;
        var outputTE = options.baseOutputTE + decryptorData.items[options.decryptor].te;
-       
+
        _updateTables(
-            newProbability, 
-            inventionTime, 
-            inventionCost, 
-            copyTime, 
+            newProbability,
+            inventionTime,
+            inventionCost,
+            copyTime,
             copyCost,
             outputRuns,
             outputME,
             outputTE
         );
     }
-    
+
     /**
      * Update all the tables with the new data
      * @private
@@ -228,25 +287,25 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         for(var i in matData.idList) {
             var mat = matData.materials[matData.idList[i]];
             var quantity = mat.quantity * options.runs;
-            
+
             var price = 0;
             if(options.region in priceData.prices && mat.id in priceData.prices[options.region]) {
                 price = priceData.prices[options.region][mat.id].buy;
                 price = (price == 0) ? priceData.prices[options.region][mat.id].sell : price;
-            } 
+            }
             materialPrice += quantity * price;
 
             $('#mat-' + mat.id + ' .quantity').html(Humanize.intcomma(quantity, 0));
             $('#mat-' + mat.id + ' .ppu').html(Humanize.intcomma(price, 2));
             $('#mat-' + mat.id + ' .total').html(Humanize.intcomma(quantity * price, 2));
         }
-        
+
         var quantity = (options.decryptor == 0) ? 0 : options.runs;
         var price = 0;
         if(options.decryptor != 0 && options.region in priceData.prices && options.decryptor in priceData.prices[options.region]) {
             price = priceData.prices[options.region][options.decryptor].buy;
             price = (price == 0) ? priceData.prices[options.region][options.decryptor].sell : price;
-        } 
+        }
         materialPrice += quantity * price;
 
         $('#mat-decryptor .quantity').html(Humanize.intcomma(quantity, 0));
@@ -264,18 +323,18 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         $('.output-qty').html(outputRuns);
         $('.output-me').html(outputME);
         $('.output-te').html(outputTE);
-        
+
         $('.output-cost').html(Humanize.intcomma(outputPrices[outputME], 2));
         $('.output-cost-invention').html(Humanize.intcomma(outputPrices[outputME] + inventionTotalPriceProba / (outputRuns * options.runs), 2));
-        
+
         $('.copy-time').html(utils.durationToString(copyTime));
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
     };
 
-    
+
     // EVENTS
     // ------
-   
+
     /**
      * Init input fields
      * @private
@@ -283,29 +342,42 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     var _initInputs = function() {
         // checks and update on copy numbers
         $('#invention-number').on('keyup', _inventionNumberOnKeyUp)
-                         .on('change', _inventionNumberOnChange);                        
+                         .on('change', _inventionNumberOnChange);
 
         $('#facility').on('change', function() {
             options.facility = parseInt($('#facility').val());
+            _toggleStructureConfigsDisplay(facilityStats[options.facility].structure);
             _updateInventionData();
-        });  
-        
+        });
+
         $('#region').on('change', function() {
             options.region = parseInt($('#region').val());
             _updateInventionData();
-        });       
-        
+        });
+
         $('#decryptor').on('change', function() {
             options.decryptor = parseInt($('#decryptor').val());
             _updateInventionData();
-        });              
-        
+        });
+
         $('#copyImplant').on('change', function() {
             options.copyImplant = parseFloat($('#copyImplant').val());
             _updateInventionData();
         });
+        $("#structure-invention-rig input[type='radio']").on('change', function() {
+            options.structureInventionRig = parseInt($(this).val());
+            _updateInventionData();
+        });
+        $("#structure-copy-rig input[type='radio']").on('change', function() {
+            options.structureCopyRig = parseInt($(this).val());
+            _updateInventionData();
+        });
+        $("#structure-sec-status input[type='radio']").on('change', function() {
+            options.structureSecStatus = $(this).val();
+            _updateInventionData();
+        });
     };
-    
+
     /**
      * Copy Number on keyup event
      * @private
@@ -319,16 +391,16 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         $(this).val(options.runs);
         _updateInventionData();
     };
-       
+
     /**
      * Copy Number on change event
      * @private
-     */ 
+     */
     var _inventionNumberOnChange = function(event) {
         $(this).val(options.runs);
-        return false; 
-    };   
-    
+        return false;
+    };
+
     /**
      * Init typeahead objects
      * @private
@@ -340,7 +412,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         });
     };
 
-    
+
     /**
      * Init all sliders on the page
      * @private
@@ -353,7 +425,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             slide: _skillOnUpdate,
         });
     };
-       
+
     /**
      * Function called on event update on the skill level sliders
      * @private
@@ -377,12 +449,12 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                 options.encryptionLevel = value;
                 $('#encryption-level-display').html(value);
                 break;
-                
+
             case 'datacore1-level':
                 options.datacoreLevel1 = value;
                 $('#datacore1-level-display').html(value);
                 break;
-                
+
             case 'datacore2-level':
                 options.datacoreLevel2 = value;
                 $('#datacore2-level-display').html(value);
@@ -390,24 +462,43 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         };
         _updateInventionData();
     };
-    
-    
+
+
+    /**
+     * Toggle the display of struture configurations depending on the parameter.
+     * If isStructure is True, we display ME/TE Rig and Security Status configs.
+     * Else we hide these configs.
+     * @param  {Boolean} isStructure Wether if the selected facility is a structure or not
+     * @param  {Boolean} modal true if we are in the modal. Define the class to update
+     * @private
+     */
+    var _toggleStructureConfigsDisplay = function(isStructure) {
+        var structConfClass = '.structure-configs';
+
+        if(isStructure) {
+            $(structConfClass).show();
+        } else {
+            $(structConfClass).hide();
+        }
+    };
+
+
     /**
      * Runner function
      */
     var run = function() {
         _initInputs();
         _initSliders();
-        
+
         $('#tab-links a').click(function (e) {
             e.preventDefault()
             $(this).tab('show')
         });
-        
+
         $('[data-toggle="tooltip"]').tooltip({
             container: 'body',
         });
-        
+
         // check all required urls (so we don't have to do it later)
         if(!lb.urls.manufacturingUrl || !lb.urls.buildCostUrl) {
             alert('Error, some URL are missing, this application cannot work properly without them.');

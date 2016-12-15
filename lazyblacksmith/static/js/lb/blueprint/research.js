@@ -13,7 +13,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         baseTeTime: 0,
         // indexes
         indexes: {},
-        
+
         // ME speed (5%)
         metallurgyLevel: 0,
         // TE speed (5%)
@@ -22,16 +22,16 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         scienceLevel: 0,
         // adv industry (3%)
         advancedIndustryLevel: 0,
-        
+
         // implants
         meImplant: 1.00,
         teImplant: 1.00,
         copyImplant: 1.00,
-        
+
         // facility
         facility: 0,
         // starting ME
-        materialEfficiency: 0,        
+        materialEfficiency: 0,
         // starting TE
         timeEfficiency: 0,
         // copy data
@@ -40,6 +40,13 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         maxRunPerCopy: 1,
         // system
         system: "Jita",
+
+        // structure configs
+        structureTeRig: 0,
+        structureMeRig: 0,
+        structureCopyRig: 0,
+        structureSecStatus: 'h',
+
     };
 
     $.extend(lb.urls, {
@@ -54,22 +61,74 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             "te": 1.0,
             "copy": 1.0,
             "name": 'Station',
+            "structure": false,
         },
         { // Laboratory
             "me": 0.7,
             "te": 0.7,
             "copy": 0.6,
             "name": 'Laboratory',
+            "structure": false,
         },
         { // Hyasyoda Laboratory
             "me": 0.65,
             "te": 0.65,
             "copy": 0.6,
             "name": 'Hyasyoda Laboratory',
+            "structure": false,
+        },
+        {
+            "me": 0.85,
+            "te": 0.85,
+            "copy": 0.85,
+            "name": 'Raitaru',
+            "structure": true,
+        },
+        {
+            "me": 0.80,
+            "te": 0.80,
+            "copy": 0.80,
+            "name": 'Azbel',
+            "structure": true,
+        },
+        {
+            "me": 0.70,
+            "te": 0.70,
+            "copy": 0.70,
+            "name": 'Sotiyo',
+            "structure": true,
+        },
+        { // station
+            "me": 1.0,
+            "te": 1.0,
+            "copy": 1.0,
+            "name": 'Other Structures',
+            "structure": true,
         },
     ];
-    
-    
+
+    var structureRigs = [
+        { // No rig bonus
+            'bonus': 0,
+            "meta": "None",
+        },
+        { // t1 rig bonus
+            'bonus': 0.20,
+            "meta": "T1",
+        },
+        { // t2 rig bonus
+            'bonus': 0.24,
+            "meta": "T2",
+        }
+    ];
+
+    var structureSecStatusMultiplier = {
+        'h': 1.0,  // High Sec
+        'l': 1.9,  // Low Sec
+        'n': 2.1,  // Null Sec / WH
+    };
+
+
     /**
      * Get the indexes of the missing solar systems
      * @private
@@ -87,8 +146,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateCopyTimeAndCost();
         });
     };
-    
-    
+
+
     /**
      * Get new copy time and price and update table
      * Called by events
@@ -96,28 +155,31 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      */
     var _updateCopyTimeAndCost = function() {
         var copyTime = eveUtils.calculateCopyTime(
-            options.baseCopyTime, 
-            options.copyNumber, 
-            options.runPerCopy, 
+            options.baseCopyTime,
+            options.copyNumber,
+            options.runPerCopy,
             facilityStats[options.facility].copy,
             options.copyImplant,
             options.scienceLevel,
-            options.advancedIndustryLevel
+            options.advancedIndustryLevel,
+            structureRigs[options.structureCopyRig].bonus,
+            structureSecStatusMultiplier[options.structureSecStatus],
+            facilityStats[options.facility].structure
         );
-        
+
         var copyCost = eveUtils.calculateCopyInstallationCost(
-            options.baseCost, 
-            options.indexes[options.system][ACTIVITY_COPYING], 
-            options.copyNumber, 
+            options.baseCost,
+            options.indexes[options.system][ACTIVITY_COPYING],
+            options.copyNumber,
             options.runPerCopy,
             1.1
         );
-        
+
         $('.copy-time').html(utils.durationToString(copyTime));
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
     };
-   
-    
+
+
     /**
      * Get research time and cost and update table for each ME/TE level
      * Called by events
@@ -133,11 +195,14 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                 facilityStats[options.facility].me,
                 options.meImplant,
                 options.metallurgyLevel,
-                options.advancedIndustryLevel
+                options.advancedIndustryLevel,
+                structureRigs[options.structureMeRig].bonus,
+                structureSecStatusMultiplier[options.structureSecStatus],
+                facilityStats[options.facility].structure
             );
             var MECost = eveUtils.calculateResearchInstallationCost(
-                options.baseCost, 
-                options.indexes[options.system][ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY], 
+                options.baseCost,
+                options.indexes[options.system][ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY],
                 level,
                 1.1
             );
@@ -147,11 +212,14 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                 facilityStats[options.facility].te,
                 options.teImplant,
                 options.researchLevel,
-                options.advancedIndustryLevel
+                options.advancedIndustryLevel,
+                structureRigs[options.structureTeRig].bonus,
+                structureSecStatusMultiplier[options.structureSecStatus],
+                facilityStats[options.facility].structure
             );
             var TECost = eveUtils.calculateResearchInstallationCost(
-                options.baseCost, 
-                options.indexes[options.system][ACTIVITY_RESEARCHING_TIME_EFFICIENCY], 
+                options.baseCost,
+                options.indexes[options.system][ACTIVITY_RESEARCHING_TIME_EFFICIENCY],
                 level,
                 1.1
             );
@@ -164,8 +232,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             _updateResearchTables(METime, MECost, MEDelta, TETime, TECost, TEDelta, level);
         }
     };
-    
-    
+
+
     /**
      * Update ME/TE tables
      * Called by _updateResearchTimeAndCost
@@ -180,7 +248,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         $('#TE-' + level + ' .price').html(Humanize.intcomma(TECost, 2));
     };
 
-    
+
     /**
      * Init input fields
      * @private
@@ -189,34 +257,53 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         // checks and update on copy numbers
         $('#copy-number').on('keyup', _copyNumberOnKeyUp)
                          .on('change', _copyNumberOnChange);
-                         
+
         $('#run-per-copy').on('keyup', _runPerCopyOnKeyUp)
                           .on('change', _runPerCopyOnChange);
-                          
+
 
         $('#facility').on('change', function() {
             options.facility = parseInt($('#facility').val());
+            _toggleStructureConfigsDisplay(facilityStats[options.facility].structure);
             _updateResearchTimeAndCost();
             _updateCopyTimeAndCost();
-        });              
+        });
 
         $('#meImplant').on('change', function() {
             options.meImplant = parseFloat($('#meImplant').val());
             _updateResearchTimeAndCost();
-        });              
+        });
 
         $('#teImplant').on('change', function() {
             options.teImplant = parseFloat($('#teImplant').val());
             _updateResearchTimeAndCost();
         });
-        
+
         $('#copyImplant').on('change', function() {
             options.copyImplant = parseFloat($('#copyImplant').val());
             _updateCopyTimeAndCost();
         });
+        $("#structure-sec-status input[type='radio']").on('change', function() {
+            options.structureSecStatus = $(this).val();
+            _updateResearchTimeAndCost();
+            _updateCopyTimeAndCost();
+        });
+        $("#structure-te-rig input[type='radio']").on('change', function() {
+            options.structureTeRig = parseInt($(this).val())
+            _updateResearchTimeAndCost();
+        });
+        $("#structure-me-rig input[type='radio']").on('change', function() {
+            options.structureMeRig = parseInt($(this).val());
+            _updateResearchTimeAndCost();
+        });
+        $("#structure-copy-rig input[type='radio']").on('change', function() {
+            options.structureCopyRig = parseInt($(this).val());
+            _updateCopyTimeAndCost();
+        });
+
     };
 
-    
+
     /**
      * Copy Number on keyup event
      * @private
@@ -230,16 +317,16 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         }
         _updateCopyTimeAndCost();
     };
-       
+
     /**
      * Copy Number on change event
      * @private
-     */ 
+     */
     var _copyNumberOnChange = function(event) {
         $(this).val(options.copyNumber);
-        return false; 
+        return false;
     };
-    
+
     /**
      * Run per copy on keyup event
      * @private
@@ -256,8 +343,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         }
         _updateCopyTimeAndCost();
     };
-    
-    
+
+
     /**
      * Run per copy on change event
      * @private
@@ -266,8 +353,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         $(this).val(options.runPerCopy);
         return false;
     };
-    
-    
+
+
     /**
      * Init typeahead objects
      * @private
@@ -305,8 +392,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             slide: _skillOnUpdate,
         });
     };
-    
-    
+
+
     /**
      * Function called on event update on the material efficiency slider
      * @private
@@ -328,7 +415,26 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         _updateResearchTimeAndCost();
     };
 
-    
+
+    /**
+     * Toggle the display of struture configurations depending on the parameter.
+     * If isStructure is True, we display ME/TE Rig and Security Status configs.
+     * Else we hide these configs.
+     * @param  {Boolean} isStructure Wether if the selected facility is a structure or not
+     * @param  {Boolean} modal true if we are in the modal. Define the class to update
+     * @private
+     */
+    var _toggleStructureConfigsDisplay = function(isStructure) {
+        var structConfClass = '.structure-configs';
+
+        if(isStructure) {
+            $(structConfClass).show();
+        } else {
+            $(structConfClass).hide();
+        }
+    };
+
+
     /**
      * Function called on event update on the skill level sliders
      * @private
@@ -361,21 +467,21 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         _updateResearchTimeAndCost();
         _updateCopyTimeAndCost();
     };
-    
-    
+
+
     /**
      * Runner function
      */
     var run = function() {
         _initInputs();
         _initSliders();
-        
+
         $('#tab-links a').click(function (e) {
             e.preventDefault()
             $(this).tab('show')
         });
         $('[data-toggle="tooltip"]').tooltip();
-        
+
         // check all required urls (so we don't have to do it later)
         if(!lb.urls.systemUrls || !lb.urls.indexActivityUrl) {
             alert('Error, some URL are missing, this application cannot work properly without them.');
@@ -384,7 +490,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
 
         // other init that require ajax call
         _initTypeahead();
-        
+
     };
 
 

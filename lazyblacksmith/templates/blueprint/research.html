@@ -3,7 +3,7 @@
 {% block title %}:: Copy/Research :: {{ blueprint.name }}{% endblock %}
 
 {% block js %}
-    <script>        
+    <script>
         researchBlueprint.options.baseCost = {{ base_cost }};
         researchBlueprint.options.baseCopyTime = {{ activity_copy.time }};
         researchBlueprint.options.baseMeTime = {{ activity_material.time }};
@@ -14,16 +14,16 @@
         {% for activity, index in index_list.iteritems() -%}
         researchBlueprint.options.indexes["Jita"][{{ activity }}] = {{ index }};
         {% endfor %}
-        
+
         lb.run('researchBlueprint');
     </script>
 {% endblock %}
 
 
-        
+
 {% block content %}
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-3 col-sm-4">
         <div class="well">
             <div>
                 Facility<br>
@@ -31,8 +31,63 @@
                     <option value="0" selected>Station</option>
                     <option value="1">Laboratory</option>
                     <option value="2">Hyasyoda Laboratory</option>
+                    <option value="3">Raitaru (M-EC)</option>
+                    <option value="4">Azbel (L-EC)</option>
+                    <option value="5">Sotiyo (XL-EC)</option>
+                    <option value="6">Other Structures</option>
                 </select>
             </div>
+            <div class="structure-configs" style="display: none; margin-top:5px">
+                Time Reduction Rigs <br>
+                <div class="btn-group" id="structure-me-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default col-xs-4 active">
+                        <input type="radio" name="structure-me-rig" autocomplete="off" value="0" checked>No ME
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-me-rig" autocomplete="off" value="1">T1 ME
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-me-rig" autocomplete="off" value="2">T2 ME
+                    </label>
+                </div>
+                <div class="btn-group" id="structure-te-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default col-xs-4 active">
+                        <input type="radio" name="structure-te-rig" autocomplete="off" value="0" checked>No TE
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-te-rig" autocomplete="off" value="1">T1 TE
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-te-rig" autocomplete="off" value="2">T2 TE
+                    </label>
+                </div>
+                Copy Time Rigs <br>
+                <div class="btn-group" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default col-xs-4 active">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" checked>None
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="1">T1
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="2">T2
+                    </label>
+                </div>
+                System Security<br>
+                <div class="btn-group" id="structure-sec-status" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default active col-xs-4">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="h" checked>HS
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="l">LS
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="n">NS/WH
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="well">
             <div>
                 System<br>
                 <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
@@ -106,14 +161,16 @@
             </div>
         </div>
     </div>
-    
-    <div class="col-md-10">
+
+    <div class="col-md-9 col-sm-8">
         <div class="row">
             <div class="col-xs-10">
                 <h4 id="item-name">{{ blueprint.name }}</h4>
             </div>
             <div class="col-xs-2 text-right" id="item-icon">
+                {% if config.USE_CCP_ICONS -%}
                 <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}"/>
+                {% endif %}
             </div>
         </div>
         <div class="row">
@@ -125,7 +182,7 @@
                     <li><a href="#copy-tab">Copy</a></li>
                 </ul>
                 <div class="tab-content">
-                
+
                     <!-- ME Tab -->
                     <div class="fade in active tab-pane" id="me-tab">
                         <table class="me-list table table-condensed table-hover table-striped">
@@ -150,9 +207,9 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>  
+                        </table>
                     </div>
-                   
+
                     <!-- ME Tab -->
                     <div class="fade tab-pane" id="me-eff-tab">
                         <table class="me-profit table table-condensed table-hover table-striped">
@@ -187,7 +244,7 @@
                                 {% set run_delta = cost_per_me[level]['job_price_run'] -%}
                                 {% endfor %}
                             </tbody>
-                        </table>  
+                        </table>
 
                         <table class="me-profit table table-condensed table-hover table-striped">
                             <thead>
@@ -204,14 +261,14 @@
                                         <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
                                             <i class="fa fa-exclamation-circle"></i>
                                         </span>
-                                    
+
                                     </th>
                                     <th colspan="2">
                                         Profit / Previous ME (max BPC run)
                                         <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
                                             <i class="fa fa-exclamation-circle"></i>
                                         </span>
-                                    
+
                                     </th>
                                 </tr>
                             </thead>
@@ -236,15 +293,15 @@
                                 {% set run_delta_max = cost_per_me[level]['job_price_max_run'] -%}
                                 {% endfor %}
                             </tbody>
-                        </table>  
+                        </table>
 
                     </div>
-                    
-                    <!-- TE Tab -->                     
+
+                    <!-- TE Tab -->
                     <div class="fade tab-pane" id="te-tab">
                         <table class="te-list table table-condensed table-hover table-striped">
                             <thead>
-                                <tr>                                   
+                                <tr>
                                     <th>Level</th>
                                     <th>Time</th>
                                     <th>Time from current level</th>
@@ -264,10 +321,10 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>  
+                        </table>
 
                     </div>
-                    
+
                     <!-- Copy Tab -->
                     <div class="fade tab-pane" id="copy-tab">
                         <table class="copy-data table table-condensed table-hover table-striped">
@@ -282,7 +339,7 @@
                             </tr>
                         </table>
                     </div>
-                    
+
                 </div>
             </div>
         </div>

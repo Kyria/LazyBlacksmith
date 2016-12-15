@@ -6,7 +6,7 @@
     <script>
         lb.urls.manufacturingUrl    = "{{ url_for('blueprint.manufacturing', item_id='111111') }}";
         lb.urls.buildCostUrl        = "{{ url_for('ajax_eve_sde.build_cost_item', material_efficiency='0,1,2,3,4,5', blueprint_id=invention_products[0].product_id, region_id=10000002) }}";
-        
+
         {{ blueprint.item_id }}
         inventionBlueprint.options.inventionBaseCost = {{ invention_base_cost }};
         inventionBlueprint.options.copyBaseCost = {{ copy_base_cost }};
@@ -14,12 +14,12 @@
         inventionBlueprint.options.baseInventionTime = {{ activity_invention.time }};
         inventionBlueprint.options.baseInventionProbability = {{ invention_products[0].probability }};
         inventionBlueprint.options.baseOutputRun = {{ invention_products[0].quantity }};
-        
+
         inventionBlueprint.indexes["Jita"] = {};
         {% for activity, index in index_list.iteritems() -%}
         inventionBlueprint.indexes["Jita"][{{ activity }}] = {{ index }};
         {% endfor %}
-        
+
         {% for inv_mat in invention_materials %}
         inventionBlueprint.matData.idList.push({{ inv_mat.material_id }});
         inventionBlueprint.matData.materials[{{ inv_mat.material_id }}] = {
@@ -28,7 +28,7 @@
             name: '{{ inv_mat.material.name }}',
         }
         {% endfor %}
-        
+
         {% for decryptor in decryptors %}
         inventionBlueprint.decryptorData.idList.push({{ decryptor.item_id }});
         inventionBlueprint.decryptorData.items[{{ decryptor.item_id }}] = {
@@ -40,14 +40,14 @@
         };
         {% endfor %}
 
-        
+
         lb.run('inventionBlueprint');
     </script>
 {% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-md-3 c">
+    <div class="col-md-3 col-sm-4">
         <div class="well">
             <div>
                 Facility<br>
@@ -55,14 +55,58 @@
                     <option value="0" selected>Station</option>
                     <option value="1">Design Laboratory</option>
                     <option value="2">Experimental Laboratory</option>
+                    <option value="3">Raitaru (M-EC)</option>
+                    <option value="4">Azbel (L-EC)</option>
+                    <option value="5">Sotiyo (XL-EC)</option>
+                    <option value="6">Other Structures</option>
                 </select>
             </div>
+            <div class="structure-configs" style="display: none; margin-top:5px">
+                Invention Time Rigs <br>
+                <div class="btn-group" id="structure-invention-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default col-xs-4 active">
+                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="0" checked>None
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="1">T1
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="2">T2
+                    </label>
+                </div>
+                Copy Time Rigs <br>
+                <div class="btn-group" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default col-xs-4 active">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" checked>None
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="1">T1
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="2">T2
+                    </label>
+                </div>
+                System Security<br>
+                <div class="btn-group" id="structure-sec-status" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default active col-xs-4">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="h" checked>HS
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="l">LS
+                    </label>
+                    <label class="btn btn-sm btn-default col-xs-4">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="n">NS/WH
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="well">
             <div>
                 System<br>
                 <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
             </div>
         </div>
-        <div class="well">   
+        <div class="well">
             <div>
                 Price Region<br>
                 <select name="region" id="region" class="form-control input-sm">
@@ -73,7 +117,7 @@
                 </select>
             </div>
         </div>
-        <div class="well">   
+        <div class="well">
             <div>
                 Decryptor (Chance / ME / TE / Runs)<br>
                 <select name="decryptor" id="decryptor" class="form-control input-sm">
@@ -102,7 +146,7 @@
             </div>
             {% endif %}
         </div>
-        <div class="well">     
+        <div class="well">
             {% if activity_copy is not none %}
             <div>
                 Copy Implant<br>
@@ -132,14 +176,16 @@
         </div>
 
     </div>
-    
-    <div class="col-md-9">
+
+    <div class="col-md-9 col-sm-8">
         <div class="row">
             <div class="col-xs-10">
                 <h4 id="item-name">{{ blueprint.name }}</h4>
             </div>
             <div class="col-xs-2 text-right" id="item-icon">
+                {% if config.USE_CCP_ICONS -%}
                 <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}"/>
+                {% endif %}
             </div>
         </div>
         <div class="row">
@@ -161,13 +207,13 @@
                         </tr>
                     </tbody>
                 </table>
-                
-                
+
+
                 <table class="invention-data table table-condensed table-hover table-striped">
                     <thead>
                         <th colspan="2">Outputs</th>
                     </thead>
-                    <tbody>                
+                    <tbody>
                         <tr>
                             <td class="title">Success Probability</td>
                             <td class="data invention-probability">{{ (invention_products[0].probability * 100) | intcomma }}%</td>
@@ -191,13 +237,13 @@
                         </tr>
                     </tbody>
                 </table>
-                
-                
+
+
                 <table class="invention-data table table-condensed table-hover table-striped">
                     <thead>
                         <th colspan="2">Invention Costs</th>
                     </thead>
-                    <tbody>            
+                    <tbody>
                         {% if activity_copy is not none %}
                         <tr>
                             <td class="title">BPO Copy</td>
@@ -223,7 +269,7 @@
                         </tr>
                         <tr>
                             <td class="title">
-                                Output / Run 
+                                Output / Run
                                 <span class='small' data-toggle="tooltip" data-placement="top" title="Price based on sell orders in The Forge (this cost is an approximate value only to compare inventions!)">
                                     <i class="fa fa-exclamation-circle"></i>
                                 </span>
@@ -267,7 +313,7 @@
                             <td class="total price">0.00</td>
                         </tr>
                     </tbody>
-                    
+
                     <tfoot>
                         <tr>
                             {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
