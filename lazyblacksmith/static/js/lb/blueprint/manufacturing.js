@@ -516,6 +516,16 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      */
     var _updateTime = function() {
         var material = materialsData.materials[materialsData.productItemId];
+        var time_per_run = eveUtils.calculateJobTime(
+            materialsData.materials[materialsData.productItemId].timePerRun,
+            1,
+            assemblyStats[material.facility].te,
+            options.timeEfficiency,
+            options.industryLvl, options.advancedIndustryLvl,
+            options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
+            structureRigs[material.structureTeRig].te, structureSecStatusMultiplier[material.structureSecStatus],
+            assemblyStats[material.facility].structure, true
+        );
         var time = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
             options.runs,
@@ -530,7 +540,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         materialsData.materials[materialsData.productItemId].timeTotal = time;
 
         var time_text = utils.durationToString(time);
+        var time_per_run_text = utils.durationToString(time_per_run);
         $('.main-list .total-time').html(time_text);
+        $('.main-list .time-per-run').html(time_per_run_text);
     };
 
 
@@ -561,10 +573,23 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                 assemblyStats[material.facility].structure, false
             );
 
+            var time_per_run = eveUtils.calculateJobTime(
+                material.timePerRun,
+                1,
+                assemblyStats[material.facility].te,
+                material.timeEfficiency,
+                options.industryLvl, options.advancedIndustryLvl,
+                0, 0, 0,
+                structureRigs[material.structureTeRig].te, structureSecStatusMultiplier[material.structureSecStatus],
+                assemblyStats[material.facility].structure, false
+            );
+
             material.timeTotal = time;
 
             var time_text = utils.durationToString(time);
+            var time_per_run_text = utils.durationToString(time_per_run);
             $('.sub-list-' + material.id + ' .total-time').html(time_text);
+            $('.sub-list-' + material.id + ' .time-per-run').html(time_per_run_text);
         }
     };
 
