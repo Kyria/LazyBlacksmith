@@ -16,13 +16,26 @@ class SdeImport(Command):
     """
 
     option_list = (
-        Option('--database', '-d', dest='database', default=None, help='The path to the EVE Online SDE Sqlite (absolute path may be required)'),
-        Option('--clear', '-c', dest='clear', action="store_true", default=False, help='Delete the content of all the SDE table'),
+        Option(
+            '--database', '-d',
+            dest='database',
+            default=None,
+            help=('The path to the EVE Online SDE Sqlite '
+                  '(absolute path may be required)')
+        ),
+        Option(
+            '--clear', '-c',
+            dest='clear',
+            action="store_true",
+            default=False,
+            help='Delete the content of all the SDE table'
+        ),
     )
 
     def run(self, database, clear):
         if database is None and clear is False:
-            print "Error: You must specify at least a database (SQLite) to use OR the clear argument"
+            print ("Error: You must specify at least a database "
+                   "(SQLite) to use OR the clear argument")
             return
 
         if clear:

@@ -14,8 +14,8 @@ from .eve_sde.orerefining import OreRefining  # noqa
 from .eve_sde.region import Region  # noqa
 from .eve_sde.solarsystem import SolarSystem  # noqa
 
-from .crest.industry_index import IndustryIndex  # noqa
-from .crest.item_adjusted_price import ItemAdjustedPrice  # noqa
-from .crest.item_price import ItemPrice  # noqa
+from .eve_api.industry_index import IndustryIndex  # noqa
+from .eve_api.item_adjusted_price import ItemAdjustedPrice  # noqa
+from .eve_api.item_price import ItemPrice  # noqa
 
 from .sso.eveuser import EveUser  # noqa

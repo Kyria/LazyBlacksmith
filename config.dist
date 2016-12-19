@@ -7,6 +7,11 @@ SECRET_KEY = 'YouNeedToChangeThis!'
 PORT = 5015
 HOST = '127.0.0.1'
 
+# ESI swagger JSON endpoint
+# ------------------------------------------------------
+ESI_DATASOURCE = 'tranquility'  # Change it to 'singularity' to use the test server
+ESI_SWAGGER_JSON = 'https://esi.tech.ccp.is/latest/swagger.json?datasource=%s' % datasource
+
 # ------------------------------------------------------
 # Database configuration
 # ------------------------------------------------------
@@ -32,48 +37,48 @@ BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 
-# CREST API Informations
+# EVE Online API Informations
+# register your app on https://developers.eveonline.com/
 # ------------------------------------------------------
-# Your crest secret key
+# Your ESI secret key
 # ------------------------------------------------------
-CREST_SECRET_KEY = ''
+ESI_SECRET_KEY = ''
 
 # ------------------------------------------------------
 # Your client ID
 # ------------------------------------------------------
-CREST_CLIENT_ID = ''
+ESI_CLIENT_ID = ''
 
 # ------------------------------------------------------
-# Redirect DNS. Only put the DNS, as the whole URL while be
-# constructed dynamically. (example: "localhost", "yourdomain.com")
+# Redirect domain. Only put the domain, as the whole URL will be
+# constructed dynamically. (example: "localhost", "https://yourdomain.com")
 # ------------------------------------------------------
-CREST_REDIRECT_DNS = ''
+ESI_REDIRECT_DOMAIN = ''
 
 # ------------------------------------------------------
 # Custom user agent to identify yourself to CCP, in case of problems
 # None for default
 # ------------------------------------------------------
-CREST_USER_AGENT = 'LazyBlacksmith/%d' % version
+ESI_USER_AGENT = 'LazyBlacksmith/%d' % version
 
 # ------------------------------------------------------
-# Scope required for CREST
+# Scope required for ESI
 # please do not touch this
 # ------------------------------------------------------
-CREST_SCOPE = ['publicData']
+ESI_SCOPE = ['publicData']
 
 # ------------------------------------------------------
-# Request per seconds for market order fetch (via CREST)
-# Max is 150rq/sec, but for all crest call, so better be
-# around 100-120 (we don't care about speed in our case)
-# If you got any problem (timeout / 503s), lower it :)
+# Request per seconds for market order fetch (via ESI)
+# There are no maximum value actually, but it allows you
+# to set it if you got any problem (timeout / 503s).
 # but if you don't know what is it, don't change it !
 # ------------------------------------------------------
-CREST_REQ_RATE_LIM = 130
+ESI_REQ_RATE_LIM = 150
 
 # ------------------------------------------------------
 # regions to get price from. (all 64 regions in k-space)
 # ------------------------------------------------------
-CREST_REGION_PRICE = [
+ESI_REGION_PRICE = [
     10000001,
     10000002,
     10000003,

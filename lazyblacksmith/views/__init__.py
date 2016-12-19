@@ -9,5 +9,5 @@ from industry.blueprint import blueprint
 from industry.price import price
 
 # import ajax blueprint
-from ajax.crest import ajax_crest
+from ajax.eve_api import ajax_eve_api
 from ajax.eve_sde import ajax_eve_sde

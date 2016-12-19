@@ -4,7 +4,6 @@ from datetime import datetime
 from . import db
 from flask_login import UserMixin
 from lazyblacksmith.models.utcdatetime import UTCDateTime
-from lazyblacksmith.utils.crestutils import get_crest
 from lazyblacksmith.utils.time import utcnow
 from sqlalchemy import func
 
@@ -32,21 +31,21 @@ class EveUser(db.Model, UserMixin):
     def get_id(self):
         return self.character_id
 
-    def get_authed_crest(self):
-        crest = get_crest()
-        if self.refresh_token and utcnow() >= self.access_token_expires_on:
-            crest.refr_authorize(self.refresh_token)
-            self.access_token_expires_on = utcnow() + datetime.fromtimestamp(seconds=int(crest.expires) - 60)
-            self.access_token_expires_in = crest.expires - utcnow()
-            self.access_token = crest.token
-            self.refresh_token = crest.refresh_token
-            db.session.commit()
+    # def get_authed_crest(self):
+    #     crest = get_crest()
+    #     if self.refresh_token and utcnow() >= self.access_token_expires_on:
+    #         crest.refr_authorize(self.refresh_token)
+    #         self.access_token_expires_on = utcnow() + datetime.fromtimestamp(seconds=int(crest.expires) - 60)
+    #         self.access_token_expires_in = crest.expires - utcnow()
+    #         self.access_token = crest.token
+    #         self.refresh_token = crest.refresh_token
+    #         db.session.commit()
 
-        else:
-            crest.temptoken_authorize(
-                self.access_token,
-                (self.access_token_expires_on - utcnow()).total_seconds(),
-                self.refresh_token
-            )
+    #     else:
+    #         crest.temptoken_authorize(
+    #             self.access_token,
+    #             (self.access_token_expires_on - utcnow()).total_seconds(),
+    #             self.refresh_token
+    #         )
 
-        return crest
+    #     return crest
