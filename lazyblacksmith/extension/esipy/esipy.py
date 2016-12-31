@@ -13,14 +13,15 @@ from requests.adapters import HTTPAdapter
 
 
 class LbCache(BaseCache):
-    """ Custom BaseCac=he implementation for Lazyblacksmith
+    """ Custom BaseCache implementation for Lazyblacksmith
         used in esipy, to use the flask cache
     """
-    def put(self, key, value):
-        cache.set(key, value)
+    def set(self, key, value, timeout=300):
+        cache.set(key, value, timeout)
 
-    def get(self, key):
-        return cache.get(key)
+    def get(self, key, default=None):
+        cached = cache.get(key)
+        return cached if cached is not None else default
 
     def invalidate(self, key):
         cache.delete(key)
@@ -28,7 +29,7 @@ class LbCache(BaseCache):
 
 transport_adapter = HTTPAdapter(
     pool_connections=20,
-    pool_maxsize=150,
+    pool_maxsize=300,
 )
 
 # ESI objects to be imported
