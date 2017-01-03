@@ -165,8 +165,6 @@ def update_market_price():
     """Celery task to upgrade prices through CREST"""
     region_list = Region.query.filter(
         Region.id.in_(config.ESI_REGION_PRICE)
-    ).order_by(
-        Region.market_order_page.desc()
     ).all()
 
     for region in region_list:
@@ -176,4 +174,4 @@ def update_market_price():
             ).filter_by(region_id=region.id)
         ]
 
-        esi_region_order_price.s(region.id, item_id_list).apply_async()
+        esi_region_order_price.s(region.id, item_id_list).apply_async(queue='celery')

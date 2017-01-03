@@ -14,8 +14,6 @@ from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import OreRefining
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
-from lazyblacksmith.tasks.adjusted_price import update_adjusted_price
-from lazyblacksmith.tasks.industry_index import update_industry_index
 
 
 class Importer(object):
@@ -659,10 +657,12 @@ class Importer(object):
         """
         import item adjusted price into DB
         """
+        from lazyblacksmith.tasks.adjusted_price import update_adjusted_price
         return update_adjusted_price()
 
     def import_industryindex(self):
         """
         import industry index into DB
         """
+        from lazyblacksmith.tasks.industry_index import update_industry_index
         return update_industry_index()

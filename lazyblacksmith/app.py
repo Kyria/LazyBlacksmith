@@ -54,7 +54,7 @@ def register_blueprints(app):
     app.register_blueprint(home)
     app.register_blueprint(templatefilter)
 
-
+    
 def register_extensions(app):
     """Register Flask extensions."""
     db.app = app
@@ -65,6 +65,7 @@ def register_extensions(app):
     login_manager.init_app(app)
     celery_app.init_app(app)
 
+    
 
 def register_errorhandlers(app):
     """Add errorhandlers to the app."""

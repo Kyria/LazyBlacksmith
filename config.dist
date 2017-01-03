@@ -30,8 +30,8 @@ CACHE_TYPE = 'null'
 # ------------------------------------------------------
 # Celery configs
 # ------------------------------------------------------
-broker_url = 'amqp://guest:guest@localhost:5672//'
-result_backend = 'rpc://'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = 'rpc://'
 
 
 # EVE Online API Informations
@@ -144,6 +144,7 @@ ESI_REGION_PRICE = [
 
 # ------------------------------------------------------
 # DO NOT EDIT
-# Fix deprecated/warning from flask-sqlalchemy
+# Fix warnings from flask-sqlalchemy / others
 # ------------------------------------------------------
 SQLALCHEMY_TRACK_MODIFICATIONS = True
+CACHE_NO_NULL_WARNING = True

@@ -1,16 +1,22 @@
 # -*- encoding: utf-8 -*-
 import config
+import logging
 
 from celery.schedules import crontab
 from lazyblacksmith.app import create_app
 from lazyblacksmith.extension.celery_app import celery_app
+
+# disable / enable loggers we want
+logging.getLogger('pyswagger').setLevel(logging.ERROR)
+
+
 
 app = create_app(config)
 app.app_context().push()
 
 celery_app.init_app(app)
 
-celery_app.conf.broker_url = config.broker_url
+#celery_app.conf.broker_url = config.broker_url
 celery_app.conf.beat_schedule.update({
     'adjusted-price': {
         'task': 'schedule.update_adjusted_price',
