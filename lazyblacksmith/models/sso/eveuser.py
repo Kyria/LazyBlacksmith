@@ -1,10 +1,15 @@
 # -*- encoding: utf-8 -*-
+import pytz
+import time
+
 from datetime import datetime
 
 from . import db
-from flask_login import UserMixin
 from lazyblacksmith.models.utcdatetime import UTCDateTime
 from lazyblacksmith.utils.time import utcnow
+
+from esipy import EsiClient
+from flask_login import UserMixin
 from sqlalchemy import func
 
 
@@ -17,35 +22,46 @@ class EveUser(db.Model, UserMixin):
 
     token_type = db.Column(db.String(20))
     access_token = db.Column(db.String(100))
-    access_token_expires_on = db.Column(UTCDateTime(timezone=True))
-    access_token_expires_in = db.Column(db.Integer)
+    access_token_expires = db.Column(UTCDateTime(timezone=True))
     refresh_token = db.Column(db.String(100))
 
-    created_at = db.Column(UTCDateTime(timezone=True), server_default=func.now())
-    updated_at = db.Column(UTCDateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    created_at = db.Column(
+        UTCDateTime(timezone=True),
+        server_default=func.now()
+    )
+    updated_at = db.Column(
+       UTCDateTime(timezone=True),
+       server_default=func.now(),
+       onupdate=func.now()
+    )
 
-    def get_portrait_url(self, size=128):
+    def get_portrait_url(self, datasource='tranquility', size=128):
         """returns URL to Character portrait from EVE Image Server"""
-        return "{0}Character/{1}_{2}.jpg".format(get_crest()._image_server, self.character_id, size)
+        return "{0}Character/{1}_{2}.jpg".format(
+             EsiClient.__image_server__[datasource],
+             self.character_id,
+             size
+         )
 
     def get_id(self):
         return self.character_id
 
-    # def get_authed_crest(self):
-    #     crest = get_crest()
-    #     if self.refresh_token and utcnow() >= self.access_token_expires_on:
-    #         crest.refr_authorize(self.refresh_token)
-    #         self.access_token_expires_on = utcnow() + datetime.fromtimestamp(seconds=int(crest.expires) - 60)
-    #         self.access_token_expires_in = crest.expires - utcnow()
-    #         self.access_token = crest.token
-    #         self.refresh_token = crest.refresh_token
-    #         db.session.commit()
+    def update_token(self, token_response):
+        self.access_token = token_response['access_token']
+        self.access_token_expires = datetime.fromtimestamp(
+            time.time() + token_response['expires_in'],
+            tz=pytz.utc
+        )
+        self.token_type = token_response['token_type']
 
-    #     else:
-    #         crest.temptoken_authorize(
-    #             self.access_token,
-    #             (self.access_token_expires_on - utcnow()).total_seconds(),
-    #             self.refresh_token
-    #         )
+        if 'refresh_token' in token_response:
+            self.refresh_token = token_response['refresh_token']
 
-    #     return crest
+    def get_sso_data(self):
+        return {
+            'access_token': self.access_token,
+            'refresh_token': self.refresh_token,
+            'expires_in': (
+                self.access_token_expires - utcnow()
+            ).total_seconds()
+        }
