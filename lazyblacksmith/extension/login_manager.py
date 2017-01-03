@@ -4,7 +4,7 @@ from lazyblacksmith.models import EveUser
 
 
 login_manager = LoginManager()
-login_manager.login_view = 'sso.crest_login'
+login_manager.login_view = 'sso.login'
 
 
 @login_manager.user_loader

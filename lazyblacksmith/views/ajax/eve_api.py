@@ -10,10 +10,10 @@ from lazyblacksmith.utils.time import utcnow
 
 import humanize
 
-ajax_crest = Blueprint('ajax_crest', __name__)
+ajax_eve_api = Blueprint('ajax_eve_api', __name__)
 
 
-@ajax_crest.route('/get_price/<string:item_list>', methods=['GET'])
+@ajax_eve_api.route('/get_price/<string:item_list>', methods=['GET'])
 def get_price(item_list):
     """
     Get prices for all items we need !
@@ -48,12 +48,17 @@ def get_price(item_list):
         for item in item_adjusted:
             item_adjusted_list[item.item_id] = item.price
 
-        return jsonify({'prices': item_price_list, 'adjusted': item_adjusted_list})
+        return jsonify(
+            {'prices': item_price_list, 'adjusted': item_adjusted_list}
+        )
     else:
         return 'Cannot call this page directly', 403
 
 
-@ajax_crest.route('/crest/get_index/<string:solar_system_names>', methods=['GET'])
+@ajax_eve_api.route(
+    '/get_index/<string:solar_system_names>',
+    methods=['GET']
+)
 def get_index_activity(solar_system_names):
     ss_name_list = solar_system_names.split(',')
 
