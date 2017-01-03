@@ -3,12 +3,12 @@ from __future__ import absolute_import
 
 import config
 
+from lazyblacksmith.extension.cache import cache
+
 from esipy import App
 from esipy import EsiClient
 from esipy import EsiSecurity
 from esipy.cache import BaseCache
-from lazyblacksmith.extension.cache import cache
-
 from requests.adapters import HTTPAdapter
 
 
@@ -37,7 +37,7 @@ esiapp = App.create(config.ESI_SWAGGER_JSON)
 esisecurity = EsiSecurity(
     app=esiapp,
     redirect_uri="%s%s" % (
-        config.ESI_REDIRECT_DOMAIN, '/sso/crest/callback'
+        config.ESI_REDIRECT_DOMAIN, '/sso/callback/',
     ),
     client_id=config.ESI_CLIENT_ID,
     secret_key=config.ESI_SECRET_KEY,
