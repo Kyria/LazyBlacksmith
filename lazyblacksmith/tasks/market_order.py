@@ -35,7 +35,7 @@ def esi_region_order_price(region_id, item_id_list):
     a given region
     """
 
-    # call the crest page and extract all items from every pages if required
+    # call the market page and extract all items from every pages if required
     page = 0
     item_list = {'update': {}, 'insert': {}}
     order_number = 0
@@ -162,7 +162,7 @@ def esi_region_order_price(region_id, item_id_list):
 
 @celery_app.task(name="schedule.update_market_price")
 def update_market_price():
-    """Celery task to upgrade prices through CREST"""
+    """Celery task to upgrade prices"""
     region_list = Region.query.filter(
         Region.id.in_(config.ESI_REGION_PRICE)
     ).all()

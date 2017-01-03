@@ -12,7 +12,7 @@ price = Blueprint('price', __name__)
 @price.route("/")
 def index():
     regions = Region.query.filter(
-        Region.id.in_(config.CREST_REGION_PRICE)
+        Region.id.in_(config.ESI_REGION_PRICE)
     ).filter_by(
         wh=False
     )

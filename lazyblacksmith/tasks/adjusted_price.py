@@ -12,7 +12,6 @@ def update_adjusted_price():
     db.engine.execute("TRUNCATE TABLE %s" % ItemAdjustedPrice.__tablename__)
     db.session.commit()
 
-    # crest stuff
     item_adjusted_price = []
     count = 0
 

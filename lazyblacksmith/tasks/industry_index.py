@@ -8,7 +8,7 @@ from lazyblacksmith.models import db
 
 @celery_app.task(name="schedule.update_industry_indexes")
 def update_industry_index():
-    """ Connect to the public CREST and get the industry indexes list. """
+    """ Get the industry indexes list from API. """
     db.engine.execute("TRUNCATE TABLE %s" % IndustryIndex.__tablename__)
     db.session.commit()
 

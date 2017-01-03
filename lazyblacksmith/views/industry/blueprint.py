@@ -32,7 +32,7 @@ def manufacturing(item_id):
     materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
     product = item.activity_products.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
     regions = Region.query.filter(
-        Region.id.in_(config.CREST_REGION_PRICE)
+        Region.id.in_(config.ESI_REGION_PRICE)
     ).filter_by(
         wh=False
     )
@@ -251,7 +251,7 @@ def invention(item_id):
 
     # get regions
     regions = Region.query.filter(
-        Region.id.in_(config.CREST_REGION_PRICE)
+        Region.id.in_(config.ESI_REGION_PRICE)
     ).filter_by(
         wh=False
     )

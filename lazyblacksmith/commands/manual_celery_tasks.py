@@ -6,7 +6,7 @@ from flask_script import Option
 class ManualCeleryTasks(Command):
     """
     Manually trigger tasks.
-    
+
     -a : Action in update_adjusted_price, update_market_price,
     update_industry_index
     """
@@ -34,4 +34,3 @@ class ManualCeleryTasks(Command):
             update_market_price()
         if action == 'update_industry_index':
             update_industry_index()
-        

@@ -56,7 +56,7 @@ def get_price(item_list):
 
 
 @ajax_eve_api.route(
-    '/crest/get_index/<string:solar_system_names>',
+    '/get_index/<string:solar_system_names>',
     methods=['GET']
 )
 def get_index_activity(solar_system_names):
