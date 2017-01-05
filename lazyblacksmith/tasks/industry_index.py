@@ -3,8 +3,15 @@ from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_industry_systems
 from lazyblacksmith.models import IndustryIndex
+from lazyblacksmith.models import TaskStatus
 from lazyblacksmith.models import db
+from lazyblacksmith.utils.time import utcnow
 
+from datetime import datetime
+from email.utils import parsedate
+
+import json
+import pytz
 
 @celery_app.task(name="schedule.update_industry_indexes")
 def update_industry_index():
@@ -34,4 +41,15 @@ def update_industry_index():
     )
     db.session.commit()
 
+    task_status = TaskStatus(
+        name='schedule.update_industry_indexes',
+        expire=datetime(
+            *parsedate(all_indexes.header['Expires'][0])[:6]
+        ).replace(tzinfo=pytz.utc),
+        last_run=utcnow(),
+        results=json.dumps({'inserted': len(insert_index_list)})
+    )
+    db.session.merge(task_status)
+    db.session.commit()
+    
     return (len(insert_index_list), len(insert_index_list))

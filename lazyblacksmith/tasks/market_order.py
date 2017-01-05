@@ -1,8 +1,9 @@
 # -*- encoding: utf-8 -*-
 import config
 import time
+import logging
+import pytz
 
-from esipy import EsiClient
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy.esipy import transport_adapter
 from lazyblacksmith.extension.esipy.operations import (
@@ -10,9 +11,14 @@ from lazyblacksmith.extension.esipy.operations import (
 )
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
+from lazyblacksmith.models import Region
+from lazyblacksmith.models import TaskStatus
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
+from esipy import EsiClient
+from datetime import datetime
+from email.utils import parsedate
 from flask import json
 from ratelimiter import RateLimiter
 
@@ -23,12 +29,10 @@ esiclient = EsiClient(
     headers={'User-Agent': config.ESI_USER_AGENT}
 )
 
-# divide by 2, as we may have mulitple pages
-# in some cases (it still does 75/sec)
-rate_limiter = RateLimiter(max_calls=config.ESI_REQ_RATE_LIM, period=1)
+logger = logging.getLogger('lb.tasks')
 
 
-@celery_app.task(name="get_region_order_price")
+@celery_app.task(name="esi_region_order_price")
 def esi_region_order_price(region_id, item_id_list):
     """
     Get and return the orders <type> (sell|buy) from
@@ -37,53 +41,62 @@ def esi_region_order_price(region_id, item_id_list):
 
     # call the market page and extract all items from every pages if required
     page = 0
+    failed_data = []
     item_list = {'update': {}, 'insert': {}}
-    order_number = 0
+    expire = utcnow()
 
     while True:
         page += 1
-        region_orders_res = esiclient.request(
-            get_markets_region_id_orders(
-                region_id=region_id,
-                order_type='all',
-                page=page
-            ),
-            raw_body_only=True
-        )
-
-        if region_orders_res.status != 200:
-            region_orders_res = esiclient.request(
-                get_markets_region_id_orders(
+        # try up to 3 times to get the data, else go to next page
+        for retry in xrange(3):
+            op = get_markets_region_id_orders(
                     region_id=region_id,
                     order_type='all',
                     page=page
-                ),
-                raw_body_only=True
             )
-
-        if region_orders_res.status != 200:
+            
             region_orders_res = esiclient.request(
-                get_markets_region_id_orders(
-                    region_id=region_id,
-                    order_type='all',
-                    page=page
-                ),
+                op,
                 raw_body_only=True
             )
+            
+            logger.debug('Request #%d %s [%d]' % (
+                retry,
+                op[0].url,
+                region_orders_res.status
+            ))
+            if region_orders_res.status == 200:
+                break
 
         if region_orders_res.status != 200:
+            data = (
+                op[0].url, 
+                op[0].query, 
+                region_orders_res.status,
+                region_orders_res.raw, 
+            )
+            logger.error('Request failed after 3 tries [%s, %s, %d]: %s' % data)
+            failed_data.append(data)
             continue
 
+        # get the latest expire 
+        expire = max(
+            expire,
+            datetime(
+                *parsedate(region_orders_res.header['Expires'][0])[:6]
+            ).replace(tzinfo=pytz.utc)
+        )
         region_orders = json.loads(region_orders_res.raw)
 
         if not region_orders:
             break
 
         for order in region_orders:
-            order_number += 1
             item_id = order['type_id']
 
             # values if we already have this item in database or not
+            # we need custom field label for update, as we don't want the
+            # region_id item_id to be updated but we need them in where clause
             if item_id in item_id_list:
                 stmt_type = 'update'
                 region_id_label = 'u_region_id'
@@ -120,8 +133,6 @@ def esi_region_order_price(region_id, item_id_list):
                     order['price']
                 )
 
-    region = Region.query.get(region_id)
-
     # check if we have any update to do
     if len(item_list['update']) > 0:
         update_stmt = ItemPrice.__table__.update()
@@ -143,21 +154,19 @@ def esi_region_order_price(region_id, item_id_list):
             item_list['insert'].values()
         )
 
-    # print '%0.2fs | %0.2fs | %0.2fs | %d | %d | %s' % (
-    #     time.time() - time_start,
-    #     time_delta_sql - time_delta,
-    #     time.time() - time_delta_sql,
-    #     len(item_list['insert']),
-    #     len(item_list['update']),
-    #     region.name
-    # )
-    #
-    # region.market_order_item_number = (
-    #     len(item_list['insert']) + len(item_list['update'])
-    # )
-    # region.market_order_number = order_number
-    # region.market_order_page = page - 1
-    # db.session.commit()
+    task_status = TaskStatus(
+        name='esi_region_order_price [%s]' % region_id,
+        expire=expire,
+        last_run=utcnow(),
+        results=json.dumps({
+            'region_id': region_id,
+            'inserted': len(item_list['insert']),
+            'updated': len(item_list['update']),
+            'fail': failed_data,
+        })
+    )
+    db.session.merge(task_status)
+    db.session.commit()
 
 
 @celery_app.task(name="schedule.update_market_price")
@@ -173,5 +182,15 @@ def update_market_price():
                 ItemPrice.item_id
             ).filter_by(region_id=region.id)
         ]
+        
+        task_id = "%s-%s" % (
+            utcnow().strftime('%Y%m%d-%H%M%S'),
+            region.name
+        )
 
-        esi_region_order_price.s(region.id, item_id_list).apply_async(queue='celery')
+        esi_region_order_price.s(
+            region.id,
+            item_id_list
+        ).apply_async(
+            task_id=task_id
+        )
