@@ -11,7 +11,6 @@ from lazyblacksmith.extension.esipy.operations import (
 )
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
-from lazyblacksmith.models import Region
 from lazyblacksmith.models import TaskStatus
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
