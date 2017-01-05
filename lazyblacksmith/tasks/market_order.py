@@ -20,6 +20,7 @@ from datetime import datetime
 from email.utils import parsedate
 from flask import json
 from ratelimiter import RateLimiter
+from sqlalchemy.exc import SQLAlchemyError
 
 # (re)define some required objects
 esiclient = EsiClient(
@@ -76,7 +77,13 @@ def esi_region_order_price(region_id, item_id_list):
             )
             logger.error('Request failed after 3 tries [%s, %s, %d]: %s' % data)
             failed_data.append(data)
-            continue
+            
+            # if we have more than 2 fails, we stop gathering data as there
+            # are too many missing page (when average page is around 2-3)
+            if len(failed_data) > 2:
+                break
+            else:
+                continue
 
         # get the latest expire 
         expire = max(
@@ -132,41 +139,49 @@ def esi_region_order_price(region_id, item_id_list):
                     order['price']
                 )
 
-    # check if we have any update to do
-    if len(item_list['update']) > 0:
-        update_stmt = ItemPrice.__table__.update()
-        update_stmt = update_stmt.where(
-            ItemPrice.item_id == db.bindparam('u_item_id')
-        ).where(
-            ItemPrice.region_id == db.bindparam('u_region_id')
-        )
-        db.engine.execute(
-            update_stmt,
-            item_list['update'].values()
-        )
+    try:
+        # check if we have any update to do
+        if len(item_list['update']) > 0:
+            update_stmt = ItemPrice.__table__.update()
+            update_stmt = update_stmt.where(
+                ItemPrice.item_id == db.bindparam('u_item_id')
+            ).where(
+                ItemPrice.region_id == db.bindparam('u_region_id')
+            )
+            db.engine.execute(
+                update_stmt,
+                item_list['update'].values()
+            )
 
-    # check if we have any insert to do
-    if len(item_list['insert']) > 0:
-        # execute inserts
-        db.engine.execute(
-            ItemPrice.__table__.insert(),
-            item_list['insert'].values()
+        # check if we have any insert to do
+        if len(item_list['insert']) > 0:
+            # execute inserts
+            db.engine.execute(
+                ItemPrice.__table__.insert(),
+                item_list['insert'].values()
+            )
+
+        task_status = TaskStatus(
+            name='esi_region_order_price [%s]' % region_id,
+            expire=expire,
+            last_run=utcnow(),
+            results=json.dumps({
+                'region_id': region_id,
+                'inserted': len(item_list['insert']),
+                'updated': len(item_list['update']),
+                'fail': failed_data,
+            })
         )
-
-    task_status = TaskStatus(
-        name='esi_region_order_price [%s]' % region_id,
-        expire=expire,
-        last_run=utcnow(),
-        results=json.dumps({
-            'region_id': region_id,
-            'inserted': len(item_list['insert']),
-            'updated': len(item_list['update']),
-            'fail': failed_data,
-        })
-    )
-    db.session.merge(task_status)
-    db.session.commit()
-
+        db.session.merge(task_status)
+        db.session.commit()
+        
+    except SQLAlchemyError as e:
+        logger.error(
+            'Something went wrong while trying to insert/update data: %s' % (
+                e.message
+            )
+        )
+        db.session.rollback()
 
 @celery_app.task(name="schedule.update_market_price")
 def update_market_price():
