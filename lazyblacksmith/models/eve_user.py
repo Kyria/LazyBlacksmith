@@ -29,7 +29,7 @@ class EveUser(db.Model, UserMixin):
     
     main_character_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('item.id'),
+        db.ForeignKey('EveUser.character_id'),
         nullable=True
     )
     
@@ -37,7 +37,7 @@ class EveUser(db.Model, UserMixin):
         'EveUser',
         backref='main_character',
         lazy='dynamic',
-        foreign_keys='EveUser.parent_character_id')
+        foreign_keys='EveUser.main_character_id')
 
     created_at = db.Column(
         UTCDateTime(timezone=True),

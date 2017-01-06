@@ -24,13 +24,12 @@ def upgrade():
     sa.Column('access_token', sa.String(length=100), nullable=True),
     sa.Column('access_token_expires', sa.DateTime(timezone=True), nullable=True),
     sa.Column('refresh_token', sa.String(length=100), nullable=True),
-    sa.Column('main_character_id', sa.BigInteger(), nullable=True))
-    
+    sa.Column('main_character_id', sa.BigInteger(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.PrimaryKeyConstraint('character_id')
     )
-    op.create_foreign_key(None, 'eve_user', 'item', ['main_character_id'], ['id'])
+    op.create_foreign_key(None, 'eve_user', 'eve_user', ['main_character_id'], ['character_id'])
     # ### end Alembic commands ###
 
 
