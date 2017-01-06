@@ -62,7 +62,7 @@ ESI_USER_AGENT = 'LazyBlacksmith/%d' % version
 # Scope required for ESI
 # please do not touch this
 # ------------------------------------------------------
-ESI_SCOPE = ['publicData']
+ESI_SCOPE = ['esi-skills.read_skills.v1', 'esi-location.read_location.v1']
 
 # ------------------------------------------------------
 # Request per seconds for market order fetch (via ESI)
