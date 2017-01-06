@@ -4,6 +4,9 @@ from flask import session
 from flask_login import login_user
 from sqlalchemy.orm.exc import NoResultFound
 
+from lazyblacksmith.models import EveUser
+from lazyblacksmith.models import db
+
    
 def check_login_user(character_data, main=None):
     try:
