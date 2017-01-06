@@ -40,6 +40,7 @@ def check_login_user(cdata, auth_response, main=None):
     try:
         db.session.merge(user)
         db.session.commit()
+        update_data(user)
 
         if main is None:
             login_user(user)

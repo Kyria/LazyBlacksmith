@@ -32,7 +32,7 @@ def update_character_skills(character_id):
     )
 
     if character_skills.status == 200:
-        for skill_object in character_skills.data:
+        for skill_object in character_skills.data.skills:
             item = Item.query.get(skill_object.skill_id)
             if item is None:
                 continue
