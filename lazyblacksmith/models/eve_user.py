@@ -33,11 +33,11 @@ class EveUser(db.Model, UserMixin):
         nullable=True
     )
     
-    alt_characters = db.relationship(
+    main_character = db.relationship(
         'EveUser',
-        backref='main_character',
-        lazy='dynamic',
-        foreign_keys='eve_user.main_character_id')
+        remote_side=[character_id],
+        backref=db.backref('alts_characters', lazy='dynamic')
+    )
 
     created_at = db.Column(
         UTCDateTime(timezone=True),

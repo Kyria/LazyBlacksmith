@@ -54,9 +54,9 @@ def callback():
     cdata = esisecurity.verify()
 
     if current_user.is_authenticated:
-        check_login_user(cdata, current_user)
+        check_login_user(cdata, auth_response, current_user)
     else:
-        check_login_user(cdata)
+        check_login_user(cdata, auth_response)
     
     # redirect
     return redirect(url_for("home.index"))

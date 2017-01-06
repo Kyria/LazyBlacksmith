@@ -8,7 +8,7 @@ from lazyblacksmith.models import EveUser
 from lazyblacksmith.models import db
 
    
-def check_login_user(character_data, main=None):
+def check_login_user(character_data, auth_response, main=None):
     try:
         user = EveUser.query.filter(
             EveUser.character_id == character_data['CharacterID'],
