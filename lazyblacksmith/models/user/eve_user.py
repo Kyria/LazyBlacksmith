@@ -26,13 +26,13 @@ class EveUser(db.Model, UserMixin):
     access_token = db.Column(db.String(100))
     access_token_expires = db.Column(UTCDateTime(timezone=True))
     refresh_token = db.Column(db.String(100))
-    
+
     main_character_id = db.Column(
         db.BigInteger,
         db.ForeignKey('eve_user.character_id'),
         nullable=True
     )
-    
+
     main_character = db.relationship(
         'EveUser',
         remote_side=[character_id],

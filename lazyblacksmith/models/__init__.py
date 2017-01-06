@@ -19,4 +19,5 @@ from .eve_api.item_adjusted_price import ItemAdjustedPrice  # noqa
 from .eve_api.item_price import ItemPrice  # noqa
 from .eve_api.task_status import TaskStatus  # noqa
 
-from .eve_user import EveUser  # noqa
+from .user.eve_user import EveUser  # noqa
+from .user.skill import Skill
