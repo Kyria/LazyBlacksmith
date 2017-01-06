@@ -19,4 +19,4 @@ from .eve_api.item_adjusted_price import ItemAdjustedPrice  # noqa
 from .eve_api.item_price import ItemPrice  # noqa
 from .eve_api.task_status import TaskStatus  # noqa
 
-from .sso.eveuser import EveUser  # noqa
+from .eve_user import EveUser  # noqa

@@ -15,15 +15,29 @@ from sqlalchemy import func
 
 class EveUser(db.Model, UserMixin):
 
-    character_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    character_id = db.Column(
+        db.BigInteger,
+        primary_key=True,
+        autoincrement=False
+    )
     character_owner_hash = db.Column(db.String(255))
     character_name = db.Column(db.String(200))
-    scopes = db.Column(db.String(200))
 
-    token_type = db.Column(db.String(20))
     access_token = db.Column(db.String(100))
     access_token_expires = db.Column(UTCDateTime(timezone=True))
     refresh_token = db.Column(db.String(100))
+    
+    main_character_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey('item.id'),
+        nullable=True
+    )
+    
+    alt_characters = db.relationship(
+        'EveUser',
+        backref='main_character',
+        lazy='dynamic',
+        foreign_keys='EveUser.parent_character_id')
 
     created_at = db.Column(
         UTCDateTime(timezone=True),
