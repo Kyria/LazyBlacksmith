@@ -29,7 +29,7 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.PrimaryKeyConstraint('character_id')
-
+    )
     op.create_foreign_key(None, 'eve_user', 'item', ['main_character_id'], ['id'])
     # ### end Alembic commands ###
 
@@ -49,4 +49,5 @@ def downgrade():
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.PrimaryKeyConstraint('character_id')
+    )
     # ### end Alembic commands ###
