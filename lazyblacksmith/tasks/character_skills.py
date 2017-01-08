@@ -48,7 +48,7 @@ def update_character_skills(character_id):
         db.session.commit()
 
     task_status = TaskStatus(
-        name='character_skill_update [%d]' % character_id,
+        name=TaskStatus.TASK_CHARACTER_SKILLS % character_id,
         expire=datetime(
             *parsedate(character_skills.header['Expires'][0])[:6]
         ).replace(tzinfo=pytz.utc),

@@ -13,6 +13,7 @@ from email.utils import parsedate
 import json
 import pytz
 
+
 @celery_app.task(name="schedule.update_industry_indexes")
 def update_industry_index():
     """ Get the industry indexes list from API. """
@@ -40,7 +41,7 @@ def update_industry_index():
         db.session.commit()
 
     task_status = TaskStatus(
-        name='schedule.update_industry_indexes',
+        name=TaskStatus.TASK_INDUSTRY_INDEX,
         expire=datetime(
             *parsedate(all_indexes.header['Expires'][0])[:6]
         ).replace(tzinfo=pytz.utc),
@@ -49,5 +50,5 @@ def update_industry_index():
     )
     db.session.merge(task_status)
     db.session.commit()
-    
+
     return (len(insert_index_list), len(insert_index_list))

@@ -54,12 +54,12 @@ def esi_region_order_price(region_id, item_id_list):
                     order_type='all',
                     page=page
             )
-            
+
             region_orders_res = esiclient.request(
                 op,
                 raw_body_only=True
             )
-            
+
             logger.debug('Request #%d %s [%d]' % (
                 retry,
                 op[0].url,
@@ -70,14 +70,14 @@ def esi_region_order_price(region_id, item_id_list):
 
         if region_orders_res.status != 200:
             data = (
-                op[0].url, 
-                op[0].query, 
+                op[0].url,
+                op[0].query,
                 region_orders_res.status,
-                region_orders_res.raw, 
+                region_orders_res.raw,
             )
             logger.error('Request failed after 3 tries [%s, %s, %d]: %s' % data)
             failed_data.append(data)
-            
+
             # if we have more than 2 fails, we stop gathering data as there
             # are too many missing page (when average page is around 2-3)
             if len(failed_data) > 2:
@@ -85,7 +85,7 @@ def esi_region_order_price(region_id, item_id_list):
             else:
                 continue
 
-        # get the latest expire 
+        # get the latest expire
         expire = max(
             expire,
             datetime(
@@ -162,7 +162,7 @@ def esi_region_order_price(region_id, item_id_list):
             )
 
         task_status = TaskStatus(
-            name='esi_region_order_price [%s]' % region_id,
+            name=TaskStatus.TASK_MARKET_ORDER % region_id,
             expire=expire,
             last_run=utcnow(),
             results=json.dumps({
@@ -174,7 +174,7 @@ def esi_region_order_price(region_id, item_id_list):
         )
         db.session.merge(task_status)
         db.session.commit()
-        
+
     except SQLAlchemyError as e:
         logger.error(
             'Something went wrong while trying to insert/update data: %s' % (
@@ -196,7 +196,7 @@ def update_market_price():
                 ItemPrice.item_id
             ).filter_by(region_id=region.id)
         ]
-        
+
         task_id = "%s-%s" % (
             utcnow().strftime('%Y%m%d-%H%M%S'),
             region.name

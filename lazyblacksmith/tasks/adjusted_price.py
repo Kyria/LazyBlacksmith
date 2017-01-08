@@ -13,6 +13,7 @@ from email.utils import parsedate
 import json
 import pytz
 
+
 @celery_app.task(name="schedule.update_adjusted_price")
 def update_adjusted_price():
     # delete everything from table first.
@@ -20,7 +21,7 @@ def update_adjusted_price():
     count = 0
 
     market_price = esiclient.request(get_markets_prices())
-    
+
     if market_price.status == 200:
         for item_price in market_price.data:
             count += 1
@@ -35,9 +36,9 @@ def update_adjusted_price():
             item_adjusted_price
         )
         db.session.commit()
-    
+
     task_status = TaskStatus(
-        name='schedule.update_adjusted_price',
+        name=TaskStatus.TASK_ADJUSTED_PRICE,
         expire=datetime(
             *parsedate(market_price.header['Expires'][0])[:6]
         ).replace(tzinfo=pytz.utc),
@@ -46,5 +47,5 @@ def update_adjusted_price():
     )
     db.session.merge(task_status)
     db.session.commit()
-    
+
     return count, count
