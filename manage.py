@@ -6,6 +6,7 @@ from flask_script import Manager
 import config
 
 from lazyblacksmith.app import create_app
+from lazyblacksmith.commands.admin import LbAdmin
 from lazyblacksmith.commands.manual_celery_tasks import ManualCeleryTasks
 from lazyblacksmith.commands.sde_import import SdeImport
 from lazyblacksmith.models import db
@@ -19,6 +20,7 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 manager.add_command('sde_import', SdeImport)
 manager.add_command('celery_task', ManualCeleryTasks)
+manager.add_command('lb_admin', LbAdmin)
 
 if __name__ == '__main__':
     manager.run()
