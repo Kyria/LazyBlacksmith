@@ -27,6 +27,8 @@ class EveUser(db.Model, UserMixin):
     access_token_expires = db.Column(UTCDateTime(timezone=True))
     refresh_token = db.Column(db.String(100))
 
+    is_admin = db.Column(db.Boolean, default=False)
+
     main_character_id = db.Column(
         db.BigInteger,
         db.ForeignKey('eve_user.character_id'),

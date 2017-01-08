@@ -43,6 +43,7 @@ def register_blueprints(app):
     from lazyblacksmith.views import price
     from lazyblacksmith.views import sso
     from lazyblacksmith.views import template
+    from lazyblacksmith.views import ucp
 
     """ register blueprints & helper blueprints """
     app.register_blueprint(ajax_eve_api, url_prefix='/ajax/eveapi')
@@ -51,10 +52,11 @@ def register_blueprints(app):
     app.register_blueprint(template, url_prefix='/template')
     app.register_blueprint(sso, url_prefix='/sso')
     app.register_blueprint(price, url_prefix='/price')
+    app.register_blueprint(ucp, url_prefix='/ucp')
     app.register_blueprint(home)
     app.register_blueprint(templatefilter)
 
-    
+
 def register_extensions(app):
     """Register Flask extensions."""
     db.app = app
@@ -65,7 +67,7 @@ def register_extensions(app):
     login_manager.init_app(app)
     celery_app.init_app(app)
 
-    
+
 
 def register_errorhandlers(app):
     """Add errorhandlers to the app."""

@@ -49,6 +49,8 @@
                         <li>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.character_name }} <span class="caret"></span></a>
                             <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('ucp.index') }}">Settings</a></li>
+                                <li role="separator" class="divider"></li>
                                 <li><a href="{{ url_for('sso.logout') }}">Logout</a></li>
                             </ul>
                         </li>
@@ -59,6 +61,16 @@
         </div>
 
         <div class="container-fluid">
+        {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
         {% block content %}{% endblock %}
         </div>
     </div>

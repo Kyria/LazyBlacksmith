@@ -1,19 +1,15 @@
 # -*- encoding: utf-8 -*-
 from flask import Blueprint
-from flask import flash
 from flask import redirect
 from flask import request
-from flask import session
 from flask import url_for
 from flask_login import current_user
 from flask_login import login_required
-from flask_login import login_user
 from flask_login import logout_user
 from flask_oauthlib.client import OAuthException
 
 from lazyblacksmith.extension.esipy import esisecurity
 from lazyblacksmith.extension.oauth import eve_oauth
-from lazyblacksmith.models import EveUser
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.login import check_login_user
 
@@ -57,7 +53,7 @@ def callback():
         check_login_user(cdata, auth_response, current_user)
     else:
         check_login_user(cdata, auth_response)
-    
+
     # redirect
     return redirect(url_for("home.index"))
 
