@@ -8,6 +8,10 @@ from lazyblacksmith.models import Skill
 from lazyblacksmith.models import db
 from lazyblacksmith.tasks.character_skills import update_character_skills
 
+import logging
+
+logger = logging.getLogger("%s.utils.login" % __name__)
+
 
 def check_login_user(cdata, auth_response, main=None):
     try:
@@ -44,16 +48,18 @@ def check_login_user(cdata, auth_response, main=None):
 
         if main is None:
             login_user(user)
-            flash('You were successfully logged in')
+            flash('You were successfully logged in.')
         else:
             flash(
                 'You successfully added "%s" to your alts' % (
                     user.character_name,
                 )
             )
+
     except:
+        logger.exception("Cannot login the user - uid: %d" % user.character_id)
         db.session.rollback()
-        flash('Something went wrong. Please contact the administrator')
+        flash('Something went wrong. Please try again')
 
 
 def wipe_character_data(user):
@@ -62,4 +68,7 @@ def wipe_character_data(user):
 
 
 def update_data(user):
-    update_character_skills.s(user.character_id).apply_async()
+    try:
+        update_character_skills.s(user.character_id).apply_async()
+    except:
+        logger.exception("Cannot update skills")
