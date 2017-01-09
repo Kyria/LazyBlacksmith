@@ -110,7 +110,7 @@
             <div>
                 Price Region<br>
                 <select name="region" id="region" class="form-control input-sm">
-                    <option disabled selected>Select a region</option>
+                    <option disabled>Select a region</option>
                     {% for region in regions -%}
                     <option value="{{ region.id }}" {% if region.id == 10000002 -%}selected{% endif %}>{{ region.name }}</option>
                     {% endfor %}
