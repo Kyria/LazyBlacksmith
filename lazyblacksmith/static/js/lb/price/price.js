@@ -3,6 +3,11 @@ var itemPriceLookup = (function ($, lb, Humanize) {
 
     var sorting = [[1,1]];
     var regions = {};
+    var items = {};
+
+    // hash data
+    var itemNameHash = "";
+    var itemIdHash = false;
 
     var options = {
         useIcons: false,
@@ -50,6 +55,9 @@ var itemPriceLookup = (function ($, lb, Humanize) {
 
             // for each items in data
             for(var item in data) {
+                if(data[item].name == itemNameHash) {
+                    itemIdHash = data[item].id;
+                }
                 var view = resultRow.replace(/@@ID@@/, data[item].id)
                                     .replace(/@@ICON@@/, data[item].icon)
                                     .replace(/@@NAME@@/g, data[item].name);
@@ -77,9 +85,15 @@ var itemPriceLookup = (function ($, lb, Humanize) {
 
                 // get price
                 _searchPrice($(this).attr('data-id'));
-                return false;
-            })
 
+                items[$(this).attr('data-name')] = $(this).attr('data-id');
+                window.location.hash = $(this).attr('data-name').replace(/ /g, '_');
+                return false;
+            });
+
+            if(itemIdHash) {
+                $(".search-price[data-id='"+itemIdHash+"']").click();
+            }
         })
         .fail(function() {
             $(itemSearchBodyResult).html("");
@@ -111,7 +125,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
 
     }
 
-    
+
     /**
      * Runner function
      */
@@ -158,6 +172,14 @@ var itemPriceLookup = (function ($, lb, Humanize) {
             headerTemplate : '{content} {icon}',
             widgets : ["uitheme"],
         });
+
+        // if hash is present, load data and prices
+        if(window.location.hash) {
+            itemNameHash = window.location.hash.split('#')[1].replace(/_/g, ' ');
+            $('#itemSearch').val(itemNameHash);
+            _searchItem(itemNameHash);
+        }
+
     };
 
 
