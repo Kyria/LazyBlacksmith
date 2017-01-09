@@ -14,8 +14,9 @@
 
 {% if config.DEBUG %}
     <link href="{{ url_for('static', filename='less/theme-default/bootstrap.less') }}" rel="stylesheet/less">
+    <link href="{{ url_for('static', filename='css/animate.css') }}" rel="stylesheet">
 {% else %}
-    <link href="{{ url_for('static', filename='css/theme-default.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme-default-combined.min.css') }}" rel="stylesheet">
 {% endif %}
 </head>
 
@@ -61,16 +62,6 @@
         </div>
 
         <div class="container-fluid">
-        {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-
         {% block content %}{% endblock %}
         </div>
     </div>
@@ -80,7 +71,7 @@
             <span class="text-muted"><a href="https://github.com/Kyria/LazyBlacksmith#readme">LazyB.</a> &copy; Kyria.</span>
         </div>
     </footer>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
     {% block modal %}{% endblock %}
 {% if config.DEBUG %}
@@ -101,6 +92,7 @@
     <script src="{{ url_for('static', filename='js/jquery/jquery.typewatch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery.tablesorter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery/bootstrap-notify.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/humanize.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/typeahead.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/utils.js') }}"></script>
@@ -118,6 +110,14 @@
         lb.urls.indexActivityUrl    = "{{ url_for('ajax_eve_api.get_index_activity', solar_system_names='SYSTEM_LIST_TO_REPLACE') }}";
         lb.urls.priceUrl            = "{{ url_for('ajax_eve_api.get_price', item_list='ITEM_LIST_TO_REPLACE') }}";
         lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
+        
+        {% with messages = get_flashed_messages(with_categories=true) -%}
+            {%- if messages -%}
+                {%- for category, message in messages -%}
+                utils.flashNotify("{{ message }}", '{{ category }}');
+                {% endfor -%}
+            {%- endif -%}
+        {%- endwith %}
     </script>
 
 {% block js %}{% endblock %}

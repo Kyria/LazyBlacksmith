@@ -3,6 +3,7 @@ from flask import Blueprint
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask import flash
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import logout_user
@@ -30,6 +31,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash("You have been logged out successfully.", 'info')
     return redirect(url_for("home.index"))
 
 

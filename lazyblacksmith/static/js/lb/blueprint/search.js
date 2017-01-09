@@ -66,7 +66,7 @@ var searchBlueprint = (function ($, lb) {
                 $(blueprintBodyResult).html(htmlResult);
             }
         })
-        .error(function() {
+        .fail(function() {
             $(blueprintBodyResult).html('<tr><td colspan="2">Error while trying to get results.</td></tr>');
         });
     };

@@ -1,5 +1,13 @@
-var utils = (function() {
+var utils = (function($) {
     "use strict";
+    
+    var flashMessageType = {
+        'info': 'fa fa-info-circle',
+        'success': 'fa fa-check-circle',
+        'warning': 'fa fa-exclamation-triangle',
+        'danger': 'fa fa-exclamation-circle',
+    };
+    
     var durationToString = function(duration) {
         var days = Math.floor(duration / (24 * 3600));
         var duration = duration % (24 * 3600)
@@ -23,10 +31,33 @@ var utils = (function() {
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/i.test(method));
     };
+    
+    /**
+     * Display a flash message using grawl like notifications.
+     */
+    var flashNotify = function(message, type) {
+        var finalType = type;
+        if(!(type in flashMessageType)) {
+            finalType = 'info';
+        }
+        
+        $.notify({
+            icon: flashMessageType[finalType],
+            message: message,
+        }, {
+            type: finalType,
+            allow_dismiss: false,
+            offset: {
+                x: 20,
+                y: 60,
+            },
+        });
+    }
 
     return {
         durationToString: durationToString,
         csrfSafeMethod: csrfSafeMethod,
+        flashNotify: flashNotify,
     }
 
-})();
+})(jQuery);

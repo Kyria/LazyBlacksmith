@@ -81,7 +81,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
             })
 
         })
-        .error(function() {
+        .fail(function() {
             $(itemSearchBodyResult).html("");
         });
     };

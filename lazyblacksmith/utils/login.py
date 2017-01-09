@@ -48,18 +48,18 @@ def check_login_user(cdata, auth_response, main=None):
 
         if main is None:
             login_user(user)
-            flash('You were successfully logged in.')
+            flash('You have successfully logged in.', 'success')
         else:
             flash(
-                'You successfully added "%s" to your alts' % (
+                'You have successfully added "%s" to your alts list' % (
                     user.character_name,
-                )
+                ), 'success'
             )
 
     except:
         logger.exception("Cannot login the user - uid: %d" % user.character_id)
         db.session.rollback()
-        flash('Something went wrong. Please try again')
+        flash('Something went wrong. Please try to login again', 'error')
 
 
 def wipe_character_data(user):
