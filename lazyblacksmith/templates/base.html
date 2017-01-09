@@ -50,7 +50,7 @@
                         <li>
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.character_name }} <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('ucp.index') }}">Settings</a></li>
+                                <li><a href="{{ url_for('account.index') }}">Settings</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ url_for('sso.logout') }}">Logout</a></li>
                             </ul>
@@ -110,7 +110,7 @@
         lb.urls.indexActivityUrl    = "{{ url_for('ajax_eve_api.get_index_activity', solar_system_names='SYSTEM_LIST_TO_REPLACE') }}";
         lb.urls.priceUrl            = "{{ url_for('ajax_eve_api.get_price', item_list='ITEM_LIST_TO_REPLACE') }}";
         lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
-        
+
         {% with messages = get_flashed_messages(with_categories=true) -%}
             {%- if messages -%}
                 {%- for category, message in messages -%}

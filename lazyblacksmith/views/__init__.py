@@ -12,5 +12,5 @@ from ajax.eve_api import ajax_eve_api
 from ajax.eve_sde import ajax_eve_sde
 
 # user related stuff
+from .user.account import account
 from .user.sso import sso
-from .user.ucp import ucp
