@@ -2,7 +2,7 @@
 from flask import Flask
 from flask import g
 from flask import render_template
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf.csrf import CSRFProtect
 
 import flask_login
 
@@ -61,7 +61,7 @@ def register_extensions(app):
     """Register Flask extensions."""
     db.app = app
     db.init_app(app)
-    csrf = CsrfProtect()
+    csrf = CSRFProtect()
     csrf.init_app(app)
     cache.init_app(app)
     login_manager.init_app(app)
