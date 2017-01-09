@@ -55,7 +55,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
 
             // for each items in data
             for(var item in data) {
-                if(data[item].name == itemNameHash) {
+                if(data[item].name.toLowerCase() == itemNameHash) {
                     itemIdHash = data[item].id;
                 }
                 var view = resultRow.replace(/@@ID@@/, data[item].id)
@@ -87,7 +87,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
                 _searchPrice($(this).attr('data-id'));
 
                 items[$(this).attr('data-name')] = $(this).attr('data-id');
-                window.location.hash = $(this).attr('data-name').replace(/ /g, '_');
+                window.location.hash = $(this).attr('data-name').replace(/ /g, '_').toLowerCase();
                 return false;
             });
 
@@ -175,7 +175,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
 
         // if hash is present, load data and prices
         if(window.location.hash) {
-            itemNameHash = window.location.hash.split('#')[1].replace(/_/g, ' ');
+            itemNameHash = window.location.hash.split('#')[1].replace(/_/g, ' ').toLowerCase();
             $('#itemSearch').val(itemNameHash);
             _searchItem(itemNameHash);
         }
