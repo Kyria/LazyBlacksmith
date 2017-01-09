@@ -6,7 +6,6 @@ from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
-from lazyblacksmith.utils.time import utcnow
 
 import humanize
 
@@ -32,11 +31,10 @@ def get_price(item_list):
             if price.region_id not in item_price_list:
                 item_price_list[price.region_id] = {}
 
-            update_delta = price.updated_at - utcnow()
             item_price_list[price.region_id][price.item_id] = {
                 'sell': price.sell_price,
                 'buy': price.buy_price,
-                'updated_at': humanize.naturaltime(update_delta),
+                'updated_at': humanize.naturaltime(price.get_delta_update()),
             }
 
         # get all items adjusted price
