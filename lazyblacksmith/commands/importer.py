@@ -13,6 +13,7 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import OreRefining
 from lazyblacksmith.models import Region
+from lazyblacksmith.models import Skill
 from lazyblacksmith.models import SolarSystem
 
 
@@ -21,6 +22,7 @@ class Importer(object):
     # Import object in the list must be class from models to work
     IMPORT_ORDER = [
         Item,
+        Skill,
         OreRefining,
         Decryptor,
         Activity,
@@ -153,6 +155,9 @@ class Importer(object):
             )
 
         return (added, total)
+
+    def import_skill(self):
+        return (0, 0)
 
     def import_orerefining(self):
         """
