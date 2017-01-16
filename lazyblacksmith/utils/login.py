@@ -3,9 +3,9 @@ from flask import flash
 from flask_login import login_user
 from sqlalchemy.orm.exc import NoResultFound
 
+from lazyblacksmith.models import Skill
 from lazyblacksmith.models import User
 from lazyblacksmith.models import UserPreference
-from lazyblacksmith.models import Skill
 from lazyblacksmith.models import db
 from lazyblacksmith.tasks.character_skills import update_character_skills
 
@@ -75,12 +75,11 @@ def update_data(user):
         logger.exception("Cannot update skills")
 
     if not user.pref and not user.main_character:
-        try:               
+        try:
             prefs = UserPreference()
-            prefs.user = userpref
+            prefs.user = user
             db.session.merge(prefs)
             db.session.commit()
         except:
             logger.exception("Failed to initialize user preference")
             db.session.rollback()
-            

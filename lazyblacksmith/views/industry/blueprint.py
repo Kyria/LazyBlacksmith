@@ -112,10 +112,10 @@ def research(item_id):
         ).one_or_none()
         for level in xrange(0, 11):
             if price:
-                buy_price = price.buy_price 
+                buy_price = price.buy_price
             else:
                 buy_price = item_adjusted_price.price
-                
+
             if level not in cost_per_me:
                 cost_per_me[level] = {
                     'job_price_run': 0,
@@ -125,7 +125,7 @@ def research(item_id):
             adjusted_quantity = max(1, me_bonus * material.quantity)
             job_price_run = max(1, ceil(adjusted_quantity)) * buy_price
             job_price_max_run = max(
-                item.max_production_limit, 
+                item.max_production_limit,
                 ceil(item.max_production_limit * adjusted_quantity)
             ) * buy_price
 
