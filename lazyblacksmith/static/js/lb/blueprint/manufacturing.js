@@ -1,4 +1,4 @@
-var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
+var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     "use strict";
 
     var ACTIVITY_MANUFACTURING = 1;
@@ -73,80 +73,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     var modalPriceUpdatePrice = true;
 
     // assembly informations
-    var assemblyStats = [
-        { // station
-            "me": 1.0,
-            "te": 1.0,
-            "name": 'Station',
-            "structure": false,
-        },
-        { // Assembly Array
-            "me": 0.98,
-            "te": 0.75,
-            "name": 'Assembly Array',
-            "structure": false,
-        },
-        { // Thukker Component Array
-            "me": 0.9,
-            "te": 0.75,
-            "name": 'Thukker Component Array',
-            "structure": false,
-        },
-        { // Rapid Assembly Array
-            "me": 1.05,
-            "te": 0.65,
-            "name": 'Rapid Assembly Array',
-            "structure": false,
-        },
-        {
-            "me": 0.99,
-            "te": 0.85,
-            "name": 'Raitaru',
-            "structure": true,
-        },
-        {
-            "me": 0.99,
-            "te": 0.80,
-            "name": 'Azbel',
-            "structure": true,
-        },
-        {
-            "me": 0.99,
-            "te": 0.70,
-            "name": 'Sotiyo',
-            "structure": true,
-        },
-        { // station
-            "me": 1.0,
-            "te": 1.0,
-            "name": 'Other Structures',
-            "structure": true,
-        },
-    ];
+    var facilityStats = eveData.facilities;
+    var structureRigs = eveData.structureRigs;
+    var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
 
-    var structureRigs = [
-        { // No rig bonus
-            'me': 0,
-            'te': 0,
-            "meta": "None",
-        },
-        { // t1 rig bonus
-            'me': 0.02,
-            'te': 0.20,
-            "meta": "T1",
-        },
-        { // t2 rig bonus
-            'me': 0.024,
-            'te': 0.24,
-            "meta": "T2",
-        }
-    ];
-
-    var structureSecStatusMultiplier = {
-        'h': 1.0,  // High Sec
-        'l': 1.9,  // Low Sec
-        'n': 2.1,  // Null Sec / WH
-    }
 
     // -------------------------------------------------
     // Material list generators and ajax getters
@@ -307,12 +237,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                 material.timeTotal = eveUtils.calculateJobTime(
                     material.timePerRun,
                     material.runs,
-                    assemblyStats[material.facility].te,
+                    facilityStats[material.facility].bpTe,
                     material.timeEfficiency,
                     options.industryLvl, options.advancedIndustryLvl,
                     0, 0, 0,
-                    structureRigs[material.structureTeRig].te, structureSecStatusMultiplier[material.structureSecStatus],
-                    assemblyStats[material.facility].structure, false
+                    structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                    facilityStats[material.facility].structure, false
                 );
 
                 var timeHuman = utils.durationToString(material.timePerRun);
@@ -333,10 +263,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                     subMaterial.qtyAdjusted = eveUtils.calculateAdjustedQuantity(
                         subMaterial.qtyRequiredPerRun,
                         material.materialEfficiency,
-                        assemblyStats[material.facility].me,
-                        structureRigs[material.structureMeRig].me,
+                        facilityStats[material.facility].bpMe,
+                        structureRigs[material.structureMeRig].materialBonus,
                         structureSecStatusMultiplier[material.structureSecStatus],
-                        assemblyStats[material.facility].structure
+                        facilityStats[material.facility].structure
                     );
                     subMaterial.qtyJob = eveUtils.calculateJobQuantity(
                         subMaterial.qtyAdjusted,
@@ -361,7 +291,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                                      .replace(/@@QTY@@/g, material.qtyJob)
                                      .replace(/@@RUN@@/g, material.runs)
                                      .replace(/@@SYSTEM@@/g, material.manufacturingSystem)
-                                     .replace(/@@FACILITY_NAME@@/g, assemblyStats[material.facility].name)
+                                     .replace(/@@FACILITY_NAME@@/g, facilityStats[material.facility].name)
                                      .replace(/@@ACTIVITY_TIME_HUMAN@@/g, timeHuman)
                                      .replace(/@@ACTIVITY_TIME_TOTAL@@/g, timeTotalHuman)
                                      .replace(/@@BOM@@/g, rows);
@@ -432,10 +362,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
                 material.qtyRequiredPerRun,
                 options.materialEfficiency,
-                assemblyStats[parentMaterial.facility].me,
-                structureRigs[parentMaterial.structureMeRig].me,
+                facilityStats[parentMaterial.facility].bpMe,
+                structureRigs[parentMaterial.structureMeRig].materialBonus,
                 structureSecStatusMultiplier[parentMaterial.structureSecStatus],
-                assemblyStats[parentMaterial.facility].structure
+                facilityStats[parentMaterial.facility].structure
             );
             var quantityJob = eveUtils.calculateJobQuantity(
                 quantityAdjusted,
@@ -488,10 +418,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
                 var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
                     subMaterial.qtyRequiredPerRun,
                     material.materialEfficiency,
-                    assemblyStats[material.facility].me,
-                    structureRigs[material.structureMeRig].me,
+                    facilityStats[material.facility].bpMe,
+                    structureRigs[material.structureMeRig].materialBonus,
                     structureSecStatusMultiplier[material.structureSecStatus],
-                    assemblyStats[material.facility].structure
+                    facilityStats[material.facility].structure
                 );
                 var quantityJob = eveUtils.calculateJobQuantity(
                     quantityAdjusted,
@@ -519,22 +449,22 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         var time_per_run = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
             1,
-            assemblyStats[material.facility].te,
+            facilityStats[material.facility].bpTe,
             options.timeEfficiency,
             options.industryLvl, options.advancedIndustryLvl,
             options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
-            structureRigs[material.structureTeRig].te, structureSecStatusMultiplier[material.structureSecStatus],
-            assemblyStats[material.facility].structure, true
+            structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+            facilityStats[material.facility].structure, true
         );
         var time = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
             options.runs,
-            assemblyStats[material.facility].te,
+            facilityStats[material.facility].bpTe,
             options.timeEfficiency,
             options.industryLvl, options.advancedIndustryLvl,
             options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
-            structureRigs[material.structureTeRig].te, structureSecStatusMultiplier[material.structureSecStatus],
-            assemblyStats[material.facility].structure, true
+            structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+            facilityStats[material.facility].structure, true
         );
 
         materialsData.materials[materialsData.productItemId].timeTotal = time;
@@ -565,23 +495,23 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             var time = eveUtils.calculateJobTime(
                 material.timePerRun,
                 material.runs,
-                assemblyStats[material.facility].te,
+                facilityStats[material.facility].bpTe,
                 material.timeEfficiency,
                 options.industryLvl, options.advancedIndustryLvl,
                 0, 0, 0,
-                structureRigs[material.structureTeRig].te, structureSecStatusMultiplier[material.structureSecStatus],
-                assemblyStats[material.facility].structure, false
+                structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                facilityStats[material.facility].structure, false
             );
 
             var time_per_run = eveUtils.calculateJobTime(
                 material.timePerRun,
                 1,
-                assemblyStats[material.facility].te,
+                facilityStats[material.facility].bpTe,
                 material.timeEfficiency,
                 options.industryLvl, options.advancedIndustryLvl,
                 0, 0, 0,
-                structureRigs[material.structureTeRig].te, structureSecStatusMultiplier[material.structureSecStatus],
-                assemblyStats[material.facility].structure, false
+                structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                facilityStats[material.facility].structure, false
             );
 
             material.timeTotal = time;
@@ -644,7 +574,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
      * @param the id of the blueprint we update
      */
     var _updateComponentBpInfoDisplay = function(id) {
-        if(assemblyStats[materialsData.materials[id].facility].structure) {
+        if(facilityStats[materialsData.materials[id].facility].structure) {
             var ss = "Security: ";
             if(materialsData.materials[id].structureSecStatus == 'h') {
                 ss += "High Sec";
@@ -666,7 +596,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         $('.sub-list-'+ id +' .system').html(materialsData.materials[id].manufacturingSystem);
         $('.sub-list-'+ id +' .me').html(materialsData.materials[id].materialEfficiency);
         $('.sub-list-'+ id +' .te').html(materialsData.materials[id].timeEfficiency);
-        $('.sub-list-'+ id +' .facility').html(assemblyStats[materialsData.materials[id].facility].name);
+        $('.sub-list-'+ id +' .facility').html(facilityStats[materialsData.materials[id].facility].name);
 
     };
 
@@ -926,7 +856,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         $('#facility').on('change', function() {
             var facility = parseInt($('#facility').val());
             materialsData.materials[materialsData.productItemId].facility = facility;
-            _toggleStructureConfigsDisplay(assemblyStats[facility].structure, false);
+            _toggleStructureConfigsDisplay(facilityStats[facility].structure, false);
             _updateTime();
             _updateMaterial();
         });
@@ -946,7 +876,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
 
         $('#modal-facility').on('change', function() {
             var facility = parseInt($('#modal-facility').val());
-            _toggleStructureConfigsDisplay(assemblyStats[facility].structure, true);
+            _toggleStructureConfigsDisplay(facilityStats[facility].structure, true);
         });
 
         $("#raw-components input[type='checkbox']").on('change', _componentButtonOnStateChange);
@@ -1459,6 +1389,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         // functions
         run: run,
     };
-})(jQuery, lb, utils, eveUtils, Humanize);
+})(jQuery, lb, utils, eveUtils, eveData, Humanize);
 
 lb.registerModule('manufacturingBlueprint', manufacturingBlueprint);

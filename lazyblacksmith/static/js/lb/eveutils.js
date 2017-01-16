@@ -282,6 +282,7 @@ var eveUtils = (function() {
         }
     };
 
+    
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
         calculateJobQuantity: calculateJobQuantity,

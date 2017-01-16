@@ -1,4 +1,4 @@
-var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
+var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     "use strict"
 
     var ACTIVITY_RESEARCHING_TIME_EFFICIENCY = 3;
@@ -55,78 +55,9 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     });
 
     // assembly informations
-    var facilityStats = [
-        { // station
-            "me": 1.0,
-            "te": 1.0,
-            "copy": 1.0,
-            "name": 'Station',
-            "structure": false,
-        },
-        { // Laboratory
-            "me": 0.7,
-            "te": 0.7,
-            "copy": 0.6,
-            "name": 'Laboratory',
-            "structure": false,
-        },
-        { // Hyasyoda Laboratory
-            "me": 0.65,
-            "te": 0.65,
-            "copy": 0.6,
-            "name": 'Hyasyoda Laboratory',
-            "structure": false,
-        },
-        {
-            "me": 0.85,
-            "te": 0.85,
-            "copy": 0.85,
-            "name": 'Raitaru',
-            "structure": true,
-        },
-        {
-            "me": 0.80,
-            "te": 0.80,
-            "copy": 0.80,
-            "name": 'Azbel',
-            "structure": true,
-        },
-        {
-            "me": 0.70,
-            "te": 0.70,
-            "copy": 0.70,
-            "name": 'Sotiyo',
-            "structure": true,
-        },
-        { // station
-            "me": 1.0,
-            "te": 1.0,
-            "copy": 1.0,
-            "name": 'Other Structures',
-            "structure": true,
-        },
-    ];
-
-    var structureRigs = [
-        { // No rig bonus
-            'bonus': 0,
-            "meta": "None",
-        },
-        { // t1 rig bonus
-            'bonus': 0.20,
-            "meta": "T1",
-        },
-        { // t2 rig bonus
-            'bonus': 0.24,
-            "meta": "T2",
-        }
-    ];
-
-    var structureSecStatusMultiplier = {
-        'h': 1.0,  // High Sec
-        'l': 1.9,  // Low Sec
-        'n': 2.1,  // Null Sec / WH
-    };
+    var facilityStats = eveData.facilities;
+    var structureRigs = eveData.structureRigs;
+    var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
 
 
     /**
@@ -162,7 +93,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             options.copyImplant,
             options.scienceLevel,
             options.advancedIndustryLevel,
-            structureRigs[options.structureCopyRig].bonus,
+            structureRigs[options.structureCopyRig].timeBonus,
             structureSecStatusMultiplier[options.structureSecStatus],
             facilityStats[options.facility].structure
         );
@@ -192,11 +123,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             var METime = eveUtils.calculateResearchTime(
                 options.baseMeTime,
                 level,
-                facilityStats[options.facility].me,
+                facilityStats[options.facility].jobMe,
                 options.meImplant,
                 options.metallurgyLevel,
                 options.advancedIndustryLevel,
-                structureRigs[options.structureMeRig].bonus,
+                structureRigs[options.structureMeRig].timeBonus,
                 structureSecStatusMultiplier[options.structureSecStatus],
                 facilityStats[options.facility].structure
             );
@@ -209,11 +140,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             var TETime = eveUtils.calculateResearchTime(
                 options.baseTeTime,
                 level,
-                facilityStats[options.facility].te,
+                facilityStats[options.facility].jobTe,
                 options.teImplant,
                 options.researchLevel,
                 options.advancedIndustryLevel,
-                structureRigs[options.structureTeRig].bonus,
+                structureRigs[options.structureTeRig].timeBonus,
                 structureSecStatusMultiplier[options.structureSecStatus],
                 facilityStats[options.facility].structure
             );
@@ -504,6 +435,6 @@ var researchBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         // functions
         run: run,
     };
-})(jQuery, lb, utils, eveUtils, Humanize);
+})(jQuery, lb, utils, eveUtils, eveData, Humanize);
 
 lb.registerModule('researchBlueprint', researchBlueprint);

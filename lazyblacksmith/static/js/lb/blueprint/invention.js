@@ -1,4 +1,4 @@
-var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
+var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     "use strict"
 
     var ACTIVITY_COPYING = 5;
@@ -77,71 +77,10 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
     var outputPrices = false;
 
     // assembly informations
-    var facilityStats = [
-        { // station
-            "copy": 1.0,
-            "invention": 1.0,
-            "name": 'Station',
-            "structure": false,
-        },
-        { // Laboratory
-            "copy": 0.6,
-            "invention": 0.5,
-            "name": 'Laboratory',
-            "structure": false,
-        },
-        { // experimental lab
-            "copy": 1.0,
-            "invention": 1.0,
-            "name": 'Experimental Laboratory',
-            "structure": false,
-        },
-        {
-            "copy": 0.85,
-            "invention": 0.85,
-            "name": 'Raitaru',
-            "structure": true,
-        },
-        {
-            "copy": 0.80,
-            "invention": 0.80,
-            "name": 'Azbel',
-            "structure": true,
-        },
-        {
-            "copy": 0.70,
-            "invention": 0.70,
-            "name": 'Sotiyo',
-            "structure": true,
-        },
-        { // station
-            "copy": 1.0,
-            "invention": 1.0,
-            "name": 'Other Structures',
-            "structure": true,
-        },
-    ];
+    var facilityStats = eveData.facilities;
+    var structureRigs = eveData.structureRigs;
+    var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
 
-    var structureRigs = [
-        { // No rig bonus
-            'bonus': 0,
-            "meta": "None",
-        },
-        { // t1 rig bonus
-            'bonus': 0.20,
-            "meta": "T1",
-        },
-        { // t2 rig bonus
-            'bonus': 0.24,
-            "meta": "T2",
-        }
-    ];
-
-    var structureSecStatusMultiplier = {
-        'h': 1.0,  // High Sec
-        'l': 1.9,  // Low Sec
-        'n': 2.1,  // Null Sec / WH
-    };
 
     // Ajax calls
     // -----------
@@ -229,7 +168,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             options.baseInventionTime,
             facilityStats[options.facility].invention,
             options.advancedIndustryLevel,
-            structureRigs[options.structureInventionRig].bonus,
+            structureRigs[options.structureInventionRig].timeBonus,
             structureSecStatusMultiplier[options.structureSecStatus],
             facilityStats[options.facility].structure
         );
@@ -249,7 +188,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
             options.copyImplant,
             options.scienceLevel,
             options.advancedIndustryLevel,
-            structureRigs[options.structureCopyRig].bonus,
+            structureRigs[options.structureCopyRig].timeBonus,
             structureSecStatusMultiplier[options.structureSecStatus],
             facilityStats[options.facility].structure
         );
@@ -524,6 +463,6 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, Humanize) {
         // functions
         run: run,
     };
-})(jQuery, lb, utils, eveUtils, Humanize);
+})(jQuery, lb, utils, eveUtils, eveData, Humanize);
 
 lb.registerModule('inventionBlueprint', inventionBlueprint);
