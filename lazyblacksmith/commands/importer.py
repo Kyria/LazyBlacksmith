@@ -13,6 +13,7 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import OreRefining
 from lazyblacksmith.models import Region
+from lazyblacksmith.models import Skill
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import db
 
