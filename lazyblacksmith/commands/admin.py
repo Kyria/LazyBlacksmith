@@ -3,7 +3,7 @@ from flask_script import Command
 from flask_script import Option
 from sqlalchemy import func
 
-from lazyblacksmith.models import EveUser
+from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 
 
@@ -30,8 +30,8 @@ class LbAdmin(Command):
 
     def run(self, add, delete):
         if add is not None:
-            user = EveUser.query.filter(
-                func.lower(EveUser.character_name) == func.lower(add)
+            user = User.query.filter(
+                func.lower(User.character_name) == func.lower(add)
             ).one_or_none()
 
             if user is None:
@@ -41,8 +41,8 @@ class LbAdmin(Command):
             user.is_admin = True
 
         elif delete is not None:
-            user = EveUser.query.filter(
-                func.lower(EveUser.character_name) == func.lower(delete)
+            user = User.query.filter(
+                func.lower(User.character_name) == func.lower(delete)
             ).one_or_none()
 
             if user is None:

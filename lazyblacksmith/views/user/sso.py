@@ -4,6 +4,8 @@ from flask import redirect
 from flask import request
 from flask import url_for
 from flask import flash
+from urlparse import urlparse
+from urlparse import urljoin
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import logout_user
@@ -22,6 +24,18 @@ def login():
     return eve_oauth.authorize(
         callback=url_for(
             'sso.callback',
+            next='home.index',
+            _external=True
+        ),
+    )
+
+
+@sso.route('/add_alt')
+def add_alt():
+    return eve_oauth.authorize(
+        callback=url_for(
+            'sso.callback',
+            next='account.index',
             _external=True
         ),
     )
@@ -38,7 +52,6 @@ def logout():
 @sso.route('/callback')
 def callback():
     auth_response = eve_oauth.authorized_response()
-
     if auth_response is None:
         return 'Access denied: reason=%s error=%s' % (
             request.args['error_reason'],
@@ -57,7 +70,10 @@ def callback():
         check_login_user(cdata, auth_response)
 
     # redirect
-    return redirect(url_for("home.index"))
+    try:
+        return redirect(url_for(request.args.get('next')))
+    except:
+        return redirect(url_for("home.index"))
 
 
 @eve_oauth.tokengetter

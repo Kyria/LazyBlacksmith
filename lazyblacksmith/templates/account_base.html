@@ -18,7 +18,9 @@
                 <div class="col-md-4 col-sm-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <div class="pull-right"><button class="btn btn-xs btn-success"><i class="fa fa-plus" aria-hidden="true"></i></button></div>
+                            <div class="pull-right">
+                                <a class="btn btn-xs btn-success" href="{{ url_for('sso.add_alt') }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                            </div>
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Alts</h3>
                         </div>
                         <div class="panel-body">
@@ -57,13 +59,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td>Update Skills</td><td>01/01/2017 13:37:00</td>
-                                    <td><button style="margin-left:5px" class="btn btn-xs btn-info pull-right"><i class="fa fa-refresh" aria-hidden="true"></i></button>
-                                    <button class="btn btn-xs btn-default pull-right" style="margin-left:5px"><i class="fa fa-cog" aria-hidden="true"></i></button></td>
-                                </tr>
-                                <tr><td>Update Assets</td><td>01/01/2017 13:37:00</td>
-                                    <td><button style="margin-left:5px" class="btn btn-xs btn-info pull-right"><i class="fa fa-refresh" aria-hidden="true"></i></button>
-                                    <button class="btn btn-xs btn-default pull-right" style="margin-left:5px"><i class="fa fa-cog" aria-hidden="true"></i></button></td>
+                                <tr><td>Update Skills</td><td>{{ skill_status.get_last_run_format() }}</td>
+                                    <td>
+                                        <button style="margin-left:5px" class="btn btn-xs btn-info pull-right">
+                                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-default pull-right" style="margin-left:5px">
+                                            <i class="fa fa-cog" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             </tbody>
                             </table>

@@ -13,7 +13,7 @@ from flask_login import UserMixin
 from sqlalchemy import func
 
 
-class EveUser(db.Model, UserMixin):
+class User(db.Model, UserMixin):
 
     character_id = db.Column(
         db.BigInteger,
@@ -29,18 +29,6 @@ class EveUser(db.Model, UserMixin):
 
     is_admin = db.Column(db.Boolean, default=False)
 
-    main_character_id = db.Column(
-        db.BigInteger,
-        db.ForeignKey('eve_user.character_id'),
-        nullable=True
-    )
-
-    main_character = db.relationship(
-        'EveUser',
-        remote_side=[character_id],
-        backref=db.backref('alts_characters', lazy='dynamic')
-    )
-
     created_at = db.Column(
         UTCDateTime(timezone=True),
         server_default=func.now()
@@ -50,6 +38,19 @@ class EveUser(db.Model, UserMixin):
        server_default=func.now(),
        onupdate=func.now()
     )
+    
+    # foreign keys
+    main_character_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey('user.character_id'),
+        nullable=True
+    )
+    main_character = db.relationship(
+        'User',
+        remote_side=[character_id],
+        backref=db.backref('alts_characters', lazy='dynamic')
+    )
+
 
     def get_portrait_url(self, datasource='tranquility', size=128):
         """returns URL to Character portrait from EVE Image Server"""

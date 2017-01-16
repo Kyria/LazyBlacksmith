@@ -13,10 +13,10 @@ account = Blueprint('account', __name__)
 @account.route('/')
 @login_required
 def index():
-    status = TaskStatus.query.get(
+    skill_status = TaskStatus.query.get(
         TaskStatus.TASK_CHARACTER_SKILLS % current_user.character_id
     )
 
     return render_template('account_base.html', **{
-
+        'skill_status': skill_status,
     })

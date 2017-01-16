@@ -109,8 +109,13 @@ def research(item_id):
         price = ItemPrice.query.filter(
             ItemPrice.item_id == material.material_id,
             ItemPrice.region_id == 10000002,
-        ).one()
+        ).one_or_none()
         for level in xrange(0, 11):
+            if price:
+                buy_price = price.buy_price 
+            else:
+                buy_price = item_adjusted_price.price
+                
             if level not in cost_per_me:
                 cost_per_me[level] = {
                     'job_price_run': 0,
@@ -118,8 +123,11 @@ def research(item_id):
                 }
             me_bonus = (1.00 - level / 100.00)
             adjusted_quantity = max(1, me_bonus * material.quantity)
-            job_price_run = max(1, ceil(adjusted_quantity)) * price.buy_price
-            job_price_max_run = max(item.max_production_limit, ceil(item.max_production_limit * adjusted_quantity)) * price.buy_price
+            job_price_run = max(1, ceil(adjusted_quantity)) * buy_price
+            job_price_max_run = max(
+                item.max_production_limit, 
+                ceil(item.max_production_limit * adjusted_quantity)
+            ) * buy_price
 
             cost_per_me[level]['job_price_run'] += job_price_run
             cost_per_me[level]['job_price_max_run'] += job_price_max_run

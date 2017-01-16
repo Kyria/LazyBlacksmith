@@ -10,14 +10,14 @@ class Skill(db.Model):
     )
     character_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('eve_user.character_id'),
+        db.ForeignKey('user.character_id'),
         primary_key=True,
     )
 
     level = db.Column(db.Integer, nullable=False, default=0)
 
     character = db.relationship(
-        'EveUser',
+        'User',
         remote_side=[character_id],
         backref=db.backref('skills', lazy='dynamic')
     )

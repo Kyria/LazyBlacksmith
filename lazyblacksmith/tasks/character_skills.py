@@ -3,7 +3,7 @@ from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy import esisecurity
 from lazyblacksmith.extension.esipy.operations import get_characters_skills
-from lazyblacksmith.models import EveUser
+from lazyblacksmith.models import User
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Skill
 from lazyblacksmith.models import TaskStatus
@@ -21,7 +21,7 @@ import pytz
 def update_character_skills(character_id):
     skill_number = 0
 
-    character = EveUser.query.get(character_id)
+    character = User.query.get(character_id)
     if character is None:
         return
 
