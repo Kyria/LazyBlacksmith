@@ -14,24 +14,28 @@ from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import OreRefining
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.models import db
 
 
 class Importer(object):
+    DELETE = 0
+    UPDATE = 1
+
 
     # Import object in the list must be class from models to work
     IMPORT_ORDER = [
-        Item,
-        OreRefining,
-        Decryptor,
-        Activity,
-        ActivityMaterial,
-        ActivityProduct,
-        ActivitySkill,
-        Region,
-        Constellation,
-        SolarSystem,
-        ItemAdjustedPrice,
-        IndustryIndex,
+        (Item, UPDATE),
+        (OreRefining, DELETE),
+        (Decryptor, DELETE),
+        (Activity, DELETE),
+        (ActivityMaterial, DELETE),
+        (ActivityProduct, DELETE),
+        (ActivitySkill, DELETE),
+        (Region, DELETE),
+        (Constellation, DELETE),
+        (SolarSystem, DELETE),
+        (ItemAdjustedPrice, DELETE),
+        (IndustryIndex, DELETE),
     ]
 
     def __init__(self, sde_connection, lb_engine):
@@ -64,7 +68,7 @@ class Importer(object):
         print "\nIMPORT ALL TABLES"
         print "================="
         for table in self.IMPORT_ORDER:
-            self.import_table(table.__name__.lower())
+            self.import_table(table[0].__name__.lower())
 
     def import_table(self, table):
         """
@@ -89,7 +93,8 @@ class Importer(object):
         delete_order = list(self.IMPORT_ORDER)
         delete_order.reverse()
         for table in delete_order:
-            self.delete_table(table.__tablename__)
+            if table[1] == Importer.DELETE:
+                self.delete_table(table[0].__tablename__)
 
     # IMPORT CLASS FUNCTIONS START HERE
     ###################################
@@ -105,6 +110,11 @@ class Importer(object):
         added = 0
         total = 0
 
+        new = []
+        update = []
+        bulk_data = {}
+        item_list = []
+        
         # get all data, marketGroupID > 35k == dust514
         self.sde_cursor.execute("""
             SELECT
@@ -122,11 +132,12 @@ class Importer(object):
             WHERE i.published=1
         """)
 
-        bulk_data = {}
         for row in self.sde_cursor:
             bulk_data[int(row[0])] = row[1:]
-
-        new = []
+        
+        items = Item.query.all()
+        for item in items:
+            item_list.append(item.id)
 
         # for each item from SDE, check valid data and check if it doesn't exist yet in our db
         for id, data in bulk_data.items():
@@ -136,13 +147,19 @@ class Importer(object):
                 continue
 
             item = {
-                'id': id,
                 'name': data[0],
                 'max_production_limit': int(data[1]) if data[1] else None,
                 'market_group_id': int(data[2]) if data[2] else None,
                 'category_id': int(data[3]) if data[3] else None,
             }
-            new.append(item)
+            
+            if id in item_list:
+                item['update_id'] = id
+                update.append(item)
+            else:
+                item['id'] = id
+                new.append(item)
+                
             added += 1
 
         # then create the new item if they exist
@@ -150,6 +167,16 @@ class Importer(object):
             self.lb_engine.execute(
                 Item.__table__.insert(),
                 new
+            )
+            
+        if update:
+            update_stmt = Item.__table__.update()
+            update_stmt = update_stmt.where(
+                Item.id == db.bindparam('update_id')
+            )
+            db.engine.execute(
+                update_stmt,
+                update,
             )
 
         return (added, total)
