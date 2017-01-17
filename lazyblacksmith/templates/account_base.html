@@ -76,6 +76,7 @@
                 </div>
             </div>
 
+            {% set pref = current_user.pref %}
             <div class="row fade tab-pane" id="tab-bp">
                 <div class="col-md-4 col-sm-4">
                     <div class="panel panel-default">
@@ -84,11 +85,32 @@
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Manufacturing Settings</h3>
                         </div>
                         <div class="panel-body">
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
+                            <table class="table table-borderless config-table">
+                                <tbody>
+                                    <tr><td>Main BPO Facility</td><td>{{ pref.label_facility(pref.prod_facility) }}</td></tr>
+                                    {% if pref.is_structure(pref.prod_facility) -%}
+                                    <tr><td>Main BPO ME Rig</td><td>{{ pref.label_rig(pref.prod_me_rig) }}</td></tr>
+                                    <tr><td>Main BPO TE Rig</td><td>{{ pref.label_rig(pref.prod_te_rig) }}</td></tr>
+                                    <tr><td>Main BPO Security</td><td>{{ pref.label_security(pref.prod_security) }}</td></tr>
+                                    {%- endif %}
+                                    <tr><td>Main BPO System index</td><td>{{ pref.prod_system }}</td></tr>
+                                    <tr><td>Components Facility</td><td>{{ pref.label_facility(pref.prod_sub_facility) }}</td></tr>
+                                    {% if pref.is_structure(pref.prod_sub_facility) -%}
+                                    <tr><td>Components ME Rig</td><td>{{ pref.label_rig(pref.prod_sub_me_rig) }}</td></tr>
+                                    <tr><td>Components TE Rig</td><td>{{ pref.label_rig(pref.prod_sub_te_rig) }}</td></tr>
+                                    <tr><td>Components Security</td><td>{{ pref.label_security(pref.prod_sub_security) }}</td></tr>
+                                    {%- endif %}
+                                    <tr><td>Components System index</td><td>{{ pref.prod_sub_system }}</td></tr>
+                                    <tr><td>Minerals Price Region</td><td>{{ pref.prod_price_region_minerals }}</td></tr>
+                                    <tr><td>Minerals Price Type</td><td>{{ pref.prod_price_type_minerals }}</td></tr>
+                                    <tr><td>PI Price Region</td><td>{{ pref.prod_price_region_pi }}</td></tr>
+                                    <tr><td>PI Price Type</td><td>{{ pref.prod_price_type_pi }}</td></tr>
+                                    <tr><td>Moon Goo Price Region</td><td>{{ pref.prod_price_region_moongoo }}</td></tr>
+                                    <tr><td>Moon Goo Price Type</td><td>{{ pref.prod_price_type_moongoo }}</td></tr>
+                                    <tr><td>Others Price Region</td><td>{{ pref.prod_price_region_others }}</td></tr>
+                                    <tr><td>Others Price Type</td><td>{{ pref.prod_price_type_others }}</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -100,15 +122,22 @@
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Research Settings</h3>
                         </div>
                         <div class="panel-body">
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
+                            <table class="table table-borderless config-table">
+                                <tbody>
+                                    <tr><td>Facility</td><td>{{ pref.label_facility(pref.research_facility) }}</td></tr>
+                                    {% if pref.is_structure(pref.research_facility) -%}
+                                    <tr><td>ME Jobs Time Rig</td><td>{{ pref.label_rig(pref.research_me_rig) }}</td></tr>
+                                    <tr><td>TE Jobs Time Rig</td><td>{{ pref.label_rig(pref.research_te_rig) }}</td></tr>
+                                    <tr><td>Copy Time Rig</td><td>{{ pref.label_rig(pref.research_copy_rig) }}</td></tr>
+                                    <tr><td>Security</td><td>{{ pref.label_security(pref.research_security) }}</td></tr>
+                                    {%- endif %}
+                                    <tr><td>System index</td><td>{{ pref.research_system }}</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="col-md-4 col-sm-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -116,11 +145,19 @@
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Invention Settings</h3>
                         </div>
                         <div class="panel-body">
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
-                            Some configs<br>
+                            <table class="table table-borderless config-table">
+                                <tbody>
+                                    <tr><td>Facility</td><td>{{ pref.label_facility(pref.invention_facility) }}</td></tr>
+                                    {% if pref.is_structure(pref.invention_facility) -%}
+                                    <tr><td>Invention Time Rig</td><td>{{ pref.label_rig(pref.invention_invention_rig) }}</td></tr>
+                                    <tr><td>Copy Time Rig</td><td>{{ pref.label_rig(pref.invention_copy_rig) }}</td></tr>
+                                    <tr><td>Security</td><td>{{ pref.label_security(pref.invention_security) }}</td></tr>
+                                    {%- endif %}
+                                    <tr><td>System Index</td><td>{{ pref.invention_system }}</td></tr>
+                                    <tr><td>Region Price</td><td>{{ pref.invention_price_region }}</td></tr>
+                                    <tr><td>Price Type</td><td>{{ pref.invention_price_type }}</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

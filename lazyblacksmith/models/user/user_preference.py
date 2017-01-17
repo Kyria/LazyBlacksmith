@@ -6,7 +6,45 @@ from datetime import datetime
 
 from . import db
 
-class UserPreference(db.Model):   
+class UserPreference(db.Model):
+    # fake enums
+    LABEL_RIGS = ('None', 'T1', 'T2')
+    LABEL_SECURITY = {'h': 'High Sec', 'l': 'Low Sec', 'n': 'Null Sec / WH'}
+    LABEL_FACILITY = (  # order is important, same as in evedata.js
+        'Station', 'Raitaru (M-EC)', 'Azbel (L-EC)',
+        'Sotiyo (XL-EC)', 'Other Structures', 'Assembly Array', 
+        'Thukker Component Array', 'Rapid Assembly Array', 
+        'Laboratory', 'Hyasyoda Laboratory', 'Experimental Laboratory'
+    )
+    FACILITY_STRUCTURE = (1,2,3,4)  # Raitaru, Azbel, Sotiyo, Other structures
+    
+    # helpers
+    @classmethod
+    def label_rig(cls, value):
+        try:
+            return cls.LABEL_RIGS[value]
+        except IndexError:
+            return cls.LABEL_RIGS[0]
+
+    @classmethod
+    def label_facility(cls, value):
+        try:
+            return cls.LABEL_FACILITY[value]
+        except IndexError:
+            return cls.LABEL_FACILITY[0]
+
+    @classmethod
+    def label_security(cls, value):
+        if value in cls.LABEL_SECURITY:
+            return cls.LABEL_SECURITY[value]
+        else:
+            return cls.LABEL_SECURITY[0]
+
+    @classmethod
+    def is_structure(cls, value):
+        return value in cls.FACILITY_STRUCTURE
+        
+    # model 
     user_id = db.Column(
         db.BigInteger,
         db.ForeignKey('user.character_id'),
