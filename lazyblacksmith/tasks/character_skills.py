@@ -37,12 +37,19 @@ def update_character_skills(character_id):
             if item is None:
                 continue
 
-            skill = Skill(
-                character=character,
-                skill=item,
-                level=skill_object.current_skill_level,
-            )
-            db.session.merge(skill)
+            char_skill = character.skills.filter(
+                Skill.skill_id == item.id
+            ).one_or_none()
+            
+            if char_skill:
+                char_skill.level = skill_object.current_skill_level
+            else:            
+                skill = Skill(
+                    character=character,
+                    skill=item,
+                    level=skill_object.current_skill_level,
+                )
+                db.session.merge(skill)
             skill_number += 1
 
         db.session.commit()

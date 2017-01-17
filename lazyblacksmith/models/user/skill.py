@@ -17,11 +17,6 @@ class Skill(db.Model):
     level = db.Column(db.Integer, nullable=False, default=0)
 
     character = db.relationship(
-        'User',
-        remote_side=[character_id],
-        backref=db.backref('skills', lazy='dynamic')
+        'User', backref=db.backref('skills', lazy='dynamic'),
     )
-    skill = db.relationship(
-        'Item',
-        remote_side=[skill_id],
-    )
+    skill = db.relationship('Item')
