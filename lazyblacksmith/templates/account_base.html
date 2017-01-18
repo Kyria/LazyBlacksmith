@@ -1,8 +1,47 @@
 {% extends "base.html" %}
+{% set pref = current_user.pref %}
 
 {% block title %}:: User Dashboard{% endblock %}
 
 {% block js %}
+    <script>
+        accountDashboard.inventionSettings.facility = {{ pref.invention_facility }};
+        accountDashboard.inventionSettings.inventionRig = {{ pref.invention_invention_rig }};
+        accountDashboard.inventionSettings.copyRig = {{ pref.invention_copy_rig }};
+        accountDashboard.inventionSettings.security = '{{ pref.invention_security }}';
+        accountDashboard.inventionSettings.system = '{{ pref.invention_system }}';
+        accountDashboard.inventionSettings.priceRegion = {{ pref.invention_price_region }};
+        accountDashboard.inventionSettings.priceType = '{{ pref.invention_price_type }}';
+        
+        accountDashboard.researchSettings.facility = {{ pref.research_facility }};
+        accountDashboard.researchSettings.meRig = {{ pref.research_me_rig }};
+        accountDashboard.researchSettings.teRig = {{ pref.research_te_rig }};
+        accountDashboard.researchSettings.copyRig = {{ pref.research_copy_rig }};
+        accountDashboard.researchSettings.security = '{{ pref.research_security }}';
+        accountDashboard.researchSettings.system = '{{ pref.research_system }}';
+
+        accountDashboard.productionSettings.facility = {{ pref.prod_facility }};
+        accountDashboard.productionSettings.meRig = {{ pref.prod_me_rig }};
+        accountDashboard.productionSettings.teRig = {{ pref.prod_te_rig }};
+        accountDashboard.productionSettings.security = '{{ pref.prod_security }}';
+        accountDashboard.productionSettings.system = '{{ pref.prod_system }}';
+        accountDashboard.productionSettings.componentFacility = {{ pref.prod_sub_facility }};
+        accountDashboard.productionSettings.componentMeRig = {{ pref.prod_sub_me_rig }};
+        accountDashboard.productionSettings.componentTeRig = {{ pref.prod_sub_te_rig }};
+        accountDashboard.productionSettings.componentSecurity = '{{ pref.prod_sub_security }}';
+        accountDashboard.productionSettings.componentSystem = '{{ pref.prod_sub_system }}';
+        accountDashboard.productionSettings.priceMineralRegion = {{ pref.prod_price_region_minerals }};
+        accountDashboard.productionSettings.priceMineralType = '{{ pref.prod_price_type_minerals }}';
+        accountDashboard.productionSettings.pricePiRegion = {{ pref.prod_price_region_pi }};
+        accountDashboard.productionSettings.pricePiType = '{{ pref.prod_price_type_pi }}';
+        accountDashboard.productionSettings.priceMoongooRegion = {{ pref.prod_price_region_moongoo }};
+        accountDashboard.productionSettings.priceMoongooType = '{{ pref.prod_price_type_moongoo }}';
+        accountDashboard.productionSettings.priceOtherRegion = {{ pref.prod_price_region_others }};
+        accountDashboard.productionSettings.priceOtherType = '{{ pref.prod_price_type_others }}';
+        
+        // run
+        lb.run('accountDashboard');
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -24,7 +63,7 @@
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Alts</h3>
                         </div>
                         <div class="panel-body">
-                            <table class="table">
+                            <table class="table table-no-margin-bottom">
                             <thead>
                                 <tr>
                                     <th>Character</th>
@@ -36,6 +75,10 @@
                                 <tr>
                                     <td>{{ alt.character_name }}</td>
                                     <td class="td-valign-middle"><a href="#{{alt.character_id}}" class="btn btn-xs btn-danger pull-right"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2">No alt registered</td>
                                 </tr>
                                 {%- endfor %}
                             </tbody>
@@ -50,7 +93,7 @@
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Background tasks</h3>
                         </div>
                         <div class="panel-body">
-                            <table class="table">
+                            <table class="table table-no-margin-bottom">
                             <thead>
                                 <tr>
                                     <th>Tasks</th>
@@ -76,39 +119,88 @@
                 </div>
             </div>
 
-            {% set pref = current_user.pref %}
             <div class="row fade tab-pane" id="tab-bp">
                 <div class="col-md-4 col-sm-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <div class="pull-right"><button class="btn btn-xs btn-default"><i class="fa fa-cog" aria-hidden="true"></i></button></div>
+                            <div class="pull-right"><button id="open-modal-prod-settings" class="btn btn-xs btn-default"><i class="fa fa-cog" aria-hidden="true"></i></button></div>
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Manufacturing Settings</h3>
                         </div>
                         <div class="panel-body">
-                            <table class="table table-borderless config-table">
+                            <table class="table table-hover table-condensed table-borderless config-table" id="production-config">
                                 <tbody>
-                                    <tr><td>Main BPO Facility</td><td>{{ pref.label_facility(pref.prod_facility) }}</td></tr>
-                                    {% if pref.is_structure(pref.prod_facility) -%}
-                                    <tr><td>Main BPO ME Rig</td><td>{{ pref.label_rig(pref.prod_me_rig) }}</td></tr>
-                                    <tr><td>Main BPO TE Rig</td><td>{{ pref.label_rig(pref.prod_te_rig) }}</td></tr>
-                                    <tr><td>Main BPO Security</td><td>{{ pref.label_security(pref.prod_security) }}</td></tr>
-                                    {%- endif %}
-                                    <tr><td>Main BPO System index</td><td>{{ pref.prod_system }}</td></tr>
-                                    <tr><td>Components Facility</td><td>{{ pref.label_facility(pref.prod_sub_facility) }}</td></tr>
-                                    {% if pref.is_structure(pref.prod_sub_facility) -%}
-                                    <tr><td>Components ME Rig</td><td>{{ pref.label_rig(pref.prod_sub_me_rig) }}</td></tr>
-                                    <tr><td>Components TE Rig</td><td>{{ pref.label_rig(pref.prod_sub_te_rig) }}</td></tr>
-                                    <tr><td>Components Security</td><td>{{ pref.label_security(pref.prod_sub_security) }}</td></tr>
-                                    {%- endif %}
-                                    <tr><td>Components System index</td><td>{{ pref.prod_sub_system }}</td></tr>
-                                    <tr><td>Minerals Price Region</td><td>{{ pref.prod_price_region_minerals }}</td></tr>
-                                    <tr><td>Minerals Price Type</td><td>{{ pref.prod_price_type_minerals }}</td></tr>
-                                    <tr><td>PI Price Region</td><td>{{ pref.prod_price_region_pi }}</td></tr>
-                                    <tr><td>PI Price Type</td><td>{{ pref.prod_price_type_pi }}</td></tr>
-                                    <tr><td>Moon Goo Price Region</td><td>{{ pref.prod_price_region_moongoo }}</td></tr>
-                                    <tr><td>Moon Goo Price Type</td><td>{{ pref.prod_price_type_moongoo }}</td></tr>
-                                    <tr><td>Others Price Region</td><td>{{ pref.prod_price_region_others }}</td></tr>
-                                    <tr><td>Others Price Type</td><td>{{ pref.prod_price_type_others }}</td></tr>
+                                    <tr>
+                                        <th>Main BPO Facility</th>
+                                        <td>{{ pref.label_facility(pref.prod_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure-main" {% if not pref.is_structure(pref.prod_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Main BPO ME Rig</th>
+                                        <td>{{ pref.label_rig(pref.prod_me_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-main" {% if not pref.is_structure(pref.prod_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Main BPO TE Rig</th>
+                                        <td>{{ pref.label_rig(pref.prod_te_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-main" {% if not pref.is_structure(pref.prod_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Main BPO Security</th>
+                                        <td>{{ pref.label_security(pref.prod_security) }}</td>
+                                    </tr>                                
+                                    <tr>
+                                        <th>Main BPO System index</th>
+                                        <td>{{ pref.prod_system }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Components Facility</th>
+                                        <td>{{ pref.label_facility(pref.prod_sub_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure-compo" {% if not pref.is_structure(pref.prod_sub_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Components ME Rig</th>
+                                        <td>{{ pref.label_rig(pref.prod_sub_me_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-compo" {% if not pref.is_structure(pref.prod_sub_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Components TE Rig</th>
+                                        <td>{{ pref.label_rig(pref.prod_sub_te_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-compo" {% if not pref.is_structure(pref.prod_sub_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Components Security</th>
+                                        <td>{{ pref.label_security(pref.prod_sub_security) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Components System index</th>
+                                        <td>{{ pref.prod_sub_system }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Minerals Price Region</th>
+                                        <td>{{ prod_price_region_minerals.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Minerals Price Type</th>
+                                        <td>{{ pref.prod_price_type_minerals }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>PI Price Region</th>
+                                        <td>{{ prod_price_region_pi.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>PI Price Type</th>
+                                        <td>{{ pref.prod_price_type_pi }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Moon Goo Price Region</th>
+                                        <td>{{ prod_price_region_moongoo.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Moon Goo Price Type</th>
+                                        <td>{{ pref.prod_price_type_moongoo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Others Price Region</th>
+                                        <td>{{ prod_price_region_others.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Others Price Type</th>
+                                        <td>{{ pref.prod_price_type_others }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -122,16 +214,32 @@
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Research Settings</h3>
                         </div>
                         <div class="panel-body">
-                            <table class="table table-borderless config-table">
+                            <table class="table table-hover table-condensed table-borderless config-table" id="research-config">
                                 <tbody>
-                                    <tr><td>Facility</td><td>{{ pref.label_facility(pref.research_facility) }}</td></tr>
-                                    {% if pref.is_structure(pref.research_facility) -%}
-                                    <tr><td>ME Jobs Time Rig</td><td>{{ pref.label_rig(pref.research_me_rig) }}</td></tr>
-                                    <tr><td>TE Jobs Time Rig</td><td>{{ pref.label_rig(pref.research_te_rig) }}</td></tr>
-                                    <tr><td>Copy Time Rig</td><td>{{ pref.label_rig(pref.research_copy_rig) }}</td></tr>
-                                    <tr><td>Security</td><td>{{ pref.label_security(pref.research_security) }}</td></tr>
-                                    {%- endif %}
-                                    <tr><td>System index</td><td>{{ pref.research_system }}</td></tr>
+                                    <tr>
+                                        <th>Facility</th>
+                                        <td>{{ pref.label_facility(pref.research_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}> 
+                                        <th>ME Jobs Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.research_me_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>TE Jobs Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.research_te_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Copy Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.research_copy_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Security</th>
+                                        <td>{{ pref.label_security(pref.research_security) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>System index</th>
+                                        <td>{{ pref.research_system }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -145,17 +253,36 @@
                             <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Invention Settings</h3>
                         </div>
                         <div class="panel-body">
-                            <table class="table table-borderless config-table">
+                            <table class="table table-hover table-condensed table-borderless config-table" id="invention-config">
                                 <tbody>
-                                    <tr><td>Facility</td><td>{{ pref.label_facility(pref.invention_facility) }}</td></tr>
-                                    {% if pref.is_structure(pref.invention_facility) -%}
-                                    <tr><td>Invention Time Rig</td><td>{{ pref.label_rig(pref.invention_invention_rig) }}</td></tr>
-                                    <tr><td>Copy Time Rig</td><td>{{ pref.label_rig(pref.invention_copy_rig) }}</td></tr>
-                                    <tr><td>Security</td><td>{{ pref.label_security(pref.invention_security) }}</td></tr>
-                                    {%- endif %}
-                                    <tr><td>System Index</td><td>{{ pref.invention_system }}</td></tr>
-                                    <tr><td>Region Price</td><td>{{ pref.invention_price_region }}</td></tr>
-                                    <tr><td>Price Type</td><td>{{ pref.invention_price_type }}</td></tr>
+                                    <tr>
+                                        <th>Facility</th>
+                                        <td>{{ pref.label_facility(pref.invention_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Invention Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.invention_invention_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Copy Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.invention_copy_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Security</th>
+                                        <td>{{ pref.label_security(pref.invention_security) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>System Index</th>
+                                        <td>{{ pref.invention_system }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Region Price</th>
+                                        <td>{{ invention_price_region.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Price Type</th>
+                                        <td>{{ pref.invention_price_type }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -168,6 +295,262 @@
             bwahaha!
             </div>
             {%- endif %}
+        </div>
+    </div>
+</div>
+
+<!-- config modals -->
+<div class="modal fade" role="dialog" id="modalConfigProd" aria-labelledby="modalConfigProd" aria-hidden="true" data-bp-id="">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modalConfigProd">Manufacturing Default Settings</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="well">
+                                <h4>Blueprint settings</h4>
+                                <div>
+                                    Facility<br>
+                                    <select name="modal-facility" id="modal-facility-main" class="form-control input-sm">
+                                        <option value="0" selected>Station</option>
+                                        <option value="1">Raitaru (M-EC)</option>
+                                        <option value="2">Azbel (L-EC)</option>
+                                        <option value="3">Sotiyo (XL-EC)</option>
+                                        <option value="4">Other Structures</option>
+                                        <option value="5">Assembly Array</option>
+                                        <option value="6">Thukker Component Array</option>
+                                        <option value="7">Rapid Assembly Array</option>
+                                    </select>
+                                </div>
+
+                                <div class="modal-structure-configs-main" style="margin-top:5px">
+                                    Rigs <br>
+                                    <div class="btn-group" id="modal-structure-me-rig-main" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default col-xs-4 active">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0" checked>No ME
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="1">T1 ME
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2">T2 ME
+                                        </label>
+                                    </div>
+                                    <div class="btn-group" id="modal-structure-te-rig-main" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default col-xs-4 active">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0" checked>No TE
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="1">T1 TE
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="2">T2 TE
+                                        </label>
+                                    </div>
+                                    System Security<br>
+                                    <div class="btn-group" id="modal-structure-security-main" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default active col-xs-4">
+                                            <input type="radio" name="modal-structure-security" autocomplete="off" value="h" checked>HS
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-security" autocomplete="off" value="l">LS
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-security" autocomplete="off" value="n">NS/WH
+                                        </label>
+                                    </div>
+                                </div>
+                                <div style="margin-top:5px">
+                                    System<br>
+                                    <input id="modal-system-main" type="text" class="form-control input-sm typeahead" value="Jita">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="well">
+                                <h4>Components settings</h4>
+                                <div>
+                                    Facility<br>
+                                    <select name="modal-facility" id="modal-facility-comp" class="form-control input-sm">
+                                        <option value="0" selected>Station</option>
+                                        <option value="1">Raitaru (M-EC)</option>
+                                        <option value="2">Azbel (L-EC)</option>
+                                        <option value="3">Sotiyo (XL-EC)</option>
+                                        <option value="4">Other Structures</option>
+                                        <option value="5">Assembly Array</option>
+                                        <option value="6">Thukker Component Array</option>
+                                        <option value="7">Rapid Assembly Array</option>
+                                    </select>
+                                </div>
+
+                                <div class="modal-structure-configs-comp" style="margin-top:5px">
+                                    Rigs <br>
+                                    <div class="btn-group" id="modal-structure-me-rig-comp" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default col-xs-4 active">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0" checked>No ME
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="1">T1 ME
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2">T2 ME
+                                        </label>
+                                    </div>
+                                    <div class="btn-group" id="modal-structure-te-rig-comp" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default col-xs-4 active">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0" checked>No TE
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="1">T1 TE
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="2">T2 TE
+                                        </label>
+                                    </div>
+                                    System Security<br>
+                                    <div class="btn-group" id="modal-structure-security-comp" data-toggle="buttons" style="width:100%">
+                                        <label class="btn btn-sm btn-default active col-xs-4">
+                                            <input type="radio" name="modal-structure-security" autocomplete="off" value="h" checked>HS
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-security" autocomplete="off" value="l">LS
+                                        </label>
+                                        <label class="btn btn-sm btn-default col-xs-4">
+                                            <input type="radio" name="modal-structure-security" autocomplete="off" value="n">NS/WH
+                                        </label>
+                                    </div>
+                                </div>
+                                <div style="margin-top:5px">
+                                    System<br>
+                                    <input id="modal-system-comp" type="text" class="form-control input-sm typeahead" value="Jita">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="well">
+                                <span>Mineral prices</span>
+                                <table class="table table-borderless table-no-margin-bottom">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select name="modal-region-minerals" class="form-control input-sm modal-region">
+                                                    {% for region in regions %}
+                                                    <option value="{{ region.id }}">{{ region.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td class="market-type-cell">
+                                                <div class="btn-group modal-region-minerals-type" data-toggle="buttons">
+                                                    <label class="btn btn-default btn-sm btn-sell">
+                                                        <input type="radio" name="modal-region-minerals-type" autocomplete="off" value="sell">Sell
+                                                    </label>
+                                                    <label class="btn btn-default btn-sm btn-buy">
+                                                        <input type="radio" name="modal-region-minerals-type" autocomplete="off" value="buy">Buy
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <span>PI prices</span>
+                                <table class="table table-borderless table-no-margin-bottom">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select name="modal-region-pi" class="form-control input-sm modal-region">
+                                                    {% for region in regions %}
+                                                    <option value="{{ region.id }}">{{ region.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td class="market-type-cell">
+                                                <div class="btn-group modal-region-pi-type" data-toggle="buttons">
+                                                    <label class="btn btn-default btn-sm btn-sell">
+                                                        <input type="radio" name="modal-region-pi-type" autocomplete="off" value="sell">Sell
+                                                    </label>
+                                                    <label class="btn btn-default btn-sm btn-buy">
+                                                        <input type="radio" name="modal-region-pi-type" autocomplete="off" value="buy">Buy
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="well">
+                                <span>Moongoo prices</span>
+                                <table class="table table-borderless table-no-margin-bottom">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select name="modal-region-moongoo" class="form-control input-sm modal-region">
+                                                    {% for region in regions %}
+                                                    <option value="{{ region.id }}">{{ region.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td class="market-type-cell">
+                                                <div class="btn-group modal-region-moongoo-type" data-toggle="buttons">
+                                                    <label class="btn btn-default btn-sm btn-sell">
+                                                        <input type="radio" name="modal-region-moongoo-type" autocomplete="off" value="sell">Sell
+                                                    </label>
+                                                    <label class="btn btn-default btn-sm btn-buy">
+                                                        <input type="radio" name="modal-region-moongoo-type" autocomplete="off" value="buy">Buy
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <span>Other prices</span>
+                                <table class="table table-borderless table-no-margin-bottom">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select name="modal-region-others" class="form-control input-sm modal-region">
+                                                    {% for region in regions %}
+                                                    <option value="{{ region.id }}">{{ region.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td class="market-type-cell">
+                                                <div class="btn-group modal-region-others-type" data-toggle="buttons">
+                                                    <label class="btn btn-default btn-sm btn-sell">
+                                                        <input type="radio" name="modal-region-others-type" autocomplete="off" value="sell">Sell
+                                                    </label>
+                                                    <label class="btn btn-default btn-sm btn-buy">
+                                                        <input type="radio" name="modal-region-others-type" autocomplete="off" value="buy">Buy
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-prod-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
