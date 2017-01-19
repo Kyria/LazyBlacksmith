@@ -46,7 +46,7 @@ var utils = (function($) {
             message: message,
         }, {
             type: finalType,
-            allow_dismiss: false,
+            allow_dismiss: true,
             offset: {
                 x: 20,
                 y: 60,
