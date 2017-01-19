@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}:: User Dashboard{% endblock %}
+
+{% block js %}
+    {% set pref = current_user.pref %}
+    <script>
+        {% for region in regions -%}
+        accountDashboard.regions[{{ region.id }}] = "{{ region.name }}";
+        {% endfor %}
+        
+        accountDashboard.inventionSettings.facility = {{ pref.invention_facility }};
+        accountDashboard.inventionSettings.inventionRig = {{ pref.invention_invention_rig }};
+        accountDashboard.inventionSettings.copyRig = {{ pref.invention_copy_rig }};
+        accountDashboard.inventionSettings.security = '{{ pref.invention_security }}';
+        accountDashboard.inventionSettings.system = '{{ pref.invention_system }}';
+        accountDashboard.inventionSettings.priceRegion = {{ pref.invention_price_region }};
+        accountDashboard.inventionSettings.priceType = '{{ pref.invention_price_type }}';
+        
+        accountDashboard.researchSettings.facility = {{ pref.research_facility }};
+        accountDashboard.researchSettings.meRig = {{ pref.research_me_rig }};
+        accountDashboard.researchSettings.teRig = {{ pref.research_te_rig }};
+        accountDashboard.researchSettings.copyRig = {{ pref.research_copy_rig }};
+        accountDashboard.researchSettings.security = '{{ pref.research_security }}';
+        accountDashboard.researchSettings.system = '{{ pref.research_system }}';
+
+        accountDashboard.productionSettings.facility = {{ pref.prod_facility }};
+        accountDashboard.productionSettings.meRig = {{ pref.prod_me_rig }};
+        accountDashboard.productionSettings.teRig = {{ pref.prod_te_rig }};
+        accountDashboard.productionSettings.security = '{{ pref.prod_security }}';
+        accountDashboard.productionSettings.system = '{{ pref.prod_system }}';
+        accountDashboard.productionSettings.componentFacility = {{ pref.prod_sub_facility }};
+        accountDashboard.productionSettings.componentMeRig = {{ pref.prod_sub_me_rig }};
+        accountDashboard.productionSettings.componentTeRig = {{ pref.prod_sub_te_rig }};
+        accountDashboard.productionSettings.componentSecurity = '{{ pref.prod_sub_security }}';
+        accountDashboard.productionSettings.componentSystem = '{{ pref.prod_sub_system }}';
+        accountDashboard.productionSettings.priceMineralRegion = {{ pref.prod_price_region_minerals }};
+        accountDashboard.productionSettings.priceMineralType = '{{ pref.prod_price_type_minerals }}';
+        accountDashboard.productionSettings.pricePiRegion = {{ pref.prod_price_region_pi }};
+        accountDashboard.productionSettings.pricePiType = '{{ pref.prod_price_type_pi }}';
+        accountDashboard.productionSettings.priceMoongooRegion = {{ pref.prod_price_region_moongoo }};
+        accountDashboard.productionSettings.priceMoongooType = '{{ pref.prod_price_type_moongoo }}';
+        accountDashboard.productionSettings.priceOtherRegion = {{ pref.prod_price_region_others }};
+        accountDashboard.productionSettings.priceOtherType = '{{ pref.prod_price_type_others }}';
+        
+        // run
+        lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_preference') }}";
+        lb.run('accountDashboard');
+    </script>
+{% endblock %}
+
+{% block content %}
+    {% set pref = current_user.pref %}
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" role="tablist" id="account-tabs">
+            <li class="active"><a href="#tab-char" role="tab" data-toggle="tab">Characters</a></li>
+            <li><a href="#tab-bp" role="tab" data-toggle="tab">Blueprint Settings</a></li>
+            {% if current_user.is_admin -%}<li><a href="#tab-admin" role="tab" data-toggle="tab">Admin Dashboard</a></li>{%- endif %}
+        </ul>
+        <div class="tab-content">
+            {% include 'account/character_settings.html' %}
+            {% include 'account/blueprint_settings.html' %}
+
+            {% if current_user.is_admin -%}
+            <div class="row fade tab-pane" id="tab-admin">
+            bwahaha!
+            </div>
+            {%- endif %}
+        </div>
+    </div>
+</div>
+
+<!-- config modals -->
+{% include 'account/dialog.html' %}
+{% endblock %}
+

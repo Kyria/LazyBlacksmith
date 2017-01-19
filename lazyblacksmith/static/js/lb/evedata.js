@@ -27,6 +27,12 @@ var eveData = (function() {
         'n': 2.1,  // Null Sec / WH
     };
     
+    var securityStatus = {
+        'h': 'High Sec',
+        'l': 'Low Sec',
+        'n': 'Null Sec / WH',
+    };
+    
     /**
      * Facillities List
      */
@@ -127,6 +133,7 @@ var eveData = (function() {
         structureRigs: structureRigs,
         structureSecStatusMultiplier: structureSecStatusMultiplier,
         facilities: facilities,
+        securityStatus: securityStatus,
     };
 
 })();

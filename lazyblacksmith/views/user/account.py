@@ -51,7 +51,7 @@ def index():
     if not prod_price_region_others:
         prod_price_region_others = the_forge_region
     
-    return render_template('account_base.html', **{
+    return render_template('account/account.html', **{
         'skill_status': skill_status,
         'invention_price_region': invention_price_region,
         'prod_price_region_minerals': prod_price_region_minerals,

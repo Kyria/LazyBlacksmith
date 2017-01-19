@@ -38,6 +38,7 @@ def register_blueprints(app):
     # blueprint import, only here because of exts
     from lazyblacksmith.views import ajax_eve_api
     from lazyblacksmith.views import ajax_eve_sde
+    from lazyblacksmith.views import ajax_account
     from lazyblacksmith.views import blueprint
     from lazyblacksmith.views import home
     from lazyblacksmith.views import price
@@ -48,6 +49,7 @@ def register_blueprints(app):
     """ register blueprints & helper blueprints """
     app.register_blueprint(ajax_eve_api, url_prefix='/ajax/eveapi')
     app.register_blueprint(ajax_eve_sde, url_prefix='/ajax/evesde')
+    app.register_blueprint(ajax_account, url_prefix='/ajax/account')
     app.register_blueprint(blueprint, url_prefix='/blueprint')
     app.register_blueprint(template, url_prefix='/template')
     app.register_blueprint(sso, url_prefix='/sso')

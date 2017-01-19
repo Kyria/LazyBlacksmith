@@ -1,0 +1,170 @@
+        <div class="row fade tab-pane" id="tab-bp">
+                <div class="col-md-4 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="pull-right"><button id="open-modal-prod-settings" class="btn btn-xs btn-default"><i class="fa fa-cog" aria-hidden="true"></i></button></div>
+                            <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Manufacturing Settings</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover table-condensed table-borderless config-table" id="production-config">
+                                <tbody>
+                                    <tr>
+                                        <th>Main BPO Facility</th>
+                                        <td class="facility">{{ pref.label_facility(pref.prod_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure-main" {% if not pref.is_structure(pref.prod_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Main BPO ME Rig</th>
+                                        <td class="meRig">{{ pref.label_rig(pref.prod_me_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-main" {% if not pref.is_structure(pref.prod_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Main BPO TE Rig</th>
+                                        <td class="teRig">{{ pref.label_rig(pref.prod_te_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-main" {% if not pref.is_structure(pref.prod_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Main BPO Security</th>
+                                        <td class="security">{{ pref.label_security(pref.prod_security) }}</td>
+                                    </tr>                                
+                                    <tr>
+                                        <th>Main BPO System index</th>
+                                        <td class="system">{{ pref.prod_system }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Components Facility</th>
+                                        <td class="componentFacility">{{ pref.label_facility(pref.prod_sub_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure-comp" {% if not pref.is_structure(pref.prod_sub_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Components ME Rig</th>
+                                        <td class="componentMeRig">{{ pref.label_rig(pref.prod_sub_me_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-comp" {% if not pref.is_structure(pref.prod_sub_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Components TE Rig</th>
+                                        <td class="componentTeRig">{{ pref.label_rig(pref.prod_sub_te_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure-comp" {% if not pref.is_structure(pref.prod_sub_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Components Security</th>
+                                        <td class="componentSecurity">{{ pref.label_security(pref.prod_sub_security) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Components System index</th>
+                                        <td class="componentSystem">{{ pref.prod_sub_system }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Minerals Price Region</th>
+                                        <td class="priceMineralRegion">{{ prod_price_region_minerals.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Minerals Price Type</th>
+                                        <td class="priceMineralType">{{ pref.prod_price_type_minerals }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>PI Price Region</th>
+                                        <td class="pricePiRegion">{{ prod_price_region_pi.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>PI Price Type</th>
+                                        <td class="pricePiType">{{ pref.prod_price_type_pi }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Moon Goo Price Region</th>
+                                        <td class="priceMoongooRegion">{{ prod_price_region_moongoo.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Moon Goo Price Type</th>
+                                        <td class="priceMoongooType">{{ pref.prod_price_type_moongoo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Others Price Region</th>
+                                        <td class="priceOtherRegion">{{ prod_price_region_others.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Others Price Type</th>
+                                        <td class="priceOtherType">{{ pref.prod_price_type_others }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="pull-right"><button class="btn btn-xs btn-default"><i class="fa fa-cog" aria-hidden="true"></i></button></div>
+                            <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Research Settings</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover table-condensed table-borderless config-table" id="research-config">
+                                <tbody>
+                                    <tr>
+                                        <th>Facility</th>
+                                        <td>{{ pref.label_facility(pref.research_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}> 
+                                        <th>ME Jobs Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.research_me_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>TE Jobs Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.research_te_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Copy Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.research_copy_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Security</th>
+                                        <td>{{ pref.label_security(pref.research_security) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>System index</th>
+                                        <td>{{ pref.research_system }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="pull-right"><button class="btn btn-xs btn-default"><i class="fa fa-cog" aria-hidden="true"></i></button></div>
+                            <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Invention Settings</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover table-condensed table-borderless config-table" id="invention-config">
+                                <tbody>
+                                    <tr>
+                                        <th>Facility</th>
+                                        <td>{{ pref.label_facility(pref.invention_facility) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Invention Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.invention_invention_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Copy Time Rig</th>
+                                        <td>{{ pref.label_rig(pref.invention_copy_rig) }}</td>
+                                    </tr>
+                                    <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+                                        <th>Security</th>
+                                        <td>{{ pref.label_security(pref.invention_security) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>System Index</th>
+                                        <td>{{ pref.invention_system }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Region Price</th>
+                                        <td>{{ invention_price_region.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Price Type</th>
+                                        <td>{{ pref.invention_price_type }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>

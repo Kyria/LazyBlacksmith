@@ -1,0 +1,66 @@
+            <div class="row fade in active tab-pane" id="tab-char">
+                <div class="col-md-4 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="pull-right">
+                                <a class="btn btn-xs btn-success" href="{{ url_for('sso.add_alt') }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                            </div>
+                            <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Alts</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-no-margin-bottom">
+                            <thead>
+                                <tr>
+                                    <th>Character</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for alt in current_user.alts_characters.all() -%}
+                                <tr>
+                                    <td>{{ alt.character_name }}</td>
+                                    <td class="td-valign-middle"><a href="#{{alt.character_id}}" class="btn btn-xs btn-danger pull-right"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2">No alt registered</td>
+                                </tr>
+                                {%- endfor %}
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8 col-sm-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Background tasks</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-no-margin-bottom">
+                            <thead>
+                                <tr>
+                                    <th>Tasks</th>
+                                    <th>Last run</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Update Skills</td><td>{{ skill_status.get_last_run_format() }}</td>
+                                    <td>
+                                        <button style="margin-left:5px" class="btn btn-xs btn-info pull-right">
+                                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-default pull-right" style="margin-left:5px">
+                                            <i class="fa fa-cog" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+

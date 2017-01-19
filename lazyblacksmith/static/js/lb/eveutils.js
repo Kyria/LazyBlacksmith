@@ -218,6 +218,24 @@ var eveUtils = (function() {
             success: callback,
         });
     };
+    
+    /**
+     * Generic ajax post call, with json dataType as result
+     * also setting content-type to application/json 
+     * @param url the url to call
+     * @param callback function to call when ajax call succeed
+     */
+    var ajaxPostCallJson = function(url, data, successCallback, errorCallback) {
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: data,
+            success: successCallback,
+            error: errorCallback
+        });
+    };
 
     /**
      * Proxy function to get system cost indexes from backend
@@ -297,6 +315,7 @@ var eveUtils = (function() {
 
         // ajax stuff
         ajaxGetCallJson: ajaxGetCallJson,
+        ajaxPostCallJson: ajaxPostCallJson,
         getSystemCostIndex: getSystemCostIndex,
         getItemPrices: getItemPrices,
         initSolarSystemTypeahead: initSolarSystemTypeahead,

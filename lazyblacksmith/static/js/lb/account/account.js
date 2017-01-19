@@ -1,5 +1,10 @@
 var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     "use strict";
+    var regions = {};
+    
+    $.extend(lb.urls, {
+        updatePreferenceUrl: false,
+    });
 
     var inventionSettings = {
         facility: false,
@@ -99,6 +104,73 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     };
     
+    var _onModalProdSettingsApply = function(event) {
+        var productionSettingsTmp = {
+            facility: parseInt($('#modal-facility-main').val()),
+            meRig: parseInt($('#modal-structure-me-rig-main input:checked').val()),
+            teRig: parseInt($('#modal-structure-te-rig-main input:checked').val()),
+            security: $('#modal-structure-security-main input:checked').val(),
+            system: $('#modal-system-main').val(),
+            componentFacility: parseInt($('#modal-facility-comp').val()),
+            componentMeRig: parseInt($('#modal-structure-me-rig-comp input:checked').val()),
+            componentTeRig: parseInt($('#modal-structure-te-rig-comp input:checked').val()),
+            componentSecurity: $('#modal-structure-security-comp input:checked').val(),
+            componentSystem: $('#modal-system-comp').val(),
+            priceMineralRegion: parseInt($("select[name='modal-region-minerals']").val()),
+            priceMineralType: $('.modal-region-minerals-type input:checked').val(),
+            pricePiRegion: parseInt($("select[name='modal-region-pi']").val()),
+            pricePiType: $('.modal-region-pi-type input:checked').val(),
+            priceMoongooRegion: parseInt($("select[name='modal-region-moongoo']").val()),
+            priceMoongooType: $('.modal-region-moongoo-type input:checked').val(),
+            priceOtherRegion: parseInt($("select[name='modal-region-others']").val()),
+            priceOtherType: $('.modal-region-others-type input:checked').val(),
+        };
+     
+        eveUtils.ajaxPostCallJson(
+            lb.urls.updatePreferenceUrl,
+            JSON.stringify({production: productionSettingsTmp}),
+            function(data) {
+                utils.flashNotify('Production preferences successfuly saved.', 'success');
+                productionSettings = productionSettingsTmp;
+                _updateProductionConfigTable();
+            },
+            function(errorData) {
+                utils.flashNotify(errorData.responseJSON['message'], 'danger');
+            }
+        )
+    };
+    
+    var _updateProductionConfigTable = function() {
+        $('#production-config .facility').html(eveData.facilities[productionSettings.facility].name);
+        $('#production-config .meRig').html(eveData.structureRigs[productionSettings.meRig].meta);
+        $('#production-config .teRig').html(eveData.structureRigs[productionSettings.teRig].meta);
+        $('#production-config .security').html(eveData.securityStatus[productionSettings.security]);
+        $('#production-config .system').html(productionSettings.system);
+        $('#production-config .componentFacility').html(eveData.facilities[productionSettings.componentFacility].name);
+        $('#production-config .componentMeRig').html(eveData.structureRigs[productionSettings.componentMeRig].meta);
+        $('#production-config .componentTeRig').html(eveData.structureRigs[productionSettings.componentTeRig].meta);
+        $('#production-config .componentSecurity').html(eveData.securityStatus[productionSettings.componentSecurity]);
+        $('#production-config .componentSystem').html(productionSettings.componentSystem);
+        $('#production-config .priceMineralRegion').html(regions[productionSettings.priceMineralRegion]);
+        $('#production-config .priceMineralType').html(productionSettings.priceMineralType);
+        $('#production-config .pricePiRegion').html(regions[productionSettings.pricePiRegion]);
+        $('#production-config .pricePiType').html(productionSettings.pricePiType);
+        $('#production-config .priceMoongooRegion').html(regions[productionSettings.priceMoongooRegion]);
+        $('#production-config .priceMoongooType').html(productionSettings.priceMoongooType);
+        $('#production-config .priceOtherRegion').html(regions[productionSettings.priceOtherRegion]);
+        $('#production-config .priceOtherType').html(productionSettings.priceOtherType);
+        if(eveData.facilities[productionSettings.facility].structure) {
+            $('.structure-main').show();
+        } else {
+            $('.structure-main').hide();
+        }
+        if(eveData.facilities[productionSettings.componentFacility].structure) {
+            $('.structure-comp').show();
+        } else {
+            $('.structure-comp').hide();
+        }
+    }
+    
     /**
      * Init all modals
      * @private
@@ -108,7 +180,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         $('#open-modal-prod-settings').on('click', function() {
             $('#modalConfigProd').modal('show');
         });
-        //$('#modal-apply').on('click', _onModalBpApplyOne);
+        $('#modal-prod-apply').on('click', _onModalProdSettingsApply);
     };
 
     var _initTypeahead = function() {
@@ -133,6 +205,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         inventionSettings: inventionSettings,
         researchSettings: researchSettings,
         productionSettings: productionSettings,
+        regions:regions,
     };
 })(jQuery, lb, utils, eveUtils, eveData);
 
