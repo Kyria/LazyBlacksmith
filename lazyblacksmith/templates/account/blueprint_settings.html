@@ -23,7 +23,7 @@
                                     <tr class="structure-main" {% if not pref.is_structure(pref.prod_facility) -%}style="display: none;"{%- endif %}>
                                         <th>Main BPO Security</th>
                                         <td class="security">{{ pref.label_security(pref.prod_security) }}</td>
-                                    </tr>                                
+                                    </tr>
                                     <tr>
                                         <th>Main BPO System index</th>
                                         <td class="system">{{ pref.prod_system }}</td>
@@ -97,34 +97,34 @@
                                 <tbody>
                                     <tr>
                                         <th>Facility</th>
-                                        <td>{{ pref.label_facility(pref.research_facility) }}</td>
+                                        <td class="facility">{{ pref.label_facility(pref.research_facility) }}</td>
                                     </tr>
-                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}> 
+                                    <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
                                         <th>ME Jobs Time Rig</th>
-                                        <td>{{ pref.label_rig(pref.research_me_rig) }}</td>
+                                        <td class="meRig">{{ pref.label_rig(pref.research_me_rig) }}</td>
                                     </tr>
                                     <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
                                         <th>TE Jobs Time Rig</th>
-                                        <td>{{ pref.label_rig(pref.research_te_rig) }}</td>
+                                        <td class="teRig">{{ pref.label_rig(pref.research_te_rig) }}</td>
                                     </tr>
                                     <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
                                         <th>Copy Time Rig</th>
-                                        <td>{{ pref.label_rig(pref.research_copy_rig) }}</td>
+                                        <td class="copyRig">{{ pref.label_rig(pref.research_copy_rig) }}</td>
                                     </tr>
                                     <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
                                         <th>Security</th>
-                                        <td>{{ pref.label_security(pref.research_security) }}</td>
+                                        <td class="security">{{ pref.label_security(pref.research_security) }}</td>
                                     </tr>
                                     <tr>
                                         <th>System index</th>
-                                        <td>{{ pref.research_system }}</td>
+                                        <td class="system">{{ pref.research_system }}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-4 col-sm-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -136,31 +136,31 @@
                                 <tbody>
                                     <tr>
                                         <th>Facility</th>
-                                        <td>{{ pref.label_facility(pref.invention_facility) }}</td>
+                                        <td class="facility">{{ pref.label_facility(pref.invention_facility) }}</td>
                                     </tr>
                                     <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
                                         <th>Invention Time Rig</th>
-                                        <td>{{ pref.label_rig(pref.invention_invention_rig) }}</td>
+                                        <td class="inventionRig">{{ pref.label_rig(pref.invention_invention_rig) }}</td>
                                     </tr>
                                     <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
                                         <th>Copy Time Rig</th>
-                                        <td>{{ pref.label_rig(pref.invention_copy_rig) }}</td>
+                                        <td class="copyRig">{{ pref.label_rig(pref.invention_copy_rig) }}</td>
                                     </tr>
                                     <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
                                         <th>Security</th>
-                                        <td>{{ pref.label_security(pref.invention_security) }}</td>
+                                        <td class="security">{{ pref.label_security(pref.invention_security) }}</td>
                                     </tr>
                                     <tr>
                                         <th>System Index</th>
-                                        <td>{{ pref.invention_system }}</td>
+                                        <td class="system">{{ pref.invention_system }}</td>
                                     </tr>
                                     <tr>
                                         <th>Region Price</th>
-                                        <td>{{ invention_price_region.name }}</td>
+                                        <td class="priceRegion">{{ invention_price_region.name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Price Type</th>
-                                        <td>{{ pref.invention_price_type }}</td>
+                                        <td class="priceType">{{ pref.invention_price_type }}</td>
                                     </tr>
                                 </tbody>
                             </table>
