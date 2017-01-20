@@ -308,6 +308,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             isMaterialListLoaded = true;
 
             // update tables
+            for(var i in materialsData.componentIdList) {
+                var componentId = materialsData.componentIdList[i];
+                _updateComponentBpInfoDisplay(componentId);
+            }
+            
             _updateSummaryTabs();
         });
     };
@@ -575,14 +580,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var _updateComponentBpInfoDisplay = function(id) {
         if(facilityStats[materialsData.materials[id].facility].structure) {
-            var ss = "Security: ";
-            if(materialsData.materials[id].structureSecStatus == 'h') {
-                ss += "High Sec";
-            } else if(materialsData.materials[id].structureSecStatus == 'l') {
-                ss += "Low Sec";
-            } else {
-                ss += "Null Sec / WH";
-            }
+            var ss = eveData.securityStatus[materialsData.materials[id].structureSecStatus];
             var rigs = "ME: " + structureRigs[materialsData.materials[id].structureMeRig].meta;
             rigs += " - TE: " + structureRigs[materialsData.materials[id].structureTeRig].meta;
 
@@ -1375,6 +1373,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         // get materials
         _getComponentMaterials();
+        _updateMaterial();
     };
 
 

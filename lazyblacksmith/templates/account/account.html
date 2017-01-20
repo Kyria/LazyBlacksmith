@@ -70,8 +70,11 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 <!-- config modals -->
+{% block modal %}
+{% set pref = current_user.pref %}
 {% include 'account/dialog.html' %}
 {% endblock %}
 
