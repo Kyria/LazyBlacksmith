@@ -422,6 +422,9 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         // other init that require ajax call
         _initTypeahead();
 
+        // run one recalculation, in case we are not using default data        
+        _updateResearchTimeAndCost();
+        _updateCopyTimeAndCost();
     };
 
 

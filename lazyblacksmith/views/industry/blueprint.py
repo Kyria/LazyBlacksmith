@@ -2,10 +2,11 @@
 import config
 
 from math import ceil
-
 from flask import Blueprint
 from flask import abort
 from flask import render_template
+from flask_login import current_user
+
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Decryptor
@@ -14,6 +15,7 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
+from lazyblacksmith.models import SolarSystem
 
 blueprint = Blueprint('blueprint', __name__)
 
@@ -133,8 +135,12 @@ def research(item_id):
             cost_per_me[level]['job_price_max_run'] += job_price_max_run
 
     # base solar system : 30000142 = Jita
+    system = SolarSystem.query.filter(
+        SolarSystem.name == current_user.pref.research_system
+    ).one_or_none()
+    system_id = 30000142 if not system else system.id
     indexes = IndustryIndex.query.filter(
-        IndustryIndex.solarsystem_id == 30000142,
+        IndustryIndex.solarsystem_id == system_id,
         IndustryIndex.activity.in_([
             Activity.ACTIVITY_COPYING,
             Activity.ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY,
