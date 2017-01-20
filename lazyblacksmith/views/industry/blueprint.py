@@ -230,8 +230,12 @@ def invention(item_id):
         invention_base_cost += item_adjusted_price.price * material.quantity
 
     # base solar system : 30000142 = Jita
+    system = SolarSystem.query.filter(
+        SolarSystem.name == current_user.pref.invention_system
+    ).one_or_none()
+    system_id = 30000142 if not system else system.id
     indexes = IndustryIndex.query.filter(
-        IndustryIndex.solarsystem_id == 30000142,
+        IndustryIndex.solarsystem_id == system_id,
         IndustryIndex.activity.in_([
             Activity.ACTIVITY_COPYING,
             Activity.ACTIVITY_INVENTION,
@@ -244,24 +248,6 @@ def invention(item_id):
 
     # get decryptor
     decryptors = Decryptor.query.all()
-
-    # get price for all materials, for The Forge as default
-    item_price_list = {}
-    item_id_list = [d.item_id for d in decryptors]
-    item_id_list += [m.material_id for m in invention_materials + copy_materials]
-
-    price_list = ItemPrice.query.filter(
-        ItemPrice.item_id.in_(item_id_list),
-        ItemPrice.region_id == 10000002,
-    )
-    for price in price_list:
-        if price.region_id not in item_price_list:
-            item_price_list[price.region_id] = {}
-
-        item_price_list[price.region_id][price.item_id] = {
-            'sell': price.sell_price,
-            'buy': price.buy_price,
-        }
 
     # get regions
     regions = Region.query.filter(
@@ -284,6 +270,5 @@ def invention(item_id):
         'invention_materials': invention_materials,
         'invention_skills': invention_skills,
         'invention_products': invention_products,
-        'item_price_list': item_price_list,
         'regions': regions,
     })

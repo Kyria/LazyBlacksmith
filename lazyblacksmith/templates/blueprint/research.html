@@ -49,49 +49,49 @@
             </div>
             <div class="structure-configs" style="{% if not pref.is_structure(pref.research_facility) -%}display: none;{%- endif %} margin-top:5px">
                 Time Reduction Rigs <br>
-                <div class="btn-group" id="structure-me-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_me_rig == 0 -%}active{%- endif %}">
+                <div class="btn-group btn-group-justified" id="structure-me-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default {% if pref.research_me_rig == 0 -%}active{%- endif %}">
                         <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.research_me_rig == 0 -%}checked{%- endif %}>No ME
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_me_rig == 1 -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_me_rig == 1 -%}active{%- endif %}">
                         <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.research_me_rig == 1 -%}checked{%- endif %}>T1 ME
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_me_rig == 2 -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_me_rig == 2 -%}active{%- endif %}">
                         <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.research_me_rig == 2 -%}checked{%- endif %}>T2 ME
                     </label>
                 </div>
-                <div class="btn-group" id="structure-te-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_te_rig == 0 -%}active{%- endif %}">
+                <div class="btn-group btn-group-justified" id="structure-te-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default {% if pref.research_te_rig == 0 -%}active{%- endif %}">
                         <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.research_te_rig == 0 -%}checked{%- endif %}>No TE
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_te_rig == 1 -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_te_rig == 1 -%}active{%- endif %}">
                         <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.research_te_rig == 1 -%}checked{%- endif %}>T1 TE
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_te_rig == 2 -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_te_rig == 2 -%}active{%- endif %}">
                         <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.research_te_rig == 2 -%}checked{%- endif %}>T2 TE
                     </label>
                 </div>
                 Copy Time Rigs <br>
-                <div class="btn-group" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_copy_rig == 0 -%}active{%- endif %}">
+                <div class="btn-group btn-group-justified" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default {% if pref.research_copy_rig == 0 -%}active{%- endif %}">
                         <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.research_copy_rig == 0 -%}checked{%- endif %}>None
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_copy_rig == 1 -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_copy_rig == 1 -%}active{%- endif %}">
                         <input type="radio" name="structure-copy-rig" autocomplete="off" value="1" {% if pref.research_copy_rig == 1 -%}checked{%- endif %}>T1
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_copy_rig == 2 -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_copy_rig == 2 -%}active{%- endif %}">
                         <input type="radio" name="structure-copy-rig" autocomplete="off" value="2" {% if pref.research_copy_rig == 2 -%}checked{%- endif %}>T2
                     </label>
                 </div>
                 System Security<br>
-                <div class="btn-group" id="structure-sec-status" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_security == 'h' -%}active{%- endif %}">
+                <div class="btn-group btn-group-justified" id="structure-sec-status" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default {% if pref.research_security == 'h' -%}active{%- endif %}">
                         <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.research_security == 'h' -%}checked{%- endif %}>HS
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_security == 'l' -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_security == 'l' -%}active{%- endif %}">
                         <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.research_security == 'l' -%}checked{%- endif %}>LS
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4 {% if pref.research_security == 'n' -%}active{%- endif %}">
+                    <label class="btn btn-sm btn-default {% if pref.research_security == 'n' -%}active{%- endif %}">
                         <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.research_security == 'n' -%}checked{%- endif %}>NS/WH
                     </label>
                 </div>

@@ -2,7 +2,9 @@
 
 {% block title %}:: Search blueprint{% endblock %}
 
+
 {% block js %}
+{% set pref = current_user.pref %}
     <script>
         lb.urls.manufacturingUrl    = "{{ url_for('blueprint.manufacturing', item_id='111111') }}";
         lb.urls.buildCostUrl        = "{{ url_for('ajax_eve_sde.build_cost_item', material_efficiency='0,1,2,3,4,5', blueprint_id=invention_products[0].product_id, region_id=10000002) }}";
@@ -15,9 +17,9 @@
         inventionBlueprint.options.baseInventionProbability = {{ invention_products[0].probability }};
         inventionBlueprint.options.baseOutputRun = {{ invention_products[0].quantity }};
 
-        inventionBlueprint.indexes["Jita"] = {};
+        inventionBlueprint.indexes['{{ pref.invention_system }}'] = {};
         {% for activity, index in index_list.iteritems() -%}
-        inventionBlueprint.indexes["Jita"][{{ activity }}] = {{ index }};
+        inventionBlueprint.indexes['{{ pref.invention_system }}'][{{ activity }}] = {{ index }};
         {% endfor %}
 
         {% for inv_mat in invention_materials %}
@@ -40,62 +42,70 @@
         };
         {% endfor %}
 
+        inventionBlueprint.options.system = '{{ pref.invention_system }}';
+        inventionBlueprint.options.region = {{ pref.invention_price_region }};
+        inventionBlueprint.options.regionType = '{{ pref.invention_price_type }}';
+        inventionBlueprint.options.structureInventionRig = {{ pref.invention_invention_rig }};
+        inventionBlueprint.options.structureCopyRig = {{ pref.invention_copy_rig }};
+        inventionBlueprint.options.structureSecStatus = '{{ pref.invention_security }}';
+        inventionBlueprint.options.facility = {{ pref.invention_facility }};
 
         lb.run('inventionBlueprint');
     </script>
 {% endblock %}
 
 {% block content %}
+{% set pref = current_user.pref %}
 <div class="row">
     <div class="col-md-3 col-sm-4">
         <div class="well">
             <div>
                 Facility<br>
                 <select name="facility" id="facility" class="form-control input-sm">
-                    <option value="0" selected>Station</option>
-                    <option value="1">Raitaru (M-EC)</option>
-                    <option value="2">Azbel (L-EC)</option>
-                    <option value="3">Sotiyo (XL-EC)</option>
-                    <option value="4">Other Structures</option>
-                    <option value="8">Design Laboratory</option>
-                    <option value="10">Experimental Laboratory</option>
+                    <option value="0" {% if pref.invention_facility == 0 -%}selected{%- endif %}>Station</option>
+                    <option value="1" {% if pref.invention_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
+                    <option value="2" {% if pref.invention_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
+                    <option value="3" {% if pref.invention_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
+                    <option value="4" {% if pref.invention_facility == 4 -%}selected{%- endif %}>Other Structures</option>
+                    <option value="8" {% if pref.invention_facility == 8 -%}selected{%- endif %}>Design Laboratory</option>
+                    <option value="10" {% if pref.invention_facility == 10 -%}selected{%- endif %}>Experimental Laboratory</option>
                 </select>
             </div>
-            <div class="structure-configs" style="display: none; margin-top:5px">
+            <div class="structure-configs" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %} margin-top:5px">
                 Invention Time Rigs <br>
-                <div class="btn-group" id="structure-invention-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default col-xs-4 active">
-                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="0" checked>None
+                <div class="btn-group btn-group-justified" id="structure-invention-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default {% if pref.invention_invention_rig == 0 -%}active{%- endif %}">
+                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="0" {% if pref.invention_invention_rig == 0 -%}checked{%- endif %}>None
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4">
-                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="1">T1
+                    <label class="btn btn-sm btn-default {% if pref.invention_invention_rig == 1 -%}active{%- endif %}">
+                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="1" {% if pref.invention_invention_rig == 1 -%}checked{%- endif %}>T1
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4">
-                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="2">T2
+                    <label class="btn btn-sm btn-default {% if pref.invention_invention_rig == 2 -%}active{%- endif %}">
+                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="2" {% if pref.invention_invention_rig == 2 -%}checked{%- endif %}>T2
                     </label>
                 </div>
                 Copy Time Rigs <br>
-                <div class="btn-group" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default col-xs-4 active">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" checked>None
+                <div class="btn-group btn-group-justified" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default {% if pref.invention_copy_rig == 0 -%}active{%- endif %}">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.invention_copy_rig == 0 -%}checked{%- endif %}>None
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="1">T1
+                    <label class="btn btn-sm btn-default {% if pref.invention_copy_rig == 1 -%}active{%- endif %}">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="1" {% if pref.invention_copy_rig == 1 -%}checked{%- endif %}>T1
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="2">T2
+                    <label class="btn btn-sm btn-default {% if pref.invention_copy_rig == 2 -%}active{%- endif %}">
+                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="2" {% if pref.invention_copy_rig == 2 -%}checked{%- endif %}>T2
                     </label>
                 </div>
                 System Security<br>
-                <div class="btn-group" id="structure-sec-status" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default active col-xs-4">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="h" checked>HS
+                <div class="btn-group btn-group-justified" id="structure-sec-status" data-toggle="buttons" style="width:100%">
+                    <label class="btn btn-sm btn-default {% if pref.invention_security == 'h' -%}active{%- endif %}">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.invention_security == 'h' -%}checked{%- endif %}>HS
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="l">LS
+                    <label class="btn btn-sm btn-default {% if pref.invention_security == 'l' -%}active{%- endif %}">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.invention_security == 'l' -%}checked{%- endif %}>LS
                     </label>
-                    <label class="btn btn-sm btn-default col-xs-4">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="n">NS/WH
+                    <label class="btn btn-sm btn-default {% if pref.invention_security == 'n' -%}active{%- endif %}">
+                        <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.invention_security == 'n' -%}checked{%- endif %}>NS/WH
                     </label>
                 </div>
             </div>
@@ -103,7 +113,7 @@
         <div class="well">
             <div>
                 System<br>
-                <input id="system" type="text" class="form-control input-sm typeahead" value="Jita">
+                <input id="system" type="text" class="form-control input-sm typeahead" value="{{ pref.invention_system }}">
             </div>
         </div>
         <div class="well">
@@ -112,9 +122,18 @@
                 <select name="region" id="region" class="form-control input-sm">
                     <option disabled>Select a region</option>
                     {% for region in regions -%}
-                    <option value="{{ region.id }}" {% if region.id == 10000002 -%}selected{% endif %}>{{ region.name }}</option>
+                    <option value="{{ region.id }}" {% if region.id == pref.invention_price_region -%}selected{% endif %}>{{ region.name }}</option>
                     {% endfor %}
                 </select>
+                <div style="margin-top: 5px" class="btn-group btn-group-justified" id="region-order-type" data-toggle="buttons">
+                    <label class="btn btn-default btn-sm btn-sell {% if pref.invention_price_type == 'sell' -%}active{%- endif %}">
+                        <input type="radio" name="region-order-type" autocomplete="off" value="sell" {% if pref.invention_price_type == 'sell' -%}checked{%- endif %}>Sell
+                    </label>
+                    <label class="btn btn-default btn-sm btn-buy {% if pref.invention_price_type == 'buy' -%}active{%- endif %}">
+                        <input type="radio" name="region-order-type" autocomplete="off" value="buy" {% if pref.invention_price_type == 'buy' -%}checked{%- endif %}>Buy
+                    </label>
+                </div>
+
             </div>
         </div>
         <div class="well">

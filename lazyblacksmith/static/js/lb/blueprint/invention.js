@@ -37,6 +37,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         // system
         system: "Jita",
         region: 10000002,
+        regionType: 'buy',
 
         // structure configs
         structureInventionRig: 0,
@@ -229,7 +230,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
             var price = 0;
             if(options.region in priceData.prices && mat.id in priceData.prices[options.region]) {
-                price = priceData.prices[options.region][mat.id].buy;
+                price = priceData.prices[options.region][mat.id][options.regionType];
                 price = (price == 0) ? priceData.prices[options.region][mat.id].sell : price;
             }
             materialPrice += quantity * price;
@@ -242,7 +243,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         var quantity = (options.decryptor == 0) ? 0 : options.runs;
         var price = 0;
         if(options.decryptor != 0 && options.region in priceData.prices && options.decryptor in priceData.prices[options.region]) {
-            price = priceData.prices[options.region][options.decryptor].buy;
+            price = priceData.prices[options.region][options.decryptor][options.regionType];
             price = (price == 0) ? priceData.prices[options.region][options.decryptor].sell : price;
         }
         materialPrice += quantity * price;
@@ -313,6 +314,10 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         });
         $("#structure-sec-status input[type='radio']").on('change', function() {
             options.structureSecStatus = $(this).val();
+            _updateInventionData();
+        });
+        $("#region-order-type input[type='radio']").on('change', function() {
+            options.regionType = $(this).val();
             _updateInventionData();
         });
     };
