@@ -14,8 +14,10 @@ class TaskStatus(db.Model):
 
     TASK_ADJUSTED_PRICE = 'schedule.update_adjusted_price'
     TASK_INDUSTRY_INDEX = 'schedule.update_industry_indexes'
-    TASK_CHARACTER_SKILLS = 'character_skill_update [%d]'
     TASK_MARKET_ORDER = 'esi_region_order_price [%s]'
+    
+    # character related tasks
+    TASK_CHARACTER_SKILLS = 'character_skill_update [%d]'
     
     def get_last_run_format(self):
         """ return the utc string date in iso format without ms and TZ info"""

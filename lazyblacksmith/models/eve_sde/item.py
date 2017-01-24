@@ -5,7 +5,6 @@ from flask import url_for
 
 
 class Item(db.Model):
-
     id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     name = db.Column(db.String(100), nullable=True)
     max_production_limit = db.Column(db.Integer, nullable=True)
@@ -34,3 +33,12 @@ class Item(db.Model):
         if self.product_for_activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).count() > 0:
             return True
         return False
+
+    def is_moon_goo(self):
+        return self.market_group_id == 499
+    
+    def is_pi(self):
+        return self.category_id == 43
+
+    def is_mineral_salvage(self):
+        return self.market_group_id in [1857, 1033, 1863]

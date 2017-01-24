@@ -131,8 +131,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
     var _generateMaterialListPrice = function() {
         priceData.itemList.push(materialsData.productItemId);
         priceData.items[materialsData.productItemId] = {
-            'type': 'sell',
-            'region': 10000002,
+            'type': materialsData.materials[materialsData.productItemId].priceType,
+            'region': materialsData.materials[materialsData.productItemId].priceRegion,
             'id': materialsData.productItemId,
             'name': materialsData.materials[materialsData.productItemId].name,
             'icon': materialsData.materials[materialsData.productItemId].icon,
@@ -147,8 +147,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             if($.inArray(material.id, priceData.itemList) == -1) {
                 priceData.itemList.push(material.id);
                 priceData.items[material.id] = {
-                    'type': 'buy',
-                    'region': 10000002,
+                    'type': material.priceType,
+                    'region': material.priceRegion,
                     'id': material.id,
                     'name': material.name,
                     'icon': material.icon,
@@ -163,8 +163,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                        && $.inArray(subMaterial.id, priceData.itemList) == -1) {
                         subComponentList.push(subMaterial.id);
                         subComponents[subMaterial.id] = {
-                            'type': 'buy',
-                            'region': 10000002,
+                            'type': subMaterial.priceType,
+                            'region': subMaterial.priceRegion,
                             'id': subMaterial.id,
                             'name': subMaterial.name,
                             'icon': subMaterial.icon,
@@ -257,7 +257,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                         'id': tmpSubMaterial['id'],
                         'name': tmpSubMaterial['name'],
                         'icon': tmpSubMaterial['icon'],
-                        'qtyRequiredPerRun': tmpSubMaterial['quantity']
+                        'qtyRequiredPerRun': tmpSubMaterial['quantity'],
+                        'priceType': tmpSubMaterial['price_type'],
+                        'priceRegion': tmpSubMaterial['price_region'],
                     };
 
                     subMaterial.qtyAdjusted = eveUtils.calculateAdjustedQuantity(

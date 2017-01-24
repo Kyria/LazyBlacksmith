@@ -30,6 +30,17 @@
             'structureTeRig': {{ pref.prod_te_rig}},
             'structureMeRig': {{ pref.prod_me_rig}},
             'structureSecStatus': '{{ pref.prod_security }}',
+            'priceType': 'sell',
+            {% if product.product.is_moon_goo() -%}
+            'priceRegion': {{ pref.prod_price_region_moongoo }},
+            {%- elif product.product.is_pi()-%}
+            'priceRegion': {{ pref.prod_price_region_pi }},
+            {%- elif product.product.is_mineral_salvage() -%}
+            'priceRegion': {{ pref.prod_price_region_minerals }},
+            {%- else -%}
+            'priceRegion': {{ pref.prod_price_region_others }},
+            {%- endif %}
+            
         };
 
         {% for material in materials.all() %}
@@ -55,6 +66,19 @@
             'structureTeRig': {{ pref.prod_sub_te_rig }},
             'structureMeRig': {{ pref.prod_sub_me_rig }},
             'structureSecStatus': '{{ pref.prod_sub_security }}',
+            {% if material.material.is_moon_goo() -%}
+            'priceType': '{{ pref.prod_price_type_moongoo }}',
+            'priceRegion': {{ pref.prod_price_region_moongoo }},
+            {%- elif material.material.is_pi()-%}
+            'priceType': '{{ pref.prod_price_type_pi }}',
+            'priceRegion': {{ pref.prod_price_region_pi }},
+            {%- elif material.material.is_mineral_salvage() -%}
+            'priceType': '{{ pref.prod_price_type_minerals }}',
+            'priceRegion': {{ pref.prod_price_region_minerals }},
+            {%- else -%}
+            'priceType': '{{ pref.prod_price_type_others }}',
+            'priceRegion': {{ pref.prod_price_region_others }},
+            {%- endif %}
         };
         {% endfor %}
 

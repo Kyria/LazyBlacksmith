@@ -6,6 +6,7 @@ from flask import Blueprint
 from flask import json
 from flask import jsonify
 from flask import request
+from flask_login import current_user
 from sqlalchemy.orm.exc import NoResultFound
 
 from . import is_not_ajax
@@ -109,11 +110,28 @@ def blueprint_bom(blueprint_id):
                 }
 
             for mat in mats:
+                pref = current_user.pref
+                
+                if mat.material.is_moon_goo():
+                    price_type = pref.prod_price_type_moongoo
+                    price_region = pref.prod_price_region_moongoo
+                elif mat.material.is_pi():
+                    price_type = pref.prod_price_type_pi
+                    price_region = pref.prod_price_region_pi
+                elif mat.material.is_mineral_salvage():
+                    price_type = pref.prod_price_type_minerals
+                    price_region = pref.prod_price_region_minerals
+                else:
+                    price_type = pref.prod_price_type_others
+                    price_region = pref.prod_price_region_others
+                    
                 data[bp_final.id]['materials'].append({
                     'id': mat.material.id,
                     'name': mat.material.name,
                     'quantity': mat.quantity,
                     'icon': mat.material.icon_32(),
+                    'price_type': price_type,
+                    'price_region': price_region,
                 })
 
         return jsonify(result=data.values())
