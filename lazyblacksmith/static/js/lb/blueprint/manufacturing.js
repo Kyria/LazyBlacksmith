@@ -7,6 +7,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
     var tplSublistBlock = '';
     var tplSublistRow = '';
     var tplModalPrice = '';
+    
+    // multibuy field
+    var multiBuy = '';
 
     // page options
     var options = {
@@ -656,11 +659,13 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         }
         var rowMaterial = '<tr>' + iconColumn + '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td></tr>';
         var output = "";
+        multiBuy = '';
 
         for(var id in materialQuantityList) {
             output += rowMaterial.replace(/@@ICON@@/g, materialQuantityList[id].icon)
                                  .replace(/@@NAME@@/g, materialQuantityList[id].name)
                                  .replace(/@@QTY@@/g, Humanize.intcomma(materialQuantityList[id].qty));
+            multiBuy += materialQuantityList[id].name + " " + materialQuantityList[id].qty + "\n";
         }
 
         $('.materials-requirement tbody').html(output);
@@ -1359,6 +1364,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         _initTooltip();
         _initInputs();
         _initSliders();
+        
+        $('#multibuy').on('click', function() {
+            utils.copyToClipboard(multiBuy);
+        });
 
         // check all required urls (so we don't have to do it later)
         if(!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl || !lb.urls.indexActivityUrl

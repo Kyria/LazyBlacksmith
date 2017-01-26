@@ -52,12 +52,30 @@ var utils = (function($) {
                 y: 60,
             },
         });
-    }
+    };
+    
+    var copyToClipboard = function(text) {
+        $('body').append('<textarea id="clipboard" style="height:1px; width:1px; position: fixed; top:0; left:0; border: none; outline:none; background: transparent"></textarea>');
+        $('#clipboard').val(text);
+        $('#clipboard')[0].select();
+        try {
+            var successful = document.execCommand('copy');
+            if (successful) {
+                flashNotify('Multibuy copied to clipboard.', 'success');
+            } else {
+                flashNotify('Copy to clipboard failed.', 'danger');
+            }
+        } catch(err) {
+            flashNotify('Copy to clipboard failed.', 'danger');
+        }
+        $('#clipboard').remove();
+    };
 
     return {
         durationToString: durationToString,
         csrfSafeMethod: csrfSafeMethod,
         flashNotify: flashNotify,
+        copyToClipboard: copyToClipboard,
     }
 
 })(jQuery);
