@@ -23,6 +23,5 @@ eve_oauth = oauth.remote_app(
     consumer_secret=config.ESI_SECRET_KEY,
     request_token_params={
         'state': lambda: security.gen_salt(10),
-        'scope': config.ESI_SCOPE,
     }
 )

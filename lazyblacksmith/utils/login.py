@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from flask import flash
+from flask import session
 from flask_login import login_user
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -30,6 +31,7 @@ def check_login_user(cdata, auth_response, main=None):
             # if no exception is triggered, it mean we have a registered charID
             # but with another account: owner has changed, we'll wipe all data.
             wipe_character_data(user)
+            logout_user()
 
         except NoResultFound:
             user = User()
@@ -49,6 +51,7 @@ def check_login_user(cdata, auth_response, main=None):
 
         if main is None:
             login_user(user)
+            session.permanent = True
             flash('You have successfully logged in.', 'success')
         else:
             flash(
@@ -60,6 +63,7 @@ def check_login_user(cdata, auth_response, main=None):
     except:
         logger.exception("Cannot login the user - uid: %d" % user.character_id)
         db.session.rollback()
+        logout_user()
         flash('Something went wrong. Please try to login again', 'error')
 
 
