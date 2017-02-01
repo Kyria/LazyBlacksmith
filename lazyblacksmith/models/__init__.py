@@ -22,3 +22,4 @@ from .eve_api.task_status import TaskStatus  # noqa
 from .user.user import User  # noqa
 from .user.user_preference import UserPreference  # noqa
 from .user.skill import Skill  # noqa
+from .user.token_scope import TokenScope  # noqa
