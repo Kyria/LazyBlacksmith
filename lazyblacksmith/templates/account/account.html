@@ -45,6 +45,7 @@
         
         // run
         lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_preference') }}";
+        lb.urls.loginUrl = "{{ url_for('sso.login', scopes='XXXXX') }}";
         lb.run('accountDashboard');
     </script>
 {% endblock %}
@@ -54,12 +55,12 @@
 <div class="row">
     <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist" id="account-tabs">
-            <li class="active"><a href="#tab-char" role="tab" data-toggle="tab">Characters</a></li>
+            <li class="active"><a href="#tab-char" role="tab" data-toggle="tab">Account</a></li>
             <li><a href="#tab-bp" role="tab" data-toggle="tab">Blueprint Settings</a></li>
             {% if current_user.is_admin -%}<li><a href="#tab-admin" role="tab" data-toggle="tab">Admin Dashboard</a></li>{%- endif %}
         </ul>
         <div class="tab-content">
-            {% include 'account/character_settings.html' %}
+            {% include 'account/account_settings.html' %}
             {% include 'account/blueprint_settings.html' %}
 
             {% if current_user.is_admin -%}

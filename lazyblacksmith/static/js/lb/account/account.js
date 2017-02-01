@@ -1,9 +1,11 @@
 var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     "use strict";
     var regions = {};
+    var currentScopes = [];
 
     $.extend(lb.urls, {
         updatePreferenceUrl: false,
+        loginUrl: false,
     });
 
     var inventionSettings = {
@@ -46,6 +48,28 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         priceOtherType: false,
     };
 
+    
+    /* ---------------------------------------------------------------------- */
+    /*                        ACCOUNT PREFERENCES                             */
+    /* ---------------------------------------------------------------------- */
+    
+    var _initScopeInput = function() {
+        $("input[name='scope']").on('change', function() {
+            if($(this).is(':checked')) {
+                currentScopes.push($(this).val());
+            } else {
+                currentScopes.splice($.inArray($(this).val(), currentScopes),1);
+            }
+            var url = lb.urls.loginUrl.replace(/XXXXX/, currentScopes.join());
+            $('#update-scope').attr('href', url);
+        });
+    };
+    
+    
+    /* ---------------------------------------------------------------------- */
+    /*                       BLUEPRINT PREFERENCES                            */
+    /* ---------------------------------------------------------------------- */
+    
     var _initInventionModal = function() {
         $('#modalConfigInvention').on('show.bs.modal', function(event) {
             $('#modal-facility-invention').val(inventionSettings.facility);
@@ -333,6 +357,8 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     var run = function() {
         _initModal();
         _initTypeahead();
+        _initScopeInput();
+        $('[data-toggle="tooltip"]').tooltip();
     };
 
     // -------------------------------------------------
