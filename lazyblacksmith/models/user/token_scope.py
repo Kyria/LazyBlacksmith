@@ -24,6 +24,7 @@ class TokenScope(db.Model):
     access_token_expires = db.Column(UTCDateTime(timezone=True))
     refresh_token = db.Column(db.String(100))
     last_update = db.Column(UTCDateTime(timezone=True))
+    cached_until = db.Column(UTCDateTime(timezone=True))
 
     created_at = db.Column(
         UTCDateTime(timezone=True),
@@ -54,3 +55,21 @@ class TokenScope(db.Model):
                 self.access_token_expires - utcnow()
             ).total_seconds()
         }
+        
+    def get_last_update_string(self):
+        """ return the utc string date in iso format without ms and TZ info"""
+        if self.last_update:
+            return self.last_update.replace(
+                microsecond=0, tzinfo=None
+            ).isoformat(' ')
+        else:
+            return "Never updated"
+        
+    def get_cached_until_string(self):
+        """ return the utc string date in iso format without ms and TZ info"""
+        if self.cached_until:
+            return self.cached_until.replace(
+                microsecond=0, tzinfo=None
+            ).isoformat(' ')
+        else:
+            return "Unknown"

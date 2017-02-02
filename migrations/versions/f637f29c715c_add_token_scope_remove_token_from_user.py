@@ -24,6 +24,7 @@ def upgrade():
     sa.Column('access_token_expires', sa.DateTime(timezone=True), nullable=True),
     sa.Column('refresh_token', sa.String(length=100), nullable=True),
     sa.Column('last_update', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('cached_until', sa.DateTime(timezone=True), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text(u'now()'), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.character_id'], ),
