@@ -6,12 +6,79 @@ from flask_login import current_user
 from flask_login import login_required
 
 from lazyblacksmith.models import db
+from lazyblacksmith.models import TokenScope
 
 import logging
 
 
 logger = logging.getLogger('%s.views.ajax' % __name__)
 ajax_account = Blueprint('ajax_account', __name__)
+
+
+@ajax_account.route('/scopes/<int:character_id>/<scope>', methods=['DELETE'])
+@login_required
+def delete_scope(character_id, scope):
+    if request.is_xhr:
+        allowed_character_id = [
+            alt.character_id for alt in current_user.alts_characters.all()
+        ]
+        if (character_id == current_user.character_id 
+           or character_id in allowed_character_id):
+            try:
+                TokenScope.query.filter(
+                    TokenScope.user_id == character_id,
+                    TokenScope.scope == scope
+                ).delete()
+                db.session.commit()
+                return jsonify({'status': 'success'})
+                
+            except:
+                logger.exception('Cannot delete scope %s for user_id %s' % (
+                    scope,
+                    character_id,
+                ))
+                db.session.rollback()
+                response = jsonify({
+                    'status': 'error',
+                    'message': 'Error while trying to delete scope'
+                })
+                response.status_code = 500
+                return response
+        else:
+            response = jsonify({
+                'status': 'error',
+                'message': 'This character does not belong to you'
+            })
+            response.status_code = 500
+            return response
+    else:
+        return 'Cannot call this page directly', 403
+        
+
+@ajax_account.route('/scopes/<character_id>/<scope>', methods=['POST'])
+@login_required
+def update_scope(character_id, scope):
+    if request.is_xhr:
+        allowed_character_id = [
+            alt.character_id for alt in current_user.alts_characters.all()
+        ]
+        if (character_id == current_user.character_id 
+           or character_id in allowed_character_id):
+            response = jsonify({
+                'status': 'error',
+                'message': 'Not yet implemented !'
+            })
+            response.status_code = 500
+
+        else:
+            response = jsonify({
+                'status': 'error',
+                'message': 'This character does not belong to you'
+            })
+            response.status_code = 500
+            return response
+    else:
+        return 'Cannot call this page directly', 403
 
 
 @ajax_account.route('/user_preference/', methods=['POST'])

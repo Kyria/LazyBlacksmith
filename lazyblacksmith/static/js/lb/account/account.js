@@ -60,10 +60,28 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             } else {
                 currentScopes.splice($.inArray($(this).val(), currentScopes),1);
             }
-            var url = lb.urls.loginUrl.replace(/XXXXX/, currentScopes.join());
+            var url = lb.urls.loginUrl.replace(/SCOPE_REPLACE/, currentScopes.join());
             $('#update-scope').attr('href', url);
         });
     };
+    
+    var _initScopeActions = function() {
+        $('.delete-scope').on('click', function() {
+            var charId = parseInt($(this).attr('data-char-id'));
+            var scope = $(this).attr('data-scope');
+            utils.ajaxDeleteCallJson(
+                lb.urls.deleteScopeUrl.replace(/SCOPE_REPLACE/, scope).replace(/123456789/, charId),
+                function(success) {
+                    utils.flashNotify('Scope deleted.', 'success');
+                    $('#scope-'+charId+'[data-scope="'+scope+'"]').remove();
+                },
+                
+                function(errorData) {
+                    utils.flashNotify(errorData.responseJSON['message'], 'danger');
+                }
+            )
+        });        
+    }
     
     
     /* ---------------------------------------------------------------------- */
@@ -358,6 +376,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         _initModal();
         _initTypeahead();
         _initScopeInput();
+        _initScopeActions();
         $('[data-toggle="tooltip"]').tooltip();
     };
 

@@ -71,11 +71,63 @@ var utils = (function($) {
         $('#clipboard').remove();
     };
 
+    
+    /**
+     * Generic ajax get call, without data parameters with json dataType as result
+     * @param url the url to call
+     * @param callback function to call when ajax call succeed
+     */
+    var ajaxGetCallJson = function(url, callback) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: callback,
+        });
+    };
+    
+    /**
+     * Generic ajax post call, with json dataType as result
+     * also setting content-type to application/json 
+     * @param url the url to call
+     * @param callback function to call when ajax call succeed
+     */
+    var ajaxPostCallJson = function(url, data, successCallback, errorCallback) {
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: data,
+            success: successCallback,
+            error: errorCallback
+        });
+    };
+
+    /**
+     * Generic ajax get call, without data parameters with json dataType as result
+     * @param url the url to call
+     * @param callback function to call when ajax call succeed
+     */
+    var ajaxDeleteCallJson = function(url, successCallback, errorCallback) {
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            dataType: 'json',
+            success: successCallback,
+            error: errorCallback
+        });
+    };
+    
     return {
         durationToString: durationToString,
         csrfSafeMethod: csrfSafeMethod,
         flashNotify: flashNotify,
         copyToClipboard: copyToClipboard,
+        
+        ajaxDeleteCallJson: ajaxDeleteCallJson,
+        ajaxPostCallJson: ajaxPostCallJson,
+        ajaxGetCallJson: ajaxGetCallJson,
     }
 
 })(jQuery);

@@ -45,22 +45,23 @@
         
         // run
         lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_preference') }}";
-        lb.urls.loginUrl = "{{ url_for('sso.login', scopes='XXXXX') }}";
+        lb.urls.loginUrl = "{{ url_for('sso.login', scopes='SCOPE_REPLACE') }}";;
+        lb.urls.deleteScopeUrl = "{{ url_for('ajax_account.delete_scope', scope='SCOPE_REPLACE', character_id=123456789) }}"
         lb.run('accountDashboard');
     </script>
 {% endblock %}
 
 {% block content %}
-    {% set pref = current_user.pref %}
+{% set pref = current_user.pref %}
 <div class="row">
     <div class="col-md-12">
         <ul class="nav nav-tabs" role="tablist" id="account-tabs">
-            <li class="active"><a href="#tab-char" role="tab" data-toggle="tab">Account</a></li>
+            <li class="active"><a href="#tab-char" role="tab" data-toggle="tab">API Settings</a></li>
             <li><a href="#tab-bp" role="tab" data-toggle="tab">Blueprint Settings</a></li>
             {% if current_user.is_admin -%}<li><a href="#tab-admin" role="tab" data-toggle="tab">Admin Dashboard</a></li>{%- endif %}
         </ul>
         <div class="tab-content">
-            {% include 'account/account_settings.html' %}
+            {% include 'account/api_settings.html' %}
             {% include 'account/blueprint_settings.html' %}
 
             {% if current_user.is_admin -%}

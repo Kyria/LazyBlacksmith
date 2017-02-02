@@ -1,4 +1,4 @@
-var eveUtils = (function() {
+var eveUtils = (function(utils) {
     "use strict";
     /**
      * Calculate the adjusted quantity
@@ -321,4 +321,4 @@ var eveUtils = (function() {
         initSolarSystemTypeahead: initSolarSystemTypeahead,
     };
 
-})();
+})(utils);
