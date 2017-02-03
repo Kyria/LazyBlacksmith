@@ -60,7 +60,7 @@ def update_character_skills_task(self, character_id):
 
         db.session.commit()
     else:
-        self.end(TaskState.FAILED)
+        self.end(TaskState.ERROR)
         return
         
     # update the token and the state
