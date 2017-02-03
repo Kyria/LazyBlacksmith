@@ -18,7 +18,6 @@ from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import User
 from lazyblacksmith.models import UserPreference
 from lazyblacksmith.models import db
-from lazyblacksmith.tasks.character_skills import update_character_skills
 
 import base64
 import logging

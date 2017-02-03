@@ -7,7 +7,6 @@ from flask_login import current_user
 from flask_login import login_required
 
 from lazyblacksmith.models import Region
-from lazyblacksmith.models import TaskStatus
 
 account = Blueprint('account', __name__)
 
@@ -15,11 +14,6 @@ account = Blueprint('account', __name__)
 @account.route('/')
 @login_required
 def index():
-    # get all tasks status
-    skill_status = TaskStatus.query.get(
-        TaskStatus.TASK_CHARACTER_SKILLS % current_user.character_id
-    )
-    
     # get region from pref price region (for display)
     all_regions = Region.query.filter(Region.wh == False).all()
     the_forge_region = Region.query.get(10000002)
@@ -52,7 +46,6 @@ def index():
         prod_price_region_others = the_forge_region
     
     return render_template('account/account.html', **{
-        'skill_status': skill_status,
         'invention_price_region': invention_price_region,
         'prod_price_region_minerals': prod_price_region_minerals,
         'prod_price_region_pi': prod_price_region_pi,

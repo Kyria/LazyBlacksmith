@@ -33,7 +33,8 @@ celery_app.conf.beat_schedule.update({
 })
 
 celery_app.conf.imports = [
-    'lazyblacksmith.tasks.adjusted_price',
-    'lazyblacksmith.tasks.market_order',
-    'lazyblacksmith.tasks.industry_index',
+    #'lazyblacksmith.tasks.market.adjusted_price',
+    #'lazyblacksmith.tasks.market.market_order',
+    #'lazyblacksmith.tasks.industry.indexes',
+    'lazyblacksmith.tasks.character.character_skills'
 ]

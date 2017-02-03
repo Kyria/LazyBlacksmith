@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+from ..lb_task import LbTask
+
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy import esisecurity
@@ -6,7 +8,8 @@ from lazyblacksmith.extension.esipy.operations import get_characters_skills
 from lazyblacksmith.models import User
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import Skill
-from lazyblacksmith.models import TaskStatus
+from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
@@ -17,28 +20,31 @@ import json
 import pytz
 
 
-@celery_app.task(name="character_skill_update")
-def update_character_skills(character_id):
+@celery_app.task(name="character_skill_update", base=LbTask, bind=True)
+def update_character_skills_task(self, character_id):
+    self.start()
     skill_number = 0
 
     character = User.query.get(character_id)
     if character is None:
         return
 
-    esisecurity.update_token(character.get_sso_data())
+    # get token
+    token = self.get_token_scope(
+        user_id=character_id,
+        scope=TokenScope.SCOPE_SKILL
+    )
+    esisecurity.update_token(token.get_sso_data())
 
+    # get current character skills from ESI
     character_skills = esiclient.request(
         get_characters_skills(character_id=character_id),
     )
 
     if character_skills.status == 200:
         for skill_object in character_skills.data.skills:
-            item = Item.query.get(skill_object.skill_id)
-            if item is None:
-                continue
-
             char_skill = character.skills.filter(
-                Skill.skill_id == item.id
+                Skill.skill_id == skill_object.skill_id
             ).one_or_none()
             
             if char_skill:
@@ -46,24 +52,22 @@ def update_character_skills(character_id):
             else:            
                 skill = Skill(
                     character=character,
-                    skill=item,
+                    skill_id=skill_object.skill_id,
                     level=skill_object.current_skill_level,
                 )
                 db.session.merge(skill)
             skill_number += 1
 
         db.session.commit()
-
-    task_status = TaskStatus(
-        name=TaskStatus.TASK_CHARACTER_SKILLS % character_id,
-        expire=datetime(
-            *parsedate(character_skills.header['Expires'][0])[:6]
-        ).replace(tzinfo=pytz.utc),
-        last_run=utcnow(),
-        results=json.dumps({
-            'character_id': character_id,
-            'inserted': skill_number
-        })
-    )
-    db.session.merge(task_status)
+    else:
+        self.end(TaskState.FAILED)
+        return
+        
+    # update the token and the state
+    token.last_update = utcnow()
+    token.cached_until = datetime(
+        *parsedate(character_skills.header['Expires'][0])[:6]
+    ).replace(tzinfo=pytz.utc)
     db.session.commit()
+    self.end(TaskState.SUCCESS)
+
