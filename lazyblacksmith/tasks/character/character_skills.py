@@ -20,8 +20,8 @@ import json
 import pytz
 
 
-@celery_app.task(name="character_skill_update", base=LbTask, bind=True)
-def update_character_skills_task(self, character_id):
+@celery_app.task(name="update_character_skill", base=LbTask, bind=True)
+def task_update_character_skills(self, character_id):
     self.start()
     skill_number = 0
 
