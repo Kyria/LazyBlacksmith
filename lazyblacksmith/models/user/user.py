@@ -18,6 +18,11 @@ class User(db.Model, UserMixin):
     character_name = db.Column(db.String(200))
     is_admin = db.Column(db.Boolean, default=False)
 
+    current_login_at = db.Column(
+       UTCDateTime(timezone=True),
+       server_default=func.now(),
+    )
+    
     created_at = db.Column(
         UTCDateTime(timezone=True),
         server_default=func.now()

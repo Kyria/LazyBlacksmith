@@ -8,6 +8,7 @@ import flask_login
 
 # helpers
 from lazyblacksmith.utils.template_filter import templatefilter
+from lazyblacksmith.utils.time import utcnow
 
 # db
 from lazyblacksmith.models import db
@@ -78,7 +79,7 @@ def register_errorhandlers(app):
         error_code = getattr(error, 'code', 500)
         return render_template("{0}.html".format(error_code)), error_code
 
-    for errcode in [401, 404, 500]:
+    for errcode in [401, 403, 404, 500]:
         app.errorhandler(errcode)(render_error)
 
 
@@ -86,7 +87,14 @@ def register_before_requests(app):
     """Register before_request functions."""
     def global_user():
         g.user = flask_login.current_user
+    
+    def update_current_login_at():
+        if flask_login.current_user.is_authenticated:
+            flask_login.current_user.current_login_at = utcnow()
+            db.session.commit()
+        
     app.before_request(global_user)
+    app.before_request(update_current_login_at)
 
 
 def register_context_processors(app):
