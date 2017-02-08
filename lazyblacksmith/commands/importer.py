@@ -35,8 +35,6 @@ class Importer(object):
         (Region, DELETE),
         (Constellation, DELETE),
         (SolarSystem, DELETE),
-        (ItemAdjustedPrice, DELETE),
-        (IndustryIndex, DELETE),
     ]
 
     def __init__(self, sde_connection, lb_engine):
@@ -680,17 +678,3 @@ class Importer(object):
             )
 
         return (added, total)
-
-    def import_itemadjustedprice(self):
-        """
-        import item adjusted price into DB
-        """
-        from lazyblacksmith.tasks.adjusted_price import update_adjusted_price
-        return update_adjusted_price()
-
-    def import_industryindex(self):
-        """
-        import industry index into DB
-        """
-        from lazyblacksmith.tasks.industry_index import update_industry_index
-        return update_industry_index()
