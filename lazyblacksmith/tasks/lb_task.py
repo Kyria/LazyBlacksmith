@@ -5,7 +5,10 @@ from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.utils.time import utcnow
 
+
 class LbTask(celery_app.Task):
+    """ Base class for task, that defines some basic methods, such as
+    update for the task state, and allow to get the token_scope easily """
     def start(self):
         task_state = TaskState.query.get(self.request.id)
         if task_state:

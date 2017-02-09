@@ -8,7 +8,9 @@ from celery import Celery
 
 
 class FlaskCelery(Celery):
-
+    """ Redefine the Celery object init. Also add a patch to add the 
+    flask context within tasks """
+    
     def __init__(self, *args, **kwargs):
 
         super(FlaskCelery, self).__init__(*args, **kwargs)

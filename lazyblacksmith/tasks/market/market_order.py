@@ -37,7 +37,7 @@ logger = logging.getLogger('lb.tasks')
 
 @celery_app.task(name="spawn_market_price_tasks", base=LbTask, bind=True)
 def spawn_market_price_tasks(self):
-    """Celery task to upgrade prices"""
+    """Celery task to spawn market prices update tasks"""
     self.start()
     region_list = Region.query.filter(
         Region.id.in_(config.ESI_REGION_PRICE)
@@ -77,9 +77,7 @@ def spawn_market_price_tasks(self):
 
 @celery_app.task(name="update_region_order_price", base=LbTask, bind=True)
 def task_update_region_order_price(self, region_id, item_id_list):
-    """
-    Get and return the orders <type> (sell|buy) from
-    a given region
+    """ Get the price from the API and update the database for a given region
     """
     self.start()
 

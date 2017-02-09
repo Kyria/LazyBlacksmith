@@ -44,7 +44,7 @@
         accountDashboard.productionSettings.priceOtherType = '{{ pref.prod_price_type_others }}';
         
         // run
-        lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_preference') }}";
+        lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_industry_preference') }}";
         lb.urls.loginUrl = "{{ url_for('sso.login', scopes='SCOPE_REPLACE') }}";;
         lb.urls.deleteScopeUrl = "{{ url_for('ajax_account.delete_scope', scope='SCOPE_REPLACE', character_id=123456789) }}"
         lb.run('accountDashboard');

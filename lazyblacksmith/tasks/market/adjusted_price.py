@@ -18,6 +18,7 @@ import pytz
 
 @celery_app.task(name="update_adjusted_price", base=LbTask, bind=True)
 def task_update_adjusted_price(self):
+    """ Task that update the adjusted prices from the API """
     self.start()
     item_adjusted_price = []
     count = 0

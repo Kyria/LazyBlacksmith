@@ -219,7 +219,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             // if any template is not yet set, try again in 1sec
             return setTimeout(_getComponentMaterials, 100);
         }
-        $.getJSON(lb.urls.materialBOMUrl, function(materialListResult) {
+        utils.ajaxGetCallJson(lb.urls.materialBOMUrl, function(materialListResult) {
             var materialList = materialListResult['result'];
             var html = '';
 

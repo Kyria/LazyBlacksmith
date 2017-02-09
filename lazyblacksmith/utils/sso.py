@@ -26,6 +26,12 @@ logger = logging.getLogger("%s.utils.login" % __name__)
 
 
 def check_get_user(id, owner_hash, in_login=False):
+    """ Check if a user exists and return it.
+    
+    If the user exists, we return it.
+    If the user exists but with another owner hash, we delete it first
+    If the user does not exist, return a new user object 
+    """
     try:
         user = User.query.filter(
             User.character_id == id,
@@ -53,7 +59,8 @@ def check_get_user(id, owner_hash, in_login=False):
     return user
 
 
-def check_login_user(cdata, auth_response):
+def login_user_oauth(cdata, auth_response):
+    """ Login the user and update his data """
     user = check_get_user(
         cdata['CharacterID'],
         cdata['CharacterOwnerHash'],
@@ -65,7 +72,12 @@ def check_login_user(cdata, auth_response):
     try:
         db.session.merge(user)
         db.session.commit()
-        update_data(user)
+
+        if not user.pref and not user.main_character:
+            prefs = UserPreference()
+            prefs.user = user
+            db.session.merge(prefs)
+            db.session.commit()
 
         login_user(user)
         session.permanent = True
@@ -79,6 +91,7 @@ def check_login_user(cdata, auth_response):
 
 
 def add_scopes(cdata, auth_response, scopes, current_user):
+    """ Add a new scope to a logged user """ 
     # get or create the character
     user = check_get_user(
         cdata['CharacterID'],
@@ -107,9 +120,15 @@ def add_scopes(cdata, auth_response, scopes, current_user):
 
 
 def wipe_character_data(user):
+    """ Remove the data from the database of a given user """
     # remove preferences
     UserPreference.query.filter(
         UserPreference.user_id == user.character_id
+    ).delete()
+    
+    # remove scopes
+    TokenScope.query.filter(
+        TokenScope.user_id == user.character_id
     ).delete()
 
     # remove skills
@@ -120,18 +139,6 @@ def wipe_character_data(user):
 
     # commit
     db.session.commit()
-
-
-def update_data(user):
-    if not user.pref and not user.main_character:
-        try:
-            prefs = UserPreference()
-            prefs.user = user
-            db.session.merge(prefs)
-            db.session.commit()
-        except:
-            logger.exception("Failed to initialize user preference")
-            db.session.rollback()
 
 
 def is_safe_url(target):
@@ -160,6 +167,7 @@ def safe_redirect(target, endpoint="home.index"):
 
 
 def build_state_token(**kwargs):
+    """ Build the authorization state token with some data """
     redirect_uri = kwargs.pop('redirect', 'home.index')
     scopes = kwargs.pop('scopes', [])
 
@@ -172,6 +180,7 @@ def build_state_token(**kwargs):
 
 
 def extract_state_token(token_string):
+    """ Extract the data from a state token string """
     b64_json = str(unquote(token_string))
     json_string = base64.urlsafe_b64decode(b64_json)
     json_state = json.loads(json_string)

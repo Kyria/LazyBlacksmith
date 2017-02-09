@@ -18,7 +18,7 @@ from lazyblacksmith.utils.sso import build_state_token
 from lazyblacksmith.utils.sso import extract_state_token
 from lazyblacksmith.utils.sso import safe_redirect
 from lazyblacksmith.utils.sso import get_redirect_target
-from lazyblacksmith.utils.sso import check_login_user
+from lazyblacksmith.utils.sso import login_user_oauth
 
 sso = Blueprint('sso', __name__)
 
@@ -59,7 +59,7 @@ def callback():
     if current_user.is_authenticated:
         add_scopes(cdata, auth_response, scopes, current_user)
     else:
-        check_login_user(cdata, auth_response)
+        login_user_oauth(cdata, auth_response)
 
     return safe_redirect(redirect)
 

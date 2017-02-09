@@ -1,4 +1,4 @@
-var searchBlueprint = (function ($, lb) {
+var searchBlueprint = (function ($, lb, utils) {
     "use strict";
 
     var blueprintBodyResult = '#searchBlueprintResult tbody';
@@ -42,7 +42,7 @@ var searchBlueprint = (function ($, lb) {
         url = url.replace(/0000/, nameEscaped);
 
         // ajax call to get the blueprints
-        $.getJSON(url, function(jsonData) {
+        utils.ajaxGetCallJson(url, function(jsonData) {
             var htmlResult = "";
             var data = jsonData.result;
 
@@ -65,8 +65,7 @@ var searchBlueprint = (function ($, lb) {
             } else {
                 $(blueprintBodyResult).html(htmlResult);
             }
-        })
-        .fail(function() {
+        }, function() {
             $(blueprintBodyResult).html('<tr><td colspan="2">Error while trying to get results.</td></tr>');
         });
     };
@@ -96,6 +95,6 @@ var searchBlueprint = (function ($, lb) {
         run: run,
     }
 
-}) (jQuery, lb);
+}) (jQuery, lb, utils);
 
 lb.registerModule('searchBlueprint', searchBlueprint);

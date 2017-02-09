@@ -22,6 +22,7 @@ import pytz
 
 @celery_app.task(name="update_character_skill", base=LbTask, bind=True)
 def task_update_character_skills(self, character_id):
+    """ Update the skills for a given character_id """
     self.start()
     skill_number = 0
 

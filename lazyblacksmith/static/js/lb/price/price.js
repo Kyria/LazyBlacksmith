@@ -1,4 +1,4 @@
-var itemPriceLookup = (function ($, lb, Humanize) {
+var itemPriceLookup = (function ($, lb, Humanize, utils) {
     "use strict";
 
     var sorting = [[1,1]];
@@ -49,7 +49,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
         url = url.replace(/0000/, nameEscaped);
 
         // ajax call to get the blueprints
-        $.getJSON(url, function(jsonData) {
+        utils.ajaxGetCallJson(url, function(jsonData) {
             var htmlResult = "";
             var data = jsonData.result;
 
@@ -94,8 +94,7 @@ var itemPriceLookup = (function ($, lb, Humanize) {
             if(itemIdHash) {
                 $(".search-price[data-id='"+itemIdHash+"']").click();
             }
-        })
-        .fail(function() {
+        }, function() {
             $(itemSearchBodyResult).html("");
         });
     };
@@ -189,6 +188,6 @@ var itemPriceLookup = (function ($, lb, Humanize) {
         options: options,
     }
 
-}) (jQuery, lb, Humanize);
+}) (jQuery, lb, Humanize, utils);
 
 lb.registerModule('itemPriceLookup', itemPriceLookup);

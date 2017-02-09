@@ -18,6 +18,7 @@ ajax_account = Blueprint('ajax_account', __name__)
 @ajax_account.route('/scopes/<int:character_id>/<scope>', methods=['DELETE'])
 @login_required
 def delete_scope(character_id, scope):
+    """ Remove a scope for a given character_id from the database """ 
     if request.is_xhr:
         allowed_character_id = [
             alt.character_id for alt in current_user.alts_characters.all()
@@ -53,37 +54,12 @@ def delete_scope(character_id, scope):
             return response
     else:
         return 'Cannot call this page directly', 403
-        
-
-@ajax_account.route('/scopes/<character_id>/<scope>', methods=['POST'])
-@login_required
-def update_scope(character_id, scope):
-    if request.is_xhr:
-        allowed_character_id = [
-            alt.character_id for alt in current_user.alts_characters.all()
-        ]
-        if (character_id == current_user.character_id 
-           or character_id in allowed_character_id):
-            response = jsonify({
-                'status': 'error',
-                'message': 'Not yet implemented !'
-            })
-            response.status_code = 500
-
-        else:
-            response = jsonify({
-                'status': 'error',
-                'message': 'This character does not belong to you'
-            })
-            response.status_code = 500
-            return response
-    else:
-        return 'Cannot call this page directly', 403
 
 
 @ajax_account.route('/user_preference/', methods=['POST'])
 @login_required
-def update_user_preference():
+def update_user_industry_preference():
+    """ Update the user preferences for industry """
     if request.is_xhr:
         preferences = request.get_json()
 
@@ -100,6 +76,8 @@ def update_user_preference():
 
 
 def update_production_preference(preferences):
+    """ Called by update_user_industry_preference, update the production
+    preferences """
     if preferences:
         pref = current_user.pref
 
@@ -145,6 +123,8 @@ def update_production_preference(preferences):
 
 
 def update_invention_preference(preferences):
+    """ Called by update_user_industry_preference, update the invention
+    preferences """
     if preferences:
         pref = current_user.pref
 
@@ -179,6 +159,8 @@ def update_invention_preference(preferences):
 
 
 def update_research_preference(preferences):
+    """ Called by update_user_industry_preference, update the research
+    preferences """
     if preferences:
         pref = current_user.pref
 

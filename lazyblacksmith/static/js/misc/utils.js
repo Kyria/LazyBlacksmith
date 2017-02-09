@@ -54,6 +54,10 @@ var utils = (function($) {
         });
     };
     
+    /**
+     * Copy a given text into clipboard using textarea trick.
+     * @param text the text we want to copy
+     */
     var copyToClipboard = function(text) {
         $('body').append('<textarea id="clipboard" style="height:1px; width:1px; position: fixed; top:0; left:0; border: none; outline:none; background: transparent"></textarea>');
         $('#clipboard').val(text);
@@ -77,12 +81,13 @@ var utils = (function($) {
      * @param url the url to call
      * @param callback function to call when ajax call succeed
      */
-    var ajaxGetCallJson = function(url, callback) {
+    var ajaxGetCallJson = function(url, successCallback, errorCallback) {
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
-            success: callback,
+            success: successCallback,
+            error: errorCallback,
         });
     };
     

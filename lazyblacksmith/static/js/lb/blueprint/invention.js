@@ -119,7 +119,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             return;
         }
 
-        eveUtils.ajaxGetCallJson(lb.urls.buildCostUrl, function(jsonPrice) {
+        utils.ajaxGetCallJson(lb.urls.buildCostUrl, function(jsonPrice) {
             outputPrices = jsonPrice['prices'];
             callback();
         });
