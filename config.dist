@@ -1,3 +1,6 @@
+from lazyblacksmith import __version__ as version
+import datetime
+
 # Application configurations
 # ------------------------------------------------------
 DEBUG = True
@@ -32,6 +35,8 @@ CACHE_TYPE = 'null'
 # ------------------------------------------------------
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 CELERY_RESULT_BACKEND = 'rpc://'
+CELERY_TASK_IGNORE_RESULT = True
+CELERY_TASK_DEFAULT_QUEUE = 'lbqueue'
 
 
 # EVE Online API Informations
@@ -57,12 +62,6 @@ ESI_REDIRECT_DOMAIN = ''
 # None for default
 # ------------------------------------------------------
 ESI_USER_AGENT = 'LazyBlacksmith/%d' % version
-
-# ------------------------------------------------------
-# Scope required for ESI
-# please do not touch this
-# ------------------------------------------------------
-ESI_SCOPE = ['esi-skills.read_skills.v1', 'esi-location.read_location.v1']
 
 # ------------------------------------------------------
 # Request per seconds for market order fetch (via ESI)
@@ -148,3 +147,8 @@ ESI_REGION_PRICE = [
 # ------------------------------------------------------
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 CACHE_NO_NULL_WARNING = True
+
+# ------------------------------------------------------
+# Session settings
+# ------------------------------------------------------
+PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=30)

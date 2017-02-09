@@ -1,9 +1,11 @@
 # -*- encoding: utf-8 -*-
+from ..lb_task import LbTask
+
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_industry_systems
 from lazyblacksmith.models import IndustryIndex
-from lazyblacksmith.models import TaskStatus
+from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
@@ -14,9 +16,10 @@ import json
 import pytz
 
 
-@celery_app.task(name="schedule.update_industry_indexes")
-def update_industry_index():
+@celery_app.task(name="update_industry_indexes", base=LbTask, bind=True)
+def task_update_industry_indexes(self):
     """ Get the industry indexes list from API. """
+    self.start()
     all_indexes = esiclient.request(get_industry_systems())
     insert_index_list = []
 
@@ -39,16 +42,8 @@ def update_industry_index():
             insert_index_list
         )
         db.session.commit()
+        self.end(TaskState.SUCCESS)
+        
+    else:
+        self.end(TaskState.ERROR)
 
-    task_status = TaskStatus(
-        name=TaskStatus.TASK_INDUSTRY_INDEX,
-        expire=datetime(
-            *parsedate(all_indexes.header['Expires'][0])[:6]
-        ).replace(tzinfo=pytz.utc),
-        last_run=utcnow(),
-        results=json.dumps({'inserted': len(insert_index_list)})
-    )
-    db.session.merge(task_status)
-    db.session.commit()
-
-    return (len(insert_index_list), len(insert_index_list))

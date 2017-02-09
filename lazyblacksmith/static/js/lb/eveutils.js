@@ -1,4 +1,4 @@
-var eveUtils = (function() {
+var eveUtils = (function(utils) {
     "use strict";
     /**
      * Calculate the adjusted quantity
@@ -204,39 +204,7 @@ var eveUtils = (function() {
         return baseCost * systemCostIndex * runs * 0.02 * tax;
     }
 
-
-    /**
-     * Generic ajax get call, without data parameters with json dataType as result
-     * @param url the url to call
-     * @param callback function to call when ajax call succeed
-     */
-    var ajaxGetCallJson = function(url, callback) {
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            success: callback,
-        });
-    };
     
-    /**
-     * Generic ajax post call, with json dataType as result
-     * also setting content-type to application/json 
-     * @param url the url to call
-     * @param callback function to call when ajax call succeed
-     */
-    var ajaxPostCallJson = function(url, data, successCallback, errorCallback) {
-        $.ajax({
-            url: url,
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: data,
-            success: successCallback,
-            error: errorCallback
-        });
-    };
-
     /**
      * Proxy function to get system cost indexes from backend
      * @param systemList the array of system names
@@ -245,7 +213,7 @@ var eveUtils = (function() {
     var getSystemCostIndex = function(systemList, callback) {
         var systems = ($.isArray(systemList)) ? systemList.join(',') : systemList;
         var url = lb.urls.indexActivityUrl.replace(/SYSTEM_LIST_TO_REPLACE/, systems);
-        ajaxGetCallJson(url, callback);
+        utils.ajaxGetCallJson(url, callback);
 
     };
 
@@ -257,7 +225,7 @@ var eveUtils = (function() {
     var getItemPrices = function(itemList, callback) {
         var items = ($.isArray(itemList)) ? itemList.join(',') : itemList;
         var url = lb.urls.priceUrl.replace(/ITEM_LIST_TO_REPLACE/, items);
-        ajaxGetCallJson(url, callback);
+        utils.ajaxGetCallJson(url, callback);
     };
 
     /**
@@ -314,11 +282,9 @@ var eveUtils = (function() {
         calculateInventionCost: calculateInventionCost,
 
         // ajax stuff
-        ajaxGetCallJson: ajaxGetCallJson,
-        ajaxPostCallJson: ajaxPostCallJson,
         getSystemCostIndex: getSystemCostIndex,
         getItemPrices: getItemPrices,
         initSolarSystemTypeahead: initSolarSystemTypeahead,
     };
 
-})();
+})(utils);

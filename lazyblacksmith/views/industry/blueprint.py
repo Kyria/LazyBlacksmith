@@ -22,9 +22,7 @@ blueprint = Blueprint('blueprint', __name__)
 
 @blueprint.route('/manufacturing/<int:item_id>')
 def manufacturing(item_id):
-    """
-    Display the manufacturing page with all data
-    """
+    """ Display the manufacturing page with all data """
     item = Item.query.get(item_id)
 
     if item is None or item.max_production_limit is None:
@@ -77,11 +75,13 @@ def manufacturing(item_id):
 
 @blueprint.route('/')
 def search():
+    """ Display the blueprint search page """ 
     return render_template('blueprint/search.html')
 
 
 @blueprint.route('/research_copy/<int:item_id>')
 def research(item_id):
+    """ Display the research page with all price data pre calculated """
     item = Item.query.get(item_id)
 
     if item is None or item.max_production_limit is None:
@@ -166,6 +166,7 @@ def research(item_id):
 
 @blueprint.route('/invention/<int:item_id>')
 def invention(item_id):
+    """ Display the invention page with all price data pre calculated """
     item = Item.query.get(item_id)
 
     if item is None or item.max_production_limit is None:

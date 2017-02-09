@@ -58,6 +58,7 @@ def get_price(item_list):
     methods=['GET']
 )
 def get_index_activity(solar_system_names):
+    """ Return all indexes for a given solarsystem name """
     ss_name_list = solar_system_names.split(',')
 
     # get the solar systems

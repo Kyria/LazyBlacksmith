@@ -1,9 +1,11 @@
 var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     "use strict";
     var regions = {};
+    var currentScopes = [];
 
     $.extend(lb.urls, {
         updatePreferenceUrl: false,
+        loginUrl: false,
     });
 
     var inventionSettings = {
@@ -46,6 +48,56 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         priceOtherType: false,
     };
 
+    
+    /* ---------------------------------------------------------------------- */
+    /*                        ACCOUNT PREFERENCES                             */
+    /* ---------------------------------------------------------------------- */
+    
+    /**
+     * Init the checkbox for the scope selection (update the link)
+     */
+    var _initScopeInput = function() {
+        $("input[name='scope']").on('change', function() {
+            if($(this).is(':checked')) {
+                currentScopes.push($(this).val());
+            } else {
+                currentScopes.splice($.inArray($(this).val(), currentScopes),1);
+            }
+            var url = lb.urls.loginUrl.replace(/SCOPE_REPLACE/, currentScopes.join());
+            $('#update-scope').attr('href', url);
+        });
+    };
+    
+    
+    /**
+     * Init the scope deletion when the user want to remove a scope he currently have
+     */
+    var _initScopeActions = function() {
+        $('.delete-scope').on('click', function() {
+            var charId = parseInt($(this).attr('data-char-id'));
+            var scope = $(this).attr('data-scope');
+            utils.ajaxDeleteCallJson(
+                lb.urls.deleteScopeUrl.replace(/SCOPE_REPLACE/, scope).replace(/123456789/, charId),
+                function(success) {
+                    utils.flashNotify('Scope deleted.', 'success');
+                    $('#scope-'+charId+'[data-scope="'+scope+'"]').remove();
+                },
+                
+                function(errorData) {
+                    utils.flashNotify(errorData.responseJSON['message'], 'danger');
+                }
+            )
+        });        
+    }
+    
+    
+    /* ---------------------------------------------------------------------- */
+    /*                       BLUEPRINT PREFERENCES                            */
+    /* ---------------------------------------------------------------------- */
+    
+    /**
+     * Init the invention settings modal
+     */
     var _initInventionModal = function() {
         $('#modalConfigInvention').on('show.bs.modal', function(event) {
             $('#modal-facility-invention').val(inventionSettings.facility);
@@ -71,6 +123,10 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     }
 
+    
+    /**
+     * Init the research settings modal
+     */
     var _initResearchModal = function() {
         $('#modalConfigResearch').on('show.bs.modal', function(event) {
             $('#modal-facility-research').val(researchSettings.facility);
@@ -95,6 +151,10 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     }
 
+        
+    /**
+     * Init the production settings modal
+     */
     var _initProdModal = function() {
         $('#modalConfigProd').on('show.bs.modal', function(event) {
             $('#modal-system-main').val(productionSettings.system);
@@ -149,6 +209,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     };
 
+    
+    /**
+     * Production modal apply event. 
+     * Send a POST call to the backend to set the new settings
+     */
     var _onModalProdSettingsApply = function(event) {
         var productionSettingsTmp = {
             facility: parseInt($('#modal-facility-main').val()),
@@ -171,7 +236,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             priceOtherType: $('.modal-region-others-type input:checked').val(),
         };
 
-        eveUtils.ajaxPostCallJson(
+        utils.ajaxPostCallJson(
             lb.urls.updatePreferenceUrl,
             JSON.stringify({production: productionSettingsTmp}),
             function(data) {
@@ -185,6 +250,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         )
     };
 
+    
+    /**
+     * Research modal apply event. 
+     * Send a POST call to the backend to set the new settings
+     */
     var _onModalResearchSettingsApply = function(event) {
         var researchSettingsTmp = {
             facility: parseInt($('#modal-facility-research').val()),
@@ -195,7 +265,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             system: $('#modal-system-research').val(),
         };
 
-        eveUtils.ajaxPostCallJson(
+        utils.ajaxPostCallJson(
             lb.urls.updatePreferenceUrl,
             JSON.stringify({research: researchSettingsTmp}),
             function(data) {
@@ -209,6 +279,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         )
     };
 
+    
+    /**
+     * Invention modal apply event. 
+     * Send a POST call to the backend to set the new settings
+     */
     var _onModalInventionSettingsApply = function(event) {
         var inventionSettingsTmp = {
             facility: parseInt($('#modal-facility-invention').val()),
@@ -221,7 +296,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         };
 
 
-        eveUtils.ajaxPostCallJson(
+        utils.ajaxPostCallJson(
             lb.urls.updatePreferenceUrl,
             JSON.stringify({invention: inventionSettingsTmp}),
             function(data) {
@@ -236,6 +311,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     };
 
 
+    /**
+     * Post apply research table update. 
+     * This function update the main page display
+     * to set the new values the user just defined
+     */
     var _updateResearchConfigTable = function() {
         $('#research-config .facility').html(eveData.facilities[researchSettings.facility].name);
         $('#research-config .meRig').html(eveData.structureRigs[researchSettings.meRig].meta);
@@ -251,6 +331,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     };
 
 
+    /**
+     * Post apply invention table update. 
+     * This function update the main page display
+     * to set the new values the user just defined
+     */
     var _updateInventionConfigTable = function() {
         $('#invention-config .facility').html(eveData.facilities[inventionSettings.facility].name);
         $('#invention-config .inventionRig').html(eveData.structureRigs[inventionSettings.inventionRig].meta);
@@ -267,6 +352,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     };
 
 
+    /**
+     * Post apply production table update. 
+     * This function update the main page display
+     * to set the new values the user just defined
+     */
     var _updateProductionConfigTable = function() {
         $('#production-config .facility').html(eveData.facilities[productionSettings.facility].name);
         $('#production-config .meRig').html(eveData.structureRigs[productionSettings.meRig].meta);
@@ -320,6 +410,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         $('#modal-invention-apply').on('click', _onModalInventionSettingsApply);
     };
 
+    /**
+     * Init the solarsystem typeahead
+     */
     var _initTypeahead = function() {
         eveUtils.initSolarSystemTypeahead('#modal-system-main');
         eveUtils.initSolarSystemTypeahead('#modal-system-comp');
@@ -333,6 +426,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     var run = function() {
         _initModal();
         _initTypeahead();
+        _initScopeInput();
+        _initScopeActions();
+        $('[data-toggle="tooltip"]').tooltip();
     };
 
     // -------------------------------------------------

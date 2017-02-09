@@ -37,7 +37,7 @@ esiapp = App.create(config.ESI_SWAGGER_JSON)
 esisecurity = EsiSecurity(
     app=esiapp,
     redirect_uri="%s%s" % (
-        config.ESI_REDIRECT_DOMAIN, '/sso/callback/',
+        config.ESI_REDIRECT_DOMAIN, '/sso/callback',
     ),
     client_id=config.ESI_CLIENT_ID,
     secret_key=config.ESI_SECRET_KEY,

@@ -17,8 +17,9 @@ from .eve_sde.solarsystem import SolarSystem  # noqa
 from .eve_api.industry_index import IndustryIndex  # noqa
 from .eve_api.item_adjusted_price import ItemAdjustedPrice  # noqa
 from .eve_api.item_price import ItemPrice  # noqa
-from .eve_api.task_status import TaskStatus  # noqa
+from .eve_api.task_state import TaskState  # noqa
 
 from .user.user import User  # noqa
 from .user.user_preference import UserPreference  # noqa
 from .user.skill import Skill  # noqa
+from .user.token_scope import TokenScope  # noqa

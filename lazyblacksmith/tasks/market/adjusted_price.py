@@ -1,9 +1,11 @@
 # -*- encoding: utf-8 -*-
+from ..lb_task import LbTask
+
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_markets_prices
 from lazyblacksmith.models import ItemAdjustedPrice
-from lazyblacksmith.models import TaskStatus
+from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
@@ -14,9 +16,10 @@ import json
 import pytz
 
 
-@celery_app.task(name="schedule.update_adjusted_price")
-def update_adjusted_price():
-    # delete everything from table first.
+@celery_app.task(name="update_adjusted_price", base=LbTask, bind=True)
+def task_update_adjusted_price(self):
+    """ Task that update the adjusted prices from the API """
+    self.start()
     item_adjusted_price = []
     count = 0
 
@@ -30,22 +33,16 @@ def update_adjusted_price():
                 'price': item_price.adjusted_price or 0.00
             })
 
-        db.engine.execute("TRUNCATE TABLE %s" % ItemAdjustedPrice.__tablename__)
+        db.engine.execute(
+            "TRUNCATE TABLE %s" % ItemAdjustedPrice.__tablename__
+        )
         db.engine.execute(
             ItemAdjustedPrice.__table__.insert(),
             item_adjusted_price
         )
         db.session.commit()
-
-    task_status = TaskStatus(
-        name=TaskStatus.TASK_ADJUSTED_PRICE,
-        expire=datetime(
-            *parsedate(market_price.header['Expires'][0])[:6]
-        ).replace(tzinfo=pytz.utc),
-        last_run=utcnow(),
-        results=json.dumps({'inserted': count})
-    )
-    db.session.merge(task_status)
-    db.session.commit()
-
-    return count, count
+        self.end(TaskState.SUCCESS)
+        
+    else:
+        self.end(TaskState.ERROR)
+        
