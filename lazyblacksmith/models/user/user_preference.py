@@ -50,7 +50,11 @@ class UserPreference(db.Model):
         db.ForeignKey('user.character_id'),
         primary_key=True
     )
-    user = db.relationship('User', backref=db.backref('pref', uselist=False))
+    user = db.relationship(
+        'User',
+        foreign_keys=[user_id],
+        backref=db.backref('pref', uselist=False)
+    )
 
     invention_facility = db.Column(db.Integer, nullable=False, default=0)
     invention_invention_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -65,6 +69,16 @@ class UserPreference(db.Model):
     invention_price_type = db.Column(
         db.String(4), nullable=False, default='buy'
     )
+    invention_character_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey('user.character_id'),
+        nullable=True
+    )
+    invention_character = db.relationship(
+        'User',
+        foreign_keys=[invention_character_id]
+    )
+
     
     research_facility = db.Column(db.Integer, nullable=False, default=0)
     research_me_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -72,6 +86,15 @@ class UserPreference(db.Model):
     research_copy_rig = db.Column(db.Integer, nullable=False, default=0)
     research_security = db.Column(db.String(1), nullable=False, default='h')
     research_system = db.Column(db.String(100), nullable=False, default='Jita')
+    research_character_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey('user.character_id'),
+        nullable=True
+    )
+    research_character = db.relationship(
+        'User',
+        foreign_keys=[research_character_id]
+    )
     
     prod_facility = db.Column(db.Integer, nullable=False, default=0)
     prod_me_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -107,4 +130,13 @@ class UserPreference(db.Model):
     )
     prod_price_type_others = db.Column(
         db.String(4), nullable=False, default='buy'
+    )
+    prod_character_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey('user.character_id'),
+        nullable=True
+    )
+    prod_character = db.relationship(
+        'User',
+        foreign_keys=[prod_character_id]
     )

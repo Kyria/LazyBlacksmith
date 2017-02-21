@@ -80,6 +80,10 @@
                                         <th>Others Price Type</th>
                                         <td class="priceOtherType">{{ pref.prod_price_type_others }}</td>
                                     </tr>
+                                    <tr>
+                                        <th>Character Skills</th>
+                                        <td class="character_skill">{% if pref.prod_character %}{{ pref.prod_character.character_name }}{% else %}None{% endif %}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -118,6 +122,10 @@
                                     <tr>
                                         <th>System index</th>
                                         <td class="system">{{ pref.research_system }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Character Skills</th>
+                                        <td class="character_skill">{% if pref.research_character %}{{ pref.research_character.character_name }}{% else %}None{% endif %}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -161,6 +169,10 @@
                                     <tr>
                                         <th>Price Type</th>
                                         <td class="priceType">{{ pref.invention_price_type }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Character Skills</th>
+                                        <td class="character_skill">{% if pref.invention_character %}{{ pref.invention_character.character_name }}{% else %}None{% endif %}</td>
                                     </tr>
                                 </tbody>
                             </table>

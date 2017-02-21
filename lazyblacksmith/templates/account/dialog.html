@@ -70,7 +70,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="well">
                                 <h4>Components settings</h4>
@@ -132,7 +132,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="well">
@@ -160,7 +160,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                
+
                                 <span>PI prices</span>
                                 <table class="table table-borderless table-no-margin-bottom">
                                     <tbody>
@@ -214,7 +214,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                
+
                                 <span>Other prices</span>
                                 <table class="table table-borderless table-no-margin-bottom">
                                     <tbody>
@@ -241,9 +241,24 @@
                                 </table>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3">
+                            <div class="well">
+                                <div>
+                                    Character Skills<br>
+                                    <select name="modal-char" id="modal-char-prod" class="form-control input-sm">
+                                        <option value="0" selected>None (lvl 0)</option>
+                                        {% for user in list_character_skills -%}
+                                        <option value="{{ user.character_id }}" selected>{{ user.character_name }}</option>
+                                        {%- endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" id="modal-prod-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
@@ -253,7 +268,7 @@
     </div>
 </div>
 
-<!-- research dialog --> 
+<!-- research dialog -->
 <div class="modal fade" role="dialog" id="modalConfigResearch" aria-labelledby="modalConfigResearch" aria-hidden="true" data-bp-id="">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -335,6 +350,17 @@
                                     <input id="modal-system-research" type="text" class="form-control input-sm typeahead">
                                 </div>
                             </div>
+                            <div class="well">
+                                <div>
+                                    Character Skills<br>
+                                    <select name="modal-char" id="modal-char-research" class="form-control input-sm">
+                                        <option value="0" selected>None (lvl 0)</option>
+                                        {% for user in list_character_skills -%}
+                                        <option value="{{ user.character_id }}" selected>{{ user.character_name }}</option>
+                                        {%- endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -348,7 +374,7 @@
 </div>
 
 
-<!-- invention dialog --> 
+<!-- invention dialog -->
 <div class="modal fade" role="dialog" id="modalConfigInvention" aria-labelledby="modalConfigInvention" aria-hidden="true" data-bp-id="">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -420,8 +446,6 @@
                                     <input id="modal-system-invention" type="text" class="form-control input-sm typeahead">
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-12">
                             <div class="well">
                                 Price settings <br>
                                 <select name="modal-region-invention" class="form-control input-sm modal-region">
@@ -436,6 +460,17 @@
                                     <label class="btn btn-default btn-sm btn-buy">
                                         <input type="radio" name="modal-region-invention-type" autocomplete="off" value="buy">Buy
                                     </label>
+                                </div>
+                            </div>
+                            <div class="well">
+                                <div>
+                                    Character Skills<br>
+                                    <select name="modal-char" id="modal-char-invention" class="form-control input-sm">
+                                        <option value="0" selected>None (lvl 0)</option>
+                                        {% for user in list_character_skills -%}
+                                        <option value="{{ user.character_id }}" selected>{{ user.character_name }}</option>
+                                        {%- endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>

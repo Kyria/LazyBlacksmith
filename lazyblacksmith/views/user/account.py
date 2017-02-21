@@ -5,8 +5,11 @@ from flask import render_template
 from flask import request
 from flask_login import current_user
 from flask_login import login_required
+from sqlalchemy import or_
 
 from lazyblacksmith.models import Region
+from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import User
 
 account = Blueprint('account', __name__)
 
@@ -15,9 +18,9 @@ account = Blueprint('account', __name__)
 @login_required
 def index():
     # get region from pref price region (for display)
-    all_regions = Region.query.filter(Region.wh == False).all()
+    all_regions = Region.query.filter(Region.wh.is_(False)).all()
     the_forge_region = Region.query.get(10000002)
-    
+
     invention_price_region = Region.query.get(
         current_user.pref.invention_price_region
     )
@@ -44,12 +47,23 @@ def index():
         prod_price_region_moongoo = the_forge_region
     if not prod_price_region_others:
         prod_price_region_others = the_forge_region
-    
+
+    # get all characters that have skill scope attached to them
+    list_character_skills = User.query.filter(
+        User.character_id == TokenScope.user_id,
+        TokenScope.scope == TokenScope.SCOPE_SKILL,
+        or_(
+            User.character_id == current_user.character_id,
+            User.main_character_id == current_user.character_id,
+        )
+    ).all()
+
     return render_template('account/account.html', **{
         'invention_price_region': invention_price_region,
         'prod_price_region_minerals': prod_price_region_minerals,
         'prod_price_region_pi': prod_price_region_pi,
         'prod_price_region_moongoo': prod_price_region_moongoo,
         'prod_price_region_others': prod_price_region_others,
+        'list_character_skills': list_character_skills,
         'regions': all_regions,
     })

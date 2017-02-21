@@ -9,6 +9,11 @@
         accountDashboard.regions[{{ region.id }}] = "{{ region.name }}";
         {% endfor %}
         
+        accountDashboard.character_list[{{ current_user.character_id }}] = '{{ current_user.character_name }}';
+        {% for char in current_user.alts_characters.all() -%}
+        accountDashboard.character_list[{{ char.character_id }}] = '{{ char.character_name }}';
+        {% endfor %}
+
         accountDashboard.inventionSettings.facility = {{ pref.invention_facility }};
         accountDashboard.inventionSettings.inventionRig = {{ pref.invention_invention_rig }};
         accountDashboard.inventionSettings.copyRig = {{ pref.invention_copy_rig }};
@@ -16,13 +21,15 @@
         accountDashboard.inventionSettings.system = '{{ pref.invention_system }}';
         accountDashboard.inventionSettings.priceRegion = {{ pref.invention_price_region }};
         accountDashboard.inventionSettings.priceType = '{{ pref.invention_price_type }}';
-        
+        accountDashboard.inventionSettings.characterId = {% if pref.invention_character %}{{ pref.invention_character_id }}{% else %}null{% endif %};
+
         accountDashboard.researchSettings.facility = {{ pref.research_facility }};
         accountDashboard.researchSettings.meRig = {{ pref.research_me_rig }};
         accountDashboard.researchSettings.teRig = {{ pref.research_te_rig }};
         accountDashboard.researchSettings.copyRig = {{ pref.research_copy_rig }};
         accountDashboard.researchSettings.security = '{{ pref.research_security }}';
         accountDashboard.researchSettings.system = '{{ pref.research_system }}';
+        accountDashboard.researchSettings.characterId = {% if pref.research_character %}{{ pref.research_character_id }}{% else %}null{% endif %};
 
         accountDashboard.productionSettings.facility = {{ pref.prod_facility }};
         accountDashboard.productionSettings.meRig = {{ pref.prod_me_rig }};
@@ -42,7 +49,8 @@
         accountDashboard.productionSettings.priceMoongooType = '{{ pref.prod_price_type_moongoo }}';
         accountDashboard.productionSettings.priceOtherRegion = {{ pref.prod_price_region_others }};
         accountDashboard.productionSettings.priceOtherType = '{{ pref.prod_price_type_others }}';
-        
+        accountDashboard.productionSettings.characterId =  {% if pref.prod_character %}{{ pref.prod_character_id }}{% else %}null{% endif %};
+
         // run
         lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_industry_preference') }}";
         lb.urls.loginUrl = "{{ url_for('sso.login', scopes='SCOPE_REPLACE') }}";;

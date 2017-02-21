@@ -5,8 +5,8 @@ from flask import request
 from flask_login import current_user
 from flask_login import login_required
 
-from lazyblacksmith.models import db
 from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import db
 
 import logging
 
@@ -18,13 +18,13 @@ ajax_account = Blueprint('ajax_account', __name__)
 @ajax_account.route('/scopes/<int:character_id>/<scope>', methods=['DELETE'])
 @login_required
 def delete_scope(character_id, scope):
-    """ Remove a scope for a given character_id from the database """ 
+    """ Remove a scope for a given character_id from the database """
     if request.is_xhr:
         allowed_character_id = [
             alt.character_id for alt in current_user.alts_characters.all()
         ]
-        if (character_id == current_user.character_id 
-           or character_id in allowed_character_id):
+        if (character_id == current_user.character_id or
+           character_id in allowed_character_id):
             try:
                 TokenScope.query.filter(
                     TokenScope.user_id == character_id,
@@ -32,7 +32,7 @@ def delete_scope(character_id, scope):
                 ).delete()
                 db.session.commit()
                 return jsonify({'status': 'success'})
-                
+
             except:
                 logger.exception('Cannot delete scope %s for user_id %s' % (
                     scope,
@@ -100,6 +100,7 @@ def update_production_preference(preferences):
             pref.prod_price_type_moongoo = preferences['priceMoongooType']
             pref.prod_price_region_others = preferences['priceOtherRegion']
             pref.prod_price_type_others = preferences['priceOtherType']
+            pref.prod_character_id = preferences['characterId']
 
             db.session.commit()
             return jsonify({'status': 'success'})
@@ -136,6 +137,7 @@ def update_invention_preference(preferences):
             pref.invention_system = preferences['system']
             pref.invention_price_region = preferences['priceRegion']
             pref.invention_price_type = preferences['priceType']
+            pref.invention_character_id = preferences['characterId']
 
             db.session.commit()
             return jsonify({'status': 'success'})
@@ -171,6 +173,7 @@ def update_research_preference(preferences):
             pref.research_copy_rig = preferences['copyRig']
             pref.research_security = preferences['security']
             pref.research_system = preferences['system']
+            pref.research_character_id = preferences['characterId']
 
             db.session.commit()
             return jsonify({'status': 'success'})

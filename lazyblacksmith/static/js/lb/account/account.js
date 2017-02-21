@@ -2,6 +2,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     "use strict";
     var regions = {};
     var currentScopes = [];
+    var character_list = {null: 'None'};
 
     $.extend(lb.urls, {
         updatePreferenceUrl: false,
@@ -16,6 +17,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         system: false,
         priceRegion: false,
         priceType: false,
+        characterId: null,
     };
 
     var researchSettings = {
@@ -25,6 +27,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         copyRig: false,
         security: false,
         system: false,
+        characterId: null,
     };
 
     var productionSettings = {
@@ -46,13 +49,14 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         priceMoongooType: false,
         priceOtherRegion: false,
         priceOtherType: false,
+        characterId: null,
     };
 
-    
+
     /* ---------------------------------------------------------------------- */
     /*                        ACCOUNT PREFERENCES                             */
     /* ---------------------------------------------------------------------- */
-    
+
     /**
      * Init the checkbox for the scope selection (update the link)
      */
@@ -67,8 +71,8 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $('#update-scope').attr('href', url);
         });
     };
-    
-    
+
+
     /**
      * Init the scope deletion when the user want to remove a scope he currently have
      */
@@ -82,19 +86,19 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
                     utils.flashNotify('Scope deleted.', 'success');
                     $('#scope-'+charId+'[data-scope="'+scope+'"]').remove();
                 },
-                
+
                 function(errorData) {
                     utils.flashNotify(errorData.responseJSON['message'], 'danger');
                 }
             )
-        });        
+        });
     }
-    
-    
+
+
     /* ---------------------------------------------------------------------- */
     /*                       BLUEPRINT PREFERENCES                            */
     /* ---------------------------------------------------------------------- */
-    
+
     /**
      * Init the invention settings modal
      */
@@ -107,6 +111,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $('#structure-sec-status-invention input[value='+inventionSettings.security+']').parent().button("toggle");
             $("select[name='modal-region-invention']").val(inventionSettings.priceRegion);
             $('.modal-region-invention-type input[value='+inventionSettings.priceType+']').parent().button("toggle");
+
+            var charId = (inventionSettings.characterId) ? inventionSettings.characterId : 0;
+            $("select#modal-char-invention").val(charId);
 
             if(eveData.facilities[inventionSettings.facility].structure) {
                 $('.structure-configs-invention').show();
@@ -123,7 +130,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     }
 
-    
+
     /**
      * Init the research settings modal
      */
@@ -135,6 +142,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $('#structure-te-rig-research input[value='+researchSettings.teRig+']').parent().button("toggle");
             $('#structure-copy-rig-research input[value='+researchSettings.copyRig+']').parent().button("toggle");
             $('#structure-sec-status-research input[value='+researchSettings.security+']').parent().button("toggle");
+
+            var charId = (researchSettings.characterId) ? researchSettings.characterId : 0;
+            $("select#modal-char-research").val(charId);
 
             if(eveData.facilities[researchSettings.facility].structure) {
                 $('.modal-structure-configs-research').show();
@@ -151,7 +161,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     }
 
-        
+
     /**
      * Init the production settings modal
      */
@@ -182,6 +192,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $("select[name='modal-region-moongoo']").val(productionSettings.priceMoongooRegion);
             $("select[name='modal-region-others']").val(productionSettings.priceOtherRegion);
 
+            var charId = (productionSettings.characterId) ? productionSettings.characterId : 0;
+            $("select#modal-char-prod").val(charId);
+
             if(eveData.facilities[productionSettings.facility].structure) {
                 $('.modal-structure-configs-main').show();
             } else {
@@ -209,12 +222,14 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     };
 
-    
+
     /**
-     * Production modal apply event. 
+     * Production modal apply event.
      * Send a POST call to the backend to set the new settings
      */
     var _onModalProdSettingsApply = function(event) {
+        var charId = $("select#modal-char-prod").val();
+        
         var productionSettingsTmp = {
             facility: parseInt($('#modal-facility-main').val()),
             meRig: parseInt($('#modal-structure-me-rig-main input:checked').val()),
@@ -234,6 +249,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             priceMoongooType: $('.modal-region-moongoo-type input:checked').val(),
             priceOtherRegion: parseInt($("select[name='modal-region-others']").val()),
             priceOtherType: $('.modal-region-others-type input:checked').val(),
+            characterId: (charId == '0') ? null : charId,
         };
 
         utils.ajaxPostCallJson(
@@ -250,12 +266,13 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         )
     };
 
-    
+
     /**
-     * Research modal apply event. 
+     * Research modal apply event.
      * Send a POST call to the backend to set the new settings
      */
     var _onModalResearchSettingsApply = function(event) {
+        var charId = $("select#modal-char-research").val();
         var researchSettingsTmp = {
             facility: parseInt($('#modal-facility-research').val()),
             meRig: parseInt($('#structure-me-rig-research input:checked').val()),
@@ -263,6 +280,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             copyRig: parseInt($('#structure-copy-rig-research input:checked').val()),
             security: $('#structure-sec-status-research input:checked').val(),
             system: $('#modal-system-research').val(),
+            characterId: (charId == '0') ? null : charId,
         };
 
         utils.ajaxPostCallJson(
@@ -279,12 +297,13 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         )
     };
 
-    
+
     /**
-     * Invention modal apply event. 
+     * Invention modal apply event.
      * Send a POST call to the backend to set the new settings
      */
     var _onModalInventionSettingsApply = function(event) {
+        var charId = $("select#modal-char-invention").val();
         var inventionSettingsTmp = {
             facility: parseInt($('#modal-facility-invention').val()),
             inventionRig: parseInt($('#structure-invention-rig-invention input:checked').val()),
@@ -293,6 +312,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             system: $('#modal-system-invention').val(),
             priceRegion: parseInt($("select[name='modal-region-invention']").val()),
             priceType: $('.modal-region-invention-type input:checked').val(),
+            characterId: (charId == '0') ? null : charId,
         };
 
 
@@ -312,7 +332,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
 
 
     /**
-     * Post apply research table update. 
+     * Post apply research table update.
      * This function update the main page display
      * to set the new values the user just defined
      */
@@ -323,6 +343,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         $('#research-config .copyRig').html(eveData.structureRigs[researchSettings.copyRig].meta);
         $('#research-config .security').html(eveData.securityStatus[researchSettings.security]);
         $('#research-config .system').html(researchSettings.system);
+        $('#research-config .character_skill').html(character_list[researchSettings.characterId]);
         if(eveData.facilities[researchSettings.facility].structure) {
             $('#research-config .structure').show();
         } else {
@@ -332,7 +353,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
 
 
     /**
-     * Post apply invention table update. 
+     * Post apply invention table update.
      * This function update the main page display
      * to set the new values the user just defined
      */
@@ -344,6 +365,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         $('#invention-config .system').html(inventionSettings.system);
         $('#invention-config .priceRegion').html(regions[inventionSettings.priceRegion]);
         $('#invention-config .priceType').html(inventionSettings.priceType);
+        $('#invention-config .character_skill').html(character_list[inventionSettings.characterId]);
         if(eveData.facilities[inventionSettings.facility].structure) {
             $('#invention-config .structure').show();
         } else {
@@ -353,7 +375,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
 
 
     /**
-     * Post apply production table update. 
+     * Post apply production table update.
      * This function update the main page display
      * to set the new values the user just defined
      */
@@ -376,6 +398,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         $('#production-config .priceMoongooType').html(productionSettings.priceMoongooType);
         $('#production-config .priceOtherRegion').html(regions[productionSettings.priceOtherRegion]);
         $('#production-config .priceOtherType').html(productionSettings.priceOtherType);
+        $('#production-config .character_skill').html(character_list[productionSettings.characterId]);
         if(eveData.facilities[productionSettings.facility].structure) {
             $('#production-config .structure-main').show();
         } else {
@@ -441,6 +464,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         researchSettings: researchSettings,
         productionSettings: productionSettings,
         regions:regions,
+        character_list: character_list,
     };
 })(jQuery, lb, utils, eveUtils, eveData);
 
