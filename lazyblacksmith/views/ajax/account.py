@@ -8,10 +8,8 @@ from flask_login import login_required
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import db
 
-import logging
+from . import logger
 
-
-logger = logging.getLogger('%s.views.ajax' % __name__)
 ajax_account = Blueprint('ajax_account', __name__)
 
 

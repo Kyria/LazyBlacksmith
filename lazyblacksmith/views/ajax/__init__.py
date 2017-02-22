@@ -1,6 +1,10 @@
 # -*- encoding: utf-8 -*-
 from flask import request
 
+import logging
+
+logger = logging.getLogger('lb.ajax')
+
 
 def is_not_ajax():
     """

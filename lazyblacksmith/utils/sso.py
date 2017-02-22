@@ -19,18 +19,17 @@ from lazyblacksmith.models import User
 from lazyblacksmith.models import UserPreference
 from lazyblacksmith.models import db
 
-import base64
-import logging
+from . import logger
 
-logger = logging.getLogger("%s.utils.login" % __name__)
+import base64
 
 
 def check_get_user(id, owner_hash, in_login=False):
     """ Check if a user exists and return it.
-    
+
     If the user exists, we return it.
     If the user exists but with another owner hash, we delete it first
-    If the user does not exist, return a new user object 
+    If the user does not exist, return a new user object
     """
     try:
         user = User.query.filter(
@@ -91,7 +90,7 @@ def login_user_oauth(cdata, auth_response):
 
 
 def add_scopes(cdata, auth_response, scopes, current_user):
-    """ Add a new scope to a logged user """ 
+    """ Add a new scope to a logged user """
     # get or create the character
     user = check_get_user(
         cdata['CharacterID'],
@@ -125,7 +124,7 @@ def wipe_character_data(user):
     UserPreference.query.filter(
         UserPreference.user_id == user.character_id
     ).delete()
-    
+
     # remove scopes
     TokenScope.query.filter(
         TokenScope.user_id == user.character_id
