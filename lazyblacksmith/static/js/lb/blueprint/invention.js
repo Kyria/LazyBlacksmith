@@ -368,6 +368,11 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             range: "min",
             slide: _skillOnUpdate,
         });
+        $('#adv-industry-level').slider('option', 'value', options.advancedIndustryLevel);
+        $('#science-level').slider('option', 'value', options.scienceLevel);
+        $('#encryption-level').slider('option', 'value', options.encryptionLevel);
+        $('#datacore1-level').slider('option', 'value', options.datacoreLevel1);
+        $('#datacore2-level').slider('option', 'value', options.datacoreLevel2);
     };
 
     /**

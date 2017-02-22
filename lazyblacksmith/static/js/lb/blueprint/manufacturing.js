@@ -7,7 +7,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
     var tplSublistBlock = '';
     var tplSublistRow = '';
     var tplModalPrice = '';
-    
+
     // multibuy field
     var multiBuy = '';
 
@@ -25,8 +25,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         industryLvl: 0,
         advancedIndustryLvl: 0,
         t2ConstructionLvl: 0,
-        primaryScienceLevel: 0,
-        secondaryScienceLevel: 0,
+        datacoreLevel1: 0,
+        datacoreLevel2: 0,
     };
 
     // urls
@@ -235,8 +235,19 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 material.resultQtyPerRun = tmpMaterial['product_qty_per_run'];
                 material.runs = Math.ceil(material.qtyJob / material.resultQtyPerRun);
 
-                // production time
+                // production time per run (base time)
                 material.timePerRun = tmpMaterial['time'];
+
+                var timePerRun = eveUtils.calculateJobTime(
+                    material.timePerRun,
+                    1,
+                    facilityStats[material.facility].bpTe,
+                    material.timeEfficiency,
+                    options.industryLvl, options.advancedIndustryLvl,
+                    0, 0, 0,
+                    structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                    facilityStats[material.facility].structure, false
+                );
                 material.timeTotal = eveUtils.calculateJobTime(
                     material.timePerRun,
                     material.runs,
@@ -248,7 +259,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                     facilityStats[material.facility].structure, false
                 );
 
-                var timeHuman = utils.durationToString(material.timePerRun);
+                var timeHuman = utils.durationToString(timePerRun);
                 var timeTotalHuman = utils.durationToString(material.timeTotal);
 
                 // sub materials
@@ -317,7 +328,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 var componentId = materialsData.componentIdList[i];
                 _updateComponentBpInfoDisplay(componentId);
             }
-            
+
             _updateSummaryTabs();
         });
     };
@@ -462,7 +473,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             facilityStats[material.facility].bpTe,
             options.timeEfficiency,
             options.industryLvl, options.advancedIndustryLvl,
-            options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
+            options.t2ConstructionLvl, options.datacoreLevel1, options.datacoreLevel2,
             structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
             facilityStats[material.facility].structure, true
         );
@@ -472,7 +483,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             facilityStats[material.facility].bpTe,
             options.timeEfficiency,
             options.industryLvl, options.advancedIndustryLvl,
-            options.t2ConstructionLvl, options.primaryScienceLevel, options.secondaryScienceLevel,
+            options.t2ConstructionLvl, options.datacoreLevel1, options.datacoreLevel2,
             structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
             facilityStats[material.facility].structure, true
         );
@@ -952,8 +963,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             range: "min",
             slide: _skillOnUpdate,
         });
+        $('#adv-industry-level').slider('option', 'value', options.advancedIndustryLvl);
+        $('#industry-level').slider('option', 'value', options.industryLvl);
+        $('#t2-level').slider('option', 'value', options.t2ConstructionLvl);
+        $('#t2-science1').slider('option', 'value', options.datacoreLevel1);
+        $('#t2-science2').slider('option', 'value', options.datacoreLevel2);
     };
-
 
     /**
      * Init all sliders on the page
@@ -1259,12 +1274,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 break;
 
             case 't2-science1':
-                options.primaryScienceLevel = value;
+                options.datacoreLevel1 = value;
                 $('#t2-science1-display').html(value);
                 break;
 
             case 't2-science2':
-                options.secondaryScienceLevel = value;
+                options.datacoreLevel2 = value;
                 $('#t2-science2-display').html(value);
                 break;
         };
@@ -1364,7 +1379,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         _initTooltip();
         _initInputs();
         _initSliders();
-        
+
         $('#multibuy').on('click', function() {
             utils.copyToClipboard(multiBuy);
         });
@@ -1385,6 +1400,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         // get materials
         _getComponentMaterials();
         _updateMaterial();
+        _updateTime();
     };
 
 

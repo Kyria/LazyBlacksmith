@@ -40,7 +40,7 @@
             {%- else -%}
             'priceRegion': {{ pref.prod_price_region_others }},
             {%- endif %}
-            
+
         };
 
         {% for material in materials.all() %}
@@ -81,6 +81,15 @@
             {%- endif %}
         };
         {% endfor %}
+
+        manufacturingBlueprint.options.industryLvl = {{ industry_skills['adv_industry'] }};
+        manufacturingBlueprint.options.advancedIndustryLvl = {{ industry_skills['adv_industry'] }};
+        {% if t2_manufacturing_skill %}
+        manufacturingBlueprint.options.t2ConstructionLvl = {{ t2_manufacturing_skill.level }};
+        {% endif %}
+        {% for skill in science_skill %}
+        manufacturingBlueprint.options.datacoreLevel{{loop.index}} = {{ skill.level }};
+        {%- endfor %}
 
         lb.run('manufacturingBlueprint');
     </script>
@@ -173,33 +182,28 @@
                     </div>
                     <div class="well">
                         <div class="slider">
-                            Industry (<span id="industry-level-display">0</span>)<br>
+                            Industry (<span id="industry-level-display">{{ industry_skills['industry'] }}</span>)<br>
                             <div id="industry-level"></div>
                         </div>
                         <div class="slider">
-                            Adv. Industry (<span id="adv-industry-level-display">0</span>)<br>
+                            Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
                             <div id="adv-industry-level"></div>
                         </div>
                     </div>
 
-                    {% if science_skill | length > 0 or t2_manufacturing_skill is not none %}
+                    {% if science_skill | length > 0 or t2_manufacturing_skill %}
                     <div class="well">
-                        {% if science_skill | length > 0 %}
+                        {% for skill in science_skill %}
                         <div class="slider">
-                            {{ science_skill[0] or "T2 Science 1" }}
-                            (<span id="t2-science1-display">0</span>)<br>
-                            <div id="t2-science1"></div>
+                            {{ skill.name }}
+                            (<span id="t2-science{{loop.index}}-display">{{ skill.level }}</span>)<br>
+                            <div id="t2-science{{loop.index}}"></div>
                         </div>
+                        {%- endfor %}
+                        {% if t2_manufacturing_skill %}
                         <div class="slider">
-                            {{ science_skill[1] or "T2 Science 2" }}
-                            (<span id="t2-science2-display">0</span>)<br>
-                            <div id="t2-science2"></div>
-                        </div>
-                        {% endif %}
-                        {% if t2_manufacturing_skill is not none %}
-                        <div class="slider">
-                            {{ t2_manufacturing_skill or "T2 Industry" }}
-                            (<span id="t2-level-display">0</span>)<br>
+                            {{ t2_manufacturing_skill.name }}
+                            (<span id="t2-level-display">{{ t2_manufacturing_skill.level }}</span>)<br>
                             <div id="t2-level"></div>
                         </div>
                         {% endif %}
@@ -275,7 +279,7 @@
                         <button class="btn btn-default btn-xs" id="multibuy" data-toggle="tooltip" data-placement="bottom" title="Copy to clipboard - Multibuy">
                             <i class="fa fa-clipboard" aria-hidden="true"></i>
                         </button>
-                        
+
                         {% if has_manufactured_components %}
                         <span class="raw-component-btn">
                             <span id="raw-components" data-toggle="buttons">

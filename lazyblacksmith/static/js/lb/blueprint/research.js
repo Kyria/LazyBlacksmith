@@ -322,6 +322,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             range: "min",
             slide: _skillOnUpdate,
         });
+
+        $('#adv-industry-level').slider('option', 'value', options.advancedIndustryLevel);
+        $('#science-level').slider('option', 'value', options.scienceLevel);
+        $('#research-level').slider('option', 'value', options.researchLevel);
+        $('#metallurgy-level').slider('option', 'value', options.metallurgyLevel);
     };
 
 
@@ -422,7 +427,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         // other init that require ajax call
         _initTypeahead();
 
-        // run one recalculation, in case we are not using default data        
+        // run one recalculation, in case we are not using default data
         _updateResearchTimeAndCost();
         _updateCopyTimeAndCost();
     };

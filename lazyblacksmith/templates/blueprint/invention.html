@@ -50,6 +50,13 @@
         inventionBlueprint.options.structureSecStatus = '{{ pref.invention_security }}';
         inventionBlueprint.options.facility = {{ pref.invention_facility }};
 
+        {% for skill in datacore_skills %}
+        inventionBlueprint.options.datacoreLevel{{loop.index}} = {{ skill.level }};
+        {%- endfor %}
+        inventionBlueprint.options.encryptionLevel = {{ encryption_skill.level }};
+        inventionBlueprint.options.advancedIndustryLevel = {{ industry_skills['adv_industry'] }};
+        inventionBlueprint.options.scienceLevel = {{ industry_skills['science'] }};
+
         lb.run('inventionBlueprint');
     </script>
 {% endblock %}
@@ -155,12 +162,12 @@
         </div>
         <div class="well">
             <div class="slider">
-                Adv. Industry (<span id="adv-industry-level-display">0</span>)<br>
+                Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
                 <div id="adv-industry-level"></div>
             </div>
             {% if activity_copy is not none %}
             <div class="slider">
-                Science (<span id="science-level-display">0</span>)<br>
+                Science (<span id="science-level-display">{{ industry_skills['science'] }}</span>)<br>
                 <div id="science-level"></div>
             </div>
             {% endif %}
@@ -177,19 +184,16 @@
                 </select>
             </div>
             {% endif %}
+            {% for skill in datacore_skills %}
             <div class="slider">
-                {{ datacore_skills[0] }}
-                (<span id="datacore1-display">0</span>)<br>
-                <div id="datacore1-level"></div>
+                {{ skill.name }}
+                (<span id="datacore1-display">{{ skill.level }}</span>)<br>
+                <div id="datacore{{loop.index}}-level"></div>
             </div>
+            {% endfor %}
             <div class="slider">
-                {{ datacore_skills[1] }}
-                (<span id="datacore2-display">0</span>)<br>
-                <div id="datacore2-level"></div>
-            </div>
-            <div class="slider">
-                {{ encryption_skill }}
-                (<span id="encryption-display">0</span>)<br>
+                {{ encryption_skill.name }}
+                (<span id="encryption-display">{{ encryption_skill.level }}</span>)<br>
                 <div id="encryption-level"></div>
             </div>
         </div>
