@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 import config
+import humanize
 
-from collections import namedtuple
 from flask import Blueprint
 from flask import abort
 from flask import render_template
@@ -17,6 +17,10 @@ from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.utils.industry import calculate_base_cost
+from lazyblacksmith.utils.industry import calculate_build_cost
+from lazyblacksmith.utils.industry import get_common_industry_skill
+from lazyblacksmith.utils.industry import get_skill_data
 
 blueprint = Blueprint('blueprint', __name__)
 
@@ -104,59 +108,80 @@ def research(item_id):
         activity=Activity.ACTIVITY_COPYING
     ).one()
 
-    # calculate baseCost and build cost per ME
-    base_cost = 0.0
-    cost_per_me = {}
-    materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
-    for material in materials:
-        item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
-        base_cost += item_adjusted_price.price * material.quantity
-
-        # build cost
-        price = ItemPrice.query.filter(
-            ItemPrice.item_id == material.material_id,
-            ItemPrice.region_id == 10000002,
-        ).one_or_none()
-        for level in xrange(0, 11):
-            if price:
-                buy_price = price.buy_price
-            else:
-                buy_price = item_adjusted_price.price
-
-            if level not in cost_per_me:
-                cost_per_me[level] = {
-                    'job_price_run': 0,
-                    'job_price_max_run': 0,
-                }
-            me_bonus = (1.00 - level / 100.00)
-            adjusted_quantity = max(1, me_bonus * material.quantity)
-            job_price_run = max(1, ceil(adjusted_quantity)) * buy_price
-            job_price_max_run = max(
-                item.max_production_limit,
-                ceil(item.max_production_limit * adjusted_quantity)
-            ) * buy_price
-
-            cost_per_me[level]['job_price_run'] += job_price_run
-            cost_per_me[level]['job_price_max_run'] += job_price_max_run
-
-    # base solar system : 30000142 = Jita
-    system = SolarSystem.query.filter(
-        SolarSystem.name == current_user.pref.research_system
-    ).one_or_none()
-    system_id = 30000142 if not system else system.id
+    # indexes
     indexes = IndustryIndex.query.filter(
-        IndustryIndex.solarsystem_id == system_id,
+        IndustryIndex.solarsystem_id == SolarSystem.id,
+        SolarSystem.name == current_user.pref.research_system,
         IndustryIndex.activity.in_([
             Activity.ACTIVITY_COPYING,
             Activity.ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY,
             Activity.ACTIVITY_RESEARCHING_TIME_EFFICIENCY,
         ])
     )
-
     index_list = {}
     for index in indexes:
         index_list[index.activity] = index.cost_index
 
+        
+    # calculate baseCost and build cost per ME
+    materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
+    base_cost = calculate_base_cost(materials)
+    cost = calculate_build_cost(
+        materials,
+        10000002,
+        xrange(0, 11),
+        item.max_production_limit
+    )
+    
+    cost_prev_me = cost[0]['run']
+    cost_prev_me_max = cost[0]['max_bpc_run']
+    for level in xrange(0, 11):
+        # cost
+        current_cost = cost[level]['run']
+        delta_me0 = cost[0]['run'] - current_cost
+        delta_prev_me = cost_prev_me - current_cost
+        delta_pct_me0 = (1 - current_cost / cost[0]['run']) * 100
+        delta_pct_prev_me = (1 - current_cost / cost_prev_me) * 100
+        
+        current_cost = cost[level]['max_bpc_run']
+        max_delta_me0 = cost[0]['max_bpc_run'] - current_cost
+        max_delta_prev_me = cost_prev_me_max - current_cost
+        max_delta_pct_me0 = (1 - current_cost / cost[0]['max_bpc_run']) * 100
+        max_delta_pct_prev_me = (1 - current_cost / cost_prev_me_max) * 100
+        
+        cost[level].update({
+            'delta_me0': delta_me0,
+            'delta_prev_me': delta_prev_me,
+            'delta_pct_me0': delta_pct_me0,
+            'delta_pct_prev_me': delta_pct_prev_me,
+            'max_delta_me0': max_delta_me0,
+            'max_delta_prev_me': max_delta_prev_me,
+            'max_delta_pct_me0': max_delta_pct_me0,
+            'max_delta_pct_prev_me': max_delta_pct_prev_me,
+        })
+        
+        cost_prev_me = cost[level]['run']
+        cost_prev_me_max = cost[level]['max_bpc_run']
+        
+    me_time = {}
+    te_time = {}
+    for level in xrange(1, 11):
+        # time
+        level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)
+        me_duration = activity_material.time * level_modifier
+        te_duration = activity_time.time * level_modifier
+        me_cost = (base_cost * index_list[Activity.ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY] * 0.02 * level_modifier * 1.1)
+        te_cost = (base_cost * index_list[Activity.ACTIVITY_RESEARCHING_TIME_EFFICIENCY] * 0.02 * level_modifier * 1.1)
+
+        me_time[level] = {
+            'duration': float("%0.2f" % me_duration),
+            'cost': me_cost,
+        }
+        te_time[level] = {
+            'duration': float("%0.2f" % te_duration),
+            'cost': te_cost,
+        }
+        
     # display
     return render_template('blueprint/research.html', **{
         'blueprint': item,
@@ -165,8 +190,10 @@ def research(item_id):
         'activity_time': activity_time,
         'base_cost': base_cost,
         'index_list': index_list,
-        'cost_per_me': cost_per_me,
+        'cost_per_me': cost,
         'industry_skills': get_common_industry_skill(char),
+        'me_time': me_time,
+        'te_time': te_time,
     })
 
 
@@ -197,10 +224,10 @@ def invention(item_id):
         ).all()
 
         # copy base cost, as it's different from the invention
-        materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
-        for material in materials:
-            item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
-            copy_base_cost += item_adjusted_price.price * material.quantity
+        materials = item.activity_materials.filter_by(
+            activity=Activity.ACTIVITY_MANUFACTURING
+        )
+        copy_base_cost = calculate_base_cost(materials)
 
     # loop through skills for display as we need to do the difference
     # between both skills (not the same bonuses in invention probability)
@@ -216,30 +243,23 @@ def invention(item_id):
     # other skills
 
     # calculate baseCost for invention
-    invention_base_cost = 0.0
     materials = item.activity_products.filter_by(
         activity=Activity.ACTIVITY_INVENTION
     ).first().product.activity_materials.filter_by(
         activity=Activity.ACTIVITY_MANUFACTURING
     )
-
-    for material in materials:
-        item_adjusted_price = ItemAdjustedPrice.query.get(material.material_id)
-        invention_base_cost += item_adjusted_price.price * material.quantity
+    invention_base_cost = calculate_base_cost(materials)
 
     # base solar system
-    system = SolarSystem.query.filter(
-        SolarSystem.name == current_user.pref.invention_system
-    ).one_or_none()
-    system_id = 30000142 if not system else system.id
     indexes = IndustryIndex.query.filter(
-        IndustryIndex.solarsystem_id == system_id,
+        IndustryIndex.solarsystem_id == SolarSystem.id,
+        SolarSystem.name == current_user.pref.invention_system,
         IndustryIndex.activity.in_([
             Activity.ACTIVITY_COPYING,
             Activity.ACTIVITY_INVENTION,
         ])
     )
-
+    
     index_list = {}
     for index in indexes:
         index_list[index.activity] = index.cost_index
@@ -276,58 +296,3 @@ def invention(item_id):
         'regions': regions,
         'industry_skills': get_common_industry_skill(char),
     })
-
-
-def get_skill_data(skill, char):
-    """ return formatted data to be used in the template """
-    SkillData = namedtuple('SkillData', ['name', 'level'])
-    if current_user.is_authenticated:
-        if char:
-            s = char.skills.filter_by(skill=skill).one_or_none()
-            if s:
-                return SkillData(skill.name, s.level)
-    return SkillData(skill.name, 0)
-
-
-def get_common_industry_skill(char):
-    SKILL_SCIENCE_ID = 3402
-    SKILL_ADV_INDUSTRY_ID = 3388
-    SKILL_INDUSTRY = 3380
-    SKILL_RESEARCH = 3403
-    SKILL_METALLURGY = 3409
-    skills = {
-        'science': 0,
-        'industry': 0,
-        'adv_industry': 0,
-        'metallurgy': 0,
-        'research': 0,
-    }
-    if char:
-        science = char.skills.filter_by(
-            skill_id=SKILL_SCIENCE_ID
-        ).one_or_none()
-        adv_industry = char.skills.filter_by(
-            skill_id=SKILL_ADV_INDUSTRY_ID
-        ).one_or_none()
-        industry = char.skills.filter_by(
-            skill_id=SKILL_INDUSTRY
-        ).one_or_none()
-        research = char.skills.filter_by(
-            skill_id=SKILL_RESEARCH
-        ).one_or_none()
-        metallurgy = char.skills.filter_by(
-            skill_id=SKILL_METALLURGY
-        ).one_or_none()
-
-        if science:
-            skills['science'] = science.level
-        if adv_industry:
-            skills['adv_industry'] = adv_industry.level
-        if industry:
-            skills['industry'] = industry.level
-        if research:
-            skills['research'] = research.level
-        if metallurgy:
-            skills['metallurgy'] = metallurgy.level
-
-    return skills

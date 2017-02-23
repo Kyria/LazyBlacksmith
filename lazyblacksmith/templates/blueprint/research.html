@@ -211,14 +211,11 @@
                             </thead>
                             <tbody>
                                 {% for level in range(1,11) -%}
-                                {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
-                                {% set research_duration = activity_material.time * level_modifier %}
-                                {% set research_cost = "%0.2f" % (base_cost * index_list[4] * 0.02 * level_modifier * 1.1) %}
                                 <tr id="ME-{{ level }}">
                                     <td class="level">{{ level }}</td>
-                                    <td class="total">{{ research_duration | duration }}</td>
-                                    <td class="delta">{{ research_duration | duration }}</td>
-                                    <td class="price">{{ research_cost | float | intcomma }}</td>
+                                    <td class="total">{{ me_time[level]['duration'] | duration }}</td>
+                                    <td class="delta">{{ me_time[level]['duration'] | duration }}</td>
+                                    <td class="price">{{ me_time[level]['cost'] | intcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -242,21 +239,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set run_delta = cost_per_me[0]['job_price_run'] -%}
                                 {% for level in range(0,11) -%}
                                 <tr id="ME-profit-{{ level }}">
-                                    {% set delta_run = cost_per_me[0]['job_price_run'] - cost_per_me[level]['job_price_run'] -%}
-                                    {% set delta_me = run_delta - cost_per_me[level]['job_price_run'] -%}
-                                    {% set delta_run_pc = "%0.3f" % (delta_run / cost_per_me[0]['job_price_run'] * 100) -%}
-                                    {% set delta_me_pc = "%0.3f" % (delta_me / run_delta * 100) -%}
                                     <td class="level">{{ level }}</td>
-                                    <td>{{ cost_per_me[level]['job_price_run'] | intcomma }}</td>
-                                    <td class="delta">{{ delta_run | intcomma }}</td>
-                                    <td class="price-percent">{{ delta_run_pc | float | intcomma }}%</td>
-                                    <td class="delta">{{ delta_me | intcomma }}</td>
-                                    <td class="price-percent">{{ delta_me_pc | float | intcomma }}%</td>
+                                    <td>{{ cost_per_me[level]['run'] | intcomma }}</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | intcomma }}</td>
+                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_me0'] }}%</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | intcomma }}</td>
+                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_prev_me'] }}%</td>
                                 </tr>
-                                {% set run_delta = cost_per_me[level]['job_price_run'] -%}
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -288,24 +279,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set run_delta_max = cost_per_me[0]['job_price_max_run'] -%}
                                 {% for level in range(0,11) -%}
-                                <tr id="ME-profit-{{ level }}">
-                                    {% set build_cost_max = "%0.2f" % (cost_per_me[level]['job_price_max_run'] / blueprint.max_production_limit) -%}
-                                    {% set delta_max_me = "%0.2f" % ((run_delta_max - cost_per_me[level]['job_price_max_run']) / blueprint.max_production_limit) -%}
-                                    {% set delta_max_run = "%0.2f" % ((cost_per_me[0]['job_price_max_run'] - cost_per_me[level]['job_price_max_run']) / blueprint.max_production_limit) -%}
-                                    {% set delta_max_me = delta_max_me | float -%}
-                                    {% set delta_max_run = delta_max_run | float -%}
-                                    {% set delta_max_run_pc = "%0.3f" % (delta_max_run / cost_per_me[0]['job_price_max_run'] * blueprint.max_production_limit * 100) -%}
-                                    {% set delta_max_me_pc = "%0.3f" % (delta_max_me / run_delta_max * blueprint.max_production_limit * 100) -%}
+                                <tr id="ME-profit-max-run-{{ level }}">
                                     <td class="level">{{ level }}</td>
-                                    <td>{{ build_cost_max | float | intcomma }}</td>
-                                    <td class="delta">{{ delta_max_run | intcomma }}</td>
-                                    <td class="price-percent">{{ delta_max_run_pc | float | intcomma }}%</td>
-                                    <td class="delta">{{ delta_max_me | intcomma }}</td>
-                                    <td class="price-percent">{{ delta_max_me_pc | float | intcomma }}%</td>
+                                    <td>{{ cost_per_me[level]['run'] | intcomma }}</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | intcomma }}</td>
+                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_me0'] }}%</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | intcomma }}</td>
+                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_prev_me'] }}%</td>
                                 </tr>
-                                {% set run_delta_max = cost_per_me[level]['job_price_max_run'] -%}
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -325,14 +307,11 @@
                             </thead>
                             <tbody>
                                 {% for level in range(1,11) -%}
-                                {% set level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)%}
-                                {% set research_duration = activity_material.time * level_modifier %}
-                                {% set research_cost = "%0.2f" % (base_cost * index_list[3] * 0.02 * level_modifier * 1.1) %}
                                 <tr id="TE-{{ level }}">
                                     <td class="level">{{ level }}</td>
-                                    <td class="total">{{ research_duration | duration }}</td>
-                                    <td class="delta">{{ research_duration | duration }}</td>
-                                    <td class="price">{{ research_cost | float | intcomma }}</td>
+                                    <td class="total">{{ te_time[level]['duration'] | duration }}</td>
+                                    <td class="delta">{{ te_time[level]['duration'] | duration }}</td>
+                                    <td class="price">{{ te_time[level]['cost'] | intcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

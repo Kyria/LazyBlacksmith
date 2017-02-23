@@ -4,7 +4,9 @@ from flask import jsonify
 from flask import request
 from flask_login import current_user
 from flask_login import login_required
+from sqlalchemy import func
 
+from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import db
 
@@ -84,12 +86,12 @@ def update_production_preference(preferences):
             pref.prod_me_rig = preferences['meRig']
             pref.prod_te_rig = preferences['teRig']
             pref.prod_security = preferences['security']
-            pref.prod_system = preferences['system']
+            pref.prod_system = check_solar_system(preferences['system'])
             pref.prod_sub_facility = preferences['componentFacility']
             pref.prod_sub_me_rig = preferences['componentMeRig']
             pref.prod_sub_te_rig = preferences['componentTeRig']
             pref.prod_sub_security = preferences['componentSecurity']
-            pref.prod_sub_system = preferences['componentSystem']
+            pref.prod_sub_system = check_solar_system(preferences['componentSystem'])
             pref.prod_price_region_minerals = preferences['priceMineralRegion']
             pref.prod_price_type_minerals = preferences['priceMineralType']
             pref.prod_price_region_pi = preferences['pricePiRegion']
@@ -132,7 +134,7 @@ def update_invention_preference(preferences):
             pref.invention_invention_rig = preferences['inventionRig']
             pref.invention_copy_rig = preferences['copyRig']
             pref.invention_security = preferences['security']
-            pref.invention_system = preferences['system']
+            pref.invention_system = check_solar_system(preferences['system'])
             pref.invention_price_region = preferences['priceRegion']
             pref.invention_price_type = preferences['priceType']
             pref.invention_character_id = preferences['characterId']
@@ -170,7 +172,7 @@ def update_research_preference(preferences):
             pref.research_te_rig = preferences['teRig']
             pref.research_copy_rig = preferences['copyRig']
             pref.research_security = preferences['security']
-            pref.research_system = preferences['system']
+            pref.research_system = check_solar_system(preferences['system'])
             pref.research_character_id = preferences['characterId']
 
             db.session.commit()
@@ -192,3 +194,13 @@ def update_research_preference(preferences):
         })
         response.status_code = 500
         return response
+
+        
+def check_solar_system(system_name):
+    """ Check if a solarsystem exists and return the real name from database
+    (prevents lower/upper case issues) """
+    system = SolarSystem.query.filter(
+        func.lower(SolarSystem.name) == func.lower(system_name)
+    ).one_or_none()
+    return 'Jita' if not system else system.name
+    

@@ -8,6 +8,8 @@ class IndustryIndex(db.Model):
     solarsystem_id = db.Column(
        db.Integer, db.ForeignKey('solar_system.id'), primary_key=True
     )
+    solarsystem = db.relationship('SolarSystem', backref=db.backref('indexes'))
+
     activity = db.Column(db.Integer, primary_key=True, autoincrement=False)
     cost_index = db.Column(
         db.Numeric(
