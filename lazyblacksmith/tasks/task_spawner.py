@@ -1,16 +1,16 @@
 # -*- encoding: utf-8 -*-
 from .character.character_skills import task_update_character_skills
+from .industry.indexes import task_update_industry_indexes
 from .market.adjusted_price import task_update_adjusted_price
 from .market.market_order import spawn_market_price_tasks
-from .industry.indexes import task_update_industry_indexes
 
-from lazyblacksmith.utils.time import utcnow
-from lazyblacksmith.utils.tasks import is_task_running
-from lazyblacksmith.models import db
-from lazyblacksmith.models import User
-from lazyblacksmith.models import TokenScope
-from lazyblacksmith.models import TaskState
 from lazyblacksmith.extension.celery_app import celery_app
+from lazyblacksmith.models import TaskState
+from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import User
+from lazyblacksmith.models import db
+from lazyblacksmith.utils.tasks import is_task_running
+from lazyblacksmith.utils.time import utcnow
 
 import datetime
 
@@ -27,22 +27,23 @@ UNIVERSE_TASKS = [
     spawn_market_price_tasks,
 ]
 
+
 @celery_app.task(name="schedule.character_task_spawner")
 def spawn_character_tasks():
-    """ Task triggered every minutes that scan all tasks done to find 
+    """ Task triggered every minutes that scan all tasks done to find
     any character based task to do (based on the cached_until field) """
     now = utcnow()
 
     all_tokens = TokenScope.query.all()
-    
+
     for token_scope in all_tokens:
         if skip_scope(token_scope):
             continue
 
         # check if there is no running task, and the data is not still cached
-        if ((not token_scope.cached_until or token_scope.cached_until <= now) 
+        if ((not token_scope.cached_until or token_scope.cached_until <= now)
            and not is_task_running(token_scope.user_id, token_scope.scope)):
-           
+
             task = CHAR_TASK_SCOPE[token_scope.scope]
             task_id = "%s-%s-%s" % (
                 now.strftime('%Y%m%d-%H%M%S'),
@@ -62,7 +63,7 @@ def spawn_character_tasks():
 
 @celery_app.task(name="schedule.universe_task_spawner")
 def spawn_universe_tasks():
-    """ Task triggered every XX minutes (not less than 5) that trigger 
+    """ Task triggered every XX minutes (not less than 5) that trigger
     'universe' tasks (market prices, industry indexes, ...) """
     now = utcnow()
     for task in UNIVERSE_TASKS:
@@ -78,13 +79,13 @@ def spawn_universe_tasks():
             )
             db.session.add(token_state)
             db.session.commit()
-            
+
             task.s().apply_async(task_id=task_id)
-            
+
 
 def skip_scope(token_scope):
     """ Return True if we must skip that token_scope
-    
+
     This function return True in the following cases:
     - The user didn't log in for more than 30days
     - The user didn't log in for more than 7days, and we already updated the
@@ -104,14 +105,16 @@ def skip_scope(token_scope):
 
     if last_seen < past_week:
         if last_seen < past_month:
-            return True  
+            return True
+        if not token_scope.last_update:
+            return True
         if token_scope.last_update > yesterday:
             return True
-    
+
     # if no task is defined for the scope, skip it
-    if (token_scope.scope not in CHAR_TASK_SCOPE 
-       or CHAR_TASK_SCOPE[token_scope.scope] is None):
+    if (token_scope.scope not in CHAR_TASK_SCOPE or
+       CHAR_TASK_SCOPE[token_scope.scope] is None):
         return True
-    
+
     # if nothing match, return False
     return False
