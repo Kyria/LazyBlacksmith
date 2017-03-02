@@ -32,9 +32,9 @@ class Importer(object):
         (ActivityMaterial, DELETE),
         (ActivityProduct, DELETE),
         (ActivitySkill, DELETE),
-        (Region, DELETE),
-        (Constellation, DELETE),
-        (SolarSystem, DELETE),
+        (Region, UPDATE),
+        (Constellation, UPDATE),
+        (SolarSystem, UPDATE),
     ]
 
     def __init__(self, sde_connection, lb_engine):
@@ -556,6 +556,10 @@ class Importer(object):
             bulk_data[int(row[0])] = row[1:]
 
         new = []
+        update = []
+        
+        regions = Region.query.all()
+        region_id_list = [r.id for r in regions]
 
         # for each item from SDE, check valid data and check if it doesn't exist yet in our db
         for id, data in bulk_data.items():
@@ -565,11 +569,16 @@ class Importer(object):
                 continue
 
             item = {
-                'id': id,
                 'name': data[0],
                 'wh': data[1]
             }
-            new.append(item)
+            if id in region_id_list:
+                item['update_id'] = id
+                update.append(item)
+            else:
+                item['id'] = id
+                new.append(item)
+                
             added += 1
 
         # then create the new item if they exist
@@ -579,6 +588,16 @@ class Importer(object):
                 new
             )
 
+        if update:
+            update_stmt = Region.__table__.update()
+            update_stmt = update_stmt.where(
+                Region.id == db.bindparam('update_id')
+            )
+            db.engine.execute(
+                update_stmt,
+                update,
+            )
+            
         return (added, total)
 
     def import_constellation(self):
@@ -604,6 +623,10 @@ class Importer(object):
             bulk_data[int(row[0])] = row[1:]
 
         new = []
+        update = []
+        
+        constellations = Constellation.query.all()
+        constellation_id_list = [c.id for c in constellations]
 
         # for each item from SDE, check valid data and check if it doesn't exist yet in our db
         for id, data in bulk_data.items():
@@ -613,11 +636,17 @@ class Importer(object):
                 continue
 
             item = {
-                'id': id,
                 'region_id': int(data[0]),
                 'name': data[1],
             }
-            new.append(item)
+            
+            if id in constellation_id_list:
+                item['update_id'] = id
+                update.append(item)
+            else:
+                item['id'] = id
+                new.append(item)
+                
             added += 1
 
         # then create the new item if they exist
@@ -627,6 +656,15 @@ class Importer(object):
                 new
             )
 
+        if update:
+            update_stmt = Constellation.__table__.update()
+            update_stmt = update_stmt.where(
+                Constellation.id == db.bindparam('update_id')
+            )
+            db.engine.execute(
+                update_stmt,
+                update,
+            )   
         return (added, total)
 
     def import_solarsystem(self):
@@ -653,6 +691,10 @@ class Importer(object):
             bulk_data[int(row[0])] = row[1:]
 
         new = []
+        update = []
+        
+        solarsystems = SolarSystem.query.all()
+        system_id_list = [ss.id for ss in solarsystems]
 
         # for each item from SDE, check valid data and check if it doesn't exist yet in our db
         for id, data in bulk_data.items():
@@ -662,12 +704,18 @@ class Importer(object):
                 continue
 
             item = {
-                'id': id,
                 'name': data[0],
                 'region_id': int(data[1]),
                 'constellation_id': int(data[2]),
             }
-            new.append(item)
+            
+            if id in system_id_list:
+                item['update_id'] = id
+                update.append(item)
+            else:
+                item['id'] = id
+                new.append(item)
+                
             added += 1
 
         # then create the new item if they exist
@@ -677,4 +725,14 @@ class Importer(object):
                 new
             )
 
+        if update:
+            update_stmt = SolarSystem.__table__.update()
+            update_stmt = update_stmt.where(
+                SolarSystem.id == db.bindparam('update_id')
+            )
+            db.engine.execute(
+                update_stmt,
+                update,
+            )
+            
         return (added, total)
