@@ -122,7 +122,7 @@ def research(item_id):
     for index in indexes:
         index_list[index.activity] = index.cost_index
 
-        
+
     # calculate baseCost and build cost per ME
     materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
     base_cost = calculate_base_cost(materials)
@@ -132,7 +132,7 @@ def research(item_id):
         xrange(0, 11),
         item.max_production_limit
     )
-    
+
     cost_prev_me = cost[0]['run']
     cost_prev_me_max = cost[0]['max_bpc_run']
     for level in xrange(0, 11):
@@ -142,13 +142,13 @@ def research(item_id):
         delta_prev_me = cost_prev_me - current_cost
         delta_pct_me0 = (1 - current_cost / cost[0]['run']) * 100
         delta_pct_prev_me = (1 - current_cost / cost_prev_me) * 100
-        
+
         current_cost = cost[level]['max_bpc_run']
         max_delta_me0 = cost[0]['max_bpc_run'] - current_cost
         max_delta_prev_me = cost_prev_me_max - current_cost
         max_delta_pct_me0 = (1 - current_cost / cost[0]['max_bpc_run']) * 100
         max_delta_pct_prev_me = (1 - current_cost / cost_prev_me_max) * 100
-        
+
         cost[level].update({
             'delta_me0': delta_me0,
             'delta_prev_me': delta_prev_me,
@@ -159,10 +159,10 @@ def research(item_id):
             'max_delta_pct_me0': max_delta_pct_me0,
             'max_delta_pct_prev_me': max_delta_pct_prev_me,
         })
-        
+
         cost_prev_me = cost[level]['run']
         cost_prev_me_max = cost[level]['max_bpc_run']
-        
+
     me_time = {}
     te_time = {}
     for level in xrange(1, 11):
@@ -181,7 +181,7 @@ def research(item_id):
             'duration': float("%0.2f" % te_duration),
             'cost': te_cost,
         }
-        
+
     # display
     return render_template('blueprint/research.html', **{
         'blueprint': item,
@@ -259,7 +259,7 @@ def invention(item_id):
             Activity.ACTIVITY_INVENTION,
         ])
     )
-    
+
     index_list = {}
     for index in indexes:
         index_list[index.activity] = index.cost_index

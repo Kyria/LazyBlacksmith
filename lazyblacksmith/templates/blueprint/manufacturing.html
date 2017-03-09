@@ -251,10 +251,10 @@
                                         {{- material.material.name -}}
                                     </td>
                                     <td class="quantity" data-name="quantity">
-                                        {{- material.quantity|intcomma -}}
+                                        {{- material.quantity | intcomma -}}
                                     </td>
-                                    <td class="quantity" data-name="quantity-adjusted">{{ material.quantity|intcomma }}</td>
-                                    <td class="quantity" data-name="quantity-job">{{ material.quantity|intcomma }}</td>
+                                    <td class="quantity" data-name="quantity-adjusted">{{ material.quantity | floatcomma }}</td>
+                                    <td class="quantity" data-name="quantity-job">{{ material.quantity | intcomma }}</td>
                                 </tr>
                             {% endfor %}
                             </table>

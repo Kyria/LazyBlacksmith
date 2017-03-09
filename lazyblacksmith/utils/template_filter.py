@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
-import humanize
-
 import flask
+import humanize
 import jinja2
 
 templatefilter = flask.Blueprint('filters', __name__)
@@ -48,3 +47,11 @@ def duration(context, seconds):
     if s:
         parts.append('%ds' % (s))
     return ' '.join(parts)
+
+
+@jinja2.contextfilter
+@templatefilter.app_template_filter()
+def floatcomma(context, value, decimal=2):
+    float_format = '%%.%df' % decimal
+    val = str(float_format % value)
+    return humanize.intcomma(val)

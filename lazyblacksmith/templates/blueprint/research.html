@@ -215,7 +215,7 @@
                                     <td class="level">{{ level }}</td>
                                     <td class="total">{{ me_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ me_time[level]['duration'] | duration }}</td>
-                                    <td class="price">{{ me_time[level]['cost'] | intcomma }}</td>
+                                    <td class="price">{{ me_time[level]['cost'] | floatcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -243,10 +243,10 @@
                                 <tr id="ME-profit-{{ level }}">
                                     <td class="level">{{ level }}</td>
                                     <td>{{ cost_per_me[level]['run'] | intcomma }}</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | intcomma }}</td>
-                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_me0'] }}%</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | intcomma }}</td>
-                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_prev_me'] }}%</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
+                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
+                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_prev_me'] | floatcomma }}%</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -283,10 +283,10 @@
                                 <tr id="ME-profit-max-run-{{ level }}">
                                     <td class="level">{{ level }}</td>
                                     <td>{{ cost_per_me[level]['run'] | intcomma }}</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | intcomma }}</td>
-                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_me0'] }}%</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | intcomma }}</td>
-                                    <td class="price-percent">{{ "%.2f" % cost_per_me[level]['delta_pct_prev_me'] }}%</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
+                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
+                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
+                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_prev_me'] | floatcomma }}%</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -311,7 +311,7 @@
                                     <td class="level">{{ level }}</td>
                                     <td class="total">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ te_time[level]['duration'] | duration }}</td>
-                                    <td class="price">{{ te_time[level]['cost'] | intcomma }}</td>
+                                    <td class="price">{{ te_time[level]['cost'] | floatcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -328,8 +328,8 @@
                             </tr>
                             <tr>
                                 <th>Installation Cost</th>
-                                {% set copy_cost = "%0.2f" % (base_cost * index_list[5] * 0.02) -%}
-                                <td class="copy-cost">{{ copy_cost | float | intcomma }}</td>
+                                {% set copy_cost = (base_cost * index_list[5] * 0.02) -%}
+                                <td class="copy-cost">{{ copy_cost | floatcomma }}</td>
                             </tr>
                         </table>
                     </div>
