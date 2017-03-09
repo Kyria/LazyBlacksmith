@@ -63,6 +63,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     };
     // base decryptor for "no decryptor selected"
     decryptorData.items[0] = {
+        id: 0,
         name: 'Decryptor',
         probability: 1.00,
         me: 0,
@@ -92,7 +93,8 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      */
     var _getAllPrices = function() {
         if(priceData.isLoaded) {
-            return _updateInventionData();
+            _updateInventionData();
+            return;
         }
 
         if(matData.idList.length == 0) {
@@ -157,6 +159,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         if(!outputPrices) {
             return _getOutputPrices(_updateInventionData);
         }
+        _updateSummaryPrices();
 
         var newProbability = eveUtils.calculateInventionProbability(
             options.baseInventionProbability,
@@ -271,6 +274,78 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
     };
 
+
+    /**
+     * Update the summary table with prices
+     */
+    var _updateSummaryPrices = function() {
+        var idList = [0];
+        $.merge(idList, decryptorData.idList);
+
+        for(var i in idList) {
+            var materialPrice = 0;
+            var decryptor = decryptorData.items[idList[i]];
+
+            // update probability
+            var newProbability = eveUtils.calculateInventionProbability(
+                options.baseInventionProbability,
+                options.encryptionLevel,
+                options.datacoreLevel1,
+                options.datacoreLevel2,
+                decryptor.probability
+            );
+
+            // update cost
+            var outputRuns = options.baseOutputRun + decryptor.run;
+            var outputME = decryptor.me + options.baseOutputME;
+            var outputCost = outputPrices[outputME];
+            var inventionCost = eveUtils.calculateInventionCost(
+                options.inventionBaseCost,
+                indexes[options.system][ACTIVITY_INVENTION],
+                options.runs,
+                1.1
+            );
+
+            var copyCost = eveUtils.calculateCopyInstallationCost(
+                options.copyBaseCost,
+                indexes[options.system][ACTIVITY_COPYING],
+                options.runs,
+                1,
+                1.1
+            );
+
+            // material prices
+            for(var i in matData.idList) {
+                var mat = matData.materials[matData.idList[i]];
+                var quantity = mat.quantity * options.runs;
+
+                var price = 0;
+                if(options.region in priceData.prices && mat.id in priceData.prices[options.region]) {
+                    price = priceData.prices[options.region][mat.id][options.regionType];
+                    price = (price == 0) ? priceData.prices[options.region][mat.id].sell : price;
+                }
+                materialPrice += quantity * price;
+            }
+
+            // decryptor prices
+            if(decryptor.id != 0) {
+                var quantity = options.runs;
+                var price = 0;
+                if(options.region in priceData.prices && decryptor.id in priceData.prices[options.region]) {
+                    price = priceData.prices[options.region][decryptor.id][options.regionType];
+                    price = (price == 0) ? priceData.prices[options.region][decryptor.id].sell : price;
+                }
+                materialPrice += quantity * price;
+            }
+
+            var inventionTotalPriceProba = (inventionCost + materialPrice + copyCost) / newProbability;
+            var totalPrice = outputCost + inventionTotalPriceProba / (outputRuns * options.runs)
+            // update table rows
+            $('.decryptor-' + decryptor.id + ' .chance').html(Humanize.intcomma(newProbability * 100, 2) + '%')
+            $('.decryptor-' + decryptor.id + ' .invention-cost').html(Humanize.intcomma(inventionTotalPriceProba, 2))
+            $('.decryptor-' + decryptor.id + ' .total-cost').html(Humanize.intcomma(totalPrice, 2))
+        }
+    }
 
     // EVENTS
     // ------

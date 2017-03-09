@@ -34,6 +34,7 @@
         {% for decryptor in decryptors %}
         inventionBlueprint.decryptorData.idList.push({{ decryptor.item_id }});
         inventionBlueprint.decryptorData.items[{{ decryptor.item_id }}] = {
+            id: {{ decryptor.item_id }},
             name: '{{ decryptor.item.name }}',
             probability: {{ decryptor.probability_multiplier }},
             me: {{ decryptor.material_modifier }},
@@ -212,139 +213,185 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
-                <table class="invention-data table table-condensed table-hover table-striped">
-                    <thead>
-                        <th colspan="2">Activity Time</th>
-                    </thead>
-                    <tbody>
-                        {% if activity_copy is not none %}
-                        <tr>
-                            <td class="title">BPO Copy</td>
-                            <td class="data copy-time">{{ activity_copy.time | duration }}</td>
-                        </tr>
-                        {% endif %}
-                        <tr>
-                            <td class="title">Invention</td>
-                            <td class="data invention-time">{{ activity_invention.time | duration }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-md-12">
+                <ul class="nav nav-tabs" id="tab-links" role="tablist">
+                    <li class="active"><a href="#summary">Summary</a></li>
+                    <li><a href="#details">Details</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="fade in active tab-pane" id="summary">
+                        <table class="table table-condensed table-hover table-striped">
+                            <thead>
+                                <th class="text-center">Decryptor</th>
+                                <th class="text-right">Chance</th>
+                                <th class="text-right">Run</th>
+                                <th class="text-right">ME</th>
+                                <th class="text-right">TE</th>
+                                <th class="text-right">Invention Cost</th>
+                                <th class="cell-text-right">Product Price / Run</th>
+                            </thead>
+                            <tbody>
+                                <tr class="decryptor-0">
+                                    <th>None</th>
+                                    <td class="text-right chance right">{{ (invention_products[0].probability * 100) | floatcomma }}%</td>
+                                    <td class="text-right">{{ invention_products[0].quantity }}</td>
+                                    <td class="text-right">2%</td>
+                                    <td class="text-right">4%</td>
+                                    <td class="text-right invention-cost">0</td>
+                                    <td class="cell-text-right total-cost">0</td>
+                                </tr>
+                                {% for decryptor in decryptors -%}
+                                <tr class="decryptor-{{ decryptor.item_id }}">
+                                    <th>{{ decryptor.item.name }}</th>
+                                    <td class="text-right chance">{{ (invention_products[0].probability * 100 * decryptor.probability_multiplier ) | floatcomma }}%</td>
+                                    <td class="text-right">{{ invention_products[0].quantity + decryptor.run_modifier }}</td>
+                                    <td class="text-right">{{ decryptor.material_modifier + 2 }}%</td>
+                                    <td class="text-right">{{ decryptor.time_modifier + 4 }}%</td>
+                                    <td class="text-right invention-cost">0</td>
+                                    <td class="cell-text-right total-cost">0</td>
+                                </tr>
+                                {% endfor %}
+                        </table>
+                    </div>
 
 
-                <table class="invention-data table table-condensed table-hover table-striped">
-                    <thead>
-                        <th colspan="2">Outputs</th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="title">Success Probability</td>
-                            <td class="data invention-probability">{{ (invention_products[0].probability * 100) | intcomma }}%</td>
-                        </tr>
-                        <tr>
-                            <td class="title">Blueprint</td>
-                            <td class="data output">
-                            {% for inv_prod in invention_products -%}
-                            {% if config.USE_CCP_ICONS -%}
-                                <a href="{{ url_for('blueprint.manufacturing', item_id=inv_prod.product_id) }}" target="_blank" title="{{- inv_prod.product.name }}" data-toggle="tooltip" data-placement="top"><img src="{{ inv_prod.product.icon_32() }}" alt="{{ inv_prod.product.name }}"></a>
-                                {%- if (loop.index) % 6 == 0 %}<br>{% endif %}
-                            {%- else -%}
-                                {{- inv_prod.product.name }}<br>
-                            {%- endif %}
-                            {% endfor %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="title">Stats (Runs / ME / TE)</td>
-                            <td class="data invention-stats"><span class="output-qty">{{ invention_products[0].quantity }}</span> / <span class="output-me">2</span>% / <span class="output-te">4</span>%</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <div class="fade tab-pane" id="details">
+                        <div class="col-md-6">
+                            <table class="invention-data table table-condensed table-hover table-striped">
+                                <thead>
+                                    <th colspan="2">Activity Time</th>
+                                </thead>
+                                <tbody>
+                                    {% if activity_copy is not none %}
+                                    <tr>
+                                        <td class="title">BPO Copy</td>
+                                        <td class="data copy-time">{{ activity_copy.time | duration }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td class="title">Invention</td>
+                                        <td class="data invention-time">{{ activity_invention.time | duration }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
 
-                <table class="invention-data table table-condensed table-hover table-striped">
-                    <thead>
-                        <th colspan="2">Invention Costs</th>
-                    </thead>
-                    <tbody>
-                        {% if activity_copy is not none %}
-                        <tr>
-                            <td class="title">BPO Copy</td>
-                            {% set copy_cost = "%0.2f" % (copy_base_cost * index_list[5] * 0.02 * 1.1) -%}
-                            <td class="data copy-cost">{{ copy_cost | float | intcomma }}</td>
-                        </tr>
-                        {% else %}
-                        {% set copy_cost = "0" %}
-                        {% endif %}
-                        <tr>
-                            <td class="title">Invention Installation</td>
-                            {% set invention_cost = "%0.2f" % (invention_base_cost * index_list[8] * 0.02 * 1.1) -%}
-                            <td class="data invention-install-cost">{{ invention_cost | float | intcomma }}</td>
-                        </tr>
-                        <tr>
-                            {% set invention_total_cost = (copy_cost | float) + (invention_cost | float) -%}
-                            <td class="title">Total</td>
-                            <td class="data invention-total-cost">{{ invention_total_cost | intcomma }}</td>
-                        </tr>
-                        <tr>
-                            <td class="title">Total with Probability</td>
-                            <td class="data invention-total-cost-proba">{{ ("%0.2f" % (invention_total_cost / invention_products[0].probability)) | intcomma }}</td>
-                        </tr>
-                        <tr>
-                            <td class="title">
-                                Output / Run
-                                <span class='small' data-toggle="tooltip" data-placement="top" title="Price based on sell orders in The Forge (this cost is an approximate value only to compare inventions!)">
-                                    <i class="fa fa-exclamation-circle"></i>
-                                </span>
-                            </td>
-                            <td class="data output-cost">0</td>
-                        </tr>
-                        <tr>
-                            <td class="title">Output / Run with Invention</td>
-                            <td class="data output-cost-invention">0</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-6">
-                <table class="materials-prices table table-condensed table-hover table-striped">
-                    <thead>
-                        <tr>
-                            {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                            <th>Name</th>
-                            <th>Quantity</th>
-                            <th>Price Per Unit</th>
-                            <th>Total Price</th>
-                        </tr>
-                    </thead>
+                            <table class="invention-data table table-condensed table-hover table-striped">
+                                <thead>
+                                    <th colspan="2">Outputs</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="title">Success Probability</td>
+                                        <td class="data invention-probability">{{ (invention_products[0].probability * 100) | floatcomma }}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="title">Blueprint</td>
+                                        <td class="data output">
+                                        {% for inv_prod in invention_products -%}
+                                        {% if config.USE_CCP_ICONS -%}
+                                            <a href="{{ url_for('blueprint.manufacturing', item_id=inv_prod.product_id) }}" target="_blank" title="{{- inv_prod.product.name }}" data-toggle="tooltip" data-placement="top"><img src="{{ inv_prod.product.icon_32() }}" alt="{{ inv_prod.product.name }}"></a>
+                                            {%- if (loop.index) % 6 == 0 %}<br>{% endif %}
+                                        {%- else -%}
+                                            {{- inv_prod.product.name }}<br>
+                                        {%- endif %}
+                                        {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="title">Stats (Runs / ME / TE)</td>
+                                        <td class="data invention-stats"><span class="output-qty">{{ invention_products[0].quantity }}</span> / <span class="output-me">2</span>% / <span class="output-te">4</span>%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-                    <tbody>
-                        {% for inv_mat in invention_materials %}
-                        <tr id="mat-{{ inv_mat.material_id }}">
-                            {% if config.USE_CCP_ICONS -%}<td class="icon"><img src="{{ inv_mat.material.icon_32() }}" alt="{{ inv_mat.material.name }}"></td>{%- endif %}
-                            <td>{{ inv_mat.material.name }}</td>
-                            <td class="quantity">{{ inv_mat.quantity }}</td>
-                            <td class="ppu price">0.00</td>
-                            <td class="total price">0.00</td>
-                        </tr>
-                        {% endfor %}
-                        <tr id="mat-decryptor">
-                            {% if config.USE_CCP_ICONS -%}<td class="icon"><img src="{{ decryptors[0].item.icon_32() }}" alt="Decryptor"></td>{%- endif %}
-                            <td class="name">Decryptor</td>
-                            <td class="quantity">0</td>
-                            <td class="ppu price">0.00</td>
-                            <td class="total price">0.00</td>
-                        </tr>
-                    </tbody>
 
-                    <tfoot>
-                        <tr>
-                            {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                            <td colspan="3" class="title">Total Material Cost</td>
-                            <td class="invention-material-cost">0.00</td>
-                        </tr>
-                    </tfoot>
-                </table>
+                            <table class="invention-data table table-condensed table-hover table-striped">
+                                <thead>
+                                    <th colspan="2">Invention Costs</th>
+                                </thead>
+                                <tbody>
+                                    {% if activity_copy is not none %}
+                                    <tr>
+                                        <td class="title">BPO Copy</td>
+                                        {% set copy_cost = (copy_base_cost * index_list[5] * 0.02 * 1.1) -%}
+                                        <td class="data copy-cost">{{ copy_cost | floatcomma }}</td>
+                                    </tr>
+                                    {% else %}
+                                    {% set copy_cost = "0" %}
+                                    {% endif %}
+                                    <tr>
+                                        <td class="title">Invention Installation</td>
+                                        {% set invention_cost = (invention_base_cost * index_list[8] * 0.02 * 1.1) -%}
+                                        <td class="data invention-install-cost">{{ invention_cost | floatcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        {% set invention_total_cost = (copy_cost | float) + (invention_cost | float) -%}
+                                        <td class="title">Total</td>
+                                        <td class="data invention-total-cost">{{ invention_total_cost | floatcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="title">Total with Probability</td>
+                                        <td class="data invention-total-cost-proba">{{ (invention_total_cost / invention_products[0].probability) | floatcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="title">
+                                            Output / Run
+                                            <span class='small' data-toggle="tooltip" data-placement="top" title="Price based on sell orders in The Forge (this cost is an approximate value only to compare inventions!)">
+                                                <i class="fa fa-exclamation-circle"></i>
+                                            </span>
+                                        </td>
+                                        <td class="data output-cost">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="title">Output / Run with Invention</td>
+                                        <td class="data output-cost-invention">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="materials-prices table table-condensed table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th>Quantity</th>
+                                        <th>Price Per Unit</th>
+                                        <th>Total Price</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for inv_mat in invention_materials %}
+                                    <tr id="mat-{{ inv_mat.material_id }}">
+                                        {% if config.USE_CCP_ICONS -%}<td class="icon"><img src="{{ inv_mat.material.icon_32() }}" alt="{{ inv_mat.material.name }}"></td>{%- endif %}
+                                        <td>{{ inv_mat.material.name }}</td>
+                                        <td class="quantity">{{ inv_mat.quantity }}</td>
+                                        <td class="ppu price">0.00</td>
+                                        <td class="total price">0.00</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr id="mat-decryptor">
+                                        {% if config.USE_CCP_ICONS -%}<td class="icon"><img src="{{ decryptors[0].item.icon_32() }}" alt="Decryptor"></td>{%- endif %}
+                                        <td class="name">Decryptor</td>
+                                        <td class="quantity">0</td>
+                                        <td class="ppu price">0.00</td>
+                                        <td class="total price">0.00</td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                        <td colspan="3" class="title">Total Material Cost</td>
+                                        <td class="invention-material-cost">0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
