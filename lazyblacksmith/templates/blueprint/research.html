@@ -29,6 +29,10 @@
         researchBlueprint.options.scienceLevel = {{ industry_skills['science'] }};
         researchBlueprint.options.advancedIndustryLevel = {{ industry_skills['adv_industry'] }};
 
+        researchBlueprint.options.meImplant = {{ pref.research_me_implant }};
+        researchBlueprint.options.teImplant = {{ pref.research_te_implant }};
+        researchBlueprint.options.copyImplant = {{ pref.research_copy_implant }};
+
         lb.run('researchBlueprint');
     </script>
 {% endblock %}
@@ -132,28 +136,28 @@
             <div>
                 ME Implant<br>
                 <select name="meImplant" id="meImplant" class="form-control input-sm">
-                    <option value="1.00" selected>None</option>
-                    <option value="0.99">MY-701</option>
-                    <option value="0.97">MY-703</option>
-                    <option value="0.95">MY-705</option>
+                    <option value="1.00" {% if pref.research_me_implant == 1.00 %}selected{% endif %}>None</option>
+                    <option value="0.99" {% if pref.research_me_implant == 0.99 %}selected{% endif %}>MY-701</option>
+                    <option value="0.97" {% if pref.research_me_implant == 0.97 %}selected{% endif %}>MY-703</option>
+                    <option value="0.95" {% if pref.research_me_implant == 0.95 %}selected{% endif %}>MY-705</option>
                 </select>
             </div>
             <div>
                 TE Implant<br>
                 <select name="teImplant" id="teImplant" class="form-control input-sm">
-                    <option value="1.00" selected>None</option>
-                    <option value="0.99">RR-601</option>
-                    <option value="0.97">RR-603</option>
-                    <option value="0.95">RR-605</option>
+                    <option value="1.00" {% if pref.research_te_implant == 1.00 %}selected{% endif %}>None</option>
+                    <option value="0.99" {% if pref.research_te_implant == 0.99 %}selected{% endif %}>RR-601</option>
+                    <option value="0.97" {% if pref.research_te_implant == 0.97 %}selected{% endif %}>RR-603</option>
+                    <option value="0.95" {% if pref.research_te_implant == 0.95 %}selected{% endif %}>RR-605</option>
                 </select>
             </div>
             <div>
                 Copy Implant<br>
                 <select name="copyImplant" id="copyImplant" class="form-control input-sm">
-                    <option value="1.00" selected>None</option>
-                    <option value="0.99">SC-801</option>
-                    <option value="0.97">SC-803</option>
-                    <option value="0.95">SC-805</option>
+                    <option value="1.00" {% if pref.research_copy_implant == 1.00 %}selected{% endif %}>None</option>
+                    <option value="0.99" {% if pref.research_copy_implant == 0.99 %}selected{% endif %}>SC-801</option>
+                    <option value="0.97" {% if pref.research_copy_implant == 0.97 %}selected{% endif %}>SC-803</option>
+                    <option value="0.95" {% if pref.research_copy_implant == 0.95 %}selected{% endif %}>SC-805</option>
                 </select>
             </div>
         </div>
