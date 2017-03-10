@@ -1,20 +1,16 @@
 # -*- encoding: utf-8 -*-
 import config
-import humanize
 
 from flask import Blueprint
 from flask import abort
 from flask import render_template
 from flask_login import current_user
-from math import ceil
 
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Decryptor
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
-from lazyblacksmith.models import ItemAdjustedPrice
-from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.utils.industry import calculate_base_cost

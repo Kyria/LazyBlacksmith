@@ -5,18 +5,16 @@ from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy import esisecurity
 from lazyblacksmith.extension.esipy.operations import get_characters_skills
-from lazyblacksmith.models import User
-from lazyblacksmith.models import Item
 from lazyblacksmith.models import Skill
-from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import TaskState
+from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
 from datetime import datetime
 from email.utils import parsedate
 
-import json
 import pytz
 
 
@@ -47,10 +45,10 @@ def task_update_character_skills(self, character_id):
             char_skill = character.skills.filter(
                 Skill.skill_id == skill_object.skill_id
             ).one_or_none()
-            
+
             if char_skill:
                 char_skill.level = skill_object.current_skill_level
-            else:            
+            else:
                 skill = Skill(
                     character=character,
                     skill_id=skill_object.skill_id,
@@ -63,7 +61,7 @@ def task_update_character_skills(self, character_id):
     else:
         self.end(TaskState.ERROR)
         return
-        
+
     # update the token and the state
     token.last_update = utcnow()
     token.cached_until = datetime(
@@ -71,4 +69,3 @@ def task_update_character_skills(self, character_id):
     ).replace(tzinfo=pytz.utc)
     db.session.commit()
     self.end(TaskState.SUCCESS)
-
