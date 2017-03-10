@@ -13,6 +13,24 @@ class UserPreference(db.Model):
         'Laboratory', 'Hyasyoda Laboratory', 'Experimental Laboratory'
     )
     FACILITY_STRUCTURE = (1, 2, 3, 4)  # Raitaru, Azbel, Sotiyo, Others
+    LABEL_ME_IMPLANT = {
+        1.00: 'None',
+        0.99: 'MY-701',
+        0.97: 'MY-703',
+        0.95: 'MY-705'
+    }
+    LABEL_TE_IMPLANT = {
+        1.00: 'None',
+        0.99: 'RR-601',
+        0.97: 'RR-603',
+        0.95: 'RR-605'
+    }
+    LABEL_COPY_IMPLANT = {
+        1.00: 'None',
+        0.99: 'SC-801',
+        0.97: 'SC-803',
+        0.95: 'SC-805'
+    }
 
     # helpers
     @classmethod
@@ -21,6 +39,27 @@ class UserPreference(db.Model):
             return cls.LABEL_RIGS[value]
         except IndexError:
             return cls.LABEL_RIGS[0]
+
+    @classmethod
+    def label_implant_me(cls, value):
+        try:
+            return cls.LABEL_ME_IMPLANT[value]
+        except IndexError:
+            return cls.LABEL_ME_IMPLANT[1.00]
+
+    @classmethod
+    def label_implant_te(cls, value):
+        try:
+            return cls.LABEL_TE_IMPLANT[value]
+        except IndexError:
+            return cls.LABEL_TE_IMPLANT[1.00]
+
+    @classmethod
+    def label_implant_copy(cls, value):
+        try:
+            return cls.LABEL_COPY_IMPLANT[value]
+        except IndexError:
+            return cls.LABEL_COPY_IMPLANT[1.00]
 
     @classmethod
     def label_facility(cls, value):
@@ -77,6 +116,11 @@ class UserPreference(db.Model):
         'User',
         foreign_keys=[invention_character_id]
     )
+    invention_copy_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
+    )
 
     # --------------------------------------------------------
     # Research preferences
@@ -95,6 +139,21 @@ class UserPreference(db.Model):
     research_character = db.relationship(
         'User',
         foreign_keys=[research_character_id]
+    )
+    research_me_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
+    )
+    research_te_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
+    )
+    research_copy_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
     )
 
     # --------------------------------------------------------

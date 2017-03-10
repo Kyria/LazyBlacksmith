@@ -138,6 +138,7 @@ def update_invention_preference(preferences):
             pref.invention_price_region = preferences['priceRegion']
             pref.invention_price_type = preferences['priceType']
             pref.invention_character_id = preferences['characterId']
+            pref.invention_copy_implant = preferences['copyImplant']
 
             db.session.commit()
             return jsonify({'status': 'success'})
@@ -174,6 +175,9 @@ def update_research_preference(preferences):
             pref.research_security = preferences['security']
             pref.research_system = check_solar_system(preferences['system'])
             pref.research_character_id = preferences['characterId']
+            pref.research_me_implant = preferences['meImplant']
+            pref.research_te_implant = preferences['teImplant']
+            pref.research_copy_implant = preferences['copyImplant']
 
             db.session.commit()
             return jsonify({'status': 'success'})
@@ -195,7 +199,7 @@ def update_research_preference(preferences):
         response.status_code = 500
         return response
 
-        
+
 def check_solar_system(system_name):
     """ Check if a solarsystem exists and return the real name from database
     (prevents lower/upper case issues) """
@@ -203,4 +207,4 @@ def check_solar_system(system_name):
         func.lower(SolarSystem.name) == func.lower(system_name)
     ).one_or_none()
     return 'Jita' if not system else system.name
-    
+

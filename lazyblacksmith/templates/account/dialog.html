@@ -270,7 +270,7 @@
 
 <!-- research dialog -->
 <div class="modal fade" role="dialog" id="modalConfigResearch" aria-labelledby="modalConfigResearch" aria-hidden="true" data-bp-id="">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -281,7 +281,7 @@
             <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="well">
                                 <div>
                                     Facility<br>
@@ -350,6 +350,9 @@
                                     <input id="modal-system-research" type="text" class="form-control input-sm typeahead">
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="col-md-6">
                             <div class="well">
                                 <div>
                                     Character Skills<br>
@@ -358,6 +361,34 @@
                                         {% for user in list_character_skills -%}
                                         <option value="{{ user.character_id }}" selected>{{ user.character_name }}</option>
                                         {%- endfor %}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    ME Implant<br>
+                                    <select name="meImplant" id="me-implant-research" class="form-control input-sm">
+                                        <option value="1.00" selected>None</option>
+                                        <option value="0.99">MY-701</option>
+                                        <option value="0.97">MY-703</option>
+                                        <option value="0.95">MY-705</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    TE Implant<br>
+                                    <select name="teImplant" id="te-implant-research" class="form-control input-sm">
+                                        <option value="1.00" selected>None</option>
+                                        <option value="0.99">RR-601</option>
+                                        <option value="0.97">RR-603</option>
+                                        <option value="0.95">RR-605</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    Copy Implant<br>
+                                    <select name="copyImplant" id="copy-implant-research" class="form-control input-sm">
+                                        <option value="1.00" selected>None</option>
+                                        <option value="0.99">SC-801</option>
+                                        <option value="0.97">SC-803</option>
+                                        <option value="0.95">SC-805</option>
                                     </select>
                                 </div>
                             </div>
@@ -376,7 +407,7 @@
 
 <!-- invention dialog -->
 <div class="modal fade" role="dialog" id="modalConfigInvention" aria-labelledby="modalConfigInvention" aria-hidden="true" data-bp-id="">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -387,7 +418,7 @@
             <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="well">
                                 <div>
                                     Facility<br>
@@ -446,6 +477,9 @@
                                     <input id="modal-system-invention" type="text" class="form-control input-sm typeahead">
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="col-md-6">
                             <div class="well">
                                 Price settings <br>
                                 <select name="modal-region-invention" class="form-control input-sm modal-region">
@@ -470,6 +504,15 @@
                                         {% for user in list_character_skills -%}
                                         <option value="{{ user.character_id }}" selected>{{ user.character_name }}</option>
                                         {%- endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    Copy Implant<br>
+                                    <select name="copyImplant" id="copy-implant-invention" class="form-control input-sm">
+                                        <option value="1.00" selected>None</option>
+                                        <option value="0.99">SC-801</option>
+                                        <option value="0.97">SC-803</option>
+                                        <option value="0.95">SC-805</option>
                                     </select>
                                 </div>
                             </div>
