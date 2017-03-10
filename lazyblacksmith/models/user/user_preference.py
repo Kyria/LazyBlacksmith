@@ -1,10 +1,6 @@
 # -*- encoding: utf-8 -*-
-import pytz
-import time
-
-from datetime import datetime
-
 from . import db
+
 
 class UserPreference(db.Model):
     # fake enums
@@ -12,12 +8,12 @@ class UserPreference(db.Model):
     LABEL_SECURITY = {'h': 'High Sec', 'l': 'Low Sec', 'n': 'Null Sec / WH'}
     LABEL_FACILITY = (  # order is important, same as in evedata.js
         'Station', 'Raitaru (M-EC)', 'Azbel (L-EC)',
-        'Sotiyo (XL-EC)', 'Other Structures', 'Assembly Array', 
-        'Thukker Component Array', 'Rapid Assembly Array', 
+        'Sotiyo (XL-EC)', 'Other Structures', 'Assembly Array',
+        'Thukker Component Array', 'Rapid Assembly Array',
         'Laboratory', 'Hyasyoda Laboratory', 'Experimental Laboratory'
     )
-    FACILITY_STRUCTURE = (1,2,3,4)  # Raitaru, Azbel, Sotiyo, Other structures
-    
+    FACILITY_STRUCTURE = (1, 2, 3, 4)  # Raitaru, Azbel, Sotiyo, Others
+
     # helpers
     @classmethod
     def label_rig(cls, value):
@@ -43,8 +39,8 @@ class UserPreference(db.Model):
     @classmethod
     def is_structure(cls, value):
         return value in cls.FACILITY_STRUCTURE
-        
-    # model 
+
+    # model
     user_id = db.Column(
         db.BigInteger,
         db.ForeignKey('user.character_id'),
@@ -56,6 +52,9 @@ class UserPreference(db.Model):
         backref=db.backref('pref', uselist=False)
     )
 
+    # --------------------------------------------------------
+    # Invention preferences
+    # --------------------------------------------------------
     invention_facility = db.Column(db.Integer, nullable=False, default=0)
     invention_invention_rig = db.Column(db.Integer, nullable=False, default=0)
     invention_copy_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -79,7 +78,9 @@ class UserPreference(db.Model):
         foreign_keys=[invention_character_id]
     )
 
-    
+    # --------------------------------------------------------
+    # Research preferences
+    # --------------------------------------------------------
     research_facility = db.Column(db.Integer, nullable=False, default=0)
     research_me_rig = db.Column(db.Integer, nullable=False, default=0)
     research_te_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -95,7 +96,10 @@ class UserPreference(db.Model):
         'User',
         foreign_keys=[research_character_id]
     )
-    
+
+    # --------------------------------------------------------
+    # Manufacturing preferences
+    # --------------------------------------------------------
     prod_facility = db.Column(db.Integer, nullable=False, default=0)
     prod_me_rig = db.Column(db.Integer, nullable=False, default=0)
     prod_te_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -118,7 +122,7 @@ class UserPreference(db.Model):
     prod_price_region_others = db.Column(
         db.Integer, nullable=False, default=10000002
     )
-    
+
     prod_price_type_minerals = db.Column(
         db.String(4), nullable=False, default='buy'
     )
