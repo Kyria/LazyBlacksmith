@@ -14,7 +14,6 @@ from sqlalchemy import func
 class TokenScope(db.Model):
     # known scopes
     SCOPE_SKILL = 'esi-skills.read_skills.v1'
-    SCOPE_CLONES = 'characterClonesRead'
     SCOPE_CHAR_ASSETS = 'characterAssetsRead'
     SCOPE_CORP_ASSETS = 'corporationAssetsRead'
 
