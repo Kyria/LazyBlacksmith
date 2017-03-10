@@ -16,7 +16,7 @@ pytz>=2016.6.1
 humanize>=0.5.1
 requests>=2.8.1
 celery>=4.0,<5.0
-ratelimiter>=1.0.2.post0
+ratelimiter>=1.1.0
 simplejson>=3.8.2
 
 # EVE API Libs
