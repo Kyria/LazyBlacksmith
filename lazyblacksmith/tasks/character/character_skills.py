@@ -58,11 +58,13 @@ def task_update_character_skills(self, character_id):
             skill_number += 1
 
         db.session.commit()
-    else:
+    else:           
+        self.inc_fail_token_scope(token, character_skills.status)
         self.end(TaskState.ERROR)
         return
 
     # update the token and the state
+    token.request_try = 0
     token.last_update = utcnow()
     token.cached_until = datetime(
         *parsedate(character_skills.header['Expires'][0])[:6]
