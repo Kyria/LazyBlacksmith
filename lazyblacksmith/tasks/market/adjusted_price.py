@@ -7,13 +7,6 @@ from lazyblacksmith.extension.esipy.operations import get_markets_prices
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import db
-from lazyblacksmith.utils.time import utcnow
-
-from datetime import datetime
-from email.utils import parsedate
-
-import json
-import pytz
 
 
 @celery_app.task(name="update_adjusted_price", base=LbTask, bind=True)
@@ -42,7 +35,6 @@ def task_update_adjusted_price(self):
         )
         db.session.commit()
         self.end(TaskState.SUCCESS)
-        
+
     else:
         self.end(TaskState.ERROR)
-        
