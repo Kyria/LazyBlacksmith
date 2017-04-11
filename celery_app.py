@@ -33,5 +33,6 @@ celery_app.conf.imports = [
     'lazyblacksmith.tasks.market.adjusted_price',
     'lazyblacksmith.tasks.market.market_order',
     'lazyblacksmith.tasks.industry.indexes',
-    'lazyblacksmith.tasks.character.character_skills'
+    'lazyblacksmith.tasks.character.skills',
+    'lazyblacksmith.tasks.character.blueprints',
 ]

@@ -1,9 +1,10 @@
 # -*- encoding: utf-8 -*-
 from lazyblacksmith.extension.celery_app import celery_app
-from lazyblacksmith.models import db
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
+
 
 class LbTask(celery_app.Task):
     """ Base class for task, that defines some basic methods, such as
@@ -17,7 +18,7 @@ class LbTask(celery_app.Task):
                 db.session.commit()
             except:
                 db.session.rollback()
-                
+
     def end(self, state):
         task_state = TaskState.query.get(self.request.id)
         if task_state:
@@ -26,18 +27,18 @@ class LbTask(celery_app.Task):
                 task_state.state = state
             else:
                 task_state.state = TaskState.UNKNOWN
-                
+
             try:
                 db.session.commit()
             except:
                 db.session.rollback()
-        
+
     def get_token_scope(self, user_id, scope):
         return TokenScope.query.filter(
             TokenScope.user_id == user_id,
             TokenScope.scope == scope
         ).one()
-        
+
     def inc_fail_token_scope(self, token, status_code):
         """ Check if status_code is 4xx, increase counter, check validity """
         if int(status_code / 100) == 4:
@@ -47,6 +48,8 @@ class LbTask(celery_app.Task):
                 db.session.commit()
             except:
                 db.session.rollback()
-        
+
     def on_failure(self, exc, task_id, args, kwargs, einfo):
+        # if failure, force db rollback before anything else, just in case
+        db.session.rollback()
         self.end(TaskState.FAILURE)

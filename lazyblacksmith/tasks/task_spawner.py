@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
-from .character.character_skills import task_update_character_skills
+from .character.blueprints import task_update_character_blueprints
+from .character.skills import task_update_character_skills
 from .industry.indexes import task_update_industry_indexes
 from .market.adjusted_price import task_update_adjusted_price
 from .market.market_order import spawn_market_price_tasks
@@ -17,8 +18,7 @@ import datetime
 
 CHAR_TASK_SCOPE = {
     TokenScope.SCOPE_SKILL: task_update_character_skills,
-    TokenScope.SCOPE_CLONES: None,
-    TokenScope.SCOPE_CHAR_ASSETS: None,
+    TokenScope.SCOPE_CHAR_ASSETS: task_update_character_blueprints,
     TokenScope.SCOPE_CORP_ASSETS: None,
 }
 

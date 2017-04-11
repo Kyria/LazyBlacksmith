@@ -56,9 +56,9 @@ def task_update_character_skills(self, character_id):
                 )
                 db.session.merge(skill)
             skill_number += 1
-
         db.session.commit()
-    else:           
+
+    else:
         self.inc_fail_token_scope(token, character_skills.status)
         self.end(TaskState.ERROR)
         return
