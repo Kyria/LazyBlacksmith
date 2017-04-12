@@ -3,6 +3,8 @@ from . import db
 
 
 class Blueprint(db.Model):
+    """ character owned blueprints """
+
     id = db.Column(db.Integer, primary_key=True)
 
     item_id = db.Column(
@@ -22,6 +24,8 @@ class Blueprint(db.Model):
 
     material_efficiency = db.Column(db.Integer, nullable=False, default=0)
     time_efficiency = db.Column(db.Integer, nullable=False, default=0)
+
+    corporation = db.Column(db.Boolean(), nullable=False, default=False)
 
     character = db.relationship(
         'User', backref=db.backref('blueprints', lazy='dynamic'),

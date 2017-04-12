@@ -3,6 +3,8 @@ from . import db
 
 
 class Skill(db.Model):
+    """ Character skills """
+
     skill_id = db.Column(
         db.Integer,
         db.ForeignKey('item.id'),
