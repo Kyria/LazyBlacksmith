@@ -41,7 +41,11 @@ def task_update_character_blueprints(self, character_id):
         db.session.commit()
 
     # get current blueprints
-    bps = Blueprint.query.filter_by(character_id=character_id).all()
+    bps = Blueprint.query.filter_by(
+        character_id=character_id
+    ).filter_by(
+        corporation=False
+    ).all()
     blueprints = {}
 
     for bp in bps:
