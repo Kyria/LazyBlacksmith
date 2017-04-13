@@ -12,14 +12,57 @@ class Item(db.Model):
     category_id = db.Column(db.Integer)
 
     # foreign keys
-    activities = db.relationship('Activity', backref='blueprint', lazy='dynamic')
-    activity_products = db.relationship('ActivityProduct', backref='blueprint', lazy='dynamic', foreign_keys='ActivityProduct.item_id')
-    activity_skills = db.relationship('ActivitySkill', backref='blueprint', lazy='dynamic', foreign_keys='ActivitySkill.item_id')
-    activity_materials = db.relationship('ActivityMaterial', backref='blueprint', lazy='dynamic', foreign_keys='ActivityMaterial.item_id')
+    activities = db.relationship(
+        'Activity',
+        backref='blueprint',
+        lazy='dynamic'
+    )
+    activity_products = db.relationship(
+        'ActivityProduct',
+        backref='blueprint',
+        lazy='dynamic',
+        foreign_keys='ActivityProduct.item_id'
+    )
 
-    product_for_activities = db.relationship('ActivityProduct', backref='product', lazy='dynamic', foreign_keys='ActivityProduct.product_id')
-    skill_for_activities = db.relationship('ActivitySkill', backref='skill', lazy='dynamic', foreign_keys='ActivitySkill.skill_id')
-    material_for_activities = db.relationship('ActivityMaterial', backref='material', lazy='dynamic', foreign_keys='ActivityMaterial.material_id')
+    activity_skills = db.relationship(
+        'ActivitySkill',
+        backref='blueprint',
+        lazy='dynamic',
+        foreign_keys='ActivitySkill.item_id'
+    )
+    activity_materials = db.relationship(
+        'ActivityMaterial',
+        backref='blueprint',
+        lazy='dynamic',
+        foreign_keys='ActivityMaterial.item_id'
+    )
+
+    product_for_activities = db.relationship(
+        'ActivityProduct',
+        backref='product',
+        lazy='dynamic',
+        foreign_keys='ActivityProduct.product_id'
+    )
+    skill_for_activities = db.relationship(
+        'ActivitySkill',
+        backref='skill',
+        lazy='dynamic',
+        foreign_keys='ActivitySkill.skill_id'
+    )
+    material_for_activities = db.relationship(
+        'ActivityMaterial',
+        backref='material',
+        lazy='dynamic',
+        foreign_keys='ActivityMaterial.material_id'
+    )
+
+    # relationship only defined for performance issues
+    # ------------------------------------------------
+    activity_products__eager = db.relationship(
+        'ActivityProduct',
+        lazy='joined',
+        foreign_keys='ActivityProduct.item_id'
+    )
 
     def icon_32(self):
         static_url = "ccp/Types/%d_32.png" % self.id
@@ -30,13 +73,15 @@ class Item(db.Model):
         return url_for('static', filename=static_url)
 
     def is_manufactured(self):
-        if self.product_for_activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).count() > 0:
+        if self.product_for_activities.filter_by(
+            activity=Activity.ACTIVITY_MANUFACTURING
+        ).count() > 0:
             return True
         return False
 
     def is_moon_goo(self):
         return self.market_group_id == 499
-    
+
     def is_pi(self):
         return self.category_id == 43
 

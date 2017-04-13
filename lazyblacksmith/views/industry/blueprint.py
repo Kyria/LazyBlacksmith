@@ -7,6 +7,7 @@ from flask import render_template
 from flask_login import current_user
 
 from lazyblacksmith.models import Activity
+from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Blueprint
 from lazyblacksmith.models import Decryptor
@@ -15,6 +16,7 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import User
+from lazyblacksmith.models import db
 from lazyblacksmith.utils.industry import calculate_base_cost
 from lazyblacksmith.utils.industry import calculate_build_cost
 from lazyblacksmith.utils.industry import get_common_industry_skill
@@ -37,6 +39,13 @@ def search():
                     (User.main_character_id == current_user.character_id)
                 )
             ),
+        ).outerjoin(
+            ActivityProduct,
+            ((Blueprint.item_id == ActivityProduct.item_id) &
+             (ActivityProduct.activity == 8))
+        ).options(
+            db.contains_eager(Blueprint.item)
+            .contains_eager(Item.activity_products__eager)
         ).order_by(
             Blueprint.corporation.asc(),
             Blueprint.original.asc(),

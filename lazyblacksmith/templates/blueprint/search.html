@@ -58,7 +58,7 @@
                                     <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-default btn-xs pull-right">Research/Copy</a>
                                     {%- endif %}
                                 {% endif %}
-                                {% if blueprint.item.activity_products.filter_by(activity=8).first() %}
+                                {% if blueprint.item.activity_products__eager %}
                                 <a href="{{ url_for('blueprint.invention', item_id=blueprint.item_id) }}" class="btn btn-default btn-xs pull-right">Invention</a>
                                 {%- endif %}
                             </td>
