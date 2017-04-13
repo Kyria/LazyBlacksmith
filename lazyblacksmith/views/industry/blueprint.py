@@ -26,19 +26,22 @@ blueprint = FlaskBlueprint('blueprint', __name__)
 @blueprint.route('/')
 def search():
     """ Display the blueprint search page """
-    blueprints = Blueprint.query.join(User, Item).filter(
-        (
-            (Blueprint.character_id == current_user.character_id) |
+    blueprints = []
+
+    if current_user.is_authenticated:
+        blueprints = Blueprint.query.join(User, Item).filter(
             (
-                (Blueprint.character_id == User.character_id) &
-                (User.main_character_id == current_user.character_id)
-            )
-        ),
-    ).order_by(
-        Blueprint.corporation.asc(),
-        Blueprint.original.asc(),
-        Item.name.asc(),
-    ).all()
+                (Blueprint.character_id == current_user.character_id) |
+                (
+                    (Blueprint.character_id == User.character_id) &
+                    (User.main_character_id == current_user.character_id)
+                )
+            ),
+        ).order_by(
+            Blueprint.corporation.asc(),
+            Blueprint.original.asc(),
+            Item.name.asc(),
+        ).all()
 
     return render_template('blueprint/search.html', ** {
         'blueprints': blueprints,
