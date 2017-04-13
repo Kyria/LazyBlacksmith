@@ -5,7 +5,6 @@ from flask import Blueprint as FlaskBlueprint
 from flask import abort
 from flask import render_template
 from flask_login import current_user
-from sqlalchemy.sql.expression import false
 
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivitySkill
@@ -27,7 +26,7 @@ blueprint = FlaskBlueprint('blueprint', __name__)
 @blueprint.route('/')
 def search():
     """ Display the blueprint search page """
-    char_blueprints = Blueprint.query.join(User, Item).filter(
+    blueprints = Blueprint.query.join(User, Item).filter(
         (
             (Blueprint.character_id == current_user.character_id) |
             (
@@ -35,13 +34,14 @@ def search():
                 (User.main_character_id == current_user.character_id)
             )
         ),
-        Blueprint.corporation == false(),
     ).order_by(
+        Blueprint.corporation.asc(),
         Blueprint.original.asc(),
         Item.name.asc(),
     ).all()
+
     return render_template('blueprint/search.html', ** {
-        'char_blueprints': char_blueprints,
+        'blueprints': blueprints,
     })
 
 
