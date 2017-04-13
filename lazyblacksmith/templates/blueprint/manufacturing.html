@@ -82,6 +82,8 @@
         };
         {% endfor %}
 
+        manufacturingBlueprint.options.materialEfficiency = {{ me }};
+        manufacturingBlueprint.options.timeEfficiency = {{ te }};
         manufacturingBlueprint.options.industryLvl = {{ industry_skills['adv_industry'] }};
         manufacturingBlueprint.options.advancedIndustryLvl = {{ industry_skills['adv_industry'] }};
         {% if t2_manufacturing_skill %}
@@ -172,11 +174,11 @@
                             <input id="runs" type="text" class="form-control input-sm" value="1">
                         </div>
                         <div class="slider">
-                            ME Level (<span id="ME-Level">0%</span>)<br>
+                            ME Level (<span id="ME-Level">{{ me }}%</span>)<br>
                             <div id="ME"></div>
                         </div>
                         <div class="slider">
-                            TE Level (<span id="TE-Level">0%</span>)<br>
+                            TE Level (<span id="TE-Level">{{ te }}%</span>)<br>
                             <div id="TE"></div>
                         </div>
                     </div>

@@ -46,7 +46,9 @@ def search():
 
 
 @blueprint.route('/manufacturing/<int:item_id>')
-def manufacturing(item_id):
+@blueprint.route(('/manufacturing/<int:item_id>/'
+                  '<int(min=0, max=10):me>/<int(min=0, max=20):te>'))
+def manufacturing(item_id, me=0, te=0):
     """ Display the manufacturing page with all data """
     item = Item.query.get(item_id)
     char = current_user.pref.prod_character
@@ -105,6 +107,8 @@ def manufacturing(item_id):
         't2_manufacturing_skill': t2_manufacturing_skill,
         'science_skill': science_skill,
         'industry_skills': get_common_industry_skill(char),
+        'me': me,
+        'te': te,
     })
 
 

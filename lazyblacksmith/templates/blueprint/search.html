@@ -53,7 +53,7 @@
                             <td>
                                 {# hack for ancient relics... cat_id = 34 #}
                                 {% if blueprint.item.category_id != 34 %}
-                                    <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id) }}" class="btn btn-default btn-xs pull-right">Manufacture</a>
+                                    <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-default btn-xs pull-right">Manufacture</a>
                                     {% if blueprint.original %}
                                     <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-default btn-xs pull-right">Research/Copy</a>
                                     {%- endif %}
