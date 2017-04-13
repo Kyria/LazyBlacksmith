@@ -35,4 +35,5 @@ celery_app.conf.imports = [
     'lazyblacksmith.tasks.industry.indexes',
     'lazyblacksmith.tasks.character.skills',
     'lazyblacksmith.tasks.character.blueprints',
+    'lazyblacksmith.tasks.corporation.blueprints',
 ]
