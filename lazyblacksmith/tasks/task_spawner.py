@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
-from .character.character_skills import task_update_character_skills
+from .character.blueprints import task_update_character_blueprints
+from .character.skills import task_update_character_skills
+from .corporation.blueprints import task_update_corporation_blueprints
 from .industry.indexes import task_update_industry_indexes
 from .market.adjusted_price import task_update_adjusted_price
 from .market.market_order import spawn_market_price_tasks
@@ -7,18 +9,18 @@ from .market.market_order import spawn_market_price_tasks
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
-from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.tasks import is_task_running
 from lazyblacksmith.utils.time import utcnow
+
+from ratelimiter import RateLimiter
 
 import datetime
 
 CHAR_TASK_SCOPE = {
     TokenScope.SCOPE_SKILL: task_update_character_skills,
-    TokenScope.SCOPE_CLONES: None,
-    TokenScope.SCOPE_CHAR_ASSETS: None,
-    TokenScope.SCOPE_CORP_ASSETS: None,
+    TokenScope.SCOPE_CHAR_ASSETS: task_update_character_blueprints,
+    TokenScope.SCOPE_CORP_ASSETS: task_update_corporation_blueprints,
 }
 
 UNIVERSE_TASKS = [
@@ -34,31 +36,35 @@ def spawn_character_tasks():
     any character based task to do (based on the cached_until field) """
     now = utcnow()
 
-    all_tokens = TokenScope.query.all()
+    all_tokens = TokenScope.query.filter_by(valid=True).all()
+
+    # XMLAPI have 30/sec req/s, so we'll just do a little less
+    rate_limiter = RateLimiter(max_calls=25, period=1)
 
     for token_scope in all_tokens:
         if skip_scope(token_scope):
             continue
 
         # check if there is no running task, and the data is not still cached
-        if ((not token_scope.cached_until or token_scope.cached_until <= now)
-           and not is_task_running(token_scope.user_id, token_scope.scope)):
+        if (not is_task_running(token_scope.user_id, token_scope.scope) and
+           (not token_scope.cached_until or token_scope.cached_until <= now)):
 
-            task = CHAR_TASK_SCOPE[token_scope.scope]
-            task_id = "%s-%s-%s" % (
-                now.strftime('%Y%m%d-%H%M%S'),
-                task.__name__,
-                token_scope.user_id
-            )
-            token_state = TaskState(
-                task_id=task_id,
-                id=token_scope.user_id,
-                scope=token_scope.scope,
-            )
-            db.session.add(token_state)
-            db.session.commit()
+            with rate_limiter:
+                task = CHAR_TASK_SCOPE[token_scope.scope]
+                task_id = "%s-%s-%s" % (
+                    now.strftime('%Y%m%d-%H%M%S'),
+                    task.__name__,
+                    token_scope.user_id
+                )
+                token_state = TaskState(
+                    task_id=task_id,
+                    id=token_scope.user_id,
+                    scope=token_scope.scope,
+                )
+                db.session.add(token_state)
+                db.session.commit()
 
-            task.s(token_scope.user_id).apply_async(task_id=task_id)
+                task.s(token_scope.user_id).apply_async(task_id=task_id)
 
 
 @celery_app.task(name="schedule.universe_task_spawner")

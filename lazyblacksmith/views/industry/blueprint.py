@@ -1,32 +1,54 @@
 # -*- encoding: utf-8 -*-
 import config
-import humanize
 
-from flask import Blueprint
+from flask import Blueprint as FlaskBlueprint
 from flask import abort
 from flask import render_template
 from flask_login import current_user
-from math import ceil
 
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivitySkill
+from lazyblacksmith.models import Blueprint
 from lazyblacksmith.models import Decryptor
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
-from lazyblacksmith.models import ItemAdjustedPrice
-from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.models import User
 from lazyblacksmith.utils.industry import calculate_base_cost
 from lazyblacksmith.utils.industry import calculate_build_cost
 from lazyblacksmith.utils.industry import get_common_industry_skill
 from lazyblacksmith.utils.industry import get_skill_data
 
-blueprint = Blueprint('blueprint', __name__)
+blueprint = FlaskBlueprint('blueprint', __name__)
+
+
+@blueprint.route('/')
+def search():
+    """ Display the blueprint search page """
+    blueprints = Blueprint.query.join(User, Item).filter(
+        (
+            (Blueprint.character_id == current_user.character_id) |
+            (
+                (Blueprint.character_id == User.character_id) &
+                (User.main_character_id == current_user.character_id)
+            )
+        ),
+    ).order_by(
+        Blueprint.corporation.asc(),
+        Blueprint.original.asc(),
+        Item.name.asc(),
+    ).all()
+
+    return render_template('blueprint/search.html', ** {
+        'blueprints': blueprints,
+    })
 
 
 @blueprint.route('/manufacturing/<int:item_id>')
-def manufacturing(item_id):
+@blueprint.route(('/manufacturing/<int:item_id>/'
+                  '<int(min=0, max=10):me>/<int(min=0, max=20):te>'))
+def manufacturing(item_id, me=0, te=0):
     """ Display the manufacturing page with all data """
     item = Item.query.get(item_id)
     char = current_user.pref.prod_character
@@ -34,9 +56,16 @@ def manufacturing(item_id):
     if item is None or item.max_production_limit is None:
         abort(404)
 
-    activity = item.activities.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
-    materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
-    product = item.activity_products.filter_by(activity=Activity.ACTIVITY_MANUFACTURING).one()
+    activity = item.activities.filter_by(
+        activity=Activity.ACTIVITY_MANUFACTURING
+    ).one()
+    materials = item.activity_materials.filter_by(
+        activity=Activity.ACTIVITY_MANUFACTURING
+    )
+    product = item.activity_products.filter_by(
+        activity=Activity.ACTIVITY_MANUFACTURING
+    ).one()
+
     regions = Region.query.filter(
         Region.id.in_(config.ESI_REGION_PRICE)
     ).filter_by(
@@ -78,13 +107,9 @@ def manufacturing(item_id):
         't2_manufacturing_skill': t2_manufacturing_skill,
         'science_skill': science_skill,
         'industry_skills': get_common_industry_skill(char),
+        'me': me,
+        'te': te,
     })
-
-
-@blueprint.route('/')
-def search():
-    """ Display the blueprint search page """
-    return render_template('blueprint/search.html')
 
 
 @blueprint.route('/research_copy/<int:item_id>')
@@ -122,9 +147,10 @@ def research(item_id):
     for index in indexes:
         index_list[index.activity] = index.cost_index
 
-
     # calculate baseCost and build cost per ME
-    materials = item.activity_materials.filter_by(activity=Activity.ACTIVITY_MANUFACTURING)
+    materials = item.activity_materials.filter_by(
+        activity=Activity.ACTIVITY_MANUFACTURING
+    )
     base_cost = calculate_base_cost(materials)
     cost = calculate_build_cost(
         materials,
@@ -170,8 +196,14 @@ def research(item_id):
         level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)
         me_duration = activity_material.time * level_modifier
         te_duration = activity_time.time * level_modifier
-        me_cost = (base_cost * index_list[Activity.ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY] * 0.02 * level_modifier * 1.1)
-        te_cost = (base_cost * index_list[Activity.ACTIVITY_RESEARCHING_TIME_EFFICIENCY] * 0.02 * level_modifier * 1.1)
+        me_cost = (
+            base_cost * 0.02 * level_modifier * 1.1 *
+            index_list[Activity.ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY]
+        )
+        te_cost = (
+            base_cost * 0.02 * level_modifier * 1.1 *
+            index_list[Activity.ACTIVITY_RESEARCHING_TIME_EFFICIENCY]
+        )
 
         me_time[level] = {
             'duration': float("%0.2f" % me_duration),
@@ -217,12 +249,7 @@ def invention(item_id):
 
     # copy stuff
     copy_base_cost = 0.0
-    copy_materials = []
     if activity_copy is not None:
-        copy_materials = item.activity_materials.filter_by(
-            activity=Activity.ACTIVITY_COPYING
-        ).all()
-
         # copy base cost, as it's different from the invention
         materials = item.activity_materials.filter_by(
             activity=Activity.ACTIVITY_MANUFACTURING

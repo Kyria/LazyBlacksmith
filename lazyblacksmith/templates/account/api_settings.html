@@ -21,19 +21,14 @@
                                     <td class="td-valign-middle"><input name="scope" type="checkbox" value="esi-skills.read_skills.v1" autocomplete="off"></td>
                                 </tr>
                                 <tr>
-                                    <td data-toggle="tooltip" data-container="body" data-placement="top" title="characterClonesRead">Clones</td>
-                                    <td><span class="small">View your character clones implants</span></td>
-                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="characterClonesRead" autocomplete="off" class="disabled" disabled></td>
-                                </tr>
-                                <tr>
                                     <td data-toggle="tooltip" data-container="body" data-placement="top" title="characterAssetsRead">Character assets</td>
                                     <td><span class="small">View your character assets (to only get blueprints)</span></td>
-                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="characterAssetsRead" autocomplete="off" class="disabled" disabled></td>
+                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="characterAssetsRead" autocomplete="off"></td>
                                 </tr>
                                 <tr>
                                     <td data-toggle="tooltip" data-container="body" data-placement="top" title="corporationAssetsRead">Corporation assets</td>
                                     <td><span class="small">View your corporation assets (to only get blueprints)</span></td>
-                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="corporationAssetsRead" autocomplete="off" class="disabled" disabled></td>
+                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="corporationAssetsRead" autocomplete="off"></td>
                                 </tr>
                             </tbody>
                             </table>
@@ -63,9 +58,16 @@
                             </thead>
                             <tbody>
                                 {% for token in current_user.tokens -%}
-                                <tr id="scope-{{ current_user.character_id }}" data-scope="{{ token.scope }}">
+                                <tr id="scope-{{ current_user.character_id }}" data-scope="{{ token.scope }}" {% if not token.valid %}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This scope is no longer valid (too many errors). It won't be updated unless you delete it and add a new one."{% endif %}>
                                     <td>{{ current_user.character_name }}</td>
-                                    <td>{{ token.scope }}</td>
+                                    <td>
+                                        {{ token.scope }}
+                                        {% if not token.valid %}
+                                        <span class="label label-danger">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid
+                                        </span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ token.get_last_update_string() }}</td>
                                     <td class="td-valign-middle">
                                         <button style="margin-left:5px" class="btn btn-xs btn-danger pull-right delete-scope" data-scope="{{ token.scope }}" data-char-id="{{ current_user.character_id }}">

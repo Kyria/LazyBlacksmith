@@ -3,23 +3,31 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-from .eve_sde.activity import Activity  # noqa
-from .eve_sde.activitymaterial import ActivityMaterial  # noqa
-from .eve_sde.activityproduct import ActivityProduct  # noqa
-from .eve_sde.activityskill import ActivitySkill  # noqa
-from .eve_sde.constellation import Constellation  # noqa
-from .eve_sde.decryptor import Decryptor  # noqa
-from .eve_sde.item import Item  # noqa
-from .eve_sde.orerefining import OreRefining  # noqa
-from .eve_sde.region import Region  # noqa
-from .eve_sde.solarsystem import SolarSystem  # noqa
-
-from .eve_api.industry_index import IndustryIndex  # noqa
-from .eve_api.item_adjusted_price import ItemAdjustedPrice  # noqa
-from .eve_api.item_price import ItemPrice  # noqa
-from .eve_api.task_state import TaskState  # noqa
-
+# LB models
+from .user.token_scope import TokenScope  # noqa
 from .user.user import User  # noqa
 from .user.user_preference import UserPreference  # noqa
-from .user.skill import Skill  # noqa
-from .user.token_scope import TokenScope  # noqa
+
+# SDE models
+from .sde.activity import Activity  # noqa
+from .sde.activitymaterial import ActivityMaterial  # noqa
+from .sde.activityproduct import ActivityProduct  # noqa
+from .sde.activityskill import ActivitySkill  # noqa
+from .sde.constellation import Constellation  # noqa
+from .sde.decryptor import Decryptor  # noqa
+from .sde.item import Item  # noqa
+from .sde.orerefining import OreRefining  # noqa
+from .sde.region import Region  # noqa
+from .sde.solarsystem import SolarSystem  # noqa
+
+# Tasks related models
+from .tasks.task_state import TaskState  # noqa
+
+# EVE API / universe models
+from .api.industry_index import IndustryIndex  # noqa
+from .api.item_adjusted_price import ItemAdjustedPrice  # noqa
+from .api.item_price import ItemPrice  # noqa
+
+# EVE API / Character models
+from .character.blueprint import Blueprint  # noqa
+from .character.skill import Skill  # noqa

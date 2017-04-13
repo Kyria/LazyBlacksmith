@@ -127,6 +127,18 @@
                                         <th>Character Skills</th>
                                         <td class="character_skill">{% if pref.research_character %}{{ pref.research_character.character_name }}{% else %}None{% endif %}</td>
                                     </tr>
+                                    <tr>
+                                        <th>Implant ME</th>
+                                        <td class="me_implant">{{ pref.label_implant_me(pref.research_me_implant) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Implant TE</th>
+                                        <td class="te_implant">{{ pref.label_implant_te(pref.research_te_implant) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Implant Copy</th>
+                                        <td class="copy_implant">{{ pref.label_implant_copy(pref.research_copy_implant) }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -173,6 +185,10 @@
                                     <tr>
                                         <th>Character Skills</th>
                                         <td class="character_skill">{% if pref.invention_character %}{{ pref.invention_character.character_name }}{% else %}None{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Implant Copy</th>
+                                        <td class="copy_implant">{{ pref.label_implant_copy(pref.invention_copy_implant) }}</td>
                                     </tr>
                                 </tbody>
                             </table>

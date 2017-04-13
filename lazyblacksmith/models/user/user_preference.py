@@ -1,10 +1,6 @@
 # -*- encoding: utf-8 -*-
-import pytz
-import time
-
-from datetime import datetime
-
 from . import db
+
 
 class UserPreference(db.Model):
     # fake enums
@@ -12,12 +8,30 @@ class UserPreference(db.Model):
     LABEL_SECURITY = {'h': 'High Sec', 'l': 'Low Sec', 'n': 'Null Sec / WH'}
     LABEL_FACILITY = (  # order is important, same as in evedata.js
         'Station', 'Raitaru (M-EC)', 'Azbel (L-EC)',
-        'Sotiyo (XL-EC)', 'Other Structures', 'Assembly Array', 
-        'Thukker Component Array', 'Rapid Assembly Array', 
+        'Sotiyo (XL-EC)', 'Other Structures', 'Assembly Array',
+        'Thukker Component Array', 'Rapid Assembly Array',
         'Laboratory', 'Hyasyoda Laboratory', 'Experimental Laboratory'
     )
-    FACILITY_STRUCTURE = (1,2,3,4)  # Raitaru, Azbel, Sotiyo, Other structures
-    
+    FACILITY_STRUCTURE = (1, 2, 3, 4)  # Raitaru, Azbel, Sotiyo, Others
+    LABEL_ME_IMPLANT = {
+        1.00: 'None',
+        0.99: 'MY-701',
+        0.97: 'MY-703',
+        0.95: 'MY-705'
+    }
+    LABEL_TE_IMPLANT = {
+        1.00: 'None',
+        0.99: 'RR-601',
+        0.97: 'RR-603',
+        0.95: 'RR-605'
+    }
+    LABEL_COPY_IMPLANT = {
+        1.00: 'None',
+        0.99: 'SC-801',
+        0.97: 'SC-803',
+        0.95: 'SC-805'
+    }
+
     # helpers
     @classmethod
     def label_rig(cls, value):
@@ -25,6 +39,27 @@ class UserPreference(db.Model):
             return cls.LABEL_RIGS[value]
         except IndexError:
             return cls.LABEL_RIGS[0]
+
+    @classmethod
+    def label_implant_me(cls, value):
+        try:
+            return cls.LABEL_ME_IMPLANT[value]
+        except IndexError:
+            return cls.LABEL_ME_IMPLANT[1.00]
+
+    @classmethod
+    def label_implant_te(cls, value):
+        try:
+            return cls.LABEL_TE_IMPLANT[value]
+        except IndexError:
+            return cls.LABEL_TE_IMPLANT[1.00]
+
+    @classmethod
+    def label_implant_copy(cls, value):
+        try:
+            return cls.LABEL_COPY_IMPLANT[value]
+        except IndexError:
+            return cls.LABEL_COPY_IMPLANT[1.00]
 
     @classmethod
     def label_facility(cls, value):
@@ -43,8 +78,8 @@ class UserPreference(db.Model):
     @classmethod
     def is_structure(cls, value):
         return value in cls.FACILITY_STRUCTURE
-        
-    # model 
+
+    # model
     user_id = db.Column(
         db.BigInteger,
         db.ForeignKey('user.character_id'),
@@ -56,6 +91,9 @@ class UserPreference(db.Model):
         backref=db.backref('pref', uselist=False)
     )
 
+    # --------------------------------------------------------
+    # Invention preferences
+    # --------------------------------------------------------
     invention_facility = db.Column(db.Integer, nullable=False, default=0)
     invention_invention_rig = db.Column(db.Integer, nullable=False, default=0)
     invention_copy_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -78,8 +116,15 @@ class UserPreference(db.Model):
         'User',
         foreign_keys=[invention_character_id]
     )
+    invention_copy_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
+    )
 
-    
+    # --------------------------------------------------------
+    # Research preferences
+    # --------------------------------------------------------
     research_facility = db.Column(db.Integer, nullable=False, default=0)
     research_me_rig = db.Column(db.Integer, nullable=False, default=0)
     research_te_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -95,7 +140,25 @@ class UserPreference(db.Model):
         'User',
         foreign_keys=[research_character_id]
     )
-    
+    research_me_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
+    )
+    research_te_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
+    )
+    research_copy_implant = db.Column(
+        db.Numeric(precision=3, scale=2,
+                   decimal_return_scale=2, asdecimal=False),
+        nullable=False, server_default='1.00'
+    )
+
+    # --------------------------------------------------------
+    # Manufacturing preferences
+    # --------------------------------------------------------
     prod_facility = db.Column(db.Integer, nullable=False, default=0)
     prod_me_rig = db.Column(db.Integer, nullable=False, default=0)
     prod_te_rig = db.Column(db.Integer, nullable=False, default=0)
@@ -118,7 +181,7 @@ class UserPreference(db.Model):
     prod_price_region_others = db.Column(
         db.Integer, nullable=False, default=10000002
     )
-    
+
     prod_price_type_minerals = db.Column(
         db.String(4), nullable=False, default='buy'
     )

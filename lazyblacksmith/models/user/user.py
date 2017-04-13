@@ -22,7 +22,7 @@ class User(db.Model, UserMixin):
        UTCDateTime(timezone=True),
        server_default=func.now(),
     )
-    
+
     created_at = db.Column(
         UTCDateTime(timezone=True),
         server_default=func.now()
@@ -32,7 +32,7 @@ class User(db.Model, UserMixin):
        server_default=func.now(),
        onupdate=func.now()
     )
-    
+
     # foreign keys
     main_character_id = db.Column(
         db.BigInteger,
@@ -44,7 +44,7 @@ class User(db.Model, UserMixin):
         remote_side=[character_id],
         backref=db.backref('alts_characters', lazy='dynamic')
     )
-    
+
     # methods
     def get_portrait_url(self, datasource='tranquility', size=128):
         """returns URL to Character portrait from EVE Image Server"""

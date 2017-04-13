@@ -5,18 +5,16 @@ from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy import esisecurity
 from lazyblacksmith.extension.esipy.operations import get_characters_skills
-from lazyblacksmith.models import User
-from lazyblacksmith.models import Item
 from lazyblacksmith.models import Skill
-from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import TaskState
+from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
 from datetime import datetime
 from email.utils import parsedate
 
-import json
 import pytz
 
 
@@ -47,10 +45,10 @@ def task_update_character_skills(self, character_id):
             char_skill = character.skills.filter(
                 Skill.skill_id == skill_object.skill_id
             ).one_or_none()
-            
+
             if char_skill:
                 char_skill.level = skill_object.current_skill_level
-            else:            
+            else:
                 skill = Skill(
                     character=character,
                     skill_id=skill_object.skill_id,
@@ -58,17 +56,18 @@ def task_update_character_skills(self, character_id):
                 )
                 db.session.merge(skill)
             skill_number += 1
-
         db.session.commit()
+
     else:
+        self.inc_fail_token_scope(token, character_skills.status)
         self.end(TaskState.ERROR)
         return
-        
+
     # update the token and the state
+    token.request_try = 0
     token.last_update = utcnow()
     token.cached_until = datetime(
         *parsedate(character_skills.header['Expires'][0])[:6]
     ).replace(tzinfo=pytz.utc)
     db.session.commit()
     self.end(TaskState.SUCCESS)
-

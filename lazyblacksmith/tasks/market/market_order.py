@@ -1,8 +1,6 @@
 # -*- encoding: utf-8 -*-
 import config
-import time
 import logging
-import pytz
 
 from ..lb_task import LbTask
 
@@ -19,10 +17,7 @@ from lazyblacksmith.utils.tasks import is_task_running
 from lazyblacksmith.utils.time import utcnow
 
 from esipy import EsiClient
-from datetime import datetime
-from email.utils import parsedate
 from flask import json
-from ratelimiter import RateLimiter
 from sqlalchemy.exc import SQLAlchemyError
 
 # (re)define some required objects
@@ -44,8 +39,8 @@ def spawn_market_price_tasks(self):
     ).all()
 
     for region in region_list:
-        if not is_task_running(region.id, 
-                              task_update_region_order_price.__name__):
+        if not is_task_running(region.id,
+                               task_update_region_order_price.__name__):
             item_id_list = [
                 it[0] for it in db.session.query(
                     ItemPrice.item_id
@@ -64,16 +59,16 @@ def spawn_market_price_tasks(self):
             )
             db.session.add(token_state)
             db.session.commit()
-            
+
             task_update_region_order_price.s(
                 region.id,
                 item_id_list
             ).apply_async(
                 task_id=task_id
             )
-    
+
     self.end(TaskState.SUCCESS)
-    
+
 
 @celery_app.task(name="update_region_order_price", base=LbTask, bind=True)
 def task_update_region_order_price(self, region_id, item_id_list):
@@ -85,7 +80,6 @@ def task_update_region_order_price(self, region_id, item_id_list):
     page = 0
     fails = 0
     item_list = {'update': {}, 'insert': {}}
-    expire = utcnow()
 
     while True:
         page += 1
@@ -155,7 +149,7 @@ def task_update_region_order_price(self, region_id, item_id_list):
     else:
         self.end(TaskState.SUCCESS)
 
-        
+
 def update_itemlist_from_order(region_id, item_list, item_id_list, order):
     item_id = order['type_id']
 
@@ -197,7 +191,7 @@ def update_itemlist_from_order(region_id, item_list, item_id_list, order):
             order['price']
         )
 
-        
+
 def save_item_prices(item_list):
     # check if we have any update to do
     if len(item_list['update']) > 0:
@@ -219,5 +213,5 @@ def save_item_prices(item_list):
             ItemPrice.__table__.insert(),
             item_list['insert'].values()
         )
-        
+
     db.session.commit()

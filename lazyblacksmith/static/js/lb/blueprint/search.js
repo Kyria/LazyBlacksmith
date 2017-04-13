@@ -5,6 +5,8 @@ var searchBlueprint = (function ($, lb, utils) {
     var noResultMessage = '<tr><td colspan="2">No results.</td></tr>';
     var resultBtn = '<a href="@@LINK@@" class="btn btn-default btn-xs pull-right">@@NAME@@</a> ';
 
+    var showCorporationBlueprints = false;
+
     $.extend(lb.urls, {
         searchUrl: false,
         inventionUrl: '',
@@ -13,6 +15,24 @@ var searchBlueprint = (function ($, lb, utils) {
     });
 
     var blueprintOldValue = "";
+
+    /**
+     * Toggle corporation blueprints
+     */
+    var _toggleCorporationBlueprintsOnChange = function() {
+        var checked = this.checked;
+        if(this.checked) {
+            $('.blueprint-corporation').show();
+            $('.blueprint-character').hide();
+            $("#toggleCorporationBlueprints label").removeClass('btn-default').addClass('btn-info');
+        } else {
+            $('.blueprint-corporation').hide();
+            $('.blueprint-character').show();
+            $("#toggleCorporationBlueprints label").removeClass('btn-info').addClass('btn-default');
+        }
+        showCorporationBlueprints = this.checked;
+        _searchOwnedBlueprint($('#ownedBlueprintSearch').val().toLowerCase());
+    };
 
     /**
      * Search blueprint function
@@ -71,23 +91,47 @@ var searchBlueprint = (function ($, lb, utils) {
     };
 
     /**
+     * Seaerch through the owned blueprint list.
+     */
+    var _searchOwnedBlueprint = function(name) {
+        var classToFilter = (showCorporationBlueprints) ? '.blueprint-corporation' : '.blueprint-character';
+        $(classToFilter).show();
+        $(classToFilter).filter(function() {
+            var bpName = $(this).find('td.name').html().toLowerCase();
+            return bpName.indexOf(name) == -1;
+        }).hide();
+    };
+
+    /**
      * Runner function
      */
     var run = function() {
-        var options = {
+        $('#blueprint').typeWatch({
             callback: function (value) {
                 _searchBlueprint(value);
             },
             wait: 250,
             highlight: true,
             captureLength: 3
-        }
-
-        $('#blueprint').typeWatch(options).on('keydown',
+        }).on('keydown',
             function() {
                 blueprintOldValue = $(this).val();
             }
         );
+
+        $('#ownedBlueprintSearch').typeWatch({
+            callback: function (value) {
+                _searchOwnedBlueprint(value.toLowerCase());
+            },
+            wait: 250,
+            highlight: true,
+            captureLength: 0
+        }).on('keydown',
+            function() {
+                blueprintOldValue = $(this).val();
+            }
+        );
+        $("#toggleCorporationBlueprints input[type='checkbox']").on('change', _toggleCorporationBlueprintsOnChange);
     };
 
 

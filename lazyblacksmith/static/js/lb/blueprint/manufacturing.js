@@ -963,6 +963,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             range: "min",
             slide: _skillOnUpdate,
         });
+        $('#ME').slider('option', 'value', options.materialEfficiency);
+        $('#TE').slider('option', 'value', options.timeEfficiency);
         $('#adv-industry-level').slider('option', 'value', options.advancedIndustryLvl);
         $('#industry-level').slider('option', 'value', options.industryLvl);
         $('#t2-level').slider('option', 'value', options.t2ConstructionLvl);

@@ -21,4 +21,8 @@ if __name__ == '__main__':
     logger.addHandler(console)
     logger.setLevel(logging.DEBUG)
 
+    logger = logging.getLogger('sqlalchemy.engine')
+    logger.addHandler(console)
+    logger.setLevel(logging.ERROR)  # DEBUG for queries + results
+
     app.run(port=config.PORT, host=config.HOST)

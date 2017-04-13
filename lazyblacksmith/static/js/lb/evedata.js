@@ -26,13 +26,13 @@ var eveData = (function() {
         'l': 1.9,  // Low Sec
         'n': 2.1,  // Null Sec / WH
     };
-    
+
     var securityStatus = {
         'h': 'High Sec',
         'l': 'Low Sec',
         'n': 'Null Sec / WH',
     };
-    
+
     /**
      * Facillities List
      */
@@ -54,7 +54,7 @@ var eveData = (function() {
             "jobTe": 0.85,
             "copy": 0.85,
             "invention": 0.85,
-            "name": 'Raitaru',
+            "name": 'Raitaru (M-EC)',
             "structure": true,
         },
         { // [2]
@@ -64,7 +64,7 @@ var eveData = (function() {
             "jobTe": 0.80,
             "copy": 0.80,
             "invention": 0.80,
-            "name": 'Azbel',
+            "name": 'Azbel (L-EC)',
             "structure": true,
         },
         { // [3]
@@ -74,7 +74,7 @@ var eveData = (function() {
             "jobTe": 0.70,
             "copy": 0.70,
             "invention": 0.70,
-            "name": 'Sotiyo',
+            "name": 'Sotiyo (XL-EC)',
             "structure": true,
         },
         { // [4]
@@ -128,12 +128,34 @@ var eveData = (function() {
         },
     ];
 
-    
+    var implants = {
+        'me': {
+            '1.00': 'None',
+            '0.99': 'MY-701',
+            '0.97': 'MY-703',
+            '0.95': 'MY-705'
+        },
+        'te': {
+            '1.00': 'None',
+            '0.99': 'RR-601',
+            '0.97': 'RR-603',
+            '0.95': 'RR-605'
+        },
+        'copy': {
+            '1.00': 'None',
+            '0.99': 'SC-801',
+            '0.97': 'SC-803',
+            '0.95': 'SC-805'
+        }
+    }
+
+
     return {
         structureRigs: structureRigs,
         structureSecStatusMultiplier: structureSecStatusMultiplier,
         facilities: facilities,
         securityStatus: securityStatus,
+        implants: implants,
     };
 
 })();

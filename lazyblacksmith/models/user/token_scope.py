@@ -14,7 +14,6 @@ from sqlalchemy import func
 class TokenScope(db.Model):
     # known scopes
     SCOPE_SKILL = 'esi-skills.read_skills.v1'
-    SCOPE_CLONES = 'characterClonesRead'
     SCOPE_CHAR_ASSETS = 'characterAssetsRead'
     SCOPE_CORP_ASSETS = 'corporationAssetsRead'
 
@@ -32,6 +31,10 @@ class TokenScope(db.Model):
     refresh_token = db.Column(db.String(100))
     last_update = db.Column(UTCDateTime(timezone=True))
     cached_until = db.Column(UTCDateTime(timezone=True))
+
+    # validity of the token
+    valid = db.Column(db.Boolean(), default=True)
+    request_try = db.Column(db.Integer(), default=0)
 
     created_at = db.Column(
         UTCDateTime(timezone=True),
@@ -62,7 +65,7 @@ class TokenScope(db.Model):
                 self.access_token_expires - utcnow()
             ).total_seconds()
         }
-        
+
     def get_last_update_string(self):
         """ return the utc string date in iso format without ms and TZ info"""
         if self.last_update:
@@ -71,7 +74,7 @@ class TokenScope(db.Model):
             ).isoformat(' ')
         else:
             return "Never updated"
-        
+
     def get_cached_until_string(self):
         """ return the utc string date in iso format without ms and TZ info"""
         if self.cached_until:

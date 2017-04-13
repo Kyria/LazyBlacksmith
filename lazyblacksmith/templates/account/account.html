@@ -8,7 +8,7 @@
         {% for region in regions -%}
         accountDashboard.regions[{{ region.id }}] = "{{ region.name }}";
         {% endfor %}
-        
+
         accountDashboard.character_list[{{ current_user.character_id }}] = '{{ current_user.character_name }}';
         {% for char in current_user.alts_characters.all() -%}
         accountDashboard.character_list[{{ char.character_id }}] = '{{ char.character_name }}';
@@ -22,6 +22,7 @@
         accountDashboard.inventionSettings.priceRegion = {{ pref.invention_price_region }};
         accountDashboard.inventionSettings.priceType = '{{ pref.invention_price_type }}';
         accountDashboard.inventionSettings.characterId = {% if pref.invention_character %}{{ pref.invention_character_id }}{% else %}null{% endif %};
+        accountDashboard.inventionSettings.copyImplant = '{{ pref.invention_copy_implant | floatcomma }}';
 
         accountDashboard.researchSettings.facility = {{ pref.research_facility }};
         accountDashboard.researchSettings.meRig = {{ pref.research_me_rig }};
@@ -30,6 +31,9 @@
         accountDashboard.researchSettings.security = '{{ pref.research_security }}';
         accountDashboard.researchSettings.system = '{{ pref.research_system }}';
         accountDashboard.researchSettings.characterId = {% if pref.research_character %}{{ pref.research_character_id }}{% else %}null{% endif %};
+        accountDashboard.researchSettings.meImplant = '{{ pref.research_me_implant | floatcomma }}';
+        accountDashboard.researchSettings.teImplant = '{{ pref.research_te_implant | floatcomma }}';
+        accountDashboard.researchSettings.copyImplant = '{{ pref.research_copy_implant | floatcomma }}';
 
         accountDashboard.productionSettings.facility = {{ pref.prod_facility }};
         accountDashboard.productionSettings.meRig = {{ pref.prod_me_rig }};
@@ -53,8 +57,8 @@
 
         // run
         lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_industry_preference') }}";
-        lb.urls.loginUrl = "{{ url_for('sso.login', scopes='SCOPE_REPLACE') }}";;
-        lb.urls.deleteScopeUrl = "{{ url_for('ajax_account.delete_scope', scope='SCOPE_REPLACE', character_id=123456789) }}"
+        lb.urls.loginUrl = "{{ url_for('sso.login', scopes='SCOPE_REPLACE') }}";
+        lb.urls.deleteScopeUrl = "{{ url_for('ajax_account.delete_scope', scope='SCOPE_REPLACE', character_id=123456789) }}";
         lb.run('accountDashboard');
     </script>
 {% endblock %}

@@ -3,12 +3,14 @@ from __future__ import absolute_import
 
 import config
 
+from .esipy_observers import token_update_observer
 from lazyblacksmith.extension.cache import cache
 
 from esipy import App
 from esipy import EsiClient
 from esipy import EsiSecurity
 from esipy.cache import BaseCache
+from esipy.events import after_token_refresh
 from requests.adapters import HTTPAdapter
 
 
@@ -48,3 +50,6 @@ esiclient = EsiClient(
     cache=LbCache(),
     headers={'User-Agent': config.ESI_USER_AGENT}
 )
+
+# register observers
+after_token_refresh.add_receiver(token_update_observer)

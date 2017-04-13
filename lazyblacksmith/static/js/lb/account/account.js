@@ -18,6 +18,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         priceRegion: false,
         priceType: false,
         characterId: null,
+        copyImplant: false,
     };
 
     var researchSettings = {
@@ -28,6 +29,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         security: false,
         system: false,
         characterId: null,
+        meImplant: false,
+        teImplant: false,
+        copyImplant: false,
     };
 
     var productionSettings = {
@@ -111,6 +115,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $('#structure-sec-status-invention input[value='+inventionSettings.security+']').parent().button("toggle");
             $("select[name='modal-region-invention']").val(inventionSettings.priceRegion);
             $('.modal-region-invention-type input[value='+inventionSettings.priceType+']').parent().button("toggle");
+            $('#copy-implant-invention').val(inventionSettings.copyImplant);
 
             var charId = (inventionSettings.characterId) ? inventionSettings.characterId : 0;
             $("select#modal-char-invention").val(charId);
@@ -142,6 +147,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $('#structure-te-rig-research input[value='+researchSettings.teRig+']').parent().button("toggle");
             $('#structure-copy-rig-research input[value='+researchSettings.copyRig+']').parent().button("toggle");
             $('#structure-sec-status-research input[value='+researchSettings.security+']').parent().button("toggle");
+            $('#me-implant-research').val(researchSettings.meImplant);
+            $('#te-implant-research').val(researchSettings.teImplant);
+            $('#copy-implant-research').val(researchSettings.copyImplant);
 
             var charId = (researchSettings.characterId) ? researchSettings.characterId : 0;
             $("select#modal-char-research").val(charId);
@@ -229,7 +237,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
      */
     var _onModalProdSettingsApply = function(event) {
         var charId = $("select#modal-char-prod").val();
-        
+
         var productionSettingsTmp = {
             facility: parseInt($('#modal-facility-main').val()),
             meRig: parseInt($('#modal-structure-me-rig-main input:checked').val()),
@@ -281,6 +289,9 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             security: $('#structure-sec-status-research input:checked').val(),
             system: $('#modal-system-research').val(),
             characterId: (charId == '0') ? null : charId,
+            meImplant: $('#me-implant-research').val(),
+            teImplant: $('#te-implant-research').val(),
+            copyImplant: $('#copy-implant-research').val(),
         };
 
         utils.ajaxPostCallJson(
@@ -313,6 +324,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             priceRegion: parseInt($("select[name='modal-region-invention']").val()),
             priceType: $('.modal-region-invention-type input:checked').val(),
             characterId: (charId == '0') ? null : charId,
+            copyImplant: $('#copy-implant-invention').val(),
         };
 
 
@@ -344,6 +356,10 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         $('#research-config .security').html(eveData.securityStatus[researchSettings.security]);
         $('#research-config .system').html(researchSettings.system);
         $('#research-config .character_skill').html(character_list[researchSettings.characterId]);
+        $('#research-config .me_implant').html(eveData.implants.me[researchSettings.meImplant]);
+        $('#research-config .te_implant').html(eveData.implants.te[researchSettings.teImplant]);
+        $('#research-config .copy_implant').html(eveData.implants.copy[researchSettings.copyImplant]);
+
         if(eveData.facilities[researchSettings.facility].structure) {
             $('#research-config .structure').show();
         } else {
@@ -366,6 +382,8 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         $('#invention-config .priceRegion').html(regions[inventionSettings.priceRegion]);
         $('#invention-config .priceType').html(inventionSettings.priceType);
         $('#invention-config .character_skill').html(character_list[inventionSettings.characterId]);
+        $('#invention-config .copy_implant').html(eveData.implants.copy[inventionSettings.copyImplant]);
+
         if(eveData.facilities[inventionSettings.facility].structure) {
             $('#invention-config .structure').show();
         } else {
