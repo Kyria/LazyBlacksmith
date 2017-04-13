@@ -58,9 +58,16 @@
                             </thead>
                             <tbody>
                                 {% for token in current_user.tokens -%}
-                                <tr id="scope-{{ current_user.character_id }}" data-scope="{{ token.scope }}">
+                                <tr id="scope-{{ current_user.character_id }}" data-scope="{{ token.scope }}" {% if not token.valid %}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This scope is no longer valid (too many errors). It won't be updated unless you delete it and add a new one."{% endif %}>
                                     <td>{{ current_user.character_name }}</td>
-                                    <td>{{ token.scope }}</td>
+                                    <td>
+                                        {{ token.scope }}
+                                        {% if not token.valid %}
+                                        <span class="label label-danger">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid
+                                        </span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ token.get_last_update_string() }}</td>
                                     <td class="td-valign-middle">
                                         <button style="margin-left:5px" class="btn btn-xs btn-danger pull-right delete-scope" data-scope="{{ token.scope }}" data-char-id="{{ current_user.character_id }}">
