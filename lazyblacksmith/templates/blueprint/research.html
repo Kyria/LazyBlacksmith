@@ -11,14 +11,14 @@
         researchBlueprint.options.baseTeTime = {{ activity_time.time }};
         researchBlueprint.options.maxRunPerCopy = {{ blueprint.max_production_limit }};
 
-        researchBlueprint.options.indexes['{{ pref.research_system }}'] = {};
+        researchBlueprint.options.indexes['{{ pref.research_system|lower }}'] = {};
         {% for activity, index in index_list.iteritems() -%}
-        researchBlueprint.options.indexes['{{ pref.research_system }}'][{{ activity }}] = {{ index }};
+        researchBlueprint.options.indexes['{{ pref.research_system|lower }}'][{{ activity }}] = {{ index }};
         {% endfor %}
 
         // configs from user preferences
         researchBlueprint.options.facility = {{ pref.research_facility }};
-        researchBlueprint.options.system = '{{ pref.research_system }}';
+        researchBlueprint.options.system = '{{ pref.research_system|lower }}';
         researchBlueprint.options.structureTeRig = {{ pref.research_te_rig }};
         researchBlueprint.options.structureMeRig = {{ pref.research_me_rig }};
         researchBlueprint.options.structureCopyRig = {{ pref.research_copy_rig }};

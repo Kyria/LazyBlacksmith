@@ -361,6 +361,26 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         eveUtils.getSystemCostIndex(systemList, function(jsonIndex) {
             $.extend(costIndex, jsonIndex['index']);
             _updateTaxTable();
+        }, function(errorObject) {
+            var jsonResponse = errorObject.responseJSON;
+            utils.flashNotify(jsonResponse.message, jsonResponse.status);
+
+            // find where solarsystem are bad, and revert to previous.
+            for(var i in materialList) {
+                var system = materialsData.materials[materialList[i]].manufacturingSystem;
+
+                if(!(system in costIndex)) {
+                    var systemPrevious = materialsData.materials[materialList[i]].manufacturingSystemPrevious;
+                    materialsData.materials[materialList[i]].manufacturingSystem = systemPrevious;
+
+                    if(materialList[i] != materialsData.productItemId) {
+                        _updateComponentBpInfoDisplay(materialList[i]);
+                    } else {
+                        $('#system').val(systemPrevious);
+                        $('#system').typeahead('val',systemPrevious);
+                    }
+                }
+            }
         });
     };
 
@@ -560,7 +580,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         }
 
         // get data
-        var system = $('#modal-system').val();
+        var system = $('#modal-system').val().toLowerCase();
         var ME = parseInt($('#Modal-ME-Level').text());
         var TE = parseInt($('#Modal-TE-Level').text());
         var facility = parseInt($('#modal-facility').val());
@@ -571,6 +591,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         for(var i in components) {
             var componentId = components[i];
+            materialsData.materials[componentId].manufacturingSystemPrevious = materialsData.materials[componentId].manufacturingSystem;
             materialsData.materials[componentId].manufacturingSystem = system;
             materialsData.materials[componentId].facility = facility;
             materialsData.materials[componentId].materialEfficiency = ME;
@@ -585,6 +606,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         _updateComponentMaterial();
         _updateComponentTime();
         _generateMaterialListQuantity();
+        _getSystemCostIndex();
         $('#componentModalBpName').modal('hide');
     };
 
@@ -618,7 +640,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
     /**
      * Update all tables from summary and price tables.
      * @private
-     * @todo uncomment adjusted price
      */
     var _updateSummaryTabs = function() {
         // wait until materials are fully loaded
@@ -919,7 +940,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var _initTypeahead = function() {
         eveUtils.initSolarSystemTypeahead('#system', function(event, suggestion) {
-            materialsData.materials[materialsData.productItemId].manufacturingSystem = $(this).typeahead('val');
+            var manufSystem = materialsData.materials[materialsData.productItemId].manufacturingSystem;
+            if(manufSystem == $(this).typeahead('val').toLowerCase()) {
+                return;
+            }
+            materialsData.materials[materialsData.productItemId].manufacturingSystemPrevious = manufSystem;
+            materialsData.materials[materialsData.productItemId].manufacturingSystem = $(this).typeahead('val').toLowerCase();
             _getSystemCostIndex();
         });
         eveUtils.initSolarSystemTypeahead('#modal-system');
@@ -1401,6 +1427,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         // get materials
         _getComponentMaterials();
+        _updateSummaryTabs();
         _updateMaterial();
         _updateTime();
     };

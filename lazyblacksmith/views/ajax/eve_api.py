@@ -6,6 +6,7 @@ from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.utils.json import json_response
 
 import humanize
 
@@ -66,8 +67,12 @@ def get_index_activity(solar_system_names):
         SolarSystem.name.in_(ss_name_list)
     ).all()
 
-    if solar_systems is None or len(solar_systems) == 0:
-        return 'SolarSystems (%s) does not exist' % (solar_system_names), 404
+    if not solar_systems:
+        return json_response(
+            'warning',
+            'Solar systems (%s) does not exist' % solar_system_names,
+            404
+        )
 
     # put the solar system in a dict
     solar_systems_list = {}
@@ -79,15 +84,17 @@ def get_index_activity(solar_system_names):
         IndustryIndex.solarsystem_id.in_(solar_systems_list.keys()),
     ).all()
 
-    if industry_index is None or len(industry_index) == 0:
-        return 'There is no index with SolarSystem(%s)' % (
-            solar_system_names
-        ), 404
+    if industry_index:
+        return json_response(
+            'warning',
+            ('There is no index for Solar System (%s).' % solar_system_names),
+            404
+        )
 
     # and then put that index list into a dict[solar_system_name] = cost_index
     index_list = {}
     for index in industry_index:
-        ss = solar_systems_list[index.solarsystem_id]
+        ss = solar_systems_list[index.solarsystem_id].lower()
         if ss not in index_list:
             index_list[ss] = {}
         index_list[ss][index.activity] = index.cost_index

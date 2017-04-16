@@ -204,16 +204,16 @@ var eveUtils = (function(utils) {
         return baseCost * systemCostIndex * runs * 0.02 * tax;
     }
 
-    
+
     /**
      * Proxy function to get system cost indexes from backend
      * @param systemList the array of system names
      * @param callback function to call when ajax call succeed
      */
-    var getSystemCostIndex = function(systemList, callback) {
+    var getSystemCostIndex = function(systemList, callback, errorCallback) {
         var systems = ($.isArray(systemList)) ? systemList.join(',') : systemList;
         var url = lb.urls.indexActivityUrl.replace(/SYSTEM_LIST_TO_REPLACE/, systems);
-        utils.ajaxGetCallJson(url, callback);
+        utils.ajaxGetCallJson(url, callback, errorCallback);
 
     };
 
@@ -268,7 +268,7 @@ var eveUtils = (function(utils) {
         }
     };
 
-    
+
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
         calculateJobQuantity: calculateJobQuantity,
