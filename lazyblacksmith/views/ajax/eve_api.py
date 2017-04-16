@@ -84,7 +84,7 @@ def get_index_activity(solar_system_names):
         IndustryIndex.solarsystem_id.in_(solar_systems_list.keys()),
     ).all()
 
-    if industry_index:
+    if not industry_index:
         return json_response(
             'warning',
             ('There is no index for Solar System (%s).' % solar_system_names),
