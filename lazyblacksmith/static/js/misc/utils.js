@@ -1,13 +1,18 @@
 var utils = (function($) {
     "use strict";
-    
+
     var flashMessageType = {
         'info': 'fa fa-info-circle',
         'success': 'fa fa-check-circle',
         'warning': 'fa fa-exclamation-triangle',
         'danger': 'fa fa-exclamation-circle',
     };
-    
+
+    var defaultErrorCallback = function(errorObject) {
+        var jsonResponse = errorObject.responseJSON;
+        flashNotify(jsonResponse.message, jsonResponse.status);
+    };
+
     var durationToString = function(duration) {
         var days = Math.floor(duration / (24 * 3600));
         var duration = duration % (24 * 3600)
@@ -31,7 +36,7 @@ var utils = (function($) {
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/i.test(method));
     };
-    
+
     /**
      * Display a flash message using grawl like notifications.
      */
@@ -40,7 +45,7 @@ var utils = (function($) {
         if(!(type in flashMessageType)) {
             finalType = 'info';
         }
-        
+
         $.notify({
             icon: flashMessageType[finalType],
             message: message,
@@ -53,7 +58,7 @@ var utils = (function($) {
             },
         });
     };
-    
+
     /**
      * Copy a given text into clipboard using textarea trick.
      * @param text the text we want to copy
@@ -75,7 +80,7 @@ var utils = (function($) {
         $('#clipboard').remove();
     };
 
-    
+
     /**
      * Generic ajax get call, without data parameters with json dataType as result
      * @param url the url to call
@@ -87,13 +92,13 @@ var utils = (function($) {
             type: 'GET',
             dataType: 'json',
             success: successCallback,
-            error: errorCallback,
+            error: errorCallback || defaultErrorCallback,
         });
     };
-    
+
     /**
      * Generic ajax post call, with json dataType as result
-     * also setting content-type to application/json 
+     * also setting content-type to application/json
      * @param url the url to call
      * @param callback function to call when ajax call succeed
      */
@@ -105,7 +110,7 @@ var utils = (function($) {
             contentType: 'application/json',
             data: data,
             success: successCallback,
-            error: errorCallback
+            error: errorCallback || defaultErrorCallback
         });
     };
 
@@ -120,16 +125,16 @@ var utils = (function($) {
             type: 'DELETE',
             dataType: 'json',
             success: successCallback,
-            error: errorCallback
+            error: errorCallback || defaultErrorCallback
         });
     };
-    
+
     return {
         durationToString: durationToString,
         csrfSafeMethod: csrfSafeMethod,
         flashNotify: flashNotify,
         copyToClipboard: copyToClipboard,
-        
+
         ajaxDeleteCallJson: ajaxDeleteCallJson,
         ajaxPostCallJson: ajaxPostCallJson,
         ajaxGetCallJson: ajaxGetCallJson,
