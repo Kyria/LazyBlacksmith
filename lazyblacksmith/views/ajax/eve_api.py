@@ -67,7 +67,7 @@ def get_index_activity(solar_system_names):
         SolarSystem.name.in_(ss_name_list)
     ).all()
 
-    if solar_systems is None or len(solar_systems) == 0:
+    if not solar_systems:
         return json_response(
             'warning',
             'Solar systems (%s) does not exist' % solar_system_names,
@@ -84,7 +84,7 @@ def get_index_activity(solar_system_names):
         IndustryIndex.solarsystem_id.in_(solar_systems_list.keys()),
     ).all()
 
-    if industry_index is None or len(industry_index) == 0:
+    if industry_index:
         return json_response(
             'warning',
             ('There is no index for Solar System (%s).' % solar_system_names),
