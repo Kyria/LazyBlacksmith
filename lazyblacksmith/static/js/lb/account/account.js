@@ -264,7 +264,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             lb.urls.updatePreferenceUrl,
             JSON.stringify({production: productionSettingsTmp}),
             function(data) {
-                utils.flashNotify('Production preferences successfuly saved.', 'success');
+                utils.flashNotify(data.message, data.status);
+                if(data.status != 'success') {
+                    productionSettingsTmp.system = 'Jita';
+                    productionSettingsTmp.componentSystem = 'Jita';
+                }
                 productionSettings = productionSettingsTmp;
                 _updateProductionConfigTable();
             },
@@ -298,7 +302,10 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             lb.urls.updatePreferenceUrl,
             JSON.stringify({research: researchSettingsTmp}),
             function(data) {
-                utils.flashNotify('Research preferences successfuly saved.', 'success');
+                utils.flashNotify(data.message, data.status);
+                if(data.status != 'success') {
+                    researchSettingsTmp.system = 'Jita';
+                }
                 researchSettings = researchSettingsTmp;
                 _updateResearchConfigTable();
             },
@@ -332,7 +339,10 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             lb.urls.updatePreferenceUrl,
             JSON.stringify({invention: inventionSettingsTmp}),
             function(data) {
-                utils.flashNotify('Invention preferences successfuly saved.', 'success');
+                utils.flashNotify(data.message, data.status);
+                if(data.status != 'success') {
+                    researchSettingsTmp.system = 'Jita';
+                }
                 inventionSettings = inventionSettingsTmp;
                 _updateInventionConfigTable();
             },
