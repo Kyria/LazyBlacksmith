@@ -9,6 +9,7 @@ from sqlalchemy import func
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import db
+from lazyblacksmith.utils.json import json_response
 
 from . import logger
 
@@ -24,14 +25,14 @@ def delete_scope(character_id, scope):
             alt.character_id for alt in current_user.alts_characters.all()
         ]
         if (character_id == current_user.character_id or
-           character_id in allowed_character_id):
+                character_id in allowed_character_id):
             try:
                 TokenScope.query.filter(
                     TokenScope.user_id == character_id,
                     TokenScope.scope == scope
                 ).delete()
                 db.session.commit()
-                return jsonify({'status': 'success'})
+                return json_response('success', '', 200)
 
             except:
                 logger.exception('Cannot delete scope %s for user_id %s' % (
@@ -39,19 +40,13 @@ def delete_scope(character_id, scope):
                     character_id,
                 ))
                 db.session.rollback()
-                response = jsonify({
-                    'status': 'error',
-                    'message': 'Error while trying to delete scope'
-                })
-                response.status_code = 500
-                return response
+                return json_response('danger',
+                                     'Error while trying to delete scope',
+                                     500)
         else:
-            response = jsonify({
-                'status': 'error',
-                'message': 'This character does not belong to you'
-            })
-            response.status_code = 500
-            return response
+            return json_response('danger',
+                                 'This character does not belong to you',
+                                 500)
     else:
         return 'Cannot call this page directly', 403
 
@@ -91,7 +86,8 @@ def update_production_preference(preferences):
             pref.prod_sub_me_rig = preferences['componentMeRig']
             pref.prod_sub_te_rig = preferences['componentTeRig']
             pref.prod_sub_security = preferences['componentSecurity']
-            pref.prod_sub_system = check_solar_system(preferences['componentSystem'])
+            pref.prod_sub_system = check_solar_system(
+                preferences['componentSystem'])
             pref.prod_price_region_minerals = preferences['priceMineralRegion']
             pref.prod_price_type_minerals = preferences['priceMineralType']
             pref.prod_price_region_pi = preferences['pricePiRegion']
@@ -108,19 +104,11 @@ def update_production_preference(preferences):
         except:
             logger.exception('Cannot update preferences')
             db.session.rollback()
-            response = jsonify({
-                'status': 'error',
-                'message': 'Error while updating preferences'
-            })
-            response.status_code = 500
-            return response
+            return json_response('danger',
+                                 'Error while updating preferences',
+                                 500)
     else:
-        response = jsonify({
-            'status': 'error',
-            'message': 'Error: preferences are empty'
-        })
-        response.status_code = 500
-        return response
+        return json_response('danger', 'Error: preferences are empty', 500)
 
 
 def update_invention_preference(preferences):
@@ -146,19 +134,11 @@ def update_invention_preference(preferences):
         except:
             logger.exception('Cannot update preferences')
             db.session.rollback()
-            response = jsonify({
-                'status': 'error',
-                'message': 'Error while updating preferences'
-            })
-            response.status_code = 500
-            return response
+            return json_response('danger',
+                                 'Error while updating preferences',
+                                 500)
     else:
-        response = jsonify({
-            'status': 'error',
-            'message': 'Error: preferences are empty'
-        })
-        response.status_code = 500
-        return response
+        return json_response('danger', 'Error: preferences are empty', 500)
 
 
 def update_research_preference(preferences):
@@ -185,19 +165,11 @@ def update_research_preference(preferences):
         except:
             logger.exception('Cannot update preferences')
             db.session.rollback()
-            response = jsonify({
-                'status': 'error',
-                'message': 'Error while updating preferences'
-            })
-            response.status_code = 500
-            return response
+            return json_response('danger',
+                                 'Error while updating preferences',
+                                 500)
     else:
-        response = jsonify({
-            'status': 'error',
-            'message': 'Error: preferences are empty'
-        })
-        response.status_code = 500
-        return response
+        return json_response('danger', 'Error: preferences are empty', 500)
 
 
 def check_solar_system(system_name):
@@ -207,4 +179,3 @@ def check_solar_system(system_name):
         func.lower(SolarSystem.name) == func.lower(system_name)
     ).one_or_none()
     return 'Jita' if not system else system.name
-

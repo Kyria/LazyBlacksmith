@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from __future__ import absolute_import
 from flask import flash
 from flask import json
 from flask import redirect
