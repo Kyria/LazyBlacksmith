@@ -36,7 +36,7 @@ module.exports = function (grunt) {
                 }
             }
         },
-        
+
         concat: {
             bootstrap: {
                 src: [
@@ -63,7 +63,7 @@ module.exports = function (grunt) {
                 dest: 'lazyblacksmith/static/css/theme-default-combined.css'
             }
         },
-        
+
         cssmin: {
             options: {
                 sourceMap: true,
@@ -74,7 +74,7 @@ module.exports = function (grunt) {
                 }
             }
         },
-        
+
         uglify: {
             combined: {
                 options: {
@@ -92,7 +92,6 @@ module.exports = function (grunt) {
         },
     });
 
-    grunt.loadNpmTasks('grunt-flake8');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-less');
@@ -100,5 +99,4 @@ module.exports = function (grunt) {
 
     // Default task(s).
     grunt.registerTask('default', ['less', 'concat', 'cssmin', 'uglify']);
-    grunt.registerTask('flake8', ['flake8']);
 };
