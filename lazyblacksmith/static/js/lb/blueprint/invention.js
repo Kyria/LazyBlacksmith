@@ -35,7 +35,8 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         // decryptor
         decryptor: 0,
         // system
-        system: "Jita",
+        system: "jita",
+        systemPrevious: 'jita',
         region: 10000002,
         regionType: 'buy',
 
@@ -141,6 +142,13 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         eveUtils.getSystemCostIndex(options.system, function(jsonIndex) {
             $.extend(indexes, jsonIndex['index']);
             _updateInventionData();
+        }, function(errorObject) {
+            var jsonResponse = errorObject.responseJSON;
+            utils.flashNotify(jsonResponse.message, jsonResponse.status);
+
+            options.system = options.systemPrevious;
+            $('#system').val(options.system);
+            $('#system').typeahead('val',options.system);
         });
     };
 
@@ -426,7 +434,11 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      */
     var _initTypeahead = function() {
         eveUtils.initSolarSystemTypeahead('#system', function(event, suggestion) {
-            options.system = $(this).typeahead('val');
+            if(options.system == $(this).typeahead('val').toLowerCase()) {
+                return;
+            }
+            options.systemPrevious = options.system;
+            options.system = $(this).typeahead('val').toLowerCase();
             _getSystemCostIndex();
         });
     };

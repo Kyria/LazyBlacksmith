@@ -18,9 +18,9 @@
         inventionBlueprint.options.baseOutputRun = {{ invention_products[0].quantity }};
         inventionBlueprint.options.copyImplant = {{ pref.invention_copy_implant }};
 
-        inventionBlueprint.indexes['{{ pref.invention_system }}'] = {};
+        inventionBlueprint.indexes['{{ pref.invention_system|lower }}'] = {};
         {% for activity, index in index_list.iteritems() -%}
-        inventionBlueprint.indexes['{{ pref.invention_system }}'][{{ activity }}] = {{ index }};
+        inventionBlueprint.indexes['{{ pref.invention_system|lower }}'][{{ activity }}] = {{ index }};
         {% endfor %}
 
         {% for inv_mat in invention_materials %}
@@ -44,7 +44,7 @@
         };
         {% endfor %}
 
-        inventionBlueprint.options.system = '{{ pref.invention_system }}';
+        inventionBlueprint.options.system = '{{ pref.invention_system|lower }}';
         inventionBlueprint.options.region = {{ pref.invention_price_region }};
         inventionBlueprint.options.regionType = '{{ pref.invention_price_type }}';
         inventionBlueprint.options.structureInventionRig = {{ pref.invention_invention_rig }};

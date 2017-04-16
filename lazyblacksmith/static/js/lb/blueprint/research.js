@@ -39,7 +39,8 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         runPerCopy: 1,
         maxRunPerCopy: 1,
         // system
-        system: "Jita",
+        system: "jita",
+        systemPrevious: "jita",
 
         // structure configs
         structureTeRig: 0,
@@ -75,6 +76,13 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             $.extend(options.indexes, jsonIndex['index']);
             _updateResearchTimeAndCost();
             _updateCopyTimeAndCost();
+        }, function(errorObject) {
+            var jsonResponse = errorObject.responseJSON;
+            utils.flashNotify(jsonResponse.message, jsonResponse.status);
+
+            options.system = options.systemPrevious;
+            $('#system').val(options.system);
+            $('#system').typeahead('val',options.system);
         });
     };
 
@@ -292,7 +300,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      */
     var _initTypeahead = function() {
         eveUtils.initSolarSystemTypeahead('#system', function(event, suggestion) {
-            options.system = $(this).typeahead('val');
+            if(options.system == $(this).typeahead('val').toLowerCase()) {
+                return;
+            }
+            options.systemPrevious = options.system;
+            options.system = $(this).typeahead('val').toLowerCase();
             _getSystemCostIndex();
         });
     };
