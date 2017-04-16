@@ -84,17 +84,19 @@ def update_production_preference(preferences):
             solar_system_subcomp, check_sub = check_solar_system_name_index(
                 preferences['componentSystem']
             )
+            if check_main:
+                pref.prod_system = solar_system
+            if check_sub:
+                pref.prod_sub_system = solar_system_subcomp
 
             pref.prod_facility = preferences['facility']
             pref.prod_me_rig = preferences['meRig']
             pref.prod_te_rig = preferences['teRig']
             pref.prod_security = preferences['security']
-            pref.prod_system = solar_system
             pref.prod_sub_facility = preferences['componentFacility']
             pref.prod_sub_me_rig = preferences['componentMeRig']
             pref.prod_sub_te_rig = preferences['componentTeRig']
             pref.prod_sub_security = preferences['componentSecurity']
-            pref.prod_sub_system = solar_system_subcomp
             pref.prod_price_region_minerals = preferences['priceMineralRegion']
             pref.prod_price_type_minerals = preferences['priceMineralType']
             pref.prod_price_region_pi = preferences['pricePiRegion']
@@ -110,7 +112,7 @@ def update_production_preference(preferences):
             check = check_main and check_sub
             return json_response(
                 'success' if check else 'warning',
-                ("Production preferences updated, solarsystem forced to Jita "
+                ("Production preferences updated, solarsystem not updated "
                  "as the system does not exist or does not have any index."
                  if not check else
                  "Production preferences successfuly saved."),
@@ -137,11 +139,13 @@ def update_invention_preference(preferences):
             solar_system, check = check_solar_system_name_index(
                 preferences['system']
             )
+            if check:
+                pref.invention_system = solar_system
+
             pref.invention_facility = preferences['facility']
             pref.invention_invention_rig = preferences['inventionRig']
             pref.invention_copy_rig = preferences['copyRig']
             pref.invention_security = preferences['security']
-            pref.invention_system = solar_system
             pref.invention_price_region = preferences['priceRegion']
             pref.invention_price_type = preferences['priceType']
             pref.invention_character_id = preferences['characterId']
@@ -150,7 +154,7 @@ def update_invention_preference(preferences):
             db.session.commit()
             return json_response(
                 'success' if check else 'warning',
-                ("Invention preferences updated, solarsystem forced to Jita "
+                ("Invention preferences updated, solarsystem not updated "
                  "as the system does not exist or does not have any index."
                  if not check else "Invention preferences successfuly saved."),
                 200
@@ -176,12 +180,14 @@ def update_research_preference(preferences):
             solar_system, check = check_solar_system_name_index(
                 preferences['system']
             )
+            if check:
+                pref.research_system = solar_system
+
             pref.research_facility = preferences['facility']
             pref.research_me_rig = preferences['meRig']
             pref.research_te_rig = preferences['teRig']
             pref.research_copy_rig = preferences['copyRig']
             pref.research_security = preferences['security']
-            pref.research_system = solar_system
             pref.research_character_id = preferences['characterId']
             pref.research_me_implant = preferences['meImplant']
             pref.research_te_implant = preferences['teImplant']
@@ -190,7 +196,7 @@ def update_research_preference(preferences):
             db.session.commit()
             return json_response(
                 'success' if check else 'warning',
-                ("Research preferences updated, solarsystem forced to Jita "
+                ("Research preferences updated, solarsystem not updated "
                  "as the system does not exist or does not have any index."
                  if not check else "Research preferences successfuly saved."),
                 200

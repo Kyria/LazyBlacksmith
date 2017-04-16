@@ -266,8 +266,8 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             function(data) {
                 utils.flashNotify(data.message, data.status);
                 if(data.status != 'success') {
-                    productionSettingsTmp.system = 'Jita';
-                    productionSettingsTmp.componentSystem = 'Jita';
+                    productionSettingsTmp.system = productionSettings.system;
+                    productionSettingsTmp.componentSystem = productionSettings.componentSystem;
                 }
                 productionSettings = productionSettingsTmp;
                 _updateProductionConfigTable();
@@ -304,7 +304,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             function(data) {
                 utils.flashNotify(data.message, data.status);
                 if(data.status != 'success') {
-                    researchSettingsTmp.system = 'Jita';
+                    researchSettingsTmp.system = researchSettings.system;
                 }
                 researchSettings = researchSettingsTmp;
                 _updateResearchConfigTable();
@@ -341,7 +341,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             function(data) {
                 utils.flashNotify(data.message, data.status);
                 if(data.status != 'success') {
-                    researchSettingsTmp.system = 'Jita';
+                    researchSettingsTmp.system = inventionSettings.system;
                 }
                 inventionSettings = inventionSettingsTmp;
                 _updateInventionConfigTable();
