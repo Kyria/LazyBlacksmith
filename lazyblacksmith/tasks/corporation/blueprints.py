@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
+from .. import logger
 from ..lb_task import LbTask
+
 
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esisecurity
@@ -106,14 +108,14 @@ def task_update_corporation_blueprints(self, character_id):
         db.session.commit()
 
     except evelink.api.APIError as e:
-        # TODO add logger : e.message
         self.inc_fail_token_scope(token, e.code)
+        logger.exception(e.message)
         self.end(TaskState.ERROR)
         return
 
     except requests.HTTPError as e:
-        # TODO add logger : e.message
         self.inc_fail_token_scope(token, e.response.status_code)
+        logger.exception(e.message)
         self.end(TaskState.ERROR)
         return
 

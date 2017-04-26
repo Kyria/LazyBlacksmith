@@ -8,7 +8,7 @@ from lazyblacksmith.extension.celery_app import celery_app
 
 # disable / enable loggers we want
 logging.getLogger('pyswagger').setLevel(logging.ERROR)
-
+logging.getLogger('lb.tasks').setLevel(logging.WARNING)
 
 
 app = create_app(config)

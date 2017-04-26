@@ -41,7 +41,7 @@ class LbTask(celery_app.Task):
 
     def inc_fail_token_scope(self, token, status_code):
         """ Check if status_code is 4xx, increase counter, check validity """
-        if int(status_code / 100) == 4:
+        if 400 <= int(status_code) <= 499:
             token.request_try += 1
             token.valid = True if token.request_try <= 3 else False
             try:
