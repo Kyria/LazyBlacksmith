@@ -105,26 +105,22 @@ def task_update_corporation_blueprints(self, character_id):
         for key in (blueprint_init_list - blueprint_updated_list):
             db.session.delete(blueprints[key])
 
+        # update the token and the state
+        token.request_try = 0
+        token.last_update = utcnow()
+        token.cached_until = datetime.fromtimestamp(
+            api_bp_list.expires,
+            tz=pytz.utc
+        )
         db.session.commit()
+        self.end(TaskState.SUCCESS)
 
     except evelink.api.APIError as e:
         self.inc_fail_token_scope(token, e.code)
         logger.exception(e.message)
         self.end(TaskState.ERROR)
-        return
 
     except requests.HTTPError as e:
         self.inc_fail_token_scope(token, e.response.status_code)
         logger.exception(e.message)
         self.end(TaskState.ERROR)
-        return
-
-    # update the token and the state
-    token.request_try = 0
-    token.last_update = utcnow()
-    token.cached_until = datetime.fromtimestamp(
-        api_bp_list.expires,
-        tz=pytz.utc
-    )
-    db.session.commit()
-    self.end(TaskState.SUCCESS)

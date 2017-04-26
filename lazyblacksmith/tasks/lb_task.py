@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from . import logger
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
@@ -17,6 +18,8 @@ class LbTask(celery_app.Task):
             try:
                 db.session.commit()
             except:
+                logger.exception('[start] Something went wrong while '
+                                 'updating task state')
                 db.session.rollback()
 
     def end(self, state):
@@ -31,6 +34,8 @@ class LbTask(celery_app.Task):
             try:
                 db.session.commit()
             except:
+                logger.exception('[end] Something went wrong while '
+                                 'updating task state')
                 db.session.rollback()
 
     def get_token_scope(self, user_id, scope):
@@ -47,6 +52,8 @@ class LbTask(celery_app.Task):
             try:
                 db.session.commit()
             except:
+                logger.exception('Something went wrong while '
+                                 'updating token validity')
                 db.session.rollback()
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
