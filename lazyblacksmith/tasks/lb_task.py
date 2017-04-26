@@ -44,9 +44,14 @@ class LbTask(celery_app.Task):
             TokenScope.scope == scope
         ).one()
 
-    def inc_fail_token_scope(self, token, status_code):
-        """ Check if status_code is 4xx, increase counter, check validity """
-        if 400 <= int(status_code) <= 499:
+    def inc_fail_token_scope(self, token, status_code, xml_api):
+        """ Check if status_code is 4xx, increase counter, check validity
+
+        if xml_api = True it means it's an xml API error, so we need to check
+        another range of status code ... great !
+        """
+        if ((400 <= int(status_code) <= 499 and not xml_api) or
+           (200 <= int(status_code) <= 299 and xml_api)):
             token.request_try += 1
             token.valid = True if token.request_try <= 3 else False
             try:

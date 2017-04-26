@@ -116,7 +116,7 @@ def task_update_corporation_blueprints(self, character_id):
         self.end(TaskState.SUCCESS)
 
     except evelink.api.APIError as e:
-        self.inc_fail_token_scope(token, e.code)
+        self.inc_fail_token_scope(token, e.code, True)
         logger.exception(e.message)
         self.end(TaskState.ERROR)
 
