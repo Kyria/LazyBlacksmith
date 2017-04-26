@@ -44,7 +44,7 @@ class LbTask(celery_app.Task):
             TokenScope.scope == scope
         ).one()
 
-    def inc_fail_token_scope(self, token, status_code, xml_api):
+    def inc_fail_token_scope(self, token, status_code, xml_api=False):
         """ Check if status_code is 4xx, increase counter, check validity
 
         if xml_api = True it means it's an xml API error, so we need to check
