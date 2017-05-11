@@ -113,7 +113,7 @@ class Importer(object):
         update = []
         bulk_data = {}
         item_list = []
-        
+
         # get all data, marketGroupID > 35k == dust514
         self.sde_cursor.execute("""
             SELECT
@@ -133,7 +133,7 @@ class Importer(object):
 
         for row in self.sde_cursor:
             bulk_data[int(row[0])] = row[1:]
-        
+
         items = Item.query.all()
         for item in items:
             item_list.append(item.id)
@@ -151,14 +151,14 @@ class Importer(object):
                 'market_group_id': int(data[2]) if data[2] else None,
                 'category_id': int(data[3]) if data[3] else None,
             }
-            
+
             if id in item_list:
                 item['update_id'] = id
                 update.append(item)
             else:
                 item['id'] = id
                 new.append(item)
-                
+
             added += 1
 
         # then create the new item if they exist
@@ -167,7 +167,7 @@ class Importer(object):
                 Item.__table__.insert(),
                 new
             )
-            
+
         if update:
             update_stmt = Item.__table__.update()
             update_stmt = update_stmt.where(
@@ -496,6 +496,9 @@ class Importer(object):
             JOIN invTypes i
                 ON  i.typeID = ias.typeID
                 AND i.published = 1
+            JOIN invTypes i2
+                ON  i2.typeID = ias.skillID
+                AND i2.published = 1
             GROUP BY ias.typeID, ias.activityID, ias.skillID
         """)
 
@@ -557,7 +560,7 @@ class Importer(object):
 
         new = []
         update = []
-        
+
         regions = Region.query.all()
         region_id_list = [r.id for r in regions]
 
@@ -578,7 +581,7 @@ class Importer(object):
             else:
                 item['id'] = id
                 new.append(item)
-                
+
             added += 1
 
         # then create the new item if they exist
@@ -597,7 +600,7 @@ class Importer(object):
                 update_stmt,
                 update,
             )
-            
+
         return (added, total)
 
     def import_constellation(self):
@@ -624,7 +627,7 @@ class Importer(object):
 
         new = []
         update = []
-        
+
         constellations = Constellation.query.all()
         constellation_id_list = [c.id for c in constellations]
 
@@ -639,14 +642,14 @@ class Importer(object):
                 'region_id': int(data[0]),
                 'name': data[1],
             }
-            
+
             if id in constellation_id_list:
                 item['update_id'] = id
                 update.append(item)
             else:
                 item['id'] = id
                 new.append(item)
-                
+
             added += 1
 
         # then create the new item if they exist
@@ -664,7 +667,7 @@ class Importer(object):
             db.engine.execute(
                 update_stmt,
                 update,
-            )   
+            )
         return (added, total)
 
     def import_solarsystem(self):
@@ -692,7 +695,7 @@ class Importer(object):
 
         new = []
         update = []
-        
+
         solarsystems = SolarSystem.query.all()
         system_id_list = [ss.id for ss in solarsystems]
 
@@ -708,14 +711,14 @@ class Importer(object):
                 'region_id': int(data[1]),
                 'constellation_id': int(data[2]),
             }
-            
+
             if id in system_id_list:
                 item['update_id'] = id
                 update.append(item)
             else:
                 item['id'] = id
                 new.append(item)
-                
+
             added += 1
 
         # then create the new item if they exist
@@ -734,5 +737,5 @@ class Importer(object):
                 update_stmt,
                 update,
             )
-            
+
         return (added, total)
