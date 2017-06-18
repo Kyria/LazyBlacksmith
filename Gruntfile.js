@@ -40,16 +40,16 @@ module.exports = function (grunt) {
         concat: {
             bootstrap: {
                 src: [
-                    'lazyblacksmith/static/js/bootstrap/modal.js',
-                    'lazyblacksmith/static/js/bootstrap/tooltip.js',
-                    'lazyblacksmith/static/js/bootstrap/popover.js',
-                    'lazyblacksmith/static/js/bootstrap/button.js',
-                    'lazyblacksmith/static/js/bootstrap/collapse.js',
-                    'lazyblacksmith/static/js/bootstrap/dropdown.js',
-                    'lazyblacksmith/static/js/bootstrap/tab.js',
-                    'lazyblacksmith/static/js/bootstrap/affix.js',
-                    'lazyblacksmith/static/js/bootstrap/alert.js',
-                    'lazyblacksmith/static/js/bootstrap/transition.js',
+                    'lazyblacksmith/static/bootstrap/js/modal.js',
+                    'lazyblacksmith/static/bootstrap/js/tooltip.js',
+                    'lazyblacksmith/static/bootstrap/js/popover.js',
+                    'lazyblacksmith/static/bootstrap/js/button.js',
+                    'lazyblacksmith/static/bootstrap/js/collapse.js',
+                    'lazyblacksmith/static/bootstrap/js/dropdown.js',
+                    'lazyblacksmith/static/bootstrap/js/tab.js',
+                    'lazyblacksmith/static/bootstrap/js/affix.js',
+                    'lazyblacksmith/static/bootstrap/js/alert.js',
+                    'lazyblacksmith/static/bootstrap/js/transition.js',
                 ],
                 dest: 'lazyblacksmith/static/js/bootstrap.js'
             },
