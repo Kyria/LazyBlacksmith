@@ -230,6 +230,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 material.blueprint_id = tmpMaterial['id'];
                 material.blueprint_name = tmpMaterial['name'];
                 material.blueprint_icon = tmpMaterial['icon'];
+                material.runsPerJob = tmpMaterial['max_run_per_bp'];
+                material.maxRunPerBp = tmpMaterial['max_run_per_bp'];
 
                 // quantity and runs
                 material.resultQtyPerRun = tmpMaterial['product_qty_per_run'];
@@ -284,9 +286,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                         structureSecStatusMultiplier[material.structureSecStatus],
                         facilityStats[material.facility].structure
                     );
-                    subMaterial.qtyJob = eveUtils.calculateJobQuantity(
+
+                    subMaterial.qtyJob = eveUtils.calculateJobQuantityBatch(
                         subMaterial.qtyAdjusted,
-                        material.runs
+                        material.runs,
+                        material.runsPerJob
                     );
 
                     rows += tplSublistRow.replace(/@@ID@@/g, subMaterial.id)
@@ -306,6 +310,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                                      .replace(/@@PRODUCT_QTY@@/g, material.resultQtyPerRun)
                                      .replace(/@@QTY@@/g, material.qtyJob)
                                      .replace(/@@RUN@@/g, material.runs)
+                                     .replace(/@@RUNPERJOB@@/g, material.runsPerJob)
                                      .replace(/@@SYSTEM@@/g, material.manufacturingSystem)
                                      .replace(/@@FACILITY_NAME@@/g, facilityStats[material.facility].name)
                                      .replace(/@@ACTIVITY_TIME_HUMAN@@/g, timeHuman)
@@ -392,6 +397,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
     /**
      * Update main blueprint components.
+     * Use the runsPerJob value to calculate correctly with the adjusted quantities
      * @private
      */
     var _updateMaterial = function() {
@@ -408,9 +414,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 structureSecStatusMultiplier[parentMaterial.structureSecStatus],
                 facilityStats[parentMaterial.facility].structure
             );
-            var quantityJob = eveUtils.calculateJobQuantity(
+
+            var quantityJob = eveUtils.calculateJobQuantityBatch(
                 quantityAdjusted,
-                options.runs
+                options.runs,
+                parentMaterial.runsPerJob
             );
 
             var selector = '.main-list tr.material[data-id="' + material.id + '"]';
@@ -464,9 +472,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                     structureSecStatusMultiplier[material.structureSecStatus],
                     facilityStats[material.facility].structure
                 );
-                var quantityJob = eveUtils.calculateJobQuantity(
+
+                var quantityJob = eveUtils.calculateJobQuantityBatch(
                     quantityAdjusted,
-                    material.runs
+                    material.runs,
+                    material.runsPerJob
                 );
 
                 subMaterial.qtyAdjusted = quantityAdjusted;
@@ -581,6 +591,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         // get data
         var system = $('#modal-system').val().toLowerCase();
+        var runsPerJob = $('#modalRunsPerJob').val();
         var ME = parseInt($('#Modal-ME-Level').text());
         var TE = parseInt($('#Modal-TE-Level').text());
         var facility = parseInt($('#modal-facility').val());
@@ -599,6 +610,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             materialsData.materials[componentId].structureMeRig = structureMeRig;
             materialsData.materials[componentId].structureTeRig = structureTeRig;
             materialsData.materials[componentId].structureSecStatus = structureSecStatus;
+
+            if(isNaN(runsPerJob) || !runsPerJob || parseInt(runsPerJob) <= 0) {
+                materialsData.materials[componentId].runsPerJob = materialsData.materials[componentId].maxRunPerBp;
+            } else {
+                materialsData.materials[componentId].runsPerJob = parseInt(runsPerJob);
+            }
 
             _updateComponentBpInfoDisplay(componentId);
         }
@@ -633,7 +650,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         $('.sub-list-'+ id +' .me').html(materialsData.materials[id].materialEfficiency);
         $('.sub-list-'+ id +' .te').html(materialsData.materials[id].timeEfficiency);
         $('.sub-list-'+ id +' .facility').html(facilityStats[materialsData.materials[id].facility].name);
-
+        $('.sub-list-'+ id +' .run-per-job').html(materialsData.materials[id].runsPerJob);
     };
 
 
@@ -917,8 +934,13 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         });
 
         $("#raw-components input[type='checkbox']").on('change', _componentButtonOnStateChange);
-    };
 
+        $("#toggleMaxRunPerBpcModal input[type='checkbox']").on('change', _toggleMaxRunPerBpcModal);
+        $('#maxRunBpc').on('click', _setMaxRunBpc);
+        $('#runsPerJob').on('keyup', _runsPerJobOnKeyUp)
+                        .on('change', _runsPerJobOnChange);
+
+    };
 
     /**
      * Init tab event actions
@@ -1018,10 +1040,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             var me = materialsData.materials[id].materialEfficiency;
             var te = materialsData.materials[id].timeEfficiency;
 
+            var runsPerJob = materialsData.materials[id].runsPerJob;
 
             $('#componentModalBpName').html(name);
             $('#componentModalBpName').attr('data-bp-id', id);
             $('#modal-system').val(system);
+            $('#modalRunsPerJob').val(runsPerJob);
             $('#modal-facility option[value='+facility+']').prop('selected',true);
             $('#modal-structure-me-rig input[value='+structureMeRig+']').parent().button("toggle");
             $('#modal-structure-te-rig input[value='+structureTeRig+']').parent().button("toggle");
@@ -1170,6 +1194,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
     /**
      * Function called on event keyup for 'run' text field
+     * Replace the text input value with an integer (if it's anything else)
      * @private
      */
     var _runsOnKeyUp = function(e) {
@@ -1193,11 +1218,43 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
     /**
      * Function called on event change for 'run' text field
-     * Replace the text input value with an integer (if it's anything else)
+     * prevents from bugging where no keyup is done.
      * @private
      */
     var _runOnChange = function(e) {
         $(this).val(options.runs);
+        return false;
+    };
+
+
+    /**
+     * Function called on event change for 'runs per job' text field
+     * prevents from bugging where no keyup is done.
+     */
+    var _runsPerJobOnChange = function() {
+        var material = materialsData.materials[materialsData.productItemId];
+        $(this).val(material.runsPerJob);
+        return false;
+    };
+    
+    /**
+     * Function called on event change for 'runs per job' text field
+     * Replace the text input value with an integer (if it's anything else)
+     * @private
+     */
+    var _runsPerJobOnKeyUp = function() {
+        var material = materialsData.materials[materialsData.productItemId];
+        if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
+            material.runsPerJob = material.runsPerJob;
+            $(this).val(material.runsPerJob);
+            return false;
+        } else {
+            material.runsPerJob = parseInt($(this).val());
+        }
+
+        _updateMaterial();
+        _updateTime();
+
         return false;
     };
 
@@ -1335,6 +1392,35 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         _updateComponentInformations(true);
     };
 
+    /**
+     *  Toggle button event to set max run bpc for component in modal form
+     *  @private
+     */
+    var _toggleMaxRunPerBpcModal = function() {
+        var id = $('#componentModalBpName').attr('data-bp-id');
+        if(!this.checked) {
+            $('#modalRunsPerJob').val(materialsData.materials[id].runsPerJob);
+            $('#modalRunsPerJob').attr('disabled', false);
+        } else {
+            $('#modalRunsPerJob').val("Max BPC Run");
+            $('#modalRunsPerJob').prop('disabled', true);
+        }
+    }
+
+    /**
+     *  Set set max run bpc for run/job for main BPO
+     *  @private
+     */
+    var _setMaxRunBpc = function() {
+        var id = materialsData.productItemId;
+        $('#runsPerJob').val(materialsData.materials[id].maxRunPerBp);
+        materialsData.materials[id].runsPerJob = materialsData.materials[id].maxRunPerBp;
+
+        _updateMaterial();
+        _updateTime();
+
+        return false;
+    }
 
     /**
      * Update button "raw components" state and update tables

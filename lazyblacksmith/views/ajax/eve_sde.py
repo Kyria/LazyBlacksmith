@@ -107,6 +107,7 @@ def blueprint_bom(blueprint_id):
                     'product_id': bp.material.id,
                     'product_name': bp.material.name,
                     'product_qty_per_run': product.quantity,
+                    'max_run_per_bp': bp_final.max_production_limit,
                 }
 
             for mat in mats:

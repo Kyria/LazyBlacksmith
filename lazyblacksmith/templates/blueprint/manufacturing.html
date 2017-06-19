@@ -17,6 +17,8 @@
         manufacturingBlueprint.materialsData.materials[{{ product.product.id }}] = {
             'id': {{ product.product.id }},
             'isManufactured': true,
+            'runsPerJob': {{ product.blueprint.max_production_limit }},
+            'maxRunPerBp': {{ product.blueprint.max_production_limit }},
             'resultQtyPerRun': {{ product.quantity }},
             'qtyRequiredPerRun': {{ product.quantity }},
             'qtyAdjusted': {{ product.quantity }},
@@ -34,7 +36,7 @@
             'priceType': 'sell',
             {% if product.product.is_moon_goo() -%}
             'priceRegion': {{ pref.prod_price_region_moongoo }},
-            {%- elif product.product.is_pi()-%}
+            {%- elif product.product.is_pi() -%}
             'priceRegion': {{ pref.prod_price_region_pi }},
             {%- elif product.product.is_mineral_salvage() -%}
             'priceRegion': {{ pref.prod_price_region_minerals }},
@@ -49,6 +51,8 @@
         manufacturingBlueprint.materialsData.materials[{{ material.material.id }}] = {
             'id': {{ material.material.id }},
             'isManufactured': {% if material.material.is_manufactured() %}true{% else %}false{% endif %},
+            'runsPerJob': -1,
+            'maxRunPerBp': -1,
             'resultQtyPerRun': -1,
             'qtyRequiredPerRun': {{ material.quantity }},
             'qtyAdjusted': {{ material.quantity }},
@@ -86,7 +90,7 @@
 
         manufacturingBlueprint.options.materialEfficiency = {{ me }};
         manufacturingBlueprint.options.timeEfficiency = {{ te }};
-        manufacturingBlueprint.options.industryLvl = {{ industry_skills['adv_industry'] }};
+        manufacturingBlueprint.options.industryLvl = {{ industry_skills['industry'] }};
         manufacturingBlueprint.options.advancedIndustryLvl = {{ industry_skills['adv_industry'] }};
         {% if t2_manufacturing_skill %}
         manufacturingBlueprint.options.t2ConstructionLvl = {{ t2_manufacturing_skill.level }};
@@ -174,6 +178,16 @@
                         <div>
                             Runs <br>
                             <input id="runs" type="text" class="form-control input-sm" value="1">
+                        </div>
+                        <div>
+                            Runs Per Jobs<br>   
+                            <div class="input-group">
+                                <input id="runsPerJob" type="text" class="form-control input-sm" value="{{ product.blueprint.max_production_limit }}">
+
+                                <span class="input-group-btn">
+                                    <button id="maxRunBpc" class="btn btn-default btn-sm">Max Run/BPC</button>
+                                </span>
+                            </div>
                         </div>
                         <div class="slider">
                             ME Level (<span id="ME-Level">{{ me }}%</span>)<br>
@@ -557,6 +571,17 @@
 
                         <div class="col-md-6">
                             <div class="well">
+                                <div>
+                                    Runs Per Jobs<br>                  
+                                    <div class="input-group">
+                                        <input id="modalRunsPerJob" type="text" class="form-control input-sm" value="1">
+                                        <span class="input-group-btn" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
+                                            <label class="btn btn-default btn-sm">
+                                                <input type="checkbox" autocomplete="off">Max Run/BPC
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
                                 <div>
                                     ME Level (<span id="Modal-ME-Level">0</span>%)<br>
                                     <div id="ModalME"></div>
