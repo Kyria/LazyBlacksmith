@@ -29,6 +29,24 @@ var eveUtils = (function(utils) {
     };
 
     /**
+     * Calculate the job quantity with batch
+     * @param quantityAdjusted the adjusted quantity
+     * @param runs the number of runs
+     * @param batch the number of run in a batch
+     * @return the final quantity of materials (round to upper integer)
+     */
+    var calculateJobQuantityBatch = function(quantityAdjusted, runs, batch) {
+        var fullRunJob = Math.floor(runs / batch);
+        var leftRunJob = runs % batch;
+
+        var quantityJob = Math.max(batch, Math.ceil(quantityAdjusted * batch));
+        quantityJob *= fullRunJob;
+        quantityJob += Math.max(leftRunJob, Math.ceil(quantityAdjusted * leftRunJob));
+
+        return quantityJob;
+    };
+
+    /**
      * Calculate the manufacturing time with the given informations.
      * Note: T2Time must never be used for subcomponents (as it's only required for tech2 items)
      *
@@ -272,6 +290,7 @@ var eveUtils = (function(utils) {
     return {
         calculateAdjustedQuantity: calculateAdjustedQuantity,
         calculateJobQuantity: calculateJobQuantity,
+        calculateJobQuantityBatch: calculateJobQuantityBatch,
         calculateJobTime: calculateJobTime,
         calculateResearchTime: calculateResearchTime,
         calculateResearchInstallationCost: calculateResearchInstallationCost,
