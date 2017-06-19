@@ -1055,6 +1055,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             $('#ModalTE').slider("option", "value", te);
             $('#Modal-ME-Level').html(me);
             $('#Modal-TE-Level').html(te);
+
+            if($('#modalRunsPerJob').attr('disabled')) {
+                $('#toggleMaxRunPerBpcModal label').button('toggle');
+                $('#modalRunsPerJob').attr('disabled', false);
+            }
         });
 
         $('#modal-apply').on('click', _onModalBpApplyOne);
