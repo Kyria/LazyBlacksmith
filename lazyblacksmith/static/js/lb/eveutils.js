@@ -15,7 +15,7 @@ var eveUtils = (function(utils) {
         if(isStructure) {
             materialBonus *= 1-(rigBonus * rigMultiplier);
         }
-        return Math.max(1.00, quantity * materialBonus * facilityBonus);
+        return Math.max(1.00, quantity * materialBonus * facilityBonus).toFixed(2);
     };
 
     /**
