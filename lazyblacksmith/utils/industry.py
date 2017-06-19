@@ -20,9 +20,9 @@ def get_skill_data(skill, char):
 
 def get_common_industry_skill(char):
     """ Return the "common" industry skills for a given char
-    
+
     Return the level of the differents industry skills that are not blueprint
-    specific for a given character (default level=0) : 
+    specific for a given character (default level=0) :
     - science
     - metallurgy
     - research
@@ -71,7 +71,7 @@ def get_common_industry_skill(char):
 
     return skills
 
-    
+
 def calculate_base_cost(material_list):
     """ Calculate the base cost using a list of activity_material """
     copy_base_cost = 0.0
@@ -87,7 +87,7 @@ def calculate_base_cost(material_list):
 
 def calculate_build_cost(material_list, region_id, me_list, max_run):
     """ Return the estimated build price for a given material_list
-    
+
     Return the build price for a given material list, for research and
     invention, in a station without any bonuses
     """
@@ -98,7 +98,7 @@ def calculate_build_cost(material_list, region_id, me_list, max_run):
             ItemPrice.item_id == material.material_id,
             ItemPrice.region_id == region_id,
         ).one_or_none()
-        
+
         price = 0.0
         if not item_price:
             # if we don't have any price, use the adjusted
@@ -107,33 +107,33 @@ def calculate_build_cost(material_list, region_id, me_list, max_run):
                 material.material_id
             )
             price = item_adjusted_price.price
-        
+
         else:
-            # we want the average price, 
+            # we want the average price,
             # since this is used only in research/invention
             nb = 0.0
             if item_price.buy_price:
                 price += item_price.buy_price
                 nb += 1.0
-                
+
             if item_price.sell_price:
                 price += item_price.sell_price
                 nb += 1.0
-                
+
             price /= nb
-            
+
         for level in me_list:
             if level not in cost:
                 cost[level] = {
                     'run': 0,
                     'max_bpc_run': 0,
                 }
-                
+
             me_bonus = (1.00 - level / 100.00)
             adjusted_quantity = max(1, me_bonus * material.quantity)
             cost[level]['run'] += max(1, ceil(adjusted_quantity)) * price
             cost[level]['max_bpc_run'] += max(
                 max_run,
-                ceil(max_run * adjusted_quantity)
+                ceil(max_run * round(adjusted_quantity, 2))
             ) * price
     return cost
