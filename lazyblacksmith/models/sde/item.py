@@ -87,3 +87,6 @@ class Item(db.Model):
 
     def is_mineral_salvage(self):
         return self.market_group_id in [1857, 1033, 1863]
+
+    def is_ancient_relic(self):
+        return self.category_id == 34

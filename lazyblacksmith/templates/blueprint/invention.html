@@ -30,7 +30,15 @@
             id: {{ inv_mat.material_id }},
             name: '{{ inv_mat.material.name }}',
         }
-        {% endfor %}
+        {% endfor -%}
+        {%- if blueprint.is_ancient_relic() %}
+        inventionBlueprint.matData.idList.push({{ blueprint.id }});
+        inventionBlueprint.matData.materials[{{ blueprint.id }}] = {
+            quantity: 1,
+            id: {{ blueprint.id }},
+            name: '{{ blueprint.name }}',
+        }
+        {% endif %}
 
         {% for decryptor in decryptors %}
         inventionBlueprint.decryptorData.idList.push({{ decryptor.item_id }});
@@ -373,6 +381,15 @@
                                         <td class="total price">0.00</td>
                                     </tr>
                                     {% endfor %}
+                                    {% if blueprint.is_ancient_relic() %}
+                                    <tr id="mat-{{ blueprint.id }}">
+                                        {% if config.USE_CCP_ICONS -%}<td class="icon"><img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}"></td>{%- endif %}
+                                        <td class="name">{{ blueprint.name }}</td>
+                                        <td class="quantity">1</td>
+                                        <td class="ppu price">0.00</td>
+                                        <td class="total price">0.00</td>
+                                    </tr>
+                                    {% endif %}
                                     <tr id="mat-decryptor">
                                         {% if config.USE_CCP_ICONS -%}<td class="icon"><img src="{{ decryptors[0].item.icon_32() }}" alt="Decryptor"></td>{%- endif %}
                                         <td class="name">Decryptor</td>
