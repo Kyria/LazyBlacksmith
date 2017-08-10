@@ -102,8 +102,9 @@ def register_before_requests(app):
                 ((TokenScope.last_update.is_(None)) & (TokenScope.updated_at >= User.current_login_at)) |
                 (User.current_login_at.is_(None)) | (TokenScope.last_update >= User.current_login_at)
             ).count()
+
             if count_error > 0:
-                flash('You have at least one scope that have been invalidate.<br>'
+                flash('You have at least one scope that have been invalidate.'
                       ' Please take a moment to check and update it, or remove it.', 'danger')
 
             flask_login.current_user.current_login_at = utcnow()
