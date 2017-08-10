@@ -47,7 +47,7 @@ def spawn_character_tasks():
 
         # check if there is no running task, and the data is not still cached
         if (not is_task_running(token_scope.user_id, token_scope.scope) and
-           (not token_scope.cached_until or token_scope.cached_until <= now)):
+                (not token_scope.cached_until or token_scope.cached_until <= now)):
 
             with rate_limiter:
                 task = CHAR_TASK_SCOPE[token_scope.scope]
@@ -119,7 +119,7 @@ def skip_scope(token_scope):
 
     # if no task is defined for the scope, skip it
     if (token_scope.scope not in CHAR_TASK_SCOPE or
-       CHAR_TASK_SCOPE[token_scope.scope] is None):
+            CHAR_TASK_SCOPE[token_scope.scope] is None):
         return True
 
     # if nothing match, return False

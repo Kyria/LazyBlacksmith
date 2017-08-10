@@ -152,3 +152,10 @@ CACHE_NO_NULL_WARNING = True
 # Session settings
 # ------------------------------------------------------
 PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=30)
+
+# ------------------------------------------------------
+# Purge settings (in days)
+# ------------------------------------------------------
+PURGE_OLD_TASKS = 15
+PURGE_INVALID_TOKENS = 30
+PURGE_OLD_PRICES = 15
