@@ -13,7 +13,7 @@ from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
 import evelink.api
-import evelink.char
+import evelink.corp
 
 from datetime import datetime
 

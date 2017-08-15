@@ -7,12 +7,15 @@ from .market.adjusted_price import task_update_adjusted_price
 from .market.market_order import spawn_market_price_tasks
 
 from lazyblacksmith.extension.celery_app import celery_app
+from lazyblacksmith.extension.esipy import esiapp
+from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.tasks import is_task_running
 from lazyblacksmith.utils.time import utcnow
 
+from . import logger
 from ratelimiter import RateLimiter
 
 import datetime
@@ -36,6 +39,11 @@ def spawn_character_tasks():
     any character based task to do (based on the cached_until field) """
     now = utcnow()
 
+    # checking if API is up. If not, just stop it
+    if not is_server_online():
+        logger.info('Looks like EVE is still down / in VIP mode. Skipping !')
+        return
+
     all_tokens = TokenScope.query.filter_by(valid=True).all()
 
     # XMLAPI have 30/sec req/s, so we'll just do a little less
@@ -47,7 +55,8 @@ def spawn_character_tasks():
 
         # check if there is no running task, and the data is not still cached
         if (not is_task_running(token_scope.user_id, token_scope.scope) and
-                (not token_scope.cached_until or token_scope.cached_until <= now)):
+                (not token_scope.cached_until or
+                    token_scope.cached_until <= now)):
 
             with rate_limiter:
                 task = CHAR_TASK_SCOPE[token_scope.scope]
@@ -72,6 +81,12 @@ def spawn_universe_tasks():
     """ Task triggered every XX minutes (not less than 5) that trigger
     'universe' tasks (market prices, industry indexes, ...) """
     now = utcnow()
+
+    # checking if API is up. If not, just stop it
+    if not is_server_online():
+        logger.info('Looks like EVE is still down / in VIP mode. Skipping !')
+        return
+
     for task in UNIVERSE_TASKS:
         if not is_task_running(None, task.__name__):
             task_id = "%s-%s" % (
@@ -124,3 +139,10 @@ def skip_scope(token_scope):
 
     # if nothing match, return False
     return False
+
+
+def is_server_online():
+    """ return true if server looks online, else otherwise """
+    op = esiapp.op['get_status']()
+    res = esiclient.request(op)
+    return (res.status == 200 and 'vip' not in res.data)
