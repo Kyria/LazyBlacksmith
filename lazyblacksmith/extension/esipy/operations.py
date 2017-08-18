@@ -11,7 +11,7 @@ get_markets_prices = esiapp.op['get_markets_prices']
 get_markets_region_id_orders = esiapp.op['get_markets_region_id_orders']
 
 # require character_id
-get_characters_location = esiapp.op['get_characters_character_id_location']
+# get_characters_location = esiapp.op['get_characters_character_id_location']
 
 # require character_id
 get_characters_skills = esiapp.op['get_characters_character_id_skills']
