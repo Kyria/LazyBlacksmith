@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from flask import Flask
+from flask import flash
 from flask import g
 from flask import render_template
 from flask_wtf.csrf import CSRFProtect
@@ -11,6 +12,8 @@ from lazyblacksmith.utils.template_filter import templatefilter
 from lazyblacksmith.utils.time import utcnow
 
 # db
+from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 
 # extensions
@@ -87,13 +90,32 @@ def register_before_requests(app):
     def global_user():
         g.user = flask_login.current_user
 
-    def update_current_login_at():
+    def check_and_update_user():
+        """ check for invalid token and print message and update last seen """
         if flask_login.current_user.is_authenticated:
+            char_id = flask_login.current_user.character_id
+            count_error = TokenScope.query.filter_by(
+                valid=False
+            ).join(User).filter(
+                ((User.main_character_id.is_(None)) &
+                    (User.character_id == char_id)) |
+                (User.main_character_id == char_id)
+            ).filter(
+                ((TokenScope.last_update.is_(None)) &
+                    (TokenScope.updated_at >= User.current_login_at)) |
+                (User.current_login_at.is_(None)) |
+                (TokenScope.last_update >= User.current_login_at)
+            ).count()
+
+            if count_error > 0:
+                flash('You have at least one scope that have been invalidate.'
+                      ' Please take a moment to check and update it, or remove it.', 'danger')
+
             flask_login.current_user.current_login_at = utcnow()
             db.session.commit()
 
     app.before_request(global_user)
-    app.before_request(update_current_login_at)
+    app.before_request(check_and_update_user)
 
 
 def register_context_processors(app):

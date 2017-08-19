@@ -9,7 +9,6 @@ Flask-WTF>=0.14
 # database
 sqlalchemy>=1.1.9
 alembic>=0.9.1
-MySQL-python>=1.2.5
 
 # others
 pytz>=2017.2

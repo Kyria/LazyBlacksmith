@@ -29,6 +29,7 @@ celery_app.conf.beat_schedule.update({
 })
 
 celery_app.conf.imports = [
+    'lazyblacksmith.tasks.purge',
     'lazyblacksmith.tasks.task_spawner',
     'lazyblacksmith.tasks.market.adjusted_price',
     'lazyblacksmith.tasks.market.market_order',

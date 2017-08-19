@@ -3,7 +3,6 @@ from ..lb_task import LbTask
 
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
-from lazyblacksmith.extension.esipy import esisecurity
 from lazyblacksmith.extension.esipy.operations import get_characters_skills
 from lazyblacksmith.models import Skill
 from lazyblacksmith.models import TaskState
@@ -29,11 +28,10 @@ def task_update_character_skills(self, character_id):
         return
 
     # get token
-    token = self.get_token_scope(
-        user_id=character_id,
+    token = self.get_token_update_esipy(
+        character_id=character_id,
         scope=TokenScope.SCOPE_SKILL
     )
-    esisecurity.update_token(token.get_sso_data())
 
     # get current character skills from ESI
     character_skills = esiclient.request(

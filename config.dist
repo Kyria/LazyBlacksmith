@@ -152,3 +152,21 @@ CACHE_NO_NULL_WARNING = True
 # Session settings
 # ------------------------------------------------------
 PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=30)
+
+# ------------------------------------------------------
+# Purge settings (in days)
+# ------------------------------------------------------
+PURGE_OLD_TASKS = 15
+PURGE_INVALID_TOKENS = 30
+PURGE_OLD_PRICES = 15
+
+# ------------------------------------------------------
+# Tasks settings
+# ------------------------------------------------------
+
+# Task: task_update_region_order_price
+# ----
+# set to None to use as much thread as there are pages.
+# You can adjust the number if you feel like the task
+# is too slow.
+MARKET_ORDER_THREADS = 5

@@ -13,7 +13,7 @@ from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
 import evelink.api
-import evelink.char
+import evelink.corp
 
 from datetime import datetime
 
@@ -31,16 +31,10 @@ def task_update_corporation_blueprints(self, character_id):
         return
 
     # get token
-    token = self.get_token_scope(
-        user_id=character_id,
+    token = self.get_token_update_esipy(
+        character_id=character_id,
         scope=TokenScope.SCOPE_CORP_ASSETS
     )
-    esisecurity.update_token(token.get_sso_data())
-
-    # check if we need to update the token
-    if esisecurity.is_token_expired():
-        token.update_token(esisecurity.refresh())
-        db.session.commit()
 
     # get current blueprints
     bps = Blueprint.query.filter_by(

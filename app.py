@@ -23,6 +23,6 @@ if __name__ == '__main__':
 
     logger = logging.getLogger('sqlalchemy.engine')
     logger.addHandler(console)
-    logger.setLevel(logging.ERROR)  # DEBUG for queries + results
+    logger.setLevel(logging.DEBUG)  # DEBUG for queries + results
 
     app.run(port=config.PORT, host=config.HOST)

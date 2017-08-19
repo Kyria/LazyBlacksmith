@@ -845,6 +845,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
     /**
      * Calculate the base cost for installation fee
+     * if a component has no adjusted price, force the value to 1.0
      * @param  material_id the id of the material we want to job cost
      * @private
      */
@@ -862,7 +863,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         var baseCost = 0;
         for(var i in material.componentIdList) {
             var component = material.materials[material.componentIdList[i]];
-            baseCost += component.qtyRequiredPerRun * priceData.adjusted[component.id];
+            var adjustedPrice = priceData.adjusted[component.id];
+            adjustedPrice = (adjustedPrice === undefined) ? 1.0 : adjustedPrice;
+            baseCost += component.qtyRequiredPerRun * adjustedPrice;
         }
         return baseCost * runs;
     }

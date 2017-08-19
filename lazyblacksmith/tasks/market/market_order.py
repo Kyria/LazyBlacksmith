@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import config
 import logging
+import time
 
 from ..lb_task import LbTask
 
@@ -24,7 +25,8 @@ from sqlalchemy.exc import SQLAlchemyError
 esiclient = EsiClient(
     transport_adapter=transport_adapter,
     cache=None,
-    headers={'User-Agent': config.ESI_USER_AGENT}
+    headers={'User-Agent': config.ESI_USER_AGENT},
+    retry_requests=True
 )
 
 logger = logging.getLogger('lb.tasks')
@@ -75,54 +77,65 @@ def task_update_region_order_price(self, region_id, item_id_list):
     """ Get the price from the API and update the database for a given region
     """
     self.start()
+    fail = False
 
     # call the market page and extract all items from every pages if required
-    page = 0
-    fails = 0
     item_list = {'update': {}, 'insert': {}}
 
-    while True:
-        page += 1
-        # try up to 3 times to get the data, else go to next page
-        for retry in xrange(3):
-            op = get_markets_region_id_orders(
-                    region_id=region_id,
-                    order_type='all',
-                    page=page
-            )
+    # get the first page to get the total number of page
+    op = get_markets_region_id_orders(
+        region_id=region_id,
+        order_type='all',
+        page=1
+    )
+    region_order_one = esiclient.request(op, raw_body_only=True)
 
-            region_orders_res = esiclient.request(
-                op,
-                raw_body_only=True
-            )
+    # if failed, stop
+    if region_order_one.status != 200:
+        logger.error('Request failed [%s, %s, %d]: %s' % (
+            op[0].url,
+            op[0].query,
+            region_order_one.status,
+            region_order_one.raw,
+        ))
+        self.end(TaskState.ERROR)
+        return
 
-            logger.debug('Request #%d %s [%d]' % (
-                retry,
-                op[0].url,
-                region_orders_res.status
+    # prepare all other pages
+    total_page = region_order_one.header['X-Pages'][0]
+    operations = []
+    for page in range(2, total_page + 1):
+        operations.append(get_markets_region_id_orders(
+            region_id=region_id,
+            order_type='all',
+            page=page
+        ))
+
+    # check how many thread we will set
+    if config.MARKET_ORDER_THREADS is not None:
+        threads = config.MARKET_ORDER_THREADS
+    else:
+        threads = total_page
+
+    # query all other pages and add the first page
+    order_list = esiclient.multi_request(
+        operations, raw_body_only=True, threads=threads)
+
+    # parse the response and save everything
+    for req, response in [(op[0], region_order_one)] + order_list:
+        region_orders = json.loads(response.raw)
+        if response.status != 200:
+            fail = True
+            logger.error('Request failed [%s, %s, %d]: %s' % (
+                req[0].url,
+                req[0].query,
+                response.status,
+                response.raw,
             ))
-            if region_orders_res.status == 200:
-                break
+            continue
 
-        if region_orders_res.status != 200:
-            fails += 1
-            logger.error('Request failed after 3 tries [%s, %s, %d]: %s' % (
-                op[0].url,
-                op[0].query,
-                region_orders_res.status,
-                region_orders_res.raw,
-            ))
-
-            # if we have more than 2 fails, we stop gathering data as there
-            # are too many missing page (when average page is around 2-3)
-            if fails > 2:
-                break
-            else:
-                continue
-
-        region_orders = json.loads(region_orders_res.raw)
         if not region_orders:
-            break
+            continue
 
         for order in region_orders:
             update_itemlist_from_order(
@@ -142,12 +155,12 @@ def task_update_region_order_price(self, region_id, item_id_list):
             )
         )
         db.session.rollback()
-        fails += 1
+        fail = True
 
-    if fails > 0:
-        self.end(TaskState.ERROR)
-    else:
+    if not fail:
         self.end(TaskState.SUCCESS)
+    else:
+        self.end(TaskState.ERROR)
 
 
 def update_itemlist_from_order(region_id, item_list, item_id_list, order):
