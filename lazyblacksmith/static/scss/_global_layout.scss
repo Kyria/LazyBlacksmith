@@ -1,0 +1,31 @@
+footer {
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    background: $gray-100;
+    margin:0;
+}
+
+html,
+body {
+    height: 100%;
+    /* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+    min-height: 100%;
+    height: auto;
+    /* Negative indent footer by its height */
+    margin: 0 auto -30px;
+    /* Pad bottom by footer height */
+    padding: 0 0 30px;
+}
+
+.sso-banner {
+    @include float-right;
+    display: inline-block;
+    margin-top: 9px;
+    margin-right: 15px;
+}
