@@ -1,6 +1,6 @@
 # LazyBlacksmith
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d87ed6e0392407bb442abfc1fc2f12e)](https://www.codacy.com/app/Kyria/LazyBlacksmith?utm_source=github.com&utm_medium=referral&utm_content=Kyria/LazyBlacksmith&utm_campaign=badger)
+![Logo](https://raw.githubusercontent.com/Kyria/LazyBlacksmith/new-theme/lazyblacksmith/static/img/logo128.png)
 
 An EVE Online Industry application for lazy people.
 
