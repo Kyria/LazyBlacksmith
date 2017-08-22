@@ -16,11 +16,9 @@
 <div class="row">
     {% if blueprints %}
     <div class="col-lg-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Owned Blueprints</h3>
-            </div>
-            <div class="panel-body">
+        <div class="card bg-light mb-3">
+            <div class="card-header">Owned Blueprints</div>
+            <div class="card-body">
                 <div class="input-group">
                     <input id="ownedBlueprintSearch" type="text" class="form-control" placeholder="Search">
                     <span class="input-group-btn" data-toggle="buttons" id="toggleCorporationBlueprints">
@@ -73,11 +71,9 @@
     </div>
     {% endif %}
     <div class="col-lg-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Search Blueprint</h3>
-            </div>
-            <div class="panel-body">
+        <div class="card bg-light mb-3">
+            <div class="card-header">Search Blueprint</div>
+            <div class="card-body">
                 <input id="blueprint" type="text" class="form-control" placeholder="Item name">
                 <br />
                 <table class="table table-striped table-hover" id="searchBlueprintResult">
