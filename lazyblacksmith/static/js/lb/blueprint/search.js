@@ -3,7 +3,7 @@ var searchBlueprint = (function ($, lb, utils) {
 
     var blueprintBodyResult = '#searchBlueprintResult tbody';
     var noResultMessage = '<tr><td colspan="2">No results.</td></tr>';
-    var resultBtn = '<a href="@@LINK@@" class="btn btn-default btn-xs pull-right">@@NAME@@</a> ';
+    var resultBtn = '<a href="@@LINK@@" class="btn btn-light btn-sm float-right ml-1">@@NAME@@</a> ';
 
     var showCorporationBlueprints = false;
 
@@ -24,11 +24,11 @@ var searchBlueprint = (function ($, lb, utils) {
         if(this.checked) {
             $('.blueprint-corporation').show();
             $('.blueprint-character').hide();
-            $("#toggleCorporationBlueprints label").removeClass('btn-default').addClass('btn-info');
+            $("#toggleCorporationBlueprints label").removeClass('btn-secondary').addClass('btn-info');
         } else {
             $('.blueprint-corporation').hide();
             $('.blueprint-character').show();
-            $("#toggleCorporationBlueprints label").removeClass('btn-info').addClass('btn-default');
+            $("#toggleCorporationBlueprints label").removeClass('btn-info').addClass('btn-secondary');
         }
         showCorporationBlueprints = this.checked;
         _searchOwnedBlueprint($('#ownedBlueprintSearch').val().toLowerCase());

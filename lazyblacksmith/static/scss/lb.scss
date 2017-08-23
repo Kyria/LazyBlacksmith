@@ -41,4 +41,8 @@
 
 // global layout styles (header, wrap, footer)
 @import "global_layout";
-//@import "overwrite";
+@import "overwrite";
+
+.lb-search-bp-icon {
+	width:130px
+}

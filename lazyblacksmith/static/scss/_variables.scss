@@ -9,7 +9,7 @@
 
 $enable-rounded:            true;
 $enable-shadows:            true;
-$enable-gradients:          true;
+$enable-gradients:          false;
 $enable-transitions:        true;
 $enable-hover-media-query:  false;
 $enable-grid-classes:       true;
@@ -18,6 +18,12 @@ $enable-print-styles:       true;
 // reduce spacer from 1rem
 $spacer: .5rem;
 
+// fonts
 $font-size-base: .925rem;
 $font-size-lg:   1.1rem;
 $font-size-sm:   .775rem;
+$line-height-base: 1.25; // 1.5
+
+// cards
+$card-spacer-y:            .55rem; // default 0.75
+$card-spacer-x:            1.25rem; // default 1.25

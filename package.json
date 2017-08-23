@@ -17,14 +17,14 @@
   },
   "watch": {
     "watch-css": {
-      "patterns" : [
+      "patterns": [
         "lazyblacksmith/static/scss/",
         "lazyblacksmith/static/scss/*/"
       ],
       "extensions": "scss,css"
     },
     "watch-js": {
-      "patterns" : [
+      "patterns": [
         "lazyblacksmith/static/js/misc/",
         "lazyblacksmith/static/js/lb/",
         "lazyblacksmith/static/js/lb/*",

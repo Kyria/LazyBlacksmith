@@ -1,0 +1,10 @@
+// extends table-* class for lb
+.lb-table {
+	@extend .table;
+	@extend .table-striped;
+	@extend .table-hover;
+	@extend .table-sm;
+}
+.lb-table td {
+	@extend .align-middle;
+}
