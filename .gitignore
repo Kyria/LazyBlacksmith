@@ -71,3 +71,11 @@ env3/
 
 lazyblacksmith/static/css/lb-combined\.css
 lazyblacksmith/static/js/lb\.js
+
+lazyblacksmith/static/css/lb\.css
+
+lazyblacksmith/static/css/lb-combined\.min\.css
+
+lazyblacksmith/static/js/bootstrap\.js
+
+lazyblacksmith/static/js/lazybl-combined\.min\.js
