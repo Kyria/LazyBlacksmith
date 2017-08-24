@@ -44,5 +44,6 @@
 @import "overwrite";
 
 .lb-search-bp-icon {
-	width:130px
+	width:125px;
+	@extend .text-right;
 }

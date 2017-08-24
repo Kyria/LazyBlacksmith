@@ -30,9 +30,9 @@
                 <table class="lb-table" id="ownedBlueprints">
                     <thead>
                         <th>Blueprint Name</th>
-                        <th>ME</th>
-                        <th>TE</th>
-                        <th>Runs</th>
+                        <th class="text-right">ME</th>
+                        <th class="text-right">TE</th>
+                        <th class="text-right">Runs</th>
                         <th>&nbsp;</th>
                     </thead>
                     <tbody>
@@ -44,21 +44,30 @@
                                 {% else %}
                                     <span class="badge badge-warning">BPC</span>
                                 {% endif %}
-                                <strong>{{ blueprint.item.name }}</strong></td>
-                            <td>{{ blueprint.material_efficiency }}</td>
-                            <td>{{ blueprint.time_efficiency }}</td>
-                            <td>{% if blueprint.original %}&infin;{% else %}{{ blueprint.total_runs }}{% endif %}</td>
+                                {{ blueprint.item.name }}
+                            </td>
+                            <td class="text-right">{{ blueprint.material_efficiency }}</td>
+                            <td class="text-right">{{ blueprint.time_efficiency }}</td>
+                            <td class="text-right">{% if blueprint.original %}&infin;{% else %}{{ blueprint.total_runs }}{% endif %}</td>
                             <td class="lb-search-bp-icon">
-                                {# hack for ancient relics... cat_id = 34 #}
-                                {% if blueprint.item.category_id != 34 %}
-                                    <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-light btn-sm float-right ml-1"><i class="fa fa-industry" aria-hidden="true"></i></a>
-                                    {% if blueprint.original %}
-                                    <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-light btn-sm float-right ml-1"><i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i></a>
+                                <div class="btn-group" role="group">
+                                    {% if blueprint.item.activity_products__eager %}
+                                    <a href="{{ url_for('blueprint.invention', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Invention">
+                                        <i class="fa fa-flask" aria-hidden="true"></i>
+                                    </a>
                                     {%- endif %}
-                                {% endif %}
-                                {% if blueprint.item.activity_products__eager %}
-                                <a href="{{ url_for('blueprint.invention', item_id=blueprint.item_id) }}" class="btn btn-light btn-sm float-right ml-1"><i class="fa fa-flask" aria-hidden="true"></i></a>
-                                {%- endif %}
+                                    {# hack for ancient relics... cat_id = 34 #}
+                                    {% if blueprint.item.category_id != 34 %}
+                                        {% if blueprint.original %}
+                                        <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Research">
+                                            <i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>
+                                        </a>
+                                        {%- endif %}
+                                        <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-outline-secondary btn-sm"  data-toggle="tooltip" data-placement="top" title="Manufacturing">
+                                            <i class="fa fa-industry" aria-hidden="true"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {%- else -%}
@@ -67,7 +76,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div>  
     </div>
     {% endif %}
     <div class="col-lg-6 col-md-6">
