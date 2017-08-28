@@ -73,6 +73,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             }
             var url = lb.urls.loginUrl.replace(/SCOPE_REPLACE/, currentScopes.join());
             $('#update-scope').attr('href', url);
+            $('#update-scope').toggleClass('disabled', (currentScopes.length == 0));
         });
     };
 

@@ -1,0 +1,46 @@
+<h3>Research Settings</h3>
+<br>
+<table class="table table-hover table-condensed table-borderless config-table" id="research-config">
+    <tbody>
+        <tr>
+            <th>Facility</th>
+            <td class="facility">{{ pref.label_facility(pref.research_facility) }}</td>
+        </tr>
+        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+            <th>ME Jobs Time Rig</th>
+            <td class="meRig">{{ pref.label_rig(pref.research_me_rig) }}</td>
+        </tr>
+        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+            <th>TE Jobs Time Rig</th>
+            <td class="teRig">{{ pref.label_rig(pref.research_te_rig) }}</td>
+        </tr>
+        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+            <th>Copy Time Rig</th>
+            <td class="copyRig">{{ pref.label_rig(pref.research_copy_rig) }}</td>
+        </tr>
+        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
+            <th>Security</th>
+            <td class="security">{{ pref.label_security(pref.research_security) }}</td>
+        </tr>
+        <tr>
+            <th>System index</th>
+            <td class="system">{{ pref.research_system }}</td>
+        </tr>
+        <tr>
+            <th>Character Skills</th>
+            <td class="character_skill">{% if pref.research_character %}{{ pref.research_character.character_name }}{% else %}None{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Implant ME</th>
+            <td class="me_implant">{{ pref.label_implant_me(pref.research_me_implant) }}</td>
+        </tr>
+        <tr>
+            <th>Implant TE</th>
+            <td class="te_implant">{{ pref.label_implant_te(pref.research_te_implant) }}</td>
+        </tr>
+        <tr>
+            <th>Implant Copy</th>
+            <td class="copy_implant">{{ pref.label_implant_copy(pref.research_copy_implant) }}</td>
+        </tr>
+    </tbody>
+</table>

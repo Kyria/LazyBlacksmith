@@ -1,0 +1,42 @@
+<h3>Invention Settings</h3>
+<br>
+<table class="table table-hover table-condensed table-borderless config-table" id="invention-config">
+    <tbody>
+        <tr>
+            <th>Facility</th>
+            <td class="facility">{{ pref.label_facility(pref.invention_facility) }}</td>
+        </tr>
+        <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+            <th>Invention Time Rig</th>
+            <td class="inventionRig">{{ pref.label_rig(pref.invention_invention_rig) }}</td>
+        </tr>
+        <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+            <th>Copy Time Rig</th>
+            <td class="copyRig">{{ pref.label_rig(pref.invention_copy_rig) }}</td>
+        </tr>
+        <tr class="structure" {% if not pref.is_structure(pref.invention_facility) -%}style="display: none;"{%- endif %}>
+            <th>Security</th>
+            <td class="security">{{ pref.label_security(pref.invention_security) }}</td>
+        </tr>
+        <tr>
+            <th>System Index</th>
+            <td class="system">{{ pref.invention_system }}</td>
+        </tr>
+        <tr>
+            <th>Region Price</th>
+            <td class="priceRegion">{{ invention_price_region.name }}</td>
+        </tr>
+        <tr>
+            <th>Price Type</th>
+            <td class="priceType">{{ pref.invention_price_type }}</td>
+        </tr>
+        <tr>
+            <th>Character Skills</th>
+            <td class="character_skill">{% if pref.invention_character %}{{ pref.invention_character.character_name }}{% else %}None{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Implant Copy</th>
+            <td class="copy_implant">{{ pref.label_implant_copy(pref.invention_copy_implant) }}</td>
+        </tr>
+    </tbody>
+</table>

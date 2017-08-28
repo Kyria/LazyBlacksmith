@@ -1,99 +1,102 @@
-            <div class="row fade in active tab-pane" id="tab-char">
-                <div class="col-md-5 col-sm-5">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> API Scopes</h3>
-                        </div>
-                        <div class="panel-body">
-                            <strong>Update your API scopes to access other features.</strong>
-                            <table class="table table-no-margin-bottom">
-                            <thead>
-                                <tr>
-                                    <th>Scope</th>
-                                    <th>Usage</th>
-                                    <th>&nbsp;</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td data-toggle="tooltip" data-container="body" data-placement="top" title="esi-skills.read_skills.v1">Skills</td>
-                                    <td><span class="small">View your character skills</span></td>
-                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="esi-skills.read_skills.v1" autocomplete="off"></td>
-                                </tr>
-                                <tr>
-                                    <td data-toggle="tooltip" data-container="body" data-placement="top" title="characterAssetsRead">Character assets</td>
-                                    <td><span class="small">View your character assets (to only get blueprints)</span></td>
-                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="characterAssetsRead" autocomplete="off"></td>
-                                </tr>
-                                <tr>
-                                    <td data-toggle="tooltip" data-container="body" data-placement="top" title="corporationAssetsRead">Corporation assets</td>
-                                    <td><span class="small">View your corporation assets (to only get blueprints)</span></td>
-                                    <td class="td-valign-middle"><input name="scope" type="checkbox" value="corporationAssetsRead" autocomplete="off"></td>
-                                </tr>
-                            </tbody>
-                            </table>
-                            <p>
-                                <a class="pull-right" id="update-scope" href="{{ url_for('sso.login') }}">
-                                    <img src="https://images.contentful.com/idjq7aai9ylm/18BxKSXCymyqY4QKo8KwKe/c2bdded6118472dd587c8107f24104d7/EVE_SSO_Login_Buttons_Small_White.png?w=195&amp;h=30" alt="Log in with eveonline.com" />
-                                </a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+<h3>Update your API scopes to access other features</h3>
+<br>
+<table class="lb-table">
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Scopes</th>
+            <th>Description</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Character skills</strong></td>
+            <td>esi-skills.read_skills.v1</td>
+            <td><em>Allow to set your character skills in industry configs.</em></td>
+            <td data-toggle="buttons" class="cell-btn-1">
+                <label class="btn btn-sm btn-outline-secondary mb-0">
+                    <input name="scope" type="checkbox" value="esi-skills.read_skills.v1" autocomplete="off">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Character blueprints</strong></td>
+            <td>characterAssetsRead</td>
+            <td><em>Get the list of the blueprint your character own.</em></td>
+            <td data-toggle="buttons" class="cell-btn-1">
+                <label class="btn btn-sm btn-outline-secondary mb-0">
+                    <input name="scope" type="checkbox" value="characterAssetsRead" autocomplete="off">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Corporation blueprints</strong></td>
+            <td>corporationAssetsRead</td>
+            <td><em>Get the list of the blueprint your corporation own.</em></td>
+            <td data-toggle="buttons" class="cell-btn-1">
+                <label class="btn btn-sm btn-outline-secondary mb-0">
+                    <input name="scope" type="checkbox" value="corporationAssetsRead" autocomplete="off">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                </label>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p>
+    <a class="btn btn-outline-secondary disabled" id="update-scope" href="{{ url_for('sso.login') }}">
+        Update scope using EVE Online SSO
+    </a>
+</p>
 
-                <div class="col-md-7 col-sm-7">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title btn-xs-lineheight"><i class="fa fa-caret-down" aria-hidden="true"></i> Current API scopes</h3>
-                        </div>
-                        <div class="panel-body">
-                            <table class="table table-no-margin-bottom">
-                            <thead>
-                                <tr>
-                                    <th>Character</th>
-                                    <th>Scope</th>
-                                    <th>Last Update</th>
-                                    <th>&nbsp;</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for token in current_user.tokens -%}
-                                <tr id="scope-{{ current_user.character_id }}" data-scope="{{ token.scope }}" {% if not token.valid %}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This scope is no longer valid (too many errors). It won't be updated unless you delete it and add a new one."{% endif %}>
-                                    <td>{{ current_user.character_name }}</td>
-                                    <td>
-                                        {{ token.scope }}
-                                        {% if not token.valid %}
-                                        <span class="label label-danger">
-                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid
-                                        </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ token.get_last_update_string() }}</td>
-                                    <td class="td-valign-middle">
-                                        <button style="margin-left:5px" class="btn btn-xs btn-danger pull-right delete-scope" data-scope="{{ token.scope }}" data-char-id="{{ current_user.character_id }}">
-                                            <i class="fa fa-times" aria-hidden="true"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {%- endfor %}
-                                {% for alt in current_user.alts_characters.all() -%}
-                                    {%- for token in alt.tokens -%}
-                                    <tr id="scope-{{ alt.character_id }}" data-scope="{{ token.scope }}">
-                                        <td>{{ alt.character_name }}</td>
-                                        <td>{{ token.scope }}</td>
-                                        <td>{{ token.get_last_update_string() }}</td>
-                                        <td class="td-valign-middle">
-                                            <button style="margin-left:5px" class="btn btn-xs btn-danger pull-right delete-scope" data-scope="{{ token.scope }}" data-char-id="{{ alt.character_id }}">
-                                                <i class="fa fa-times" aria-hidden="true"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    {%- endfor %}
-                                {%- endfor %}
-                            </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<br><br>
 
+<h3>Your current scopes</h3>
+<br>
+<table class="lb-table">
+    <thead>
+        <tr>
+            <th>Character</th>
+            <th>Scope</th>
+            <th>Last Update</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for token in current_user.tokens -%}
+            <tr id="scope-{{ current_user.character_id }}" data-scope="{{ token.scope }}" {% if not token.valid %}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This scope is no longer valid (too many errors). It won't be updated unless you delete it and add a new one."{% endif %}>
+            <td>{{ current_user.character_name }}</td>
+            <td>
+                {{ token.scope }}
+                {% if not token.valid %}
+                    <span class="label label-danger">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid
+                    </span>
+                {% endif %}
+            </td>
+            <td>{{ token.get_last_update_string() }}</td>
+            <td class="td-valign-middle">
+                <button style="margin-left:5px" class="btn btn-sm btn-danger float-right delete-scope" data-scope="{{ token.scope }}" data-char-id="{{ current_user.character_id }}">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+            </td>
+        </tr>
+        {%- endfor %}
+        {% for alt in current_user.alts_characters.all() -%}
+            {%- for token in alt.tokens -%}
+            <tr id="scope-{{ alt.character_id }}" data-scope="{{ token.scope }}">
+                <td>{{ alt.character_name }}</td>
+                <td>{{ token.scope }}</td>
+                <td>{{ token.get_last_update_string() }}</td>
+                <td class="td-valign-middle">
+                    <button style="margin-left:5px" class="btn btn-sm btn-danger float-right delete-scope" data-scope="{{ token.scope }}" data-char-id="{{ alt.character_id }}">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                </td>
+            </tr>
+            {%- endfor %}
+        {%- endfor %}
+    </tbody>
+</table>
