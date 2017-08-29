@@ -61,7 +61,7 @@ $theme-colors: (
 // Quickly modify global styling by enabling or disabling optional features.
 
 $enable-rounded:            true;
-$enable-shadows:            true;
+$enable-shadows:            false;
 $enable-gradients:          false;
 $enable-transitions:        true;
 $enable-hover-media-query:  false;
