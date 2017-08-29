@@ -1,46 +1,164 @@
 <h3>Research Settings</h3>
 <br>
-<table class="table table-hover table-condensed table-borderless config-table" id="research-config">
-    <tbody>
-        <tr>
-            <th>Facility</th>
-            <td class="facility">{{ pref.label_facility(pref.research_facility) }}</td>
-        </tr>
-        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
-            <th>ME Jobs Time Rig</th>
-            <td class="meRig">{{ pref.label_rig(pref.research_me_rig) }}</td>
-        </tr>
-        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
-            <th>TE Jobs Time Rig</th>
-            <td class="teRig">{{ pref.label_rig(pref.research_te_rig) }}</td>
-        </tr>
-        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
-            <th>Copy Time Rig</th>
-            <td class="copyRig">{{ pref.label_rig(pref.research_copy_rig) }}</td>
-        </tr>
-        <tr class="structure" {% if not pref.is_structure(pref.research_facility) -%}style="display: none;"{%- endif %}>
-            <th>Security</th>
-            <td class="security">{{ pref.label_security(pref.research_security) }}</td>
-        </tr>
-        <tr>
-            <th>System index</th>
-            <td class="system">{{ pref.research_system }}</td>
-        </tr>
-        <tr>
-            <th>Character Skills</th>
-            <td class="character_skill">{% if pref.research_character %}{{ pref.research_character.character_name }}{% else %}None{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Implant ME</th>
-            <td class="me_implant">{{ pref.label_implant_me(pref.research_me_implant) }}</td>
-        </tr>
-        <tr>
-            <th>Implant TE</th>
-            <td class="te_implant">{{ pref.label_implant_te(pref.research_te_implant) }}</td>
-        </tr>
-        <tr>
-            <th>Implant Copy</th>
-            <td class="copy_implant">{{ pref.label_implant_copy(pref.research_copy_implant) }}</td>
-        </tr>
-    </tbody>
-</table>
+
+<div class="form-group row">
+    <label for="facility-research" class="settings-label">Facility</label> 
+    <div class="settings-field">
+        <select name="facility" id="facility-research" class="form-control input-sm">
+            <option value="0" {% if pref.research_facility == 0 %}selected{%- endif -%}>Station</option>
+            <option value="1" {% if pref.research_facility == 1 %}selected{%- endif -%}>Raitaru (M-EC)</option>
+            <option value="2" {% if pref.research_facility == 2 %}selected{%- endif -%}>Azbel (L-EC)</option>
+            <option value="3" {% if pref.research_facility == 3 %}selected{%- endif -%}>Sotiyo (XL-EC)</option>
+            <option value="4" {% if pref.research_facility == 4 %}selected{%- endif -%}>Other Structures</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="structure-me-rig-research" class="settings-label">ME Jobs Time Rig</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-me-rig-research" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.research_me_rig == 0 %}active{% endif %}">
+                <input type="radio" name="structure-me-rig-research" autocomplete="off" value="0" {% if pref.research_me_rig == 0 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_me_rig == 1 %}active{% endif %}">
+                <input type="radio" name="structure-me-rig-research" autocomplete="off" value="1" {% if pref.research_me_rig == 1 %}checked{% endif %}>T1
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_me_rig == 2 %}active{% endif %}">
+                <input type="radio" name="structure-me-rig-research" autocomplete="off" value="2"{% if pref.research_me_rig == 2 %}checked{% endif %}>T2
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="structure-te-rig-research" class="settings-label">TE Jobs Time Rig</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-te-rig-research" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.research_te_rig == 0 %}active{% endif %}">
+                <input type="radio" name="structure-te-rig-research" autocomplete="off" value="0" {% if pref.research_te_rig == 0 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_te_rig == 1 %}active{% endif %}">
+                <input type="radio" name="structure-te-rig-research" autocomplete="off" value="1" {% if pref.research_te_rig == 1 %}checked{% endif %}>T1
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_te_rig == 2 %}active{% endif %}">
+                <input type="radio" name="structure-te-rig-research" autocomplete="off" value="2" {% if pref.research_te_rig == 2 %}checked{% endif %}>T2
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="structure-copy-rig-research" class="settings-label">Copy Time Rig</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-copy-rig-research" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.research_copy_rig == 0 %}active{% endif %}">
+                <input type="radio" name="structure-copy-rig-research" autocomplete="off" value="0" {% if pref.research_copy_rig == 0 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_copy_rig == 1 %}active{% endif %}">
+                <input type="radio" name="structure-copy-rig-research" autocomplete="off" value="1" {% if pref.research_copy_rig == 1 %}checked{% endif %}>T1
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_copy_rig == 2 %}active{% endif %}">
+                <input type="radio" name="structure-copy-rig-research" autocomplete="off" value="2" {% if pref.research_copy_rig == 2 %}checked{% endif %}>T2
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="structure-sec-status-research" class="settings-label">System Security</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-sec-status-research" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.research_security == 'h' %}active{% endif %}">
+                <input type="radio" name="structure-sec-status-research" autocomplete="off" value="h" {% if pref.research_security == 'h' %}checked{% endif %}>HS
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_security == 'l' %}active{% endif %}">
+                <input type="radio" name="structure-sec-status-research" autocomplete="off" value="l" {% if pref.research_security == 'l' %}checked{% endif %}>LS
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_security == 'n' %}active{% endif %}">
+                <input type="radio" name="structure-sec-status-research" autocomplete="off" value="n" {% if pref.research_security == 'n' %}checked{% endif %}>NS/WH
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="system-research" class="settings-label">System index</label>
+    <div class="settings-field">
+        <input id="system-research" type="text" class="form-control input-sm typeahead" value="{{ pref.research_system }}">
+    </div>
+</div>
+
+<br>
+
+<div class="form-group row">
+    <label for="char-research" class="settings-label">Character Skills</label>
+    <div class="settings-field">
+        <select name="char" id="char-research" class="form-control input-sm">
+            <option value="0">None (lvl 0)</option>
+            {% for user in list_character_skills -%}
+            <option value="{{ user.character_id }}" {% if pref.research_character_id == user.character_id %}selected{% endif %}>{{ user.character_name }}</option>
+            {%- endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="me-implant-research" class="settings-label">Implant ME</label>
+    <div class="settings-field">
+        <div class="btn-group" id="me-implant-research" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.research_me_implant == 1.00 %}active{% endif %}">
+                <input type="radio" name="me-implant-research" autocomplete="off" value="1.00" {% if pref.research_me_implant == 1.00 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_me_implant == 0.99 %}active{% endif %}">
+                <input type="radio" name="me-implant-research" autocomplete="off" value="0.99" {% if pref.research_me_implant == 0.99 %}checked{% endif %}>MY-701
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_me_implant == 0.97 %}active{% endif %}">
+                <input type="radio" name="me-implant-research" autocomplete="off" value="0.97" {% if pref.research_me_implant == 0.97 %}checked{% endif %}>MY-703
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_me_implant == 0.95 %}active{% endif %}">
+                <input type="radio" name="me-implant-research" autocomplete="off" value="0.95" {% if pref.research_me_implant == 0.95 %}checked{% endif %}>MY-705
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="te-implant-research" class="settings-label">Implant TE</label>
+    <div class="settings-field">
+        <div class="btn-group" id="te-implant-research" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.research_te_implant == 1.00 %}active{% endif %}">
+                <input type="radio" name="te-implant-research" autocomplete="off" value="1.00" {% if pref.research_te_implant == 1.00 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_te_implant == 0.99 %}active{% endif %}">
+                <input type="radio" name="te-implant-research" autocomplete="off" value="0.99" {% if pref.research_te_implant == 0.99 %}checked{% endif %}>RR-601
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_te_implant == 0.97 %}active{% endif %}">
+                <input type="radio" name="te-implant-research" autocomplete="off" value="0.97" {% if pref.research_te_implant == 0.97 %}checked{% endif %}>RR-603
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_te_implant == 0.95 %}active{% endif %}">
+                <input type="radio" name="te-implant-research" autocomplete="off" value="0.95" {% if pref.research_te_implant == 0.95 %}checked{% endif %}>RR-605
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="copy-implant-research" class="settings-label">Implant Copy</label>
+    <div class="settings-field">
+        <div class="btn-group" id="copy-implant-research" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.research_copy_implant == 1.00 %}active{% endif %}">
+                <input type="radio" name="copy-implant-research" autocomplete="off" value="1.00" {% if pref.research_copy_implant == 1.00 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_copy_implant == 0.99 %}active{% endif %}">
+                <input type="radio" name="copy-implant-research" autocomplete="off" value="0.99" {% if pref.research_copy_implant == 0.99 %}checked{% endif %}>SC-801
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_copy_implant == 0.97 %}active{% endif %}">
+                <input type="radio" name="copy-implant-research" autocomplete="off" value="0.97" {% if pref.research_copy_implant == 0.97 %}checked{% endif %}>SC-803
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.research_copy_implant == 0.95 %}active{% endif %}">
+                <input type="radio" name="copy-implant-research" autocomplete="off" value="0.95" {% if pref.research_copy_implant == 0.95 %}checked{% endif %}>SC-805
+            </label>
+        </div>
+    </div>
+</div>

@@ -69,31 +69,31 @@
     <div class="col-lg-2 col-md-3 col-sm-4">
         <div class="nav flex-column nav-pills" role="tablist">
             <span class="nav-link disabled pl-1 pb-1 mt-2" style="color:gray">Account Settings</span>
-            <a class="nav-link active" id="api-tab" data-toggle="pill" href="#api" aria-controls="api" role="tab" aria-expanded="true">API Settings</a>
+            <a class="nav-link active" id="api-tab" data-toggle="pill" href="#api" aria-controls="api" role="tab">API Settings</a>
 
             <span class="nav-link disabled pl-1 pb-1 mt-2" style="color:gray">Industry Settings</span>
-            <a class="nav-link" id="bp-cfg-prod-tab" data-toggle="pill" href="#bp-cfg-prod" aria-controls="bp-cfg-prod" role="tab" aria-expanded="true">Production</a>
-            <a class="nav-link" id="bp-cfg-research-tab" data-toggle="pill" href="#bp-cfg-research" aria-controls="bp-cfg-research" role="tab" aria-expanded="true">Research</a>
-            <a class="nav-link" id="bp-cfg-invention-tab" data-toggle="pill" href="#bp-cfg-invention" aria-controls="bp-cfg-invention" role="tab" aria-expanded="true">Invention</a>
-            <a class="nav-link disabled" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab" aria-expanded="true">Reaction</a>
+            <a class="nav-link" id="bp-cfg-prod-tab" data-toggle="pill" href="#bp-cfg-prod" aria-controls="bp-cfg-prod" role="tab">Production</a>
+            <a class="nav-link" id="bp-cfg-research-tab" data-toggle="pill" href="#bp-cfg-research" aria-controls="bp-cfg-research" role="tab">Research</a>
+            <a class="nav-link" id="bp-cfg-invention-tab" data-toggle="pill" href="#bp-cfg-invention" aria-controls="bp-cfg-invention" role="tab">Invention</a>
+            <a class="nav-link" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab">Reaction</a>
         </div>
     </div>
     <div class="col-lg-10 col-md-9 col-sm-8">
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="api" role="tabpanel" aria-labelledby="api">
+            <div class="tab-pane fade show active" id="api" role="tabpanel" aria-labelledby="api-tab">
                 {% include 'account/api_settings.html' %}
-            </div>
-            <div class="tab-pane fade" id="bp-cfg-prod" role="tabpanel" aria-labelledby="bp-cfg-prod">
                 {% include 'account/bp_prod_settings.html' %}
-            </div>
-            <div class="tab-pane fade" id="bp-cfg-research" role="tabpanel" aria-labelledby="bp-cfg-prod">
                 {% include 'account/bp_research_settings.html' %}
-            </div>
-            <div class="tab-pane fade" id="bp-cfg-invention" role="tabpanel" aria-labelledby="bp-cfg-prod">
                 {% include 'account/bp_invention_settings.html' %}
-            </div>
-            <div class="tab-pane fade" id="bp-cfg-reaction" role="tabpanel" aria-labelledby="bp-cfg-prod">
                 {% include 'account/bp_reaction_settings.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-prod" role="tabpanel" aria-labelledby="bp-cfg-prod-tab-tab">
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-research" role="tabpanel" aria-labelledby="bp-cfg-research-tab">
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-invention" role="tabpanel" aria-labelledby="bp-cfg-invention-tab">
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-reaction" role="tabpanel" aria-labelledby="bp-cfg-reaction-tab">
             </div>
         </div>
     </div>

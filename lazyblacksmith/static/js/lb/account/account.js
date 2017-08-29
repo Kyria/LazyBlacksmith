@@ -455,7 +455,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $('#modalConfigResearch').modal('show');
         });
         $('#open-modal-invention-settings').on('click', function() {
-            $('#modalConfigInvention').modal('show');
+            $('#modalConfigInvention').modal('show'); 
         });
         $('#modal-prod-apply').on('click', _onModalProdSettingsApply);
         $('#modal-research-apply').on('click', _onModalResearchSettingsApply);
@@ -468,7 +468,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
     var _initTypeahead = function() {
         eveUtils.initSolarSystemTypeahead('#modal-system-main');
         eveUtils.initSolarSystemTypeahead('#modal-system-comp');
-        eveUtils.initSolarSystemTypeahead('#modal-system-research');
+        eveUtils.initSolarSystemTypeahead('#system-research');
         eveUtils.initSolarSystemTypeahead('#modal-system-invention');
     };
 
