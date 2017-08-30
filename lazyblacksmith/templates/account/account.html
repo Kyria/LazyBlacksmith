@@ -75,24 +75,24 @@
             <a class="nav-link" id="bp-cfg-prod-tab" data-toggle="pill" href="#bp-cfg-prod" aria-controls="bp-cfg-prod" role="tab">Production</a>
             <a class="nav-link" id="bp-cfg-research-tab" data-toggle="pill" href="#bp-cfg-research" aria-controls="bp-cfg-research" role="tab">Research</a>
             <a class="nav-link" id="bp-cfg-invention-tab" data-toggle="pill" href="#bp-cfg-invention" aria-controls="bp-cfg-invention" role="tab">Invention</a>
-            <a class="nav-link" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab">Reaction</a>
+            <a class="nav-link disabled" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab" data-toggle="tooltip" data-placement="top" title="Soon&trade;">Reaction</a>
         </div>
     </div>
     <div class="col-lg-10 col-md-9 col-sm-8">
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="api" role="tabpanel" aria-labelledby="api-tab">
+            <div class="tab-pane fade show active" id="api" role="tabpanel" aria-labelledby="api" aria-expanded="true">
                 {% include 'account/api_settings.html' %}
             </div>
-            <div class="tab-pane fade" id="bp-cfg-prod" role="tabpanel" aria-labelledby="bp-cfg-prod-tab-tab">
+            <div class="tab-pane fade" id="bp-cfg-prod" role="tabpanel" aria-labelledby="bp-cfg-prod" aria-expanded="false">
                 {% include 'account/bp_prod_settings.html' %}
             </div>
-            <div class="tab-pane fade" id="bp-cfg-research" role="tabpanel" aria-labelledby="bp-cfg-research-tab">
+            <div class="tab-pane fade" id="bp-cfg-research" role="tabpanel" aria-labelledby="bp-cfg-research" aria-expanded="false">
                 {% include 'account/bp_research_settings.html' %}
             </div>
-            <div class="tab-pane fade" id="bp-cfg-invention" role="tabpanel" aria-labelledby="bp-cfg-invention-tab">
+            <div class="tab-pane fade" id="bp-cfg-invention" role="tabpanel" aria-labelledby="bp-cfg-invention" aria-expanded="false">
                 {% include 'account/bp_invention_settings.html' %}
             </div>
-            <div class="tab-pane fade" id="bp-cfg-reaction" role="tabpanel" aria-labelledby="bp-cfg-reaction-tab">
+            <div class="tab-pane fade" id="bp-cfg-reaction" role="tabpanel" aria-labelledby="bp-cfg-reaction" aria-expanded="false">
                 {% include 'account/bp_reaction_settings.html' %}
             </div>
         </div>

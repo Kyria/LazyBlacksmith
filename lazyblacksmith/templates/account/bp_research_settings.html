@@ -2,7 +2,7 @@
 <br>
 
 <div class="form-group row">
-    <label for="facility-research" class="settings-label">Facility</label> 
+    <label for="facility-research" class="settings-label">Facility</label>
     <div class="settings-field">
         <select name="facility" id="facility-research" class="form-control input-sm">
             <option value="0" {% if pref.research_facility == 0 %}selected{%- endif -%}>Station</option>
@@ -17,7 +17,7 @@
 <div class="form-group row">
     <label for="structure-me-rig-research" class="settings-label">ME Jobs Time Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="structure-me-rig-research" data-toggle="buttons">
+        <div class="btn-group" id="structure-me-rig-research" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.research_me_rig == 0 %}active{% endif %}">
                 <input type="radio" name="structure-me-rig-research" autocomplete="off" value="0" {% if pref.research_me_rig == 0 %}checked{% endif %}>None
             </label>
@@ -34,7 +34,7 @@
 <div class="form-group row">
     <label for="structure-te-rig-research" class="settings-label">TE Jobs Time Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="structure-te-rig-research" data-toggle="buttons">
+        <div class="btn-group" id="structure-te-rig-research" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.research_te_rig == 0 %}active{% endif %}">
                 <input type="radio" name="structure-te-rig-research" autocomplete="off" value="0" {% if pref.research_te_rig == 0 %}checked{% endif %}>None
             </label>
@@ -51,7 +51,7 @@
 <div class="form-group row">
     <label for="structure-copy-rig-research" class="settings-label">Copy Time Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="structure-copy-rig-research" data-toggle="buttons">
+        <div class="btn-group" id="structure-copy-rig-research" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.research_copy_rig == 0 %}active{% endif %}">
                 <input type="radio" name="structure-copy-rig-research" autocomplete="off" value="0" {% if pref.research_copy_rig == 0 %}checked{% endif %}>None
             </label>
@@ -68,7 +68,7 @@
 <div class="form-group row">
     <label for="structure-sec-status-research" class="settings-label">System Security</label>
     <div class="settings-field">
-        <div class="btn-group" id="structure-sec-status-research" data-toggle="buttons">
+        <div class="btn-group" id="structure-sec-status-research" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.research_security == 'h' %}active{% endif %}">
                 <input type="radio" name="structure-sec-status-research" autocomplete="off" value="h" {% if pref.research_security == 'h' %}checked{% endif %}>HS
             </label>
@@ -83,9 +83,9 @@
 </div>
 
 <div class="form-group row">
-    <label for="system-research" class="settings-label">System index</label>
+    <label for="system-research" class="settings-label">System Index</label>
     <div class="settings-field">
-        <input id="system-research" type="text" class="form-control input-sm typeahead" value="{{ pref.research_system }}">
+        <input id="system-research" type="text" class="form-control typeahead" value="{{ pref.research_system }}">
     </div>
 </div>
 
@@ -106,7 +106,7 @@
 <div class="form-group row">
     <label for="me-implant-research" class="settings-label">Implant ME</label>
     <div class="settings-field">
-        <div class="btn-group" id="me-implant-research" data-toggle="buttons">
+        <div class="btn-group" id="me-implant-research" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.research_me_implant == 1.00 %}active{% endif %}">
                 <input type="radio" name="me-implant-research" autocomplete="off" value="1.00" {% if pref.research_me_implant == 1.00 %}checked{% endif %}>None
             </label>
@@ -126,7 +126,7 @@
 <div class="form-group row">
     <label for="te-implant-research" class="settings-label">Implant TE</label>
     <div class="settings-field">
-        <div class="btn-group" id="te-implant-research" data-toggle="buttons">
+        <div class="btn-group" id="te-implant-research" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.research_te_implant == 1.00 %}active{% endif %}">
                 <input type="radio" name="te-implant-research" autocomplete="off" value="1.00" {% if pref.research_te_implant == 1.00 %}checked{% endif %}>None
             </label>
@@ -146,7 +146,7 @@
 <div class="form-group row">
     <label for="copy-implant-research" class="settings-label">Implant Copy</label>
     <div class="settings-field">
-        <div class="btn-group" id="copy-implant-research" data-toggle="buttons">
+        <div class="btn-group" id="copy-implant-research" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.research_copy_implant == 1.00 %}active{% endif %}">
                 <input type="radio" name="copy-implant-research" autocomplete="off" value="1.00" {% if pref.research_copy_implant == 1.00 %}checked{% endif %}>None
             </label>
@@ -162,3 +162,6 @@
         </div>
     </div>
 </div>
+
+<button type="button" id="btn-save-research" class="btn btn-primary">Save</button>
+<button type="button" id="btn-reset-research" class="btn btn-secondary">Reset</button>

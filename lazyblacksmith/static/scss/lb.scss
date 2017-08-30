@@ -39,6 +39,9 @@
 @import "../../../bootstrap/scss/carousel";
 @import "../../../bootstrap/scss/utilities";
 
+// addons
+@import "addons/typeahead.js";
+
 // global layout styles (header, wrap, footer)
 @import "global_layout";
 @import "overwrite";

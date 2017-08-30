@@ -8,10 +8,11 @@
 .lb-table td {
 	@extend .align-middle;
 }
-.settings-field {
-    @extend .col-auto;
-}
 .settings-label {
-    @extend .col-md-2;
-    @extend .col-sm-3;
+	@extend .col-sm-3;
+	@extend .col-md-3;
+	@extend .col-form-label;
 }
+.settings-field {
+	@extend .col-auto;
+}	
