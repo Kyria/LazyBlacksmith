@@ -114,9 +114,9 @@ var itemPriceLookup = (function ($, lb, Humanize, utils) {
             var output = "";
             for(var regionId in prices) {
                 output += "<tr><td>" + regions[regionId] + "</td>";
-                output += "<td>" + Humanize.intcomma(prices[regionId][item_id].sell, 2) + "</td>";
-                output += "<td>" + Humanize.intcomma(prices[regionId][item_id].buy, 2) + "</td>";
-                output += "<td>" + prices[regionId][item_id].updated_at + "</td></tr>";
+                output += "<td class='text-right'>" + Humanize.intcomma(prices[regionId][item_id].sell, 2) + "</td>";
+                output += "<td class='text-right'>" + Humanize.intcomma(prices[regionId][item_id].buy, 2) + "</td>";
+                output += "<td class='text-right'>" + prices[regionId][item_id].updated_at + "</td></tr>";
             }
             $('.price-list tbody').html(output);
             $(".price-list").trigger("update",[sorting]);
