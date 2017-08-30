@@ -18,34 +18,32 @@
 {% block content %}
 <div class="row">
     <div class="col-md-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Search Item</h3>
+        <div class="card bg-light mb-3">
+            <div class="card-header">Search Item</div>
+            <div class="card-body">
+                <input id="itemSearch" type="text" class="form-control" placeholder="Item name">
             </div>
-            <div class="panel-body">
-                <input id="itemSearch" type="text" class="form-control input-sm" placeholder="Item name">
-            </div>
-        </div>
 
-        <div class="list-group" id="resultList"></div>
+            <div class="list-group list-group-flush" id="resultList"></div>
+        </div>
     </div>
 
     <div class="col-md-9" id="content">
         <div class="row">
-            <div class="col-xs-10">
+            <div class="col-10">
                 <h4 id="item-name"></h4>
             </div>
-            <div class="col-xs-2 text-right" id="item-icon"></div>
+            <div class="col-2 text-right" id="item-icon"></div>
         </div>
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-md-12">
-                <table class="price-list table table-condensed table-hover table-striped">
+                <table class="price-list lb-table">
                     <thead>
                         <tr>
-                            <th>Region</th>
-                            <th>Min Sell</th>
-                            <th>Max Buy</th>
-                            <th>Last Updated</th>
+                            <th class="py-4">Region</th>
+                            <th class="py-4">Min Sell</th>
+                            <th class="py-4">Max Buy</th>
+                            <th class="py-4">Last Updated</th>
                         </tr>
                     </thead>
                     <tbody>

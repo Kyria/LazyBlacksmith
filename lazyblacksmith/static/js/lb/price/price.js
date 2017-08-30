@@ -17,7 +17,7 @@ var itemPriceLookup = (function ($, lb, Humanize, utils) {
         itemSearchUrl: false,
     });
 
-    var resultRow = '<a href="#" data-id="@@ID@@" data-icon="@@ICON@@" data-name="@@NAME@@" class="list-group-item search-price">@@NAME@@</a>';
+    var resultRow = '<a href="#" data-id="@@ID@@" data-icon="@@ICON@@" data-name="@@NAME@@" class="list-group-item list-group-item-action search-price">@@NAME@@</a>';
     var itemOldValue = "";
     var itemSearchBodyResult = '#resultList';
 
