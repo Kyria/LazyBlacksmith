@@ -75,88 +75,96 @@
 {% set pref = current_user.pref %}
 <div class="row">
     <div class="col-md-3 col-sm-4">
-        <div class="well">
-            <div>
-                Facility<br>
-                <select name="facility" id="facility" class="form-control input-sm">
-                    <option value="0" {% if pref.invention_facility == 0 -%}selected{%- endif %}>Station</option>
-                    <option value="1" {% if pref.invention_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
-                    <option value="2" {% if pref.invention_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
-                    <option value="3" {% if pref.invention_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
-                    <option value="4" {% if pref.invention_facility == 4 -%}selected{%- endif %}>Other Structures</option>
-                    <option value="8" {% if pref.invention_facility == 8 -%}selected{%- endif %}>Design Laboratory</option>
-                    <option value="10" {% if pref.invention_facility == 10 -%}selected{%- endif %}>Experimental Laboratory</option>
-                </select>
-            </div>
-            <div class="structure-configs" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %} margin-top:5px">
-                Invention Time Rigs <br>
-                <div class="btn-group btn-group-justified" id="structure-invention-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default {% if pref.invention_invention_rig == 0 -%}active{%- endif %}">
-                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="0" {% if pref.invention_invention_rig == 0 -%}checked{%- endif %}>None
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.invention_invention_rig == 1 -%}active{%- endif %}">
-                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="1" {% if pref.invention_invention_rig == 1 -%}checked{%- endif %}>T1
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.invention_invention_rig == 2 -%}active{%- endif %}">
-                        <input type="radio" name="structure-invention-rig" autocomplete="off" value="2" {% if pref.invention_invention_rig == 2 -%}checked{%- endif %}>T2
-                    </label>
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-auto mr-auto align-self-center">Facility</div>
+                    <div class="col-lg col-auto">
+                        <select name="facility" id="facility" class="form-control form-control-sm">
+                            <option value="0" {% if pref.invention_facility == 0 -%}selected{%- endif %}>Station</option>
+                            <option value="1" {% if pref.invention_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
+                            <option value="2" {% if pref.invention_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
+                            <option value="3" {% if pref.invention_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
+                            <option value="4" {% if pref.invention_facility == 4 -%}selected{%- endif %}>Other Structures</option>
+                        </select>
+                    </div>
                 </div>
-                Copy Time Rigs <br>
-                <div class="btn-group btn-group-justified" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default {% if pref.invention_copy_rig == 0 -%}active{%- endif %}">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.invention_copy_rig == 0 -%}checked{%- endif %}>None
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.invention_copy_rig == 1 -%}active{%- endif %}">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="1" {% if pref.invention_copy_rig == 1 -%}checked{%- endif %}>T1
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.invention_copy_rig == 2 -%}active{%- endif %}">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="2" {% if pref.invention_copy_rig == 2 -%}checked{%- endif %}>T2
-                    </label>
+                <div class="structure-configs mt-3 row" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
+                    <div class="col-auto mr-auto align-self-center">Invention Time Rigs</div>
+                    <div class="btn-group col-auto" id="structure-invention-rig" data-toggle="buttons">
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_invention_rig == 0 -%}active{%- endif %}">
+                            <input type="radio" name="structure-invention-rig" autocomplete="off" value="0" {% if pref.invention_invention_rig == 0 -%}checked{%- endif %}>None
+                        </label>
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_invention_rig == 1 -%}active{%- endif %}">
+                            <input type="radio" name="structure-invention-rig" autocomplete="off" value="1" {% if pref.invention_invention_rig == 1 -%}checked{%- endif %}>T1
+                        </label>
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_invention_rig == 2 -%}active{%- endif %}">
+                            <input type="radio" name="structure-invention-rig" autocomplete="off" value="2" {% if pref.invention_invention_rig == 2 -%}checked{%- endif %}>T2
+                        </label>
+                    </div>
                 </div>
-                System Security<br>
-                <div class="btn-group btn-group-justified" id="structure-sec-status" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default {% if pref.invention_security == 'h' -%}active{%- endif %}">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.invention_security == 'h' -%}checked{%- endif %}>HS
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.invention_security == 'l' -%}active{%- endif %}">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.invention_security == 'l' -%}checked{%- endif %}>LS
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.invention_security == 'n' -%}active{%- endif %}">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.invention_security == 'n' -%}checked{%- endif %}>NS/WH
-                    </label>
+                <div class="structure-configs mt-3 row" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
+                    <div class="col-auto mr-auto align-self-center">Copy Time Rigs</div>
+                    <div class="btn-group col-auto" id="structure-copy-rig" data-toggle="buttons">
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_copy_rig == 0 -%}active{%- endif %}">
+                            <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.invention_copy_rig == 0 -%}checked{%- endif %}>None
+                        </label>
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_copy_rig == 1 -%}active{%- endif %}">
+                            <input type="radio" name="structure-copy-rig" autocomplete="off" value="1" {% if pref.invention_copy_rig == 1 -%}checked{%- endif %}>T1
+                        </label>
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_copy_rig == 2 -%}active{%- endif %}">
+                            <input type="radio" name="structure-copy-rig" autocomplete="off" value="2" {% if pref.invention_copy_rig == 2 -%}checked{%- endif %}>T2
+                        </label>
+                    </div>
+                </div>
+                <div class="structure-configs mt-3 row" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
+                    <div class="col-auto mr-auto align-self-center">System Security</div>
+                    <div class="btn-group col-auto" id="structure-sec-status" data-toggle="buttons">
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_security == 'h' -%}active{%- endif %}">
+                            <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.invention_security == 'h' -%}checked{%- endif %}>HS
+                        </label>
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_security == 'l' -%}active{%- endif %}">
+                            <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.invention_security == 'l' -%}checked{%- endif %}>LS
+                        </label>
+                        <label class="btn btn-sm btn-secondary {% if pref.invention_security == 'n' -%}active{%- endif %}">
+                            <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.invention_security == 'n' -%}checked{%- endif %}>NS/WH
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="well">
-            <div>
+        <div class="card bg-light mb-3">
+            <div class="card-body">
                 System<br>
-                <input id="system" type="text" class="form-control input-sm typeahead" value="{{ pref.invention_system }}">
-            </div>
-        </div>
-        <div class="well">
-            <div>
+                <input id="system" type="text" class="form-control form-control-sm typeahead" value="{{ pref.invention_system }}">
+                <br>
                 Price Region<br>
-                <select name="region" id="region" class="form-control input-sm">
-                    <option disabled>Select a region</option>
-                    {% for region in regions -%}
-                    <option value="{{ region.id }}" {% if region.id == pref.invention_price_region -%}selected{% endif %}>{{ region.name }}</option>
-                    {% endfor %}
-                </select>
-                <div style="margin-top: 5px" class="btn-group btn-group-justified" id="region-order-type" data-toggle="buttons">
-                    <label class="btn btn-default btn-sm btn-sell {% if pref.invention_price_type == 'sell' -%}active{%- endif %}">
-                        <input type="radio" name="region-order-type" autocomplete="off" value="sell" {% if pref.invention_price_type == 'sell' -%}checked{%- endif %}>Sell
-                    </label>
-                    <label class="btn btn-default btn-sm btn-buy {% if pref.invention_price_type == 'buy' -%}active{%- endif %}">
-                        <input type="radio" name="region-order-type" autocomplete="off" value="buy" {% if pref.invention_price_type == 'buy' -%}checked{%- endif %}>Buy
-                    </label>
+                <div class="input-group">
+                    <select name="region" id="region" class="form-control form-control-sm">
+                        <option disabled>Select a region</option>
+                        {% for region in regions -%}
+                        <option value="{{ region.id }}" {% if region.id == pref.invention_price_region -%}selected{% endif %}>{{ region.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="input-group-btn">
+                        <div class="btn-group" id="region-order-type" data-toggle="buttons">
+                            <label class="btn btn-secondary btn-sm btn-sell {% if pref.invention_price_type == 'sell' -%}active{%- endif %}">
+                                <input type="radio" name="region-order-type" autocomplete="off" value="sell" {% if pref.invention_price_type == 'sell' -%}checked{%- endif %}>Sell
+                            </label>
+                            <label class="btn btn-secondary btn-sm btn-buy {% if pref.invention_price_type == 'buy' -%}active{%- endif %}">
+                                <input type="radio" name="region-order-type" autocomplete="off" value="buy" {% if pref.invention_price_type == 'buy' -%}checked{%- endif %}>Buy
+                            </label>
+                        </div>
+                    </span>
                 </div>
-
             </div>
         </div>
-        <div class="well">
-            <div>
+
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+
                 Decryptor (Chance / ME / TE / Runs)<br>
-                <select name="decryptor" id="decryptor" class="form-control input-sm">
+                <select name="decryptor" id="decryptor" class="form-control form-control-sm">
                     <option selected value="0">None</option>
                     {% for decryptor in decryptors -%}
                     <option value="{{ decryptor.item_id }}">
@@ -164,58 +172,62 @@
                     </option>
                     {% endfor %}
                 </select>
-            </div>
-            <div>
-                Number of inventions<br>
-                <input id="invention-number" type="text" class="form-control input-sm" value="1">
-            </div>
-        </div>
-        <div class="well">
-            <div class="slider">
-                Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
-                <div id="adv-industry-level"></div>
-            </div>
-            {% if activity_copy is not none %}
-            <div class="slider">
-                Science (<span id="science-level-display">{{ industry_skills['science'] }}</span>)<br>
-                <div id="science-level"></div>
-            </div>
-            {% endif %}
-        </div>
-        <div class="well">
-            {% if activity_copy is not none %}
-            <div>
-                Copy Implant<br>
-                <select name="copyImplant" id="copyImplant" class="form-control input-sm">
-                    <option value="1.00" {% if pref.invention_copy_implant == 1.00 %}selected{% endif %}>None</option>
-                    <option value="0.99" {% if pref.invention_copy_implant == 0.99 %}selected{% endif %}>SC-801</option>
-                    <option value="0.97" {% if pref.invention_copy_implant == 0.97 %}selected{% endif %}>SC-803</option>
-                    <option value="0.95" {% if pref.invention_copy_implant == 0.95 %}selected{% endif %}>SC-805</option>
-                </select>
-            </div>
-            {% endif %}
-            {% for skill in datacore_skills %}
-            <div class="slider">
-                {{ skill.name }}
-                (<span id="datacore1-display">{{ skill.level }}</span>)<br>
-                <div id="datacore{{loop.index}}-level"></div>
-            </div>
-            {% endfor %}
-            <div class="slider">
-                {{ encryption_skill.name }}
-                (<span id="encryption-display">{{ encryption_skill.level }}</span>)<br>
-                <div id="encryption-level"></div>
-            </div>
-        </div>
 
+                <br>
+
+                Number of inventions<br>
+                <input id="invention-number" type="text" class="form-control form-control-sm" value="1">
+            </div>
+        </div>
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <div class="slider">
+                    Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
+                    <div id="adv-industry-level"></div>
+                </div>
+                {% if activity_copy is not none %}
+                <div class="slider">
+                    Science (<span id="science-level-display">{{ industry_skills['science'] }}</span>)<br>
+                    <div id="science-level"></div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+            {% if activity_copy is not none %}
+                <div>
+                    Copy Implant<br>
+                    <select name="copyImplant" id="copyImplant" class="form-control form-control-sm">
+                        <option value="1.00" {% if pref.invention_copy_implant == 1.00 %}selected{% endif %}>None</option>
+                        <option value="0.99" {% if pref.invention_copy_implant == 0.99 %}selected{% endif %}>SC-801</option>
+                        <option value="0.97" {% if pref.invention_copy_implant == 0.97 %}selected{% endif %}>SC-803</option>
+                        <option value="0.95" {% if pref.invention_copy_implant == 0.95 %}selected{% endif %}>SC-805</option>
+                    </select>
+                </div>
+                {% endif %}
+                {% for skill in datacore_skills %}
+                <div class="slider">
+                    {{ skill.name }}
+                    (<span id="datacore1-display">{{ skill.level }}</span>)<br>
+                    <div id="datacore{{loop.index}}-level"></div>
+                </div>
+                {% endfor %}
+                <div class="slider">
+                    {{ encryption_skill.name }}
+                    (<span id="encryption-display">{{ encryption_skill.level }}</span>)<br>
+                    <div id="encryption-level"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="col-md-9 col-sm-8">
+    <div class="col">
         <div class="row">
-            <div class="col-xs-10">
-                <h4 id="item-name">{{ blueprint.name }}</h4>
+            <div class="col-10">
+                <h5 id="item-name">{{ blueprint.name }}</h5>
             </div>
-            <div class="col-xs-2 text-right" id="item-icon">
+            <div class="col-2 text-right" id="item-icon">
                 {% if config.USE_CCP_ICONS -%}
                 <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}"/>
                 {% endif %}
@@ -224,11 +236,11 @@
         <div class="row">
             <div class="col-md-12">
                 <ul class="nav nav-tabs" id="tab-links" role="tablist">
-                    <li class="active"><a href="#summary">Summary</a></li>
-                    <li><a href="#details">Details</a></li>
+                    <li class="nav-item"><a class="active nav-link" href="#summary">Summary</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#details">Details</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="fade in active tab-pane" id="summary">
+                    <div class="fade show active tab-pane" role="tabpanel" id="summary">
                         <table class="table table-condensed table-hover table-striped">
                             <thead>
                                 <th class="text-center">Decryptor</th>
@@ -264,7 +276,7 @@
                     </div>
 
 
-                    <div class="fade tab-pane" id="details">
+                    <div class="fade tab-pane" role="tabpanel" id="details">
                         <div class="col-md-6">
                             <table class="invention-data table table-condensed table-hover table-striped">
                                 <thead>
