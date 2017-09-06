@@ -41,16 +41,10 @@
 
 // addons
 @import "addons/typeahead.js";
+@import "addons/nouislider.js";
 
 // global layout styles (header, wrap, footer)
+@import "lb_variables";
 @import "global_layout";
 @import "overwrite";
-
-.lb-search-bp-icon {
-	width:125px;
-	@extend .text-right;
-}
-
-.cell-btn-1 {width: 38px; text-align:center;}
-.cell-btn-2 {width: 80px; text-align:center;}
-.cell-btn-3 {width: 120px; text-align:center;}
+@import "new_style";
