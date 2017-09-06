@@ -42,7 +42,7 @@
     "css-minify": "cleancss --level 1 --source-map-inline-sources --output lazyblacksmith/static/css/lb-combined.min.css lazyblacksmith/static/css/lb-combined.css",
     "js": "npm-run-all js-compile-bootstrap js-concat js-minify",
     "js-compile-bootstrap": "shx cat bootstrap/js/src/util.js bootstrap/js/src/alert.js bootstrap/js/src/button.js bootstrap/js/src/carousel.js bootstrap/js/src/collapse.js bootstrap/js/src/dropdown.js bootstrap/js/src/modal.js bootstrap/js/src/scrollspy.js bootstrap/js/src/tab.js bootstrap/js/src/tooltip.js bootstrap/js/src/popover.js | shx sed \"s/^(import|export).*//\" | babel --filename bootstrap/js/src/bootstrap.js > lazyblacksmith/static/js/bootstrap.js",
-    "js-concat": "shx cat lazyblacksmith/static/js/bootstrap.js lazyblacksmith/static/js/jquery/*.js lazyblacksmith/static/js/misc/*.js lazyblacksmith/static/js/lb/*.js lazyblacksmith/static/js/lb/*/*.js > lazyblacksmith/static/js/lb.js",
+    "js-concat": "shx cat lazyblacksmith/static/js/bootstrap.js lazyblacksmith/static/js/jquery/*.js lazyblacksmith/static/js/misc/{humanize,nouislider,popper,typeahead.bundle,utils}.js lazyblacksmith/static/js/lb/*.js lazyblacksmith/static/js/lb/*/*.js > lazyblacksmith/static/js/lb.js",
     "js-minify": "uglifyjs --config-file bootstrap/build/uglifyjs.config.json --output lazyblacksmith/static/js/lazybl-combined.min.js lazyblacksmith/static/js/lb.js",
     "dist": "npm-run-all --parallel js css"
   }
