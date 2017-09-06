@@ -52,7 +52,6 @@ $theme-colors: (
   warning: $yellow,
   danger: $red,
   light: $gray-100,
-  gray: $gray-400,
   dark: $gray-800
 );
 
@@ -79,5 +78,10 @@ $font-size-sm:   .775rem;
 $line-height-base: 1.25; // 1.5
 
 // cards
-$card-spacer-y:            .55rem; // default 0.75
-$card-spacer-x:            1.25rem; // default 1.25
+$card-spacer-y: .55rem; // default 0.75
+$card-spacer-x: 1.25rem; // default 1.25
+
+// table
+$table-accent-bg: rgba($black,.035);
+$table-border-color: $gray-300;
+$table-cell-padding-sm: .4rem;

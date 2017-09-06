@@ -73,44 +73,6 @@
     }
 }
 
-
-.materials-prices, .materials-taxes {
-    > thead > tr > th {
-       text-align: center;
-    }
-    > tfoot  {
-        > tr:nth-child(odd) {
-            > td,
-            > th {
-              background-color: darken(@table-bg-accent, 1%);
-            }
-        };
-        > tr:nth-child(even) {
-            > td,
-            > th {
-              background-color: darken(#FFF, 1%);
-            }
-        };
-        > tr:hover {
-            > td,
-            > th {
-              background-color: darken(@table-bg-accent, 3%);
-            }
-        };
-        > tr {
-            > td {
-                text-align: right;
-                padding-right: 20px;
-                .td-valign-middle;
-
-                &.title {
-                    font-weight: bold;
-                };
-            }
-        };
-    };
-}
-
 .copy-data {
     width: 300px;
     margin: 20px auto;
@@ -137,24 +99,6 @@
         }
         .delta {
             width: 25%;
-        }
-    };
-}
-
-.invention-data {
-    > thead > tr > th {
-        text-align: center;
-    };
-
-     > tbody > tr > td {
-        .td-valign-middle;
-        &.title {
-            width: 50%;
-            font-weight: bold;
-        };
-        &.data {
-            text-align: right;
-            padding-right: 20px;
         }
     };
 }

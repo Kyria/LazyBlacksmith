@@ -1,4 +1,4 @@
-var utils = (function($) {
+var utils = (function($, noUiSlider) {
     "use strict";
 
     var flashMessageType = {
@@ -129,6 +129,52 @@ var utils = (function($) {
         });
     };
 
+    /**
+     * create noUiSlider(s) from a jquery selector
+     * @param jQuerySelector the css/jquery selector
+     * @param options the noUiSlider options
+     */
+    var noUiSliderCreate = function(jQuerySelector, options) {
+        $(jQuerySelector).each(function() {
+            var slider = $(this).get(0);
+            noUiSlider.create(slider, options);
+        });
+    };
+
+    /**
+     * set the value of a noUiSlider from a jquery selector
+     * @param jQuerySelector the css/jquery selector
+     * @param value the noUiSlider value to set
+     */
+    var noUiSliderSetValue = function(jQuerySelector, value) {
+        $(jQuerySelector).each(function() {
+            var slider = $(this).get(0);
+            slider.noUiSlider.set(value);
+        });
+    };
+
+    /**
+     * get the value of a noUiSlider from a jquery selector
+     * @param jQuerySelector the css/jquery selector
+     */
+    var noUiSliderGetValue = function(jQuerySelector) {
+        var slider = $(jQuerySelector).get(0);
+        slider.noUiSlider.get();
+    };
+
+    /**
+     * bind event to nouislider from jquery selector
+     * @param jQuerySelector the css/jquery selector
+     * @param event the event string we want to bind
+     * @param callback the function to call on even
+     */
+    var noUiSliderBind = function(jQuerySelector, event, callback) {
+        $(jQuerySelector).each(function() {
+            var slider = $(this).get(0);
+            slider.noUiSlider.on(event, callback);
+        });
+    }
+
     return {
         durationToString: durationToString,
         csrfSafeMethod: csrfSafeMethod,
@@ -138,6 +184,11 @@ var utils = (function($) {
         ajaxDeleteCallJson: ajaxDeleteCallJson,
         ajaxPostCallJson: ajaxPostCallJson,
         ajaxGetCallJson: ajaxGetCallJson,
+
+        noUiSliderCreate: noUiSliderCreate,
+        noUiSliderSetValue: noUiSliderSetValue,
+        noUiSliderGetValue: noUiSliderGetValue,
+        noUiSliderBind: noUiSliderBind,
     }
 
-})(jQuery);
+})(jQuery, noUiSlider);
