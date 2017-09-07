@@ -30,8 +30,9 @@
     }
 
     // other specifc format
-    &.modal-config-price, &.materials-requirement, &.prices,
-    &.materials-taxes, &.materials-time {
+    //&.modal-config-price, &.materials-requirement, &.prices,
+    //&.materials-taxes, &.materials-time {
+    &.lb-list {
         tbody tr td {
             &.icon {
                 width:32px;

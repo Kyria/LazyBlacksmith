@@ -39,14 +39,16 @@
             </div>
         </div>
         <div class="col-md-10 col-sm-9">
-            <table class="table table-condensed materials-list table-hover table-striped">
-                <tr>
-                    {% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}
-                    <th>Name</th>
-                    <th>Base Qty</th>
-                    <th>Adjusted Qty</th>
-                    <th>Job Qty</th>
-                </tr>
+            <table class="lb-table-sm lb-list">
+                <thead>
+                    <tr>
+                        {% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}
+                        <th>Name</th>
+                        <th>Base Qty</th>
+                        <th>Adjusted Qty</th>
+                        <th>Job Qty</th>
+                    </tr>
+                </thead>
                 @@BOM@@
             </table>
         </div>

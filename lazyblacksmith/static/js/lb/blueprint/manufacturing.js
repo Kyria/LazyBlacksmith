@@ -318,7 +318,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                                      .replace(/@@BOM@@/g, rows);
             }
 
-            $('#tab-subcomp').html(html);
+            $('#tab-subcomp .content').html(html);
 
             // update material quantity list
             _generateMaterialListQuantity();
@@ -592,8 +592,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         // get data
         var system = $('#modal-system').val().toLowerCase();
         var runsPerJob = $('#modalRunsPerJob').val();
-        var ME = parseInt($('#Modal-ME-Level').text());
-        var TE = parseInt($('#Modal-TE-Level').text());
+
+        var ME = parseInt(utils.noUiSliderGetValue('#ModalME'));
+        var TE = parseInt(utils.noUiSliderGetValue('#ModalTE'));
+
         var facility = parseInt($('#modal-facility').val());
 
         var structureMeRig = parseInt($('#modal-structure-me-rig input:checked').val());
@@ -692,7 +694,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                                  .replace(/@@TIME@@/g, utils.durationToString(material.timeTotal));
             }
         }
-        $('.materials-time tbody').html(output);
+        $('#materials-time tbody').html(output);
     }
 
 
@@ -717,7 +719,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             multiBuy += materialQuantityList[id].name + " " + materialQuantityList[id].qty + "\n";
         }
 
-        $('.materials-requirement tbody').html(output);
+        $('#materials-requirement tbody').html(output);
     }
 
 
@@ -756,7 +758,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                                .replace(/@@PRICE@@/g, Humanize.intcomma(price, 2))
                                .replace(/@@PRICE_TOTAL@@/g, Humanize.intcomma(materialPrice, 2));
         }
-        $('.materials-prices tbody').html(output);
+        $('#materials-prices tbody').html(output);
 
         priceData.totalCost = materialTotalPrice;
         _getSystemCostIndex();
@@ -808,7 +810,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 }
             }
         }
-        $('.materials-taxes tbody').html(output);
+        $('#materials-taxes tbody').html(output);
 
         priceData.totalInstallationCost = totalInstallationCost;
         _updateMarginMarkupTable();
@@ -833,13 +835,13 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         var marginPercent = (productPrice > 0) ? (margin / totalProductPrice) * 100 : 0;
         var markupPercent = (productPrice > 0) ? (margin / totalCost) * 100 : 0;
 
-        $('.materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(priceData.totalCost, 2));
-        $('.materials-prices tfoot td#total-cost-per-unit').html(Humanize.intcomma(unitCost, 2));
-        $('.materials-prices tfoot td#product-price').html(Humanize.intcomma(productPrice, 2));
-        $('.materials-prices tfoot td#installation-cost').html(Humanize.intcomma(priceData.totalInstallationCost, 2));
-        $('.materials-prices tfoot td#margin').html(Humanize.intcomma(margin, 2));
-        $('.materials-prices tfoot td#margin-percent').html(Humanize.intcomma(marginPercent, 2) + "%");
-        $('.materials-prices tfoot td#markup-percent').html(Humanize.intcomma(markupPercent, 2) + "%");
+        $('#materials-prices tfoot td#mat-total-price').html(Humanize.intcomma(priceData.totalCost, 2));
+        $('#materials-prices tfoot td#total-cost-per-unit').html(Humanize.intcomma(unitCost, 2));
+        $('#materials-prices tfoot td#product-price').html(Humanize.intcomma(productPrice, 2));
+        $('#materials-prices tfoot td#installation-cost').html(Humanize.intcomma(priceData.totalInstallationCost, 2));
+        $('#materials-prices tfoot td#margin').html(Humanize.intcomma(margin, 2));
+        $('#materials-prices tfoot td#margin-percent').html(Humanize.intcomma(marginPercent, 2) + "%");
+        $('#materials-prices tfoot td#markup-percent').html(Humanize.intcomma(markupPercent, 2) + "%");
     }
 
 
@@ -982,45 +984,56 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * @private
      */
     var _initSliders = function() {
-        $('#ME').slider({
-            min: 0,
-            max: 10,
-            range: "min",
-            slide: _materialEfficiencyOnUpdate,
-        });
-        $('#TE').slider({
-            min: 0,
-            max: 20,
+        var skillSliderConf = {
+            start: 0,
+            connect: [true, false],
+            step: 1,
+            range: {
+                min: 0,
+                max: 5
+            }
+        };
+        var meSliderConf = {
+            start: 0,
+            connect: [true, false],
+            step: 1,
+            range: {
+                min: 0,
+                max: 10
+            }
+        };
+        var teSliderConf = {
+            start: 0,
+            connect: [true, false],
             step: 2,
-            range: "min",
-            slide: _timeEfficiencyOnUpdate,
-        });
-        $('#ModalME').slider({
-            min: 0,
-            max: 10,
-            range: "min",
-            slide: _modalMaterialEfficiencyOnUpdate,
-        });
-        $('#ModalTE').slider({
-            min: 0,
-            max: 20,
-            step: 2,
-            range: "min",
-            slide: _modalTimeEfficiencyOnUpdate,
-        });
-        $('#industry-level, #adv-industry-level, #t2-level, #t2-science1, #t2-science2').slider({
-            min: 0,
-            max: 5,
-            range: "min",
-            slide: _skillOnUpdate,
-        });
-        $('#ME').slider('option', 'value', options.materialEfficiency);
-        $('#TE').slider('option', 'value', options.timeEfficiency);
-        $('#adv-industry-level').slider('option', 'value', options.advancedIndustryLvl);
-        $('#industry-level').slider('option', 'value', options.industryLvl);
-        $('#t2-level').slider('option', 'value', options.t2ConstructionLvl);
-        $('#t2-science1').slider('option', 'value', options.datacoreLevel1);
-        $('#t2-science2').slider('option', 'value', options.datacoreLevel2);
+            range: {
+                min: 0,
+                max: 20
+            }
+        };
+
+        utils.noUiSliderCreate('#ME', meSliderConf);
+        utils.noUiSliderCreate('#ModalME', meSliderConf);
+        utils.noUiSliderCreate('#TE', teSliderConf);
+        utils.noUiSliderCreate('#ModalTE', teSliderConf);
+        utils.noUiSliderCreate('#industry-level, #adv-industry-level, #t2-level, #t2-science1, #t2-science2', skillSliderConf);
+
+        utils.noUiSliderSetValue('#ME', options.materialEfficiency);
+        utils.noUiSliderSetValue('#TE', options.timeEfficiency);
+        utils.noUiSliderSetValue('#adv-industry-level', options.advancedIndustryLvl);
+        utils.noUiSliderSetValue('#industry-level', options.industryLvl);
+        utils.noUiSliderSetValue('#t2-level', options.t2ConstructionLvl);
+        utils.noUiSliderSetValue('#t2-science1', options.datacoreLevel1);
+        utils.noUiSliderSetValue('#t2-science2', options.datacoreLevel2);
+
+        utils.noUiSliderBind('#ME', 'slide', _materialEfficiencyOnUpdate);
+        utils.noUiSliderBind('#TE', 'slide', _timeEfficiencyOnUpdate);
+        utils.noUiSliderBind('#ModalME', 'slide', _modalMaterialEfficiencyOnUpdate);
+        utils.noUiSliderBind('#ModalTE', 'slide', _modalTimeEfficiencyOnUpdate);
+        utils.noUiSliderBind(
+            '#industry-level, #adv-industry-level, #t2-level, #t2-science1, #t2-science2',
+            'slide', _skillOnUpdate
+        );
     };
 
     /**
@@ -1054,8 +1067,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             $('#modal-structure-te-rig input[value='+structureTeRig+']').parent().button("toggle");
             $('#modal-structure-sec-status input[value='+structureSecStatus+']').parent().button("toggle");
 
-            $('#ModalME').slider("option", "value", me);
-            $('#ModalTE').slider("option", "value", te);
+            utils.noUiSliderSetValue('#ModalME', me);
+            utils.noUiSliderSetValue('#ModalTE', te);
             $('#Modal-ME-Level').html(me);
             $('#Modal-TE-Level').html(te);
 
@@ -1080,7 +1093,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             return setTimeout(_initPriceModalContent, 100);
         }
 
-        var output = $("");
+        var $output = $("");
 
         for(var i in priceData.itemList) {
             var item = priceData.items[priceData.itemList[i]];
@@ -1105,9 +1118,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             tpl.attr('title', Humanize.intcomma(currentPrice, 2) + ' ISK');
 
             // add to the output
-            $('#priceConfigModal .modal-config-price tbody').append(tpl);
+            tpl.appendTo('#priceConfigModal .lb-list tbody');
         }
-        //$('#priceConfigModal .modal-config-price tbody').html(output);
         _initPriceModalEvent();
     };
 
@@ -1147,7 +1159,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             var typeOrder = $('#modal-order-all').val();
             modalPriceUpdatePrice = false;
 
-            $('.modal-config-price tbody .checkbox-cell input:checked').each(function() {
+            $('#priceConfigModal .lb-list tbody .checkbox-cell input:checked').each(function() {
                 var id = $(this).attr('data-id');
                 $('.price-config-row[data-id="' + id + '"] .modal-order-type .btn-' + typeOrder).button('toggle');
                 $('.price-config-row[data-id="' + id + '"]').tooltip('hide');
@@ -1161,7 +1173,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             var region = $('#modal-region-all').val();
             modalPriceUpdatePrice = false;
 
-            $('.modal-config-price tbody .checkbox-cell input:checked').each(function(event) {
+            $('#priceConfigModal .lb-list tbody .checkbox-cell input:checked').each(function(event) {
                 var id = $(this).attr('data-id');
                 $('.modal-region[data-id="' + id + '"]').val(region).change();
                 $('.price-config-row[data-id="' + id + '"]').tooltip('hide');
@@ -1304,9 +1316,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * Function called on event update on the material efficiency slider
      * @private
      */
-    var _materialEfficiencyOnUpdate = function(event, ui) {
-        $('#ME-Level').html(ui.value+"%");
-        options.materialEfficiency = parseInt(ui.value);
+    var _materialEfficiencyOnUpdate = function(value) {
+        var value = parseInt(value);
+        $('#ME-Level').html(value+"%");
+        options.materialEfficiency = parseInt(value);
         _updateMaterial();
     };
 
@@ -1315,9 +1328,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * Function called on event update on the time efficiency slider
      * @private
      */
-    var _timeEfficiencyOnUpdate = function(event, ui) {
-        $('#TE-Level').html(ui.value+"%");
-        options.timeEfficiency = parseInt(ui.value);
+    var _timeEfficiencyOnUpdate = function(value) {
+        var value = parseInt(value);
+        $('#TE-Level').html(value+"%");
+        options.timeEfficiency = parseInt(value);
         _updateTime();
     };
 
@@ -1327,8 +1341,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * in the modal window
      * @private
      */
-    var _modalMaterialEfficiencyOnUpdate = function(event, ui) {
-        $('#Modal-ME-Level').html(ui.value);
+    var _modalMaterialEfficiencyOnUpdate = function(value) {
+        var value = parseInt(value);
+        $('#Modal-ME-Level').html(value);
     };
 
 
@@ -1337,8 +1352,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * in the modal window
      * @private
      */
-    var _modalTimeEfficiencyOnUpdate = function(event, ui) {
-        $('#Modal-TE-Level').html(ui.value);
+    var _modalTimeEfficiencyOnUpdate = function(value) {
+        var value = parseInt(value);
+        $('#Modal-TE-Level').html(value);
     };
 
 
@@ -1346,9 +1362,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * Function called on event update on the skill level sliders
      * @private
      */
-    var _skillOnUpdate = function(event, ui) {
-        var id = $(this).attr('id');
-        var value = parseInt(ui.value);
+    var _skillOnUpdate = function(value) {
+        var id = $(this.target).attr('id');
+        var value = parseInt(value);
 
         switch(id) {
             case 'industry-level':
@@ -1463,7 +1479,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
     var _checkboxPriceToggleAllOnChange = function(event, checkbox) {
         checkbox = typeof checkbox !== 'undefined' ?  checkbox : $(this);
         var state = checkbox.prop('checked');
-        $('.modal-config-price tbody .checkbox-cell input').prop('checked', state);
+        $('#priceConfigModal .lb-list tbody .checkbox-cell input').prop('checked', state);
     };
 
     /**
@@ -1485,7 +1501,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         currentPrice = (currentPrice === undefined) ? 0 : currentPrice[item.type];
         currentPrice = Humanize.intcomma(currentPrice, 2);
         $('.price-config-row[data-id="' + item.id + '"]').attr('data-original-title', currentPrice + ' ISK')
-                                                         .tooltip('fixTitle')
                                                          .tooltip('show');
         if(modalPriceUpdatePrice) {
             _updatePriceTable();
@@ -1498,9 +1513,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var run = function() {
         // init interface stuff before some check, to have no UI issue
-        _initTooltip();
-        _initInputs();
         _initSliders();
+        _initInputs();
+        _initTooltip();
 
         $('#multibuy').on('click', function() {
             utils.copyToClipboard(multiBuy);

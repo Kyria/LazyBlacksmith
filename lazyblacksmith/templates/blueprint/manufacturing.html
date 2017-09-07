@@ -107,325 +107,348 @@
 {% set pref = current_user.pref %}
 <div class="row">
     <div class="col-md-12">
-        <ul class="nav nav-tabs" role="tablist" id="bp-tabs">
-            <li class="active"><a href="#tab-bp">Blueprint</a></li>
-            {% if has_manufactured_components %}<li id='subcomp-tab'><a href="#tab-subcomp">Components Blueprints</a></li>{% endif %}
-            <li id='summary-tab'><a href="#tab-summary">Material Summary</a></li>
-            <li id='price-tab'><a href="#tab-price">Prices</a></li>
+        <ul class="nav nav-tabs" id="bp-tabs" role="tablist">
+            <li class="nav-item"><a class="active nav-link" href="#tab-bp">Blueprint</a></li>
+            {% if has_manufactured_components %}<li class="nav-item" id='subcomp-tab'><a class="nav-link" href="#tab-subcomp">Components Blueprints</a></li>{% endif %}
+            <li class="nav-item" id='summary-tab'><a class="nav-link" href="#tab-summary">Material Summary</a></li>
+            <li class="nav-item" id='price-tab'><a class="nav-link" href="#tab-price">Prices</a></li>
         </ul>
         <div class="tab-content">
-            <div class="row fade in active tab-pane" id="tab-bp">
-                <div class="col-md-3 col-sm-4">
-                    <div class="well">
-                        <div>
-                            Facility<br>
-                            <select name="facility" id="facility" class="form-control input-sm">
-                                <option value="0" {% if pref.prod_facility == 0 -%}selected{%- endif %}>Station</option>
-                                <option value="1" {% if pref.prod_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
-                                <option value="2" {% if pref.prod_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
-                                <option value="3" {% if pref.prod_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
-                                <option value="4" {% if pref.prod_facility == 4 -%}selected{%- endif %}>Other Structures</option>
-                                <option value="5" {% if pref.prod_facility == 5 -%}selected{%- endif %}>Assembly Array</option>
-                                <option value="6" {% if pref.prod_facility == 6 -%}selected{%- endif %}>Thukker Component Array</option>
-                                <option value="7" {% if pref.prod_facility == 7 -%}selected{%- endif %}>Rapid Assembly Array</option>
-                            </select>
-                        </div>
-                        <div class="structure-configs" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %} margin-top:5px">
-                            Rigs <br>
-                            <div class="btn-group btn-group-justified" id="structure-me-rig" data-toggle="buttons" style="width:100%">
-                                <label class="btn btn-sm btn-default {% if pref.prod_me_rig == 0 -%}active{%- endif %}">
-                                    <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.prod_me_rig == 0 -%}checked{%- endif %}>No ME
-                                </label>
-                                <label class="btn btn-sm btn-default {% if pref.prod_me_rig == 1 -%}active{%- endif %}">
-                                    <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.prod_me_rig == 1 -%}checked{%- endif %}>T1 ME
-                                </label>
-                                <label class="btn btn-sm btn-default {% if pref.prod_me_rig == 2 -%}active{%- endif %}">
-                                    <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.prod_me_rig == 2 -%}checked{%- endif %}>T2 ME
-                                </label>
-                            </div>
-                            <div class="btn-group btn-group-justified" id="structure-te-rig" data-toggle="buttons" style="width:100%">
-                                <label class="btn btn-sm btn-default {% if pref.prod_te_rig == 0 -%}active{%- endif %}">
-                                    <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.prod_te_rig == 0 -%}checked{%- endif %}>No TE
-                                </label>
-                                <label class="btn btn-sm btn-default {% if pref.prod_te_rig == 1 -%}active{%- endif %}">
-                                    <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.prod_te_rig == 1 -%}checked{%- endif %}>T1 TE
-                                </label>
-                                <label class="btn btn-sm btn-default {% if pref.prod_te_rig == 2 -%}active{%- endif %}">
-                                    <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.prod_te_rig == 2 -%}checked{%- endif %}>T2 TE
-                                </label>
-                            </div>
-                            System Security<br>
-                            <div class="btn-group btn-group-justified" id="structure-sec-status" data-toggle="buttons" style="width:100%">
-                                <label class="btn btn-sm btn-default {% if pref.prod_security == 'h' -%}active{%- endif %}">
-                                    <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.prod_security == 'h' -%}checked{%- endif %}>HS
-                                </label>
-                                <label class="btn btn-sm btn-default {% if pref.prod_security == 'l' -%}active{%- endif %}">
-                                    <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.prod_security == 'l' -%}checked{%- endif %}>LS
-                                </label>
-                                <label class="btn btn-sm btn-default {% if pref.prod_security == 'n' -%}active{%- endif %}">
-                                    <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.prod_security == 'n' -%}checked{%- endif %}>NS/WH
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="well">
-                        <div>
-                            System<br>
-                            <input id="system" type="text" class="form-control input-sm typeahead" value="{{ pref.prod_system }}">
-                        </div>
-                    </div>
-                    <div class="well">
-                        <div>
-                            Runs <br>
-                            <input id="runs" type="text" class="form-control input-sm" value="1">
-                        </div>
-                        <div>
-                            Runs Per Jobs<br>   
-                            <div class="input-group">
-                                <input id="runsPerJob" type="text" class="form-control input-sm" value="{{ product.blueprint.max_production_limit }}">
+            <div class="fade show active tab-pane pt-4" id="tab-bp">
+                <div class="row">
+                    <div class="col-md-3 col-sm-4">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-auto mr-auto align-self-center">Facility</div>
+                                    <div class="col-lg col-auto">
+                                        <select name="facility" id="facility" class="form-control form-control-sm">
+                                            <option value="0" {% if pref.prod_facility == 0 -%}selected{%- endif %}>Station</option>
+                                            <option value="1" {% if pref.prod_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
+                                            <option value="2" {% if pref.prod_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
+                                            <option value="3" {% if pref.prod_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
+                                            <option value="4" {% if pref.prod_facility == 4 -%}selected{%- endif %}>Other Structures</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="structure-configs mt-3 row" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                                    <div class="col-auto mr-auto align-self-center">ME Rigs</div>
+                                    <div class="btn-group col-auto" id="structure-me-rig" data-toggle="buttons">
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_me_rig == 0 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.prod_me_rig == 0 -%}checked{%- endif %}>None
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_me_rig == 1 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.prod_me_rig == 1 -%}checked{%- endif %}>T1
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_me_rig == 2 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.prod_me_rig == 2 -%}checked{%- endif %}>T2
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="structure-configs mt-3 row" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                                    <div class="col-auto mr-auto align-self-center">TE Rigs</div>
+                                    <div class="btn-group col-auto" id="structure-te-rig" data-toggle="buttons">
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_te_rig == 0 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.prod_te_rig == 0 -%}checked{%- endif %}>None
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_te_rig == 1 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.prod_te_rig == 1 -%}checked{%- endif %}>T1
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_te_rig == 2 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.prod_te_rig == 2 -%}checked{%- endif %}>T2
+                                        </label>
+                                    </div>
+                                </div>
 
-                                <span class="input-group-btn">
-                                    <button id="maxRunBpc" class="btn btn-default btn-sm">Max Run/BPC</button>
-                                </span>
+                                <div class="structure-configs mt-3 row" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
+                                    <div class="col-auto mr-auto align-self-center">System Security</div>
+                                    <div class="btn-group col-auto" id="structure-sec-status" data-toggle="buttons">
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_security == 'h' -%}active{%- endif %}">
+                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.prod_security == 'h' -%}checked{%- endif %}>HS
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_security == 'l' -%}active{%- endif %}">
+                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.prod_security == 'l' -%}checked{%- endif %}>LS
+                                        </label>
+                                        <label class="btn btn-sm btn-secondary {% if pref.prod_security == 'n' -%}active{%- endif %}">
+                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.prod_security == 'n' -%}checked{%- endif %}>NS/WH
+                                        </label>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="slider">
-                            ME Level (<span id="ME-Level">{{ me }}%</span>)<br>
-                            <div id="ME"></div>
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <div>
+                                    System<br>
+                                    <input id="system" type="text" class="form-control form-control-sm typeahead" value="{{ pref.prod_system }}">
+                                </div>
+                            </div>
                         </div>
-                        <div class="slider">
-                            TE Level (<span id="TE-Level">{{ te }}%</span>)<br>
-                            <div id="TE"></div>
-                        </div>
-                    </div>
-                    <div class="well">
-                        <div class="slider">
-                            Industry (<span id="industry-level-display">{{ industry_skills['industry'] }}</span>)<br>
-                            <div id="industry-level"></div>
-                        </div>
-                        <div class="slider">
-                            Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
-                            <div id="adv-industry-level"></div>
-                        </div>
-                    </div>
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <div>
+                                    Runs <br>
+                                    <input id="runs" type="text" class="form-control form-control-sm" value="1">
+                                </div>
+                                <div>
+                                    Runs Per Jobs<br>   
+                                    <div class="input-group">
+                                        <input id="runsPerJob" type="text" class="form-control form-control-sm" value="{{ product.blueprint.max_production_limit }}">
 
-                    {% if science_skill | length > 0 or t2_manufacturing_skill %}
-                    <div class="well">
-                        {% for skill in science_skill %}
-                        <div class="slider">
-                            {{ skill.name }}
-                            (<span id="t2-science{{loop.index}}-display">{{ skill.level }}</span>)<br>
-                            <div id="t2-science{{loop.index}}"></div>
+                                        <span class="input-group-btn">
+                                            <button id="maxRunBpc" class="btn btn-default btn-sm">Max Run/BPC</button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="slider">
+                                    ME Level (<span id="ME-Level">{{ me }}%</span>)<br>
+                                    <div id="ME"></div>
+                                </div>
+                                <div class="slider">
+                                    TE Level (<span id="TE-Level">{{ te }}%</span>)<br>
+                                    <div id="TE"></div>
+                                </div>
+                            </div>
                         </div>
-                        {%- endfor %}
-                        {% if t2_manufacturing_skill %}
-                        <div class="slider">
-                            {{ t2_manufacturing_skill.name }}
-                            (<span id="t2-level-display">{{ t2_manufacturing_skill.level }}</span>)<br>
-                            <div id="t2-level"></div>
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <div class="slider">
+                                    Industry (<span id="industry-level-display">{{ industry_skills['industry'] }}</span>)<br>
+                                    <div id="industry-level"></div>
+                                </div>
+                                <div class="slider">
+                                    Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
+                                    <div id="adv-industry-level"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if science_skill | length > 0 or t2_manufacturing_skill %}
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                {% for skill in science_skill %}
+                                <div class="slider">
+                                    {{ skill.name }}
+                                    (<span id="t2-science{{loop.index}}-display">{{ skill.level }}</span>)<br>
+                                    <div id="t2-science{{loop.index}}"></div>
+                                </div>
+                                {%- endfor %}
+                                {% if t2_manufacturing_skill %}
+                                <div class="slider">
+                                    {{ t2_manufacturing_skill.name }}
+                                    (<span id="t2-level-display">{{ t2_manufacturing_skill.level }}</span>)<br>
+                                    <div id="t2-level"></div>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
                         {% endif %}
-                    </div>
-                    {% endif %}
 
-                </div>
-                <div class="col-md-9 col-sm-8 main-list">
-                    <div class="row">
-                        <div class="col-xs-10">
-                            <h4>
-                                {{ blueprint.name }}
-                                <span class="small">
-                                    ({{ product.product.name }} x
-                                    <span id="qty-required-{{ product.product.id }}">{{ product.quantity|intcomma }}</span>) -
-                                    <strong>Time per run: </strong><span class="time-per-run">{{ activity.time|duration }}</span> -
-                                    <strong>Total time: </strong><span class="total-time">{{ activity.time|duration }}</span>
-                                </span>
-                            </h4>
-                        </div>
-                        <div class="col-xs-2 text-right">
-                            {% if config.USE_CCP_ICONS -%}
-                                <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}">
-                            {%- endif %}
-                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <table class="table table-condensed materials-list table-hover table-striped">
-                                <tr>
-                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                                    <th>Name</th>
-                                    <th>Base Qty</th>
-                                    <th>Adjusted Qty</th>
-                                    <th>Job Qty</th>
-                                </tr>
-                            {% for material in materials.all() %}
-                                <tr class="material" data-id="{{material.material.id}}">
-                                    {% if config.USE_CCP_ICONS -%}
-                                    <td class="icon">
-                                        <img src="{{ material.material.icon_32() }}" alt="{{ material.material.name }}">
-                                    </td>
-                                    {%- endif %}
-                                    <td>
-                                        {{- material.material.name -}}
-                                    </td>
-                                    <td class="quantity" data-name="quantity">
-                                        {{- material.quantity | intcomma -}}
-                                    </td>
-                                    <td class="quantity" data-name="quantity-adjusted">{{ material.quantity | floatcomma }}</td>
-                                    <td class="quantity" data-name="quantity-job">{{ material.quantity | intcomma }}</td>
-                                </tr>
-                            {% endfor %}
-                            </table>
+                    <div class="col-md-9 col-sm-8 main-list">
+                        <div class="row">
+                            <div class="col-10">
+                                <h4>
+                                    {{ blueprint.name }}
+                                    <span class="small">
+                                        ({{ product.product.name }} x
+                                        <span id="qty-required-{{ product.product.id }}">{{ product.quantity|intcomma }}</span>) -
+                                        <strong>Time per run: </strong><span class="time-per-run">{{ activity.time|duration }}</span> -
+                                        <strong>Total time: </strong><span class="total-time">{{ activity.time|duration }}</span>
+                                    </span>
+                                </h4>
+                            </div>
+                            <div class="col-2 text-right">
+                                {% if config.USE_CCP_ICONS -%}
+                                    <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}">
+                                {%- endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="lb-table-sm lb-lists">
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th>Base Qty</th>
+                                        <th>Adjusted Qty</th>
+                                        <th>Job Qty</th>
+                                    </tr>
+                                {% for material in materials.all() %}
+                                    <tr class="material" data-id="{{material.material.id}}">
+                                        {% if config.USE_CCP_ICONS -%}
+                                        <td class="icon">
+                                            <img src="{{ material.material.icon_32() }}" alt="{{ material.material.name }}">
+                                        </td>
+                                        {%- endif %}
+                                        <td>
+                                            {{- material.material.name -}}
+                                        </td>
+                                        <td class="quantity" data-name="quantity">
+                                            {{- material.quantity | intcomma -}}
+                                        </td>
+                                        <td class="quantity" data-name="quantity-adjusted">{{ material.quantity | floatcomma }}</td>
+                                        <td class="quantity" data-name="quantity-job">{{ material.quantity | intcomma }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {% if has_manufactured_components %}
-            <div class="row fade tab-pane" id="tab-subcomp">
-                <div class="col-md-12">
-                    <strong>Loading materials... please wait a second</strong>
+            <div class="fade tab-pane pt-4" id="tab-subcomp">
+                <div class="row content">
+                    <div class="col-md-12">
+                        <strong>Loading materials... please wait a second</strong>
+                    </div>
                 </div>
             </div>
             {% endif %}
 
-            <div class="row fade tab-pane" id="tab-summary">
-                <div class="col-md-6">
-                    <h4>
-                        Material requirements
+            <div class="fade tab-pane pt-4" id="tab-summary">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>
+                            Material requirements
 
-                        <button class="btn btn-default btn-xs" id="multibuy" data-toggle="tooltip" data-placement="bottom" title="Copy to clipboard - Multibuy">
-                            <i class="fa fa-clipboard" aria-hidden="true"></i>
-                        </button>
+                            <button class="btn btn-default btn-xs" id="multibuy" data-toggle="tooltip" data-placement="bottom" title="Copy to clipboard - Multibuy">
+                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                            </button>
 
-                        {% if has_manufactured_components %}
-                        <span class="raw-component-btn">
-                            <span id="raw-components" data-toggle="buttons">
-                                <label class="btn btn-danger btn-xs">
-                                    <input type="checkbox" autocomplete="off">
-                                    Raw components: <span class="state">NO</span>
-                                </label>
+                            {% if has_manufactured_components %}
+                            <span class="raw-component-btn">
+                                <span id="raw-components" data-toggle="buttons">
+                                    <label class="btn btn-danger btn-xs">
+                                        <input type="checkbox" autocomplete="off">
+                                        Raw components: <span class="state">NO</span>
+                                    </label>
+                                </span>
                             </span>
-                        </span>
-                        {% endif %}
-                    </h4>
-                    <table class="table table-condensed materials-requirement table-hover table-striped">
-                        <thead>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                                <th>Name</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                            {% endif %}
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-requirement">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </div>
 
-                <div class="col-md-6">
-                    <h4>
-                        Production times
-                    </h4>
-                    <table class="table table-condensed materials-time table-hover table-striped">
-                        <thead>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                                <th>Name</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <div class="col-md-6">
+                        <h4>
+                            Production times
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-time">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div class="row fade tab-pane" id="tab-price">
-                <div class="col-md-6">
-                    <h4>
-                        Material Prices
-                        <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#priceConfigModal">
-                            <i class="fa fa-cog"></i>
-                        </button>
-                        <span class="raw-component-btn"></span>
-                    </h4>
-                    <table class="table table-condensed materials-prices table-hover table-striped">
-                        <thead>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                                <th>Name</th>
-                                <th>Quantity</th>
-                                <th>Price Per Unit</th>
-                                <th>Total Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="fade tab-pane pt-4" id="tab-price">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>
+                            Material Prices
+                            <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#priceConfigModal">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <span class="raw-component-btn"></span>
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-prices">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price Per Unit</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                <td colspan="3" class="title">Materials Total Cost</td>
-                                <td id="mat-total-price"></td>
-                            </tr>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                <td colspan="3" class="title">Installation Cost</td>
-                                <td id="installation-cost"></td>
-                            </tr>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                <td colspan="3" class="title">Unit Cost</td>
-                                <td id="total-cost-per-unit"></td>
-                            </tr>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                <td colspan="3" class="title">{{ product.product.name }} Sell Value</td>
-                                <td id="product-price"></td>
-                            </tr>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                <td colspan="3" class="title">Margin</td>
-                                <td id="margin"></td>
-                            </tr>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                <td colspan="3" class="title">% Margin</td>
-                                <td id="margin-percent"></td>
-                            </tr>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                <td colspan="3" class="title">% Markup</td>
-                                <td id="markup-percent"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Materials Total Cost</td>
+                                    <td id="mat-total-price"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Installation Cost</td>
+                                    <td id="installation-cost"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Unit Cost</td>
+                                    <td id="total-cost-per-unit"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">{{ product.product.name }} Sell Value</td>
+                                    <td id="product-price"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Margin</td>
+                                    <td id="margin"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">% Margin</td>
+                                    <td id="margin-percent"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">% Markup</td>
+                                    <td id="markup-percent"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h4>
+                            Industry Taxes
+                            <span class='small' data-toggle="tooltip" data-placement="top" title="Industry taxes may be wrong, as they will take the highest prices possible. Never forget to double check !">
+                                    <i class="fa fa-exclamation-circle"></i>
+                            </span>
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-taxes">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Tax Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-
-                <div class="col-md-6">
-                    <h4>
-                        Industry Taxes
-                        <span class='small' data-toggle="tooltip" data-placement="top" title="Industry taxes may be wrong, as they will take the highest prices possible. Never forget to double check !">
-                                <i class="fa fa-exclamation-circle"></i>
-                        </span>
-                    </h4>
-                    <table class="table table-condensed materials-taxes table-hover table-striped">
-                        <thead>
-                            <tr>
-                                {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                                <th>Name</th>
-                                <th>Quantity</th>
-                                <th>Tax Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-                    </table>
-                </div>
-
             </div>
         </div>
     </div>
@@ -446,7 +469,7 @@
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-6">
                         <div class="input-group">
-                            <select name="modal-region-all" id="modal-region-all" class="form-control input-sm">
+                            <select name="modal-region-all" id="modal-region-all" class="form-control form-control-sm">
                                 <option disabled selected>Select a region</option>
                                 {% for region in regions %}
                                 <option value="{{ region.id }}">{{ region.name }}</option>
@@ -459,7 +482,7 @@
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6">
                         <div class="input-group">
-                            <select name="modal-order-all" id="modal-order-all" class="form-control input-sm">
+                            <select name="modal-order-all" id="modal-order-all" class="form-control form-control-sm">
                                 <option value="buy" selected>Use buy orders</option>
                                 <option value="sell">Use sell orders</option>
                             </select>
@@ -471,13 +494,12 @@
                 </div>
                 <br/>
                 <div>
-                    <table class="table-condensed table table-hover table-striped modal-config-price">
+                    <table class="lb-table-sm lb-list">
                         <thead>
                             <tr>
                                 {% if config.USE_CCP_ICONS -%}<th class="icon">&nbsp;</th>{%- endif %}
                                 <th>Name</th>
-                                <th style="width:25%">Price region</th>
-                                <th style="width:95px">Order type</th>
+                                <th style="width:45%">Price Settings</th>
                                 <th class="checkbox-cell"><input type="checkbox" id="modal-price-checkall"/></th>
                             </tr>
                         </thead>
@@ -511,7 +533,7 @@
                             <div class="well">
                                 <div>
                                     Facility<br>
-                                    <select name="modal-facility" id="modal-facility" class="form-control input-sm">
+                                    <select name="modal-facility" id="modal-facility" class="form-control form-control-sm">
                                         <option value="0" {% if pref.prod_sub_facility == 0 -%}selected{%- endif %}>Station</option>
                                         <option value="1" {% if pref.prod_sub_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
                                         <option value="2" {% if pref.prod_sub_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
@@ -564,7 +586,7 @@
                             <div class="well">
                                 <div>
                                     System<br>
-                                    <input id="modal-system" type="text" class="form-control input-sm typeahead" value="{{ pref.prod_sub_system }}">
+                                    <input id="modal-system" type="text" class="form-control form-control-sm typeahead" value="{{ pref.prod_sub_system }}">
                                 </div>
                             </div>
                         </div>
@@ -574,7 +596,7 @@
                                 <div>
                                     Runs Per Jobs<br>                  
                                     <div class="input-group">
-                                        <input id="modalRunsPerJob" type="text" class="form-control input-sm" value="1">
+                                        <input id="modalRunsPerJob" type="text" class="form-control form-control-sm" value="1">
                                         <span class="input-group-btn" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
                                             <label class="btn btn-default btn-sm">
                                                 <input type="checkbox" autocomplete="off">Max Run/BPC
