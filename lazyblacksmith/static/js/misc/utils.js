@@ -159,7 +159,7 @@ var utils = (function($, noUiSlider) {
      */
     var noUiSliderGetValue = function(jQuerySelector) {
         var slider = $(jQuerySelector).get(0);
-        slider.noUiSlider.get();
+        return slider.noUiSlider.get();
     };
 
     /**
