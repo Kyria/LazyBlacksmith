@@ -248,8 +248,8 @@
                     </div>
                     <div class="col-md-9 col-sm-8 main-list">
                         <div class="row">
-                            <div class="col-10">
-                                <h4>
+                            <div class="col-10 align-self-center">
+                                <h5>
                                     {{ blueprint.name }}
                                     <span class="small">
                                         ({{ product.product.name }} x
@@ -257,7 +257,7 @@
                                         <strong>Time per run: </strong><span class="time-per-run">{{ activity.time|duration }}</span> -
                                         <strong>Total time: </strong><span class="total-time">{{ activity.time|duration }}</span>
                                     </span>
-                                </h4>
+                                </h5>
                             </div>
                             <div class="col-2 text-right">
                                 {% if config.USE_CCP_ICONS -%}
@@ -265,16 +265,18 @@
                                 {%- endif %}
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mt-3">
                             <div class="col-md-12">
-                                <table class="lb-table-sm lb-lists">
-                                    <tr>
-                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
-                                        <th>Name</th>
-                                        <th>Base Qty</th>
-                                        <th>Adjusted Qty</th>
-                                        <th>Job Qty</th>
-                                    </tr>
+                                <table class="lb-table-sm lb-list">
+                                    <thead>
+                                        <tr>
+                                            {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                            <th>Name</th>
+                                            <th class="text-right">Base Qty</th>
+                                            <th class="text-right">Adjusted Qty</th>
+                                            <th class="text-right">Job Qty</th>
+                                        </tr>
+                                    </thead>
                                 {% for material in materials.all() %}
                                     <tr class="material" data-id="{{material.material.id}}">
                                         {% if config.USE_CCP_ICONS -%}
@@ -499,7 +501,7 @@
                             <tr>
                                 {% if config.USE_CCP_ICONS -%}<th class="icon">&nbsp;</th>{%- endif %}
                                 <th>Name</th>
-                                <th style="width:45%">Price Settings</th>
+                                <th style="width:35%">Price Settings</th>
                                 <th class="checkbox-cell"><input type="checkbox" id="modal-price-checkall"/></th>
                             </tr>
                         </thead>
