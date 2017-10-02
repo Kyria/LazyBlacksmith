@@ -63,6 +63,57 @@
         };
     };
 
+    // specific format for research tabs
+    &.copy-data {
+        width: 300px;
+        margin: 20px auto;
+        tbody td {
+            text-align: right;
+        }
+    }
+
+    &.me-profit {
+        width: 75%;
+        margin: 20px auto;
+
+        thead th {
+            text-align: center;
+        }
+
+        tbody {
+            text-align: right;
+            .level {
+                width: 50px;
+            };
+            .price-percent {
+                width: 65px;
+            }
+            .delta {
+                width: 25%;
+            }
+        };
+    }
+
+    &.te-list, &.me-list {
+        width: 75%;
+        margin: 20px auto;
+
+        thead th {
+            text-align: center;
+        }
+
+        tbody {
+            text-align: right;
+            .level {
+                width: 50px;
+            };
+            .total, .delta, .price {
+                width: 33.33%; /* older browsers fallback */
+                width: calc(100% / 3);
+            };
+        };
+    }
+
     // glopal format header
     thead {
         tr th {
