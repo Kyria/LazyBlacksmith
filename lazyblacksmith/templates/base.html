@@ -64,8 +64,13 @@
     </div>
 
     <footer class="footer">
-        <div class="container-fluid">
-            <span class="text-muted"><a href="https://github.com/Kyria/LazyBlacksmith#readme">LazyBlacksmith</a> &copy; Kyria.</span>
+        <div class="container-fluid text-muted">
+            <a href="https://github.com/Kyria/LazyBlacksmith">Github</a> - &copy; Kyria
+            <div class="float-right font-italic">
+                All <a href="{{ url_for('home.legal') }}">EVE related materials</a> are property of <a href="http://www.ccpgames.com/">CCP Games</a> 
+                / <a href="{{ url_for('home.legal') }}">CCP Copyright Notice</a> 
+                / <a href="{{ url_for('home.legal') }}">Cookies</a>
+            </div>
         </div>
     </footer>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

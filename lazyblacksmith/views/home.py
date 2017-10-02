@@ -11,3 +11,9 @@ home = Blueprint('home', __name__)
 @cache.cached(timeout=3600 * 24)
 def index():
     return render_template('base.html')
+
+
+@home.route('/legal')
+@cache.cached(timeout=3600 * 24 * 7)
+def legal():
+    return render_template('legal.html')
