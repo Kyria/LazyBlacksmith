@@ -1501,6 +1501,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         currentPrice = (currentPrice === undefined) ? 0 : currentPrice[item.type];
         currentPrice = Humanize.intcomma(currentPrice, 2);
         $('.price-config-row[data-id="' + item.id + '"]').attr('data-original-title', currentPrice + ' ISK')
+                                                         .removeClass('focus')
                                                          .tooltip('show');
         if(modalPriceUpdatePrice) {
             _updatePriceTable();

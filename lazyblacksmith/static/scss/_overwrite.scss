@@ -24,7 +24,7 @@
 
 // noUiSlider overrides
 .noUi-connect { // change the color
-    background: theme-color-level('primary', 3);
+    background: theme-color-level('primary', -5);
     // default positions for creation (prevent some flashes on init)
     left: 0%;
     right: 100%;
@@ -42,4 +42,9 @@
         top: -0.3rem;   // original -6px;
         cursor: pointer;
     }
+}
+
+html {
+    font-size: 14px;
+    line-height: $line-height-base;
 }
