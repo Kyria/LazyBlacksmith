@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 from flask import Blueprint
+from flask import redirect
 from flask import render_template
+from flask import url_for
 
 from lazyblacksmith.extension.cache import cache
 
@@ -8,9 +10,8 @@ home = Blueprint('home', __name__)
 
 
 @home.route("/")
-@cache.cached(timeout=3600 * 24)
 def index():
-    return render_template('base.html')
+    return redirect(url_for("blueprint.search"))
 
 
 @home.route('/legal')
