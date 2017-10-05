@@ -4,7 +4,7 @@ section: index
 ---
 # What is LazyBlacksmith
 
-![Logo](/assets/img/logo128.png)
+![Logo](/LazyBlacksmith/assets/img/logo128.png)
 
 An EVE Online Industry application for lazy people.
 
