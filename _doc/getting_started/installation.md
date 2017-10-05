@@ -152,6 +152,7 @@ PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A celery_app:celery_ap
 
 ## CCP Icons
 
-If you set ```USE_CCP_ICONS = True``` you need to download the files "EVE_VERSION_Types.zip" from CCP Toolkit ; https://developers.eveonline.com/resource/resources and then
-move the files into ```lazyblacksmith/static/ccp/``` (as a result, you should have ```lazyblacksmith/static/ccp/Types/files.png```)
+If you set ```USE_CCP_ICONS = True``` you need to download the files "EVE_VERSION_Types.zip" from [CCP Toolkit](https://developers.eveonline.com/resource/resources)
+
+Then move the files into ```lazyblacksmith/static/ccp/``` (as a result, you should have ```lazyblacksmith/static/ccp/Types/files.png```)
 
