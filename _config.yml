@@ -1,0 +1,8 @@
+highlighter: rouge
+permalink: /:title/
+github_url: https://github.com/Kyria/LazyBlacksmith
+app_name: LazyBlacksmith
+collections:
+  doc:
+    output: true
+    permalink: /:path/
