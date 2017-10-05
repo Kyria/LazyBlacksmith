@@ -2,11 +2,9 @@
 layout: base
 section: index
 ---
-# What is LazyBlacksmith
-
 ![Logo](/LazyBlacksmith/assets/img/logo128.png)
 
-An EVE Online Industry application for lazy people.
+# What is LazyBlacksmith
 
 LazyBlacksmith is a flask application allowing people to get informations about industry in eveonline.
 
