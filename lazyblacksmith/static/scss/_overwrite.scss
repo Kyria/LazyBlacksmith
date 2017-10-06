@@ -1,0 +1,50 @@
+// extends table-* class for lb
+.lb-table {
+    @extend .table;
+    @extend .table-striped;
+    @extend .table-hover;
+}
+.lb-table-sm {
+    @extend .lb-table;
+    @extend .table-sm;
+}
+.lb-table td, .lb-table-sm td {
+    @extend .align-middle;
+}
+
+// shortcut for some class
+.settings-label {
+    @extend .col-sm-3;
+    @extend .col-md-3;
+    @extend .col-form-label;
+}
+.settings-field {
+    @extend .col-auto;
+}
+
+// noUiSlider overrides
+.noUi-connect { // change the color
+    background: theme-color-level('primary', -5);
+    // default positions for creation (prevent some flashes on init)
+    left: 0%;
+    right: 100%;
+}
+.noUi-horizontal {
+    height: .75rem;
+    @extend .mt-1;
+    @extend .mb-3;
+
+    // require to comment the :after:before in original css
+    .noUi-handle {
+        width: 1.2rem;   // original 34px;
+        height: 1.2rem;   // original 28px;
+        left: -0.6rem;   // original -17px;
+        top: -0.3rem;   // original -6px;
+        cursor: pointer;
+    }
+}
+
+html {
+    font-size: 14px;
+    line-height: $line-height-base;
+}

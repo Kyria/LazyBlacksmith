@@ -6,20 +6,20 @@
         {%- endif %}
         <td>@@NAME@@</td>
         <td>
-            <select name="modal-region" class="form-control input-sm modal-region" data-id="@@ID@@">
-                <!-- Region list -->
-            </select>
-        </td>
-        <td>
-            <div>
-                <div class="btn-group btn-group-justified modal-order-type" data-toggle="buttons">
-                    <label class="btn btn-default btn-sm btn-sell">
-                        <input type="radio" name="modal-order-type-@@ID@@" data-id="@@ID@@" autocomplete="off" value="sell">Sell
-                    </label>
-                    <label class="btn btn-default btn-sm btn-buy">
-                        <input type="radio" name="modal-order-type-@@ID@@" data-id="@@ID@@" autocomplete="off" value="buy">Buy
-                    </label>
-                </div>
+            <div class="input-group">
+                <select name="modal-region" class="form-control form-control-sm modal-region" data-id="@@ID@@">
+                    <!-- Region list -->
+                </select>
+                <span class="input-group-btn">
+                    <div class="btn-group modal-order-type" data-toggle="buttons">
+                        <label class="btn btn-sm btn-outline-secondary btn-sell">
+                            <input type="radio" name="modal-order-type-@@ID@@" data-id="@@ID@@" autocomplete="off" value="sell">Sell
+                        </label>
+                        <label class="btn btn-sm btn-outline-secondary btn-buy">
+                            <input type="radio" name="modal-order-type-@@ID@@" autocomplete="off" value="buy" data-id="@@ID@@">Buy
+                        </label>
+                    </div>
+                </span>
             </div>
         </td>
         <td class="checkbox-cell">

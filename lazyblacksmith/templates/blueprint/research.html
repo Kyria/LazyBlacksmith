@@ -43,171 +43,187 @@
 {% set pref = current_user.pref %}
 <div class="row">
     <div class="col-md-3 col-sm-4">
-        <div class="well">
-            <div>
+        <div class="card bg-light mb-5">
+            <div class="card-body">
                 Facility<br>
-                <select name="facility" id="facility" class="form-control input-sm">
+                <select name="facility" id="facility" class="form-control form-control-sm mt-1">
                     <option value="0" {% if pref.research_facility == 0 -%}selected{%- endif %}>Station</option>
                     <option value="1" {% if pref.research_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
                     <option value="2" {% if pref.research_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
                     <option value="3" {% if pref.research_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
                     <option value="4" {% if pref.research_facility == 4 -%}selected{%- endif %}>Other Structures</option>
-                    <option value="8" {% if pref.research_facility == 8 -%}selected{%- endif %}>Laboratory</option>
-                    <option value="9" {% if pref.research_facility == 9 -%}selected{%- endif %}>Hyasyoda Laboratory</option>
                 </select>
-            </div>
-            <div class="structure-configs" style="{% if not pref.is_structure(pref.research_facility) -%}display: none;{%- endif %} margin-top:5px">
-                Time Reduction Rigs <br>
-                <div class="btn-group btn-group-justified" id="structure-me-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default {% if pref.research_me_rig == 0 -%}active{%- endif %}">
-                        <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.research_me_rig == 0 -%}checked{%- endif %}>No ME
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_me_rig == 1 -%}active{%- endif %}">
-                        <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.research_me_rig == 1 -%}checked{%- endif %}>T1 ME
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_me_rig == 2 -%}active{%- endif %}">
-                        <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.research_me_rig == 2 -%}checked{%- endif %}>T2 ME
-                    </label>
+
+                <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                    Time Reduction Rigs<br>
+                    <div class="btn-group w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_me_rig == 0 -%}active{%- endif %}">
+                            <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.research_me_rig == 0 -%}checked{%- endif %}>None
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_me_rig == 1 -%}active{%- endif %}">
+                            <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.research_me_rig == 1 -%}checked{%- endif %}>ME T1
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_me_rig == 2 -%}active{%- endif %}">
+                            <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.research_me_rig == 2 -%}checked{%- endif %}>ME T2
+                        </label>
+                    </div>
+                    <div class="btn-group w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_te_rig == 0 -%}active{%- endif %}">
+                            <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.research_te_rig == 0 -%}checked{%- endif %}>None
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_te_rig == 1 -%}active{%- endif %}">
+                            <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.research_te_rig == 1 -%}checked{%- endif %}>TE T1
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_te_rig == 2 -%}active{%- endif %}">
+                            <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.research_te_rig == 2 -%}checked{%- endif %}>TE T2
+                        </label>
+                    </div>
                 </div>
-                <div class="btn-group btn-group-justified" id="structure-te-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default {% if pref.research_te_rig == 0 -%}active{%- endif %}">
-                        <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.research_te_rig == 0 -%}checked{%- endif %}>No TE
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_te_rig == 1 -%}active{%- endif %}">
-                        <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.research_te_rig == 1 -%}checked{%- endif %}>T1 TE
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_te_rig == 2 -%}active{%- endif %}">
-                        <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.research_te_rig == 2 -%}checked{%- endif %}>T2 TE
-                    </label>
+
+                <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                    Copy Time Rigs <br>
+                    <div class="btn-group w-100 mt-1" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_copy_rig == 0 -%}active{%- endif %}">
+                            <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.research_copy_rig == 0 -%}checked{%- endif %}>None
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_copy_rig == 1 -%}active{%- endif %}">
+                            <input type="radio" name="structure-copy-rig" autocomplete="off" value="1" {% if pref.research_copy_rig == 1 -%}checked{%- endif %}>T1
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_copy_rig == 2 -%}active{%- endif %}">
+                            <input type="radio" name="structure-copy-rig" autocomplete="off" value="2" {% if pref.research_copy_rig == 2 -%}checked{%- endif %}>T2
+                        </label>
+                    </div>
                 </div>
-                Copy Time Rigs <br>
-                <div class="btn-group btn-group-justified" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default {% if pref.research_copy_rig == 0 -%}active{%- endif %}">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.research_copy_rig == 0 -%}checked{%- endif %}>None
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_copy_rig == 1 -%}active{%- endif %}">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="1" {% if pref.research_copy_rig == 1 -%}checked{%- endif %}>T1
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_copy_rig == 2 -%}active{%- endif %}">
-                        <input type="radio" name="structure-copy-rig" autocomplete="off" value="2" {% if pref.research_copy_rig == 2 -%}checked{%- endif %}>T2
-                    </label>
+
+                <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                    System Security<br>
+                    <div class="btn-group w-100 mt-1" id="structure-sec-status" data-toggle="buttons" style="width:100%">
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_security == 'h' -%}active{%- endif %}">
+                            <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.research_security == 'h' -%}checked{%- endif %}>HS
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_security == 'l' -%}active{%- endif %}">
+                            <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.research_security == 'l' -%}checked{%- endif %}>LS
+                        </label>
+                        <label class="btn col btn-sm btn-secondary {% if pref.research_security == 'n' -%}active{%- endif %}">
+                            <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.research_security == 'n' -%}checked{%- endif %}>NS/WH
+                        </label>
+                    </div>
                 </div>
-                System Security<br>
-                <div class="btn-group btn-group-justified" id="structure-sec-status" data-toggle="buttons" style="width:100%">
-                    <label class="btn btn-sm btn-default {% if pref.research_security == 'h' -%}active{%- endif %}">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.research_security == 'h' -%}checked{%- endif %}>HS
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_security == 'l' -%}active{%- endif %}">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.research_security == 'l' -%}checked{%- endif %}>LS
-                    </label>
-                    <label class="btn btn-sm btn-default {% if pref.research_security == 'n' -%}active{%- endif %}">
-                        <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.research_security == 'n' -%}checked{%- endif %}>NS/WH
-                    </label>
+                <div class="mt-3">
+                    System<br>
+                    <input id="system" type="text" class="form-control form-control-sm typeahead mt-1" value="{{ pref.research_system }}">
                 </div>
             </div>
         </div>
-        <div class="well">
-            <div>
-                System<br>
-                <input id="system" type="text" class="form-control input-sm typeahead" value="{{ pref.research_system }}">
+        <div class="card bg-light mb-5">
+            <div class="card-body">
+                <div class="slider">
+                    Current ME Level (<span id="ME-Level">0%</span>)<br>
+                    <div id="ME"></div>
+                </div>
+                <div class="slider">
+                    Current TE Level (<span id="TE-Level">0%</span>)<br>
+                    <div id="TE"></div>
+                </div>
             </div>
         </div>
-        <div class="well">
-            <div class="slider">
-                Current ME Level (<span id="ME-Level">0%</span>)<br>
-                <div id="ME"></div>
-            </div>
-            <div class="slider">
-                Current TE Level (<span id="TE-Level">0%</span>)<br>
-                <div id="TE"></div>
-            </div>
-        </div>
-        <div class="well">
-            <div>
-                Number of copy<br>
-                <input id="copy-number" type="text" class="form-control input-sm" value="1">
-            </div>
-            <div>
-                Runs/copy (max: {{ blueprint.max_production_limit }})<br>
-                <input id="run-per-copy" type="text" class="form-control input-sm" value="1">
+        
+        <div class="card bg-light mb-5">
+            <div class="card-body">
+                <div>
+                    Number of copy<br>
+                    <input id="copy-number" type="text" class="form-control form-control-sm mt-1" value="1">
+                </div>
+                <div class="mt-3">
+                    Runs/copy (max: {{ blueprint.max_production_limit }})<br>
+                    <input id="run-per-copy" type="text" class="form-control form-control-sm mt-1" value="1">
+                </div>
             </div>
         </div>
-        <div class="well">
-            <div>
-                ME Implant<br>
-                <select name="meImplant" id="meImplant" class="form-control input-sm">
-                    <option value="1.00" {% if pref.research_me_implant == 1.00 %}selected{% endif %}>None</option>
-                    <option value="0.99" {% if pref.research_me_implant == 0.99 %}selected{% endif %}>MY-701</option>
-                    <option value="0.97" {% if pref.research_me_implant == 0.97 %}selected{% endif %}>MY-703</option>
-                    <option value="0.95" {% if pref.research_me_implant == 0.95 %}selected{% endif %}>MY-705</option>
-                </select>
-            </div>
-            <div>
-                TE Implant<br>
-                <select name="teImplant" id="teImplant" class="form-control input-sm">
-                    <option value="1.00" {% if pref.research_te_implant == 1.00 %}selected{% endif %}>None</option>
-                    <option value="0.99" {% if pref.research_te_implant == 0.99 %}selected{% endif %}>RR-601</option>
-                    <option value="0.97" {% if pref.research_te_implant == 0.97 %}selected{% endif %}>RR-603</option>
-                    <option value="0.95" {% if pref.research_te_implant == 0.95 %}selected{% endif %}>RR-605</option>
-                </select>
-            </div>
-            <div>
-                Copy Implant<br>
-                <select name="copyImplant" id="copyImplant" class="form-control input-sm">
-                    <option value="1.00" {% if pref.research_copy_implant == 1.00 %}selected{% endif %}>None</option>
-                    <option value="0.99" {% if pref.research_copy_implant == 0.99 %}selected{% endif %}>SC-801</option>
-                    <option value="0.97" {% if pref.research_copy_implant == 0.97 %}selected{% endif %}>SC-803</option>
-                    <option value="0.95" {% if pref.research_copy_implant == 0.95 %}selected{% endif %}>SC-805</option>
-                </select>
+        
+        <div class="card bg-light mb-5">
+            <div class="card-body">
+                <div>
+                    ME Implant<br>
+                    <select name="meImplant" id="meImplant" class="form-control form-control-sm mt-1">
+                        <option value="1.00" {% if pref.research_me_implant == 1.00 %}selected{% endif %}>None</option>
+                        <option value="0.99" {% if pref.research_me_implant == 0.99 %}selected{% endif %}>MY-701</option>
+                        <option value="0.97" {% if pref.research_me_implant == 0.97 %}selected{% endif %}>MY-703</option>
+                        <option value="0.95" {% if pref.research_me_implant == 0.95 %}selected{% endif %}>MY-705</option>
+                    </select>
+                </div>
+                <div class="mt-3">
+                    TE Implant<br>
+                    <select name="teImplant" id="teImplant" class="form-control form-control-sm mt-1">
+                        <option value="1.00" {% if pref.research_te_implant == 1.00 %}selected{% endif %}>None</option>
+                        <option value="0.99" {% if pref.research_te_implant == 0.99 %}selected{% endif %}>RR-601</option>
+                        <option value="0.97" {% if pref.research_te_implant == 0.97 %}selected{% endif %}>RR-603</option>
+                        <option value="0.95" {% if pref.research_te_implant == 0.95 %}selected{% endif %}>RR-605</option>
+                    </select>
+                </div>
+                <div class="mt-3">
+                    Copy Implant<br>
+                    <select name="copyImplant" id="copyImplant" class="form-control form-control-sm mt-1">
+                        <option value="1.00" {% if pref.research_copy_implant == 1.00 %}selected{% endif %}>None</option>
+                        <option value="0.99" {% if pref.research_copy_implant == 0.99 %}selected{% endif %}>SC-801</option>
+                        <option value="0.97" {% if pref.research_copy_implant == 0.97 %}selected{% endif %}>SC-803</option>
+                        <option value="0.95" {% if pref.research_copy_implant == 0.95 %}selected{% endif %}>SC-805</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="well">
-            <div class="slider">
-                Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
-                <div id="adv-industry-level"></div>
-            </div>
-            <div class="slider">
-                Research (<span id="research-level-display">{{ industry_skills['research'] }}</span>)<br>
-                <div id="research-level"></div>
-            </div>
-            <div class="slider">
-                Science (<span id="science-level-display">{{ industry_skills['science'] }}</span>)<br>
-                <div id="science-level"></div>
-            </div>
-            <div class="slider">
-                Metallurgy (<span id="metallurgy-level-display">{{ industry_skills['metallurgy'] }}</span>)<br>
-                <div id="metallurgy-level"></div>
+        
+        <div class="card bg-light mb-5">
+            <div class="card-body">
+                <div class="slider">
+                    Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
+                    <div id="adv-industry-level"></div>
+                </div>
+                <div class="slider">
+                    Research (<span id="research-level-display">{{ industry_skills['research'] }}</span>)<br>
+                    <div id="research-level"></div>
+                </div>
+                <div class="slider">
+                    Science (<span id="science-level-display">{{ industry_skills['science'] }}</span>)<br>
+                    <div id="science-level"></div>
+                </div>
+                <div class="slider">
+                    Metallurgy (<span id="metallurgy-level-display">{{ industry_skills['metallurgy'] }}</span>)<br>
+                    <div id="metallurgy-level"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="col-md-9 col-sm-8">
         <div class="row">
-            <div class="col-xs-10">
-                <h4 id="item-name">{{ blueprint.name }}</h4>
+            <div class="col-10 align-self-center">
+                <h5>
+                    {{ blueprint.name }}
+                </h5>
             </div>
-            <div class="col-xs-2 text-right" id="item-icon">
+            <div class="col-2 text-right" id="item-icon">
                 {% if config.USE_CCP_ICONS -%}
-                <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}"/>
-                {% endif %}
+                    <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}">
+                {%- endif %}
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <ul class="nav nav-tabs" id="tab-links" role="tablist">
-                    <li class="active"><a href="#me-tab">Material Efficiency</a></li>
-                    <li><a href="#me-eff-tab">Cost / ME</a></li>
-                    <li><a href="#te-tab">Time Efficiency</a></li>
-                    <li><a href="#copy-tab">Copy</a></li>
+                    <li class="nav-item"><a class="active nav-link" href="#me-tab">Material Efficiency</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#me-eff-tab">Cost / ME</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#te-tab">Time Efficiency</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#copy-tab">Copy</a></li>
                 </ul>
                 <div class="tab-content">
 
                     <!-- ME Tab -->
-                    <div class="fade in active tab-pane" id="me-tab">
-                        <table class="me-list table table-condensed table-hover table-striped">
+                    <div class="fade show active tab-pane" role="tabpanel" id="me-tab">
+                        <table class="me-list lb-table-sm">
                             <thead>
                                 <tr>
-                                    <th>Level</th>
+                                    <th style="width:30px">ME</th>
                                     <th>Time</th>
                                     <th>Time from current level</th>
                                     <th>Installation Cost</th>
@@ -226,12 +242,12 @@
                         </table>
                     </div>
 
-                    <!-- ME Tab -->
+                    <!-- Cost / ME Tab -->
                     <div class="fade tab-pane" id="me-eff-tab">
-                        <table class="me-profit table table-condensed table-hover table-striped">
+                        <table class="me-profit lb-table-sm">
                             <thead>
                                 <tr>
-                                    <th>Level</th>
+                                    <th style="width:30px">ME</th>
                                     <th>
                                         Build Cost
                                         <span class='small' data-toggle="tooltip" data-placement="top" title="Based on The Forge prices. Values may be inaccurate but the only goal is to provide a comparison between build costs for each ME level, when built in station.">
@@ -246,7 +262,7 @@
                                 {% for level in range(0,11) -%}
                                 <tr id="ME-profit-{{ level }}">
                                     <td class="level">{{ level }}</td>
-                                    <td>{{ cost_per_me[level]['run'] | intcomma }}</td>
+                                    <td>{{ cost_per_me[level]['run'] | floatcomma }}</td>
                                     <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
                                     <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
                                     <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
@@ -256,10 +272,10 @@
                             </tbody>
                         </table>
 
-                        <table class="me-profit table table-condensed table-hover table-striped">
+                        <table class="me-profit lb-table-sm">
                             <thead>
                                 <tr>
-                                    <th>Level</th>
+                                    <th style="width:30px">ME</th>
                                     <th>
                                         Build Cost (max BPC run)
                                         <span class='small' data-toggle="tooltip" data-placement="top" title="Same as build cost, but using max run to test adjusted quantities.">
@@ -286,7 +302,7 @@
                                 {% for level in range(0,11) -%}
                                 <tr id="ME-profit-max-run-{{ level }}">
                                     <td class="level">{{ level }}</td>
-                                    <td>{{ cost_per_me[level]['run'] | intcomma }}</td>
+                                    <td>{{ cost_per_me[level]['run'] | floatcomma }}</td>
                                     <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
                                     <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
                                     <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
@@ -300,10 +316,10 @@
 
                     <!-- TE Tab -->
                     <div class="fade tab-pane" id="te-tab">
-                        <table class="te-list table table-condensed table-hover table-striped">
+                        <table class="te-list lb-table-sm">
                             <thead>
                                 <tr>
-                                    <th>Level</th>
+                                    <th style="width:30px">TE</th>
                                     <th>Time</th>
                                     <th>Time from current level</th>
                                     <th>Installation Cost</th>
@@ -312,7 +328,7 @@
                             <tbody>
                                 {% for level in range(1,11) -%}
                                 <tr id="TE-{{ level }}">
-                                    <td class="level">{{ level }}</td>
+                                    <td class="level">{{ level * 2 }}</td>
                                     <td class="total">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="price">{{ te_time[level]['cost'] | floatcomma }}</td>
@@ -325,7 +341,7 @@
 
                     <!-- Copy Tab -->
                     <div class="fade tab-pane" id="copy-tab">
-                        <table class="copy-data table table-condensed table-hover table-striped">
+                        <table class="copy-data lb-table-sm">
                             <tr>
                                 <th>Copy time</th>
                                 <td class="copy-time">{{ activity_copy.time | duration }}</td>

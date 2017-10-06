@@ -52,8 +52,13 @@ def search():
             Item.name.asc(),
         ).all()
 
+        # take the latest blueprint (as corp bp are at the end)
+        # and check if it's a corp bp.
+        has_corp_bp = blueprints[-1].corporation
+
     return render_template('blueprint/search.html', ** {
         'blueprints': blueprints,
+        'has_corp_bp': has_corp_bp,
     })
 
 

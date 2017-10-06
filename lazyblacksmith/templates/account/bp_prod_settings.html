@@ -1,0 +1,250 @@
+<h3>Manufacturing Settings</h3>
+
+<br>
+
+<div class="form-group row">
+    <label for="main-facility-prod" class="settings-label">Facility</label>
+    <div class="settings-field">
+        <select name="facility" id="main-facility-prod" class="form-control ">
+            <option value="0" {% if pref.prod_facility == 0 %}selected{%- endif -%}>Station</option>
+            <option value="1" {% if pref.prod_facility == 1 %}selected{%- endif -%}>Raitaru (M-EC)</option>
+            <option value="2" {% if pref.prod_facility == 2 %}selected{%- endif -%}>Azbel (L-EC)</option>
+            <option value="3" {% if pref.prod_facility == 3 %}selected{%- endif -%}>Sotiyo (XL-EC)</option>
+            <option value="4" {% if pref.prod_facility == 4 %}selected{%- endif -%}>Other Structures</option>
+        </select>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="structure-main-me-rig-prod" class="settings-label">ME Rig</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-main-me-rig-prod" data-toggle="buttons" >
+            <label class="btn btn-outline-secondary {% if pref.prod_me_rig == 0 %}active{% endif %}">
+                <input type="radio" name="structure-main-me-rig-prod" autocomplete="off" value="0" {% if pref.prod_me_rig == 0 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_me_rig == 1 %}active{% endif %}">
+                <input type="radio" name="structure-main-me-rig-prod" autocomplete="off" value="1" {% if pref.prod_me_rig == 1 %}checked{% endif %}>T1
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_me_rig == 2 %}active{% endif %}">
+                <input type="radio" name="structure-main-me-rig-prod" autocomplete="off" value="2"{% if pref.prod_me_rig == 2 %}checked{% endif %}>T2
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="structure-main-te-rig-prod" class="settings-label">TE Rig</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-main-te-rig-prod" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.prod_te_rig == 0 %}active{% endif %}">
+                <input type="radio" name="structure-main-te-rig-prod" autocomplete="off" value="0" {% if pref.prod_te_rig == 0 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_te_rig == 1 %}active{% endif %}">
+                <input type="radio" name="structure-main-te-rig-prod" autocomplete="off" value="1" {% if pref.prod_te_rig == 1 %}checked{% endif %}>T1
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_te_rig == 2 %}active{% endif %}">
+                <input type="radio" name="structure-main-te-rig-prod" autocomplete="off" value="2"{% if pref.prod_te_rig == 2 %}checked{% endif %}>T2
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="structure-main-sec-status-prod" class="settings-label">System Security</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-main-sec-status-prod" data-toggle="buttons" >
+            <label class="btn btn-outline-secondary {% if pref.prod_security == 'h' %}active{% endif %}">
+                <input type="radio" name="structure-main-sec-status-prod" autocomplete="off" value="h" {% if pref.prod_security == 'h' %}checked{% endif %}>HS
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_security == 'l' %}active{% endif %}">
+                <input type="radio" name="structure-main-sec-status-prod" autocomplete="off" value="l" {% if pref.prod_security == 'l' %}checked{% endif %}>LS
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_security == 'n' %}active{% endif %}">
+                <input type="radio" name="structure-main-sec-status-prod" autocomplete="off" value="n" {% if pref.prod_security == 'n' %}checked{% endif %}>NS/WH
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="xxxx" class="settings-label">System Index</label>
+    <div class="settings-field">
+        <input id="main-system-prod" type="text" class="form-control typeahead" value="{{ pref.prod_system }}"> 
+    </div>
+</div>
+
+<br>
+
+<div class="form-group row">
+    <label for="comp-facility-prod" class="settings-label">Components Facility</label>
+    <div class="settings-field">
+        <select name="facility" id="comp-facility-prod" class="form-control">
+            <option value="0" {% if pref.prod_sub_facility == 0 %}selected{%- endif -%}>Station</option>
+            <option value="1" {% if pref.prod_sub_facility == 1 %}selected{%- endif -%}>Raitaru (M-EC)</option>
+            <option value="2" {% if pref.prod_sub_facility == 2 %}selected{%- endif -%}>Azbel (L-EC)</option>
+            <option value="3" {% if pref.prod_sub_facility == 3 %}selected{%- endif -%}>Sotiyo (XL-EC)</option>
+            <option value="4" {% if pref.prod_sub_facility == 4 %}selected{%- endif -%}>Other Structures</option>
+        </select>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="structure-comp-me-rig-prod" class="settings-label">Components ME Rig</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-comp-me-rig-prod" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_me_rig == 0 %}active{% endif %}">
+                <input type="radio" name="structure-comp-me-rig-prod" autocomplete="off" value="0" {% if pref.prod_sub_me_rig == 0 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_me_rig == 1 %}active{% endif %}">
+                <input type="radio" name="structure-comp-me-rig-prod" autocomplete="off" value="1" {% if pref.prod_sub_me_rig == 1 %}checked{% endif %}>T1
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_me_rig == 2 %}active{% endif %}">
+                <input type="radio" name="structure-comp-me-rig-prod" autocomplete="off" value="2"{% if pref.prod_sub_me_rig == 2 %}checked{% endif %}>T2
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="structure-comp-te-rig-prod" class="settings-label">Components TE Rig</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-comp-te-rig-prod" data-toggle="buttons">
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_te_rig == 0 %}active{% endif %}">
+                <input type="radio" name="structure-comp-te-rig-prod" autocomplete="off" value="0" {% if pref.prod_sub_te_rig == 0 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_te_rig == 1 %}active{% endif %}">
+                <input type="radio" name="structure-comp-te-rig-prod" autocomplete="off" value="1" {% if pref.prod_sub_te_rig == 1 %}checked{% endif %}>T1
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_te_rig == 2 %}active{% endif %}">
+                <input type="radio" name="structure-comp-te-rig-prod" autocomplete="off" value="2"{% if pref.prod_sub_te_rig == 2 %}checked{% endif %}>T2
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="structure-comp-sec-status-prod" class="settings-label">Comp. System Security</label>
+    <div class="settings-field">
+        <div class="btn-group" id="structure-comp-sec-status-prod" data-toggle="buttons" >
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_security == 'h' %}active{% endif %}">
+                <input type="radio" name="structure-comp-sec-status-prod" autocomplete="off" value="h" {% if pref.prod_sub_security == 'h' %}checked{% endif %}>HS
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_security == 'l' %}active{% endif %}">
+                <input type="radio" name="structure-comp-sec-status-prod" autocomplete="off" value="l" {% if pref.prod_sub_security == 'l' %}checked{% endif %}>LS
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_sub_security == 'n' %}active{% endif %}">
+                <input type="radio" name="structure-comp-sec-status-prod" autocomplete="off" value="n" {% if pref.prod_sub_security == 'n' %}checked{% endif %}>NS/WH
+            </label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="comp-system-prod" class="settings-label">Comp. System index</label>
+    <div class="settings-field">
+        <input id="comp-system-prod" type="text" class="form-control typeahead" value="{{ pref.prod_sub_system }}"> 
+    </div>
+</div>
+
+<br>
+
+<div class="form-group row">
+    <label for="char-prod" class="settings-label">Character Skills</label>
+    <div class="settings-field">
+        <select name="char" id="char-prod" class="form-control ">
+            <option value="0">None (lvl 0)</option>
+            {% for user in list_character_skills -%}
+            <option value="{{ user.character_id }}" {% if pref.prod_character_id == user.character_id %}selected{% endif %}>{{ user.character_name }}</option>
+            {%- endfor %}
+        </select>
+    </div>
+</div>
+
+<br>
+
+<div class="form-group row">
+    <label for="region-mineral-prod" class="settings-label">Region Price - Minerals</label>
+    <div class="settings-field">
+        <div class="input-group">
+            <select id="region-mineral-prod" class="form-control">
+                {% for region in regions %}
+                <option value="{{ region.id }}" {% if prod_price_region_minerals.id == region.id %}selected{% endif %}>{{ region.name }}</option>
+                {% endfor %}
+            </select>
+            <span class="input-group-btn">
+                <div class="btn-group" id="order-type-mineral-prod" data-toggle="buttons">
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_minerals == 'sell' %}active{% endif %}">
+                        <input type="radio" name="order-type-mineral-prod" autocomplete="off" value="sell" {% if pref.prod_price_type_minerals == 'sell' %}checked{% endif %}>Sell
+                    </label>
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_minerals == 'buy' %}active{% endif %}">
+                        <input type="radio" name="order-type-mineral-prod" autocomplete="off" value="buy" {% if pref.prod_price_type_minerals == 'buy' %}checked{% endif %}>Buy
+                    </label>
+                </div>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="region-pi-prod" class="settings-label">Region Price - PI</label>
+    <div class="settings-field">
+        <div class="input-group">
+            <select id="region-pi-prod" class="form-control">
+                {% for region in regions %}
+                <option value="{{ region.id }}" {% if prod_price_region_pi.id == region.id %}selected{% endif %}>{{ region.name }}</option>
+                {% endfor %}
+            </select>
+            <span class="input-group-btn">
+                <div class="btn-group" id="order-type-pi-prod" data-toggle="buttons">
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_pi == 'sell' %}active{% endif %}">
+                        <input type="radio" name="order-type-pi-prod" autocomplete="off" value="sell" {% if pref.prod_price_type_pi == 'sell' %}checked{% endif %}>Sell
+                    </label>
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_pi == 'buy' %}active{% endif %}">
+                        <input type="radio" name="order-type-pi-prod" autocomplete="off" value="buy" {% if pref.prod_price_type_pi == 'buy' %}checked{% endif %}>Buy
+                    </label>
+                </div>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="region-moongoo-prod" class="settings-label">Region Price - MoonGoo</label>
+    <div class="settings-field">
+        <div class="input-group">
+            <select id="region-moongoo-prod" class="form-control">
+                {% for region in regions %}
+                <option value="{{ region.id }}" {% if prod_price_region_moongoo.id == region.id %}selected{% endif %}>{{ region.name }}</option>
+                {% endfor %}
+            </select>
+            <span class="input-group-btn">
+                <div class="btn-group" id="order-type-moongoo-prod" data-toggle="buttons">
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_moongoo == 'sell' %}active{% endif %}">
+                        <input type="radio" name="order-type-moongoo-prod" autocomplete="off" value="sell" {% if pref.prod_price_type_moongoo == 'sell' %}checked{% endif %}>Sell
+                    </label>
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_moongoo == 'buy' %}active{% endif %}">
+                        <input type="radio" name="order-type-moongoo-prod" autocomplete="off" value="buy" {% if pref.prod_price_type_moongoo == 'buy' %}checked{% endif %}>Buy
+                    </label>
+                </div>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="region-others-prod" class="settings-label">Region Price - Others</label>
+    <div class="settings-field">
+        <div class="input-group">
+            <select id="region-others-prod" class="form-control">
+                {% for region in regions %}
+                <option value="{{ region.id }}" {% if prod_price_region_others.id == region.id %}selected{% endif %}>{{ region.name }}</option>
+                {% endfor %}
+            </select>
+            <span class="input-group-btn">
+                <div class="btn-group" id="order-type-others-prod" data-toggle="buttons">
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_others == 'sell' %}active{% endif %}">
+                        <input type="radio" name="order-type-others-prod" autocomplete="off" value="sell" {% if pref.prod_price_type_others == 'sell' %}checked{% endif %}>Sell
+                    </label>
+                    <label class="btn btn-outline-secondary {% if pref.prod_price_type_others == 'buy' %}active{% endif %}">
+                        <input type="radio" name="order-type-others-prod" autocomplete="off" value="buy" {% if pref.prod_price_type_others == 'buy' %}checked{% endif %}>Buy
+                    </label>
+                </div>
+            </span>
+        </div>
+    </div>
+</div>
+
+<button type="button" id="btn-save-prod" class="btn btn-primary">Save</button>
+<button type="button" id="btn-reset-prod" class="btn btn-secondary">Reset</button>

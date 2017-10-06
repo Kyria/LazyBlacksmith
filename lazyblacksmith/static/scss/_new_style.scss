@@ -1,0 +1,158 @@
+// bigger nav
+.lb-nav {
+    font-size:15px;
+    line-height: 1.55;
+}
+
+// icons & buttons size
+.lb-search-bp-icon {
+    width:125px;
+    @extend .text-right;
+}
+
+.cell-btn-1 {width: 38px; text-align:center;}
+.cell-btn-2 {width: 80px; text-align:center;}
+.cell-btn-3 {width: 120px; text-align:center;}
+
+// table
+.lb-table, .lb-table-sm {
+    // invention specific format
+    &.invention-data {
+        thead tr th {
+            text-align: center;
+        };
+
+        tbody tr td {
+            &.title {
+                width: 50%;
+                font-weight: bold;
+            };
+            &.data {
+                text-align: right;
+                padding-right: 20px;
+            }
+        };
+    }
+
+    // other specifc format
+    //&.modal-config-price, &.materials-requirement, &.prices,
+    //&.materials-taxes, &.materials-time {
+    &.lb-list {
+        tbody tr td {
+            &.icon {
+                width:32px;
+            };
+            &.quantity {
+                text-align: right;
+                padding-right: 20px;
+                width: 20%;
+            };
+            &.price {
+                text-align: right;
+                padding-right: 20px;
+                width: 20%;
+            };
+            &.checkbox-cell {
+                width: 25px;
+                cursor: pointer;
+
+                input[type='checkbox'] {
+                    cursor: pointer;
+                }
+            }
+        };
+    };
+
+    // specific format for research tabs
+    &.copy-data {
+        width: 300px;
+        margin: 20px auto;
+        tbody td {
+            text-align: right;
+        }
+    }
+
+    &.me-profit {
+        width: 75%;
+        margin: 20px auto;
+
+        thead th {
+            text-align: center;
+        }
+
+        tbody {
+            text-align: right;
+            .level {
+                width: 50px;
+            };
+            .price-percent {
+                width: 65px;
+            }
+            .delta {
+                width: 25%;
+            }
+        };
+    }
+
+    &.te-list, &.me-list {
+        width: 75%;
+        margin: 20px auto;
+
+        thead th {
+            text-align: center;
+        }
+
+        tbody {
+            text-align: right;
+            .level {
+                width: 50px;
+            };
+            .total, .delta, .price {
+                width: 33.33%; /* older browsers fallback */
+                width: calc(100% / 3);
+            };
+        };
+    }
+
+    // glopal format header
+    thead {
+        tr th {
+            border-top: 0;
+        }
+    };
+
+    // global format footer
+    tfoot  {
+        tr:nth-child(odd) {
+            td, th {
+              background-color: $table-foot-accent-bg-odd;
+            };
+            &:hover {
+                td, th {
+                  background-color: $table-foot-hover-bg-odd;
+                }
+            }
+        };
+
+        tr:nth-child(even) {
+            td, th {
+              background-color: $table-foot-accent-bg-even;
+            };
+            &:hover {
+                td, th {
+                  background-color: $table-foot-hover-bg-even;
+                }
+            }
+        };
+        tr {
+            td {
+                text-align: right;
+                padding-right: 20px;
+
+                &.title {
+                    font-weight: bold;
+                };
+            }
+        };
+    };
+}

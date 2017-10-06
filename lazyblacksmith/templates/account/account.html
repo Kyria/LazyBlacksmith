@@ -66,21 +66,35 @@
 {% block content %}
 {% set pref = current_user.pref %}
 <div class="row">
-    <div class="col-md-12">
-        <ul class="nav nav-tabs" role="tablist" id="account-tabs">
-            <li class="active"><a href="#tab-char" role="tab" data-toggle="tab">API Settings</a></li>
-            <li><a href="#tab-bp" role="tab" data-toggle="tab">Blueprint Settings</a></li>
-            {% if current_user.is_admin -%}<li><a href="#tab-admin" role="tab" data-toggle="tab">Admin Dashboard</a></li>{%- endif %}
-        </ul>
-        <div class="tab-content">
-            {% include 'account/api_settings.html' %}
-            {% include 'account/blueprint_settings.html' %}
+    <div class="col-lg-2 col-md-3 col-sm-4">
+        <div class="nav flex-column nav-pills" role="tablist">
+            <span class="nav-link disabled pl-1 pb-1 mt-2" style="color:gray">Account Settings</span>
+            <a class="nav-link active" id="api-tab" data-toggle="pill" href="#api" aria-controls="api" role="tab">API Settings</a>
 
-            {% if current_user.is_admin -%}
-            <div class="row fade tab-pane" id="tab-admin">
-            bwahaha!
+            <span class="nav-link disabled pl-1 pb-1 mt-2" style="color:gray">Industry Settings</span>
+            <a class="nav-link" id="bp-cfg-prod-tab" data-toggle="pill" href="#bp-cfg-prod" aria-controls="bp-cfg-prod" role="tab">Production</a>
+            <a class="nav-link" id="bp-cfg-research-tab" data-toggle="pill" href="#bp-cfg-research" aria-controls="bp-cfg-research" role="tab">Research</a>
+            <a class="nav-link" id="bp-cfg-invention-tab" data-toggle="pill" href="#bp-cfg-invention" aria-controls="bp-cfg-invention" role="tab">Invention</a>
+            <a class="nav-link disabled" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab" data-toggle="tooltip" data-placement="top" title="Soon&trade;">Reaction</a>
+        </div>
+    </div>
+    <div class="col-lg-10 col-md-9 col-sm-8">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="api" role="tabpanel" aria-labelledby="api" aria-expanded="true">
+                {% include 'account/api_settings.html' %}
             </div>
-            {%- endif %}
+            <div class="tab-pane fade" id="bp-cfg-prod" role="tabpanel" aria-labelledby="bp-cfg-prod" aria-expanded="false">
+                {% include 'account/bp_prod_settings.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-research" role="tabpanel" aria-labelledby="bp-cfg-research" aria-expanded="false">
+                {% include 'account/bp_research_settings.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-invention" role="tabpanel" aria-labelledby="bp-cfg-invention" aria-expanded="false">
+                {% include 'account/bp_invention_settings.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-reaction" role="tabpanel" aria-labelledby="bp-cfg-reaction" aria-expanded="false">
+                {% include 'account/bp_reaction_settings.html' %}
+            </div>
         </div>
     </div>
 </div>
@@ -89,6 +103,5 @@
 <!-- config modals -->
 {% block modal %}
 {% set pref = current_user.pref %}
-{% include 'account/dialog.html' %}
 {% endblock %}
 

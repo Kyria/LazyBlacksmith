@@ -3,6 +3,7 @@ from esipy.exceptions import APIException
 from flask import Blueprint
 from flask import redirect
 from flask import request
+from flask import session
 from flask import url_for
 from flask import flash
 from urlparse import urlparse
@@ -27,7 +28,7 @@ sso = Blueprint('sso', __name__)
 @sso.route('/login/<scopes>')
 def login(scopes):
     scope_list = scopes.split(',')
-    state=build_state_token(
+    state = build_state_token(
         redirect=get_redirect_target(),
         scopes=scope_list
     )
@@ -47,19 +48,23 @@ def logout():
 
 @sso.route('/callback')
 def callback():
-    redirect, scopes = extract_state_token(request.args.get('state'))
+    redirect_uri, scopes, token = extract_state_token(request.args.get('state'))
     code = request.args.get('code')
-    
+
+    sess_token = session.pop('token', None)
+    if sess_token is None or token is None or token != sess_token:
+        flash("CSRF Token invalid. Login failed.", 'danger')
+        return redirect(url_for("home.index"))
+
     try:
         auth_response = esisecurity.auth(code)
     except APIException as e:
         return 'Login EVE Online SSO failed: %s' % e, 403
-    
+
     cdata = esisecurity.verify()
     if current_user.is_authenticated:
         add_scopes(cdata, auth_response, scopes, current_user)
     else:
         login_user_oauth(cdata, auth_response)
 
-    return safe_redirect(redirect)
-
+    return safe_redirect(redirect_uri)
