@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from flask import Blueprint
-from flask import jsonify
+from flask import flash
 from flask import request
 from flask_login import current_user
 from flask_login import login_required
@@ -11,10 +11,111 @@ from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.json import json_response
+from lazyblacksmith.utils.purge import delete_account
+from lazyblacksmith.utils.purge import purge_characters_blueprints
+from lazyblacksmith.utils.purge import purge_characters_skill
+from lazyblacksmith.utils.purge import purge_corporation_blueprints
 
 from . import logger
 
 ajax_account = Blueprint('ajax_account', __name__)
+
+
+@ajax_account.route('/skills', methods=['DELETE'])
+@login_required
+def delete_characters_skills():
+    """ remove all character skills for current user """
+    if request.is_xhr:
+        try:
+            purge_characters_skill(current_user)
+            return json_response(
+                'success',
+                'Characters skills deleted.',
+                200
+            )
+
+        except:
+            logger.exception('Cannot delete characters skills [u:%d]'
+                             % current_user.character_id)
+            db.session.rollback()
+            return json_response('danger',
+                                 'Error while trying to delete skills',
+                                 500)
+    else:
+        return 'Cannot call this page directly', 403
+
+
+@ajax_account.route('/character/blueprint', methods=['DELETE'])
+@login_required
+def delete_characters_blueprint():
+    """ remove all character blueprint for current user """
+    if request.is_xhr:
+        try:
+            purge_characters_blueprints(current_user)
+            return json_response(
+                'success',
+                'Characters blueprints deleted.',
+                200
+            )
+
+        except:
+            logger.exception('Cannot delete characters blueprints [u:%d]'
+                             % current_user.character_id)
+            db.session.rollback()
+            return json_response('danger',
+                                 'Error while trying to delete blueprints',
+                                 500)
+    else:
+        return 'Cannot call this page directly', 403
+
+
+@ajax_account.route('/corporation/blueprint', methods=['DELETE'])
+@login_required
+def delete_corporation_blueprint():
+    """ remove all character blueprint for current user """
+    if request.is_xhr:
+        try:
+            purge_corporation_blueprints(current_user)
+            return json_response(
+                'success',
+                'Corporations blueprints deleted.',
+                200
+            )
+
+        except:
+            logger.exception('Cannot delete corporation blueprints [u:%d]'
+                             % current_user.character_id)
+            db.session.rollback()
+            return json_response(
+                'danger',
+                'Error while trying to delete corporation blueprints',
+                500
+            )
+    else:
+        return 'Cannot call this page directly', 403
+
+
+@ajax_account.route('/', methods=['DELETE'])
+@login_required
+def delete_user_account():
+    """ remove all character blueprint for current user """
+    if request.is_xhr:
+        char_id = current_user.character_id
+        try:
+            delete_account(current_user)
+            flash("Your account have been deleted.", 'info')
+            return json_response('success', '', 200)
+        except:
+            logger.exception('Cannot delete user account [u:%d]'
+                             % char_id)
+            db.session.rollback()
+            return json_response(
+                'danger',
+                'Error while trying to delete corporation blueprints',
+                500
+            )
+    else:
+        return 'Cannot call this page directly', 403
 
 
 @ajax_account.route('/scopes/<int:character_id>/<scope>', methods=['DELETE'])

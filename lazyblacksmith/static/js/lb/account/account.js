@@ -304,6 +304,73 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         });
     };
 
+    /**
+     * 
+     */
+    var _initPurgeActions = function() {
+        $('#delete-char-skills').on('click', function() { 
+            _askConfirmation("all characters skills",
+                             lb.urls.purgeSkillsUrl,
+                             false)
+        });
+        $('#delete-char-bp').on('click',function() { 
+            _askConfirmation("all characters blueprints",
+                             lb.urls.purgeCharBpUrl,
+                             false)
+        });
+        $('#delete-corp-bp').on('click',function() { 
+            _askConfirmation("all corporations blueprints",
+                             lb.urls.purgeCorpBpUrl,
+                             false)
+        });
+        $('#delete-account').on('click',function() { 
+            _askConfirmation("your account",
+                             lb.urls.deleteAccountUrl,
+                             true)
+        });
+    }
+
+    var _askConfirmation = function(element, url, reload) {
+        $("#confirm-modal #modal-confirm-element").html(element);
+        $("#confirm-modal").modal('show');
+        $("#confirm-modal #modal-confirm").on('click', function(event) {
+            _callPurgeAction(url, reload);
+            $(this).off('click');
+            $("#confirm-modal").modal('hide');
+        })
+    }
+
+    var _callPurgeAction = function(url, reload) {
+        utils.ajaxDeleteCallJson(
+            url,
+            function(json) {
+                utils.flashNotify(json['message'], json['status']);
+                if(reload) {
+                    window.location.replace(lb.urls.index);
+                }
+            },
+
+            function(errorData) {
+                utils.flashNotify(errorData.responseJSON['message'], 'danger');
+            }
+        )
+
+    }
+        $('.delete-scope').on('click', function() {
+            var charId = parseInt($(this).attr('data-char-id'));
+            var scope = $(this).attr('data-scope');
+            utils.ajaxDeleteCallJson(
+                lb.urls.deleteScopeUrl.replace(/SCOPE_REPLACE/, scope).replace(/123456789/, charId),
+                function(success) {
+                    utils.flashNotify('Scope deleted.', 'success');
+                    $('#scope-'+charId+'[data-scope="'+scope+'"]').remove();
+                },
+
+                function(errorData) {
+                    utils.flashNotify(errorData.responseJSON['message'], 'danger');
+                }
+            )
+        });
 
     /**
      * Init all buttons
@@ -336,6 +403,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         _initTypeahead();
         _initScopeInput();
         _initScopeActions();
+        _initPurgeActions();
         $('[data-toggle="tooltip"]').tooltip();
     };
 
