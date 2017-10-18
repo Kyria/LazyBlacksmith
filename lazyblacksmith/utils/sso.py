@@ -21,12 +21,13 @@ from lazyblacksmith.models import UserPreference
 from lazyblacksmith.models import db
 
 from . import logger
+from .purge import delete_account
 
 import base64
 import config
 import hashlib
-import random
 import hmac
+import random
 
 
 def check_get_user(id, owner_hash, in_login=False):
@@ -50,7 +51,7 @@ def check_get_user(id, owner_hash, in_login=False):
             ).one()
             # if no exception is triggered, it mean we have a registered charID
             # but with another account: owner has changed, we'll wipe all data.
-            wipe_character_data(user)
+            delete_account(user)
             if in_login:
                 logout_user()
 

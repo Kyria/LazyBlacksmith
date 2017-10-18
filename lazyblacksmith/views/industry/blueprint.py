@@ -29,6 +29,7 @@ blueprint = FlaskBlueprint('blueprint', __name__)
 def search():
     """ Display the blueprint search page """
     blueprints = []
+    has_corp_bp = False
 
     if current_user.is_authenticated:
         blueprints = Blueprint.query.join(User, Item).filter(
@@ -42,7 +43,7 @@ def search():
         ).outerjoin(
             ActivityProduct,
             ((Blueprint.item_id == ActivityProduct.item_id) &
-             (ActivityProduct.activity == 8))
+             (ActivityProduct.activity == Activity.ACTIVITY_INVENTION))
         ).options(
             db.contains_eager(Blueprint.item)
             .contains_eager(Item.activity_products__eager)
@@ -54,7 +55,8 @@ def search():
 
         # take the latest blueprint (as corp bp are at the end)
         # and check if it's a corp bp.
-        has_corp_bp = blueprints[-1].corporation
+        if blueprints:
+            has_corp_bp = blueprints[-1].corporation
 
     return render_template('blueprint/search.html', ** {
         'blueprints': blueprints,
