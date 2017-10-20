@@ -17,9 +17,10 @@ def purge_characters_skill(user):
 
     alts = [alt.character_id for alt in user.alts_characters.all()]
     # remove all alt skills
-    Skill.query.filter(
-        Skill.character_id.in_(alts)
-    ).delete(synchronize_session='fetch')
+    if alts:
+        Skill.query.filter(
+            Skill.character_id.in_(alts)
+        ).delete(synchronize_session='fetch')
 
     # commit
     db.session.commit()
@@ -35,9 +36,10 @@ def purge_characters_blueprints(user):
 
     alts = [alt.character_id for alt in user.alts_characters.all()]
     # remove all alt skills
-    Blueprint.query.filter(
-        Blueprint.character_id.in_(alts)
-    ).filter_by(corporation=False).delete(synchronize_session='fetch')
+    if alts:
+        Blueprint.query.filter(
+            Blueprint.character_id.in_(alts)
+        ).filter_by(corporation=False).delete(synchronize_session='fetch')
 
     # commit
     db.session.commit()
@@ -53,9 +55,10 @@ def purge_corporation_blueprints(user):
 
     alts = [alt.character_id for alt in user.alts_characters.all()]
     # remove all alt skills
-    Blueprint.query.filter(
-        Blueprint.character_id.in_(alts)
-    ).filter_by(corporation=True).delete(synchronize_session='fetch')
+    if alts:
+        Blueprint.query.filter(
+            Blueprint.character_id.in_(alts)
+        ).filter_by(corporation=True).delete(synchronize_session='fetch')
 
     # commit
     db.session.commit()
@@ -78,14 +81,16 @@ def delete_account(user):
     TokenScope.query.filter(
         TokenScope.user_id == user.character_id
     ).delete()
-    TokenScope.query.filter(
-        TokenScope.user_id.in_(alts)
-    ).delete(synchronize_session='fetch')
 
-    # delete all alts
-    User.query.filter(
-        User.character_id.in_(alts)
-    ).delete(synchronize_session='fetch')
+    # delete all alts stuff
+    if alts:
+        TokenScope.query.filter(
+            TokenScope.user_id.in_(alts)
+        ).delete(synchronize_session='fetch')
+
+        User.query.filter(
+            User.character_id.in_(alts)
+        ).delete(synchronize_session='fetch')
 
     # commit
     db.session.commit()
