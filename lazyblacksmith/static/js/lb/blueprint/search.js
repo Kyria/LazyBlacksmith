@@ -71,10 +71,16 @@ var searchBlueprint = (function ($, lb, utils) {
                 var inventionLink = lb.urls.inventionUrl.replace(/999999999/, data[item].id);
                 var manufacturingLink = lb.urls.manufacturingUrl.replace(/999999999/, data[item].id);
                 var researchLink = lb.urls.researchUrl.replace(/999999999/, data[item].id);
+                var reactionLink = lb.urls.reactionUrl.replace(/999999999/, data[item].id);
 
                 var invention = (!data[item].invention) ? '' : resultBtn.replace(/@@LINK@@/, inventionLink)
                                                                         .replace(/@@NAME@@/, 'Invention')
                                                                         .replace(/@@ICON@@/, '<i class="fa fa-flask" aria-hidden="true"></i>');
+
+                var reaction = (!data[item].reaction) ? '' : resultBtn.replace(/@@LINK@@/, reactionLink)
+                                                                        .replace(/@@NAME@@/, 'Reaction')
+                                                                        .replace(/@@ICON@@/, '<i class="fa fa-share-alt" aria-hidden="true"></i>');
+
                 var research = resultBtn.replace(/@@LINK@@/, researchLink)
                                         .replace(/@@NAME@@/, 'Research')
                                         .replace(/@@ICON@@/, '<i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>');
@@ -82,8 +88,12 @@ var searchBlueprint = (function ($, lb, utils) {
                                              .replace(/@@NAME@@/, 'Manufacture')
                                              .replace(/@@ICON@@/, '<i class="fa fa-industry" aria-hidden="true"></i>');
 
-
-                htmlResult += '<tr><td>' + data[item].name + '</td><td class="text-right"><div class="btn-group" role="group">' + invention  + research + manufacturing + '</div></td></tr>';
+                htmlResult += '<tr><td>' + data[item].name + '</td>';
+                if(!data[item].reaction) {
+                    htmlResult += '<td class="text-right"><div class="btn-group" role="group">' + invention  + research + manufacturing + '</div></td></tr>';
+                } else {
+                    htmlResult += '<td class="text-right"><div class="btn-group" role="group">' + reaction + '</div></td></tr>';
+                }
             }
 
             // display result

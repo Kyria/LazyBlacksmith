@@ -8,20 +8,22 @@ class Activity(db.Model):
     time = db.Column(db.Integer, nullable=True)
     activity = db.Column(db.Integer, primary_key=True, autoincrement=False)
 
-    ACTIVITY_NONE = 0
-    ACTIVITY_MANUFACTURING = 1
-    ACTIVITY_RESEARCHING_TIME_EFFICIENCY = 3
-    ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY = 4
-    ACTIVITY_COPYING = 5
-    ACTIVITY_INVENTION = 8
+    NONE = 0
+    MANUFACTURING = 1
+    RESEARCH_TIME_EFFICIENCY = 3
+    RESEARCH_MATERIAL_EFFICIENCY = 4
+    COPYING = 5
+    INVENTION = 8
+    REACTION = 11
 
     ACTIVITIES = {
-        ACTIVITY_NONE: 'None',
-        ACTIVITY_MANUFACTURING: 'Manufacturing',
-        ACTIVITY_RESEARCHING_TIME_EFFICIENCY: 'Time efficiency',
-        ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY: 'Material efficiency',
-        ACTIVITY_COPYING: 'Copy',
-        ACTIVITY_INVENTION: 'Invention',
+        NONE: 'None',
+        MANUFACTURING: 'Manufacturing',
+        RESEARCH_TIME_EFFICIENCY: 'Time efficiency',
+        RESEARCH_MATERIAL_EFFICIENCY: 'Material efficiency',
+        COPYING: 'Copy',
+        INVENTION: 'Invention',
+        REACTION: 'Reaction',
     }
 
     @classmethod

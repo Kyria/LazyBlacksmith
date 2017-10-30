@@ -6,7 +6,7 @@ from lazyblacksmith.models import Activity
 class IndustryIndex(db.Model):
 
     solarsystem_id = db.Column(
-       db.Integer, db.ForeignKey('solar_system.id'), primary_key=True
+        db.Integer, db.ForeignKey('solar_system.id'), primary_key=True
     )
     solarsystem = db.relationship('SolarSystem', backref=db.backref('indexes'))
 
@@ -23,12 +23,12 @@ class IndustryIndex(db.Model):
     @classmethod
     def activity_string_to_activity(cls, activity_string):
         if activity_string == 'invention':
-            return Activity.ACTIVITY_INVENTION
+            return Activity.INVENTION
         if activity_string == 'manufacturing':
-            return Activity.ACTIVITY_MANUFACTURING
+            return Activity.MANUFACTURING
         if activity_string == 'researching_time_efficiency':
-            return Activity.ACTIVITY_RESEARCHING_TIME_EFFICIENCY
+            return Activity.RESEARCH_TIME_EFFICIENCY
         if activity_string == 'researching_material_efficiency':
-            return Activity.ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY
+            return Activity.RESEARCH_MATERIAL_EFFICIENCY
         if activity_string == 'copying':
-            return Activity.ACTIVITY_COPYING
+            return Activity.COPYING

@@ -13,9 +13,11 @@ from . import is_not_ajax
 from lazyblacksmith.extension.cache import cache
 from lazyblacksmith.models import Activity
 from lazyblacksmith.models import ActivityMaterial
+from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
+from lazyblacksmith.models import db
 
 
 ajax_eve_sde = Blueprint('ajax_eve_sde', __name__)
@@ -28,28 +30,56 @@ def blueprint_search(name):
     name is the request name.
     """
     if request.is_xhr:
-        cache_key = 'blueprint:search:%s' % (name.lower().replace(" ", ""),)
+        name_lower = name.lower()
+
+        # prevent only % string, to avoid query the full database at once...
+        if name_lower == '%' * len(name_lower):
+            return jsonify(result=[])
+
+        cache_key = 'blueprint:search:%s' % (name_lower.replace(" ", ""),)
 
         data = cache.get(cache_key)
         if data is None:
             blueprints = Item.query.filter(
-                Item.name.ilike('%' + name.lower() + '%'),
+                Item.name.ilike('%' + name_lower + '%'),
                 Item.max_production_limit.isnot(None)
+            ).outerjoin(
+                ActivityProduct,
+                (
+                    (Item.id == ActivityProduct.item_id) & (
+                        (ActivityProduct.activity == Activity.INVENTION) |
+                        (ActivityProduct.activity == Activity.REACTION)
+                    )
+                )
+            ).options(
+                db.contains_eager(Item.activity_products__eager)
             ).order_by(
                 Item.name.asc()
             ).all()
 
             data = []
             for bp in blueprints:
-                invention_product = bp.activity_products.filter_by(
-                    activity=Activity.ACTIVITY_INVENTION
-                ).first()
-                invention = False if invention_product is None else True
+                invention = False
+                reaction = False
+
+                # we can't have invention AND reaction
+                # at the same time as product.
+                print "%s" % [a.activity for a in bp.activity_products__eager]
+                if bp.activity_products__eager:
+                    invention = (
+                        bp.activity_products__eager[0].activity ==
+                        Activity.INVENTION
+                    )
+                    reaction = (
+                        bp.activity_products__eager[0].activity ==
+                        Activity.REACTION
+                    )
 
                 data.append({
                     'id': bp.id,
                     'name': bp.name,
-                    'invention': invention
+                    'invention': invention,
+                    'reaction': reaction
                 })
 
             # cache for 7 day as it does not change that often
@@ -73,7 +103,7 @@ def blueprint_bom(blueprint_id):
     if request.is_xhr:
         blueprints = ActivityMaterial.query.filter_by(
             item_id=blueprint_id,
-            activity=Activity.ACTIVITY_MANUFACTURING
+            activity=Activity.MANUFACTURING
         ).all()
 
         data = OrderedDict()
@@ -83,18 +113,18 @@ def blueprint_bom(blueprint_id):
             try:
                 product = bp.material.product_for_activities
                 product = product.filter_by(
-                    activity=Activity.ACTIVITY_MANUFACTURING
+                    activity=Activity.MANUFACTURING
                 ).one()
                 bp_final = product.blueprint
             except NoResultFound:
                 continue
 
             activity = bp_final.activities.filter_by(
-                activity=Activity.ACTIVITY_MANUFACTURING
+                activity=Activity.MANUFACTURING
             ).one()
 
             mats = bp_final.activity_materials.filter_by(
-                activity=Activity.ACTIVITY_MANUFACTURING
+                activity=Activity.MANUFACTURING
             ).all()
 
             if bp_final.id not in data:
@@ -112,7 +142,7 @@ def blueprint_bom(blueprint_id):
 
             for mat in mats:
                 pref = current_user.pref
-                
+
                 if mat.material.is_moon_goo():
                     price_type = pref.prod_price_type_moongoo
                     price_region = pref.prod_price_region_moongoo
@@ -125,7 +155,7 @@ def blueprint_bom(blueprint_id):
                 else:
                     price_type = pref.prod_price_type_others
                     price_region = pref.prod_price_region_others
-                    
+
                 data[bp_final.id]['materials'].append({
                     'id': mat.material.id,
                     'name': mat.material.name,
@@ -204,7 +234,7 @@ def build_cost_item(material_efficiency, blueprint_id, region_id):
     """
     material_list = ActivityMaterial.query.filter_by(
         item_id=blueprint_id,
-        activity=Activity.ACTIVITY_MANUFACTURING
+        activity=Activity.MANUFACTURING
     ).all()
 
     me_list = material_efficiency.split(',')

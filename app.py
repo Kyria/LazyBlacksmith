@@ -25,4 +25,8 @@ if __name__ == '__main__':
     logger.addHandler(console)
     logger.setLevel(logging.ERROR)  # DEBUG for queries + results
 
+    if config.DEBUG:
+        from flask_debugtoolbar import DebugToolbarExtension
+        toolbar = DebugToolbarExtension(app)
+
     app.run(port=config.PORT, host=config.HOST)

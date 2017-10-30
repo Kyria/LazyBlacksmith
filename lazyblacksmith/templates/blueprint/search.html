@@ -8,6 +8,7 @@
         lb.urls.inventionUrl        = '{{ url_for('blueprint.invention', item_id='999999999') }}';
         lb.urls.manufacturingUrl    = '{{ url_for('blueprint.manufacturing', item_id='999999999') }}';
         lb.urls.researchUrl         = '{{ url_for('blueprint.research', item_id='999999999') }}';
+        lb.urls.reactionUrl         = '{{ url_for('blueprint.reaction', item_id='999999999') }}';
         lb.run('searchBlueprint');
     </script>
 {% endblock %}
@@ -53,22 +54,28 @@
                             <td class="text-right">{% if blueprint.original %}&infin;{% else %}{{ blueprint.total_runs }}{% endif %}</td>
                             <td class="lb-search-bp-icon">
                                 <div class="btn-group" role="group">
-                                    {% if blueprint.item.activity_products__eager %}
-                                    <a href="{{ url_for('blueprint.invention', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Invention">
-                                        <i class="fa fa-flask" aria-hidden="true"></i>
-                                    </a>
-                                    {%- endif %}
-                                    {# hack for ancient relics... cat_id = 34 #}
-                                    {% if blueprint.item.category_id != 34 %}
-                                        {% if blueprint.original %}
-                                        <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Research">
-                                            <i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>
+                                    {% if blueprint.item.activity_products__eager and blueprint.item.activity_products__eager[0].activity == 11 %}
+                                        <a href="{{ url_for('blueprint.reaction', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Reaction">
+                                            <i class="fa fa-share-alt" aria-hidden="true"></i>
+                                        </a>
+                                    {%- else -%}
+                                        {% if blueprint.item.activity_products__eager %}
+                                        <a href="{{ url_for('blueprint.invention', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Invention">
+                                            <i class="fa fa-flask" aria-hidden="true"></i>
                                         </a>
                                         {%- endif %}
-                                        <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-outline-secondary btn-sm"  data-toggle="tooltip" data-placement="top" title="Manufacturing">
-                                            <i class="fa fa-industry" aria-hidden="true"></i>
-                                        </a>
-                                    {% endif %}
+                                        {# hack for ancient relics... cat_id = 34 #}
+                                        {% if blueprint.item.category_id != 34 %}
+                                            {% if blueprint.original %}
+                                            <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Research">
+                                                <i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>
+                                            </a>
+                                            {%- endif %}
+                                            <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-outline-secondary btn-sm"  data-toggle="tooltip" data-placement="top" title="Manufacturing">
+                                                <i class="fa fa-industry" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                    {%- endif %}
                                 </div>
                             </td>
                         </tr>

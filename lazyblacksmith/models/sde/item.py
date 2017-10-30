@@ -74,7 +74,7 @@ class Item(db.Model):
 
     def is_manufactured(self):
         if self.product_for_activities.filter_by(
-            activity=Activity.ACTIVITY_MANUFACTURING
+            activity=Activity.MANUFACTURING
         ).count() > 0:
             return True
         return False
