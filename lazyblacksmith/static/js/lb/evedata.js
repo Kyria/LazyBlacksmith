@@ -3,7 +3,7 @@ var eveData = (function() {
     /**
      * Structure data
      */
-    var structureRigs = [
+    var structureIndustryRigs = [
         { // No rig bonus
             'timeBonus': 0,
             'materialBonus': 0,
@@ -27,6 +27,13 @@ var eveData = (function() {
         'n': 2.1,  // Null Sec / WH
     };
 
+    // as refineries can't be in highsec, multiplier are different..
+    var refinerySectatusMultiplier = {
+        'h': 0,
+        'l': 1,
+        'n': 1.1,
+    }
+
     var securityStatus = {
         'h': 'High Sec',
         'l': 'Low Sec',
@@ -44,6 +51,7 @@ var eveData = (function() {
             "jobTe": 1.0, // time bonus on TE Research on BPO
             "copy": 1.0,
             "invention": 1.0,
+            "reactionTime": 1.0,
             "name": 'Station',
             "structure": false,
         },
@@ -54,6 +62,7 @@ var eveData = (function() {
             "jobTe": 0.85,
             "copy": 0.85,
             "invention": 0.85,
+            "reactionTime": 1.0,
             "name": 'Raitaru (M-EC)',
             "structure": true,
         },
@@ -64,6 +73,7 @@ var eveData = (function() {
             "jobTe": 0.80,
             "copy": 0.80,
             "invention": 0.80,
+            "reactionTime": 1.0,
             "name": 'Azbel (L-EC)',
             "structure": true,
         },
@@ -74,6 +84,7 @@ var eveData = (function() {
             "jobTe": 0.70,
             "copy": 0.70,
             "invention": 0.70,
+            "reactionTime": 1.0,
             "name": 'Sotiyo (XL-EC)',
             "structure": true,
         },
@@ -84,48 +95,32 @@ var eveData = (function() {
             "jobTe": 1.0,
             "copy": 1.0,
             "invention": 1.0,
+            "reactionTime": 1.0,
             "name": 'Other Structures',
             "structure": true,
         },
-        { // [5] - manufacturing
-            "bpMe": 0.98,
-            "bpTe": 0.75,
-            "name": 'Assembly Array',
-            "structure": false,
-        },
-        { // [6] - manufacturing
-            "bpMe": 0.9,
-            "bpTe": 0.75,
-            "name": 'Thukker Component Array',
-            "structure": false,
-        },
-        { // [7] - Manufacturing
-            "bpMe": 1.05,
-            "bpTe": 0.65,
-            "name": 'Rapid Assembly Array',
-            "structure": false,
-        },
-        { // [8] - Research - Invention
-            "jobMe": 0.7,
-            "jobTe": 0.7,
-            "copy": 0.6,
-            "invention": 0.5,
-            "name": 'Laboratory',
-            "structure": false,
-        },
-        { // [9] - Research
-            "jobMe": 0.65,
-            "jobTe": 0.65,
-            "copy": 0.6,
-            "name": 'Hyasyoda Laboratory',
-            "structure": false,
-        },
-        { // [10] - Invention
+        { // [5]
+            "bpMe": 1.0,
+            "bpTe": 1.0,
+            "jobMe": 1.0,
+            "jobTe": 1.0,
             "copy": 1.0,
             "invention": 1.0,
-            "name": 'Experimental Laboratory',
-            "structure": false,
+            "reactionTime": 1.0,
+            "name": 'Athanor',
+            "structure": true,
         },
+        { // [6]
+            "bpMe": 1.0,
+            "bpTe": 1.0,
+            "jobMe": 1.0,
+            "jobTe": 1.0,
+            "copy": 1.0,
+            "invention": 1.0,
+            "reactionTime": 0.75,
+            "name": 'Tatara',
+            "structure": true,
+        }
     ];
 
     var implants = {
@@ -151,7 +146,7 @@ var eveData = (function() {
 
 
     return {
-        structureRigs: structureRigs,
+        structureIndustryRigs: structureIndustryRigs,
         structureSecStatusMultiplier: structureSecStatusMultiplier,
         facilities: facilities,
         securityStatus: securityStatus,

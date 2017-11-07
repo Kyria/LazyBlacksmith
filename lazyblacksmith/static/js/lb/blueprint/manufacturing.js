@@ -77,7 +77,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
     // assembly informations
     var facilityStats = eveData.facilities;
-    var structureRigs = eveData.structureRigs;
+    var structureRigs = eveData.structureIndustryRigs;
     var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
 
 
