@@ -11,6 +11,10 @@ class Item(db.Model):
     market_group_id = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
 
+    # calculated field on import
+    is_from_manufacturing = db.Column(db.Boolean(), default=True)
+    is_from_reaction = db.Column(db.Boolean(), default=True)
+
     # foreign keys
     activities = db.relationship(
         'Activity',
