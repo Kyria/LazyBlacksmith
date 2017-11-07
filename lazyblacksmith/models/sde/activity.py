@@ -14,7 +14,7 @@ class Activity(db.Model):
     RESEARCH_MATERIAL_EFFICIENCY = 4
     COPYING = 5
     INVENTION = 8
-    REACTION = 11
+    REACTIONS = 11
 
     ACTIVITIES = {
         NONE: 'None',
@@ -23,7 +23,7 @@ class Activity(db.Model):
         RESEARCH_MATERIAL_EFFICIENCY: 'Material efficiency',
         COPYING: 'Copy',
         INVENTION: 'Invention',
-        REACTION: 'Reaction',
+        REACTIONS: 'Reactions',
     }
 
     @classmethod

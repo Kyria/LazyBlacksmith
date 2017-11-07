@@ -48,7 +48,7 @@ def blueprint_search(name):
                 (
                     (Item.id == ActivityProduct.item_id) & (
                         (ActivityProduct.activity == Activity.INVENTION) |
-                        (ActivityProduct.activity == Activity.REACTION)
+                        (ActivityProduct.activity == Activity.REACTIONS)
                     )
                 )
             ).options(
@@ -64,7 +64,6 @@ def blueprint_search(name):
 
                 # we can't have invention AND reaction
                 # at the same time as product.
-                print "%s" % [a.activity for a in bp.activity_products__eager]
                 if bp.activity_products__eager:
                     invention = (
                         bp.activity_products__eager[0].activity ==
@@ -72,7 +71,7 @@ def blueprint_search(name):
                     )
                     reaction = (
                         bp.activity_products__eager[0].activity ==
-                        Activity.REACTION
+                        Activity.REACTIONS
                     )
 
                 data.append({
@@ -99,11 +98,17 @@ def blueprint_bom(blueprint_id):
     """
     Return JSON with the list of all bill of material for
     each material in the blueprint given in argument
+
+    As reaction and manufacturing cannot happen on the same blueprint at once
+    we can safely ask for both at the same time (to be used in prod/reactions)
     """
     if request.is_xhr:
-        blueprints = ActivityMaterial.query.filter_by(
-            item_id=blueprint_id,
-            activity=Activity.MANUFACTURING
+        blueprints = ActivityMaterial.query.filter(
+            ActivityMaterial.item_id == blueprint_id,
+            (
+                (ActivityMaterial.activity == Activity.MANUFACTURING) |
+                (ActivityMaterial.activity == Activity.REACTIONS)
+            )
         ).all()
 
         data = OrderedDict()
@@ -112,19 +117,22 @@ def blueprint_bom(blueprint_id):
             # As some item cannot be manufactured, catch the exception
             try:
                 product = bp.material.product_for_activities
-                product = product.filter_by(
-                    activity=Activity.MANUFACTURING
+                product = product.filter(
+                    (ActivityProduct.activity == Activity.MANUFACTURING) |
+                    (ActivityProduct.activity == Activity.REACTIONS)
                 ).one()
                 bp_final = product.blueprint
             except NoResultFound:
                 continue
 
-            activity = bp_final.activities.filter_by(
-                activity=Activity.MANUFACTURING
+            activity = bp_final.activities.filter(
+                (Activity.activity == Activity.MANUFACTURING) |
+                (Activity.activity == Activity.REACTIONS)
             ).one()
 
-            mats = bp_final.activity_materials.filter_by(
-                activity=Activity.MANUFACTURING
+            mats = bp_final.activity_materials.filter(
+                (ActivityMaterial.activity == Activity.MANUFACTURING) |
+                (ActivityMaterial.activity == Activity.REACTIONS)
             ).all()
 
             if bp_final.id not in data:

@@ -34,12 +34,14 @@ def get_common_industry_skill(char):
     SKILL_INDUSTRY = 3380
     SKILL_RESEARCH = 3403
     SKILL_METALLURGY = 3409
+    SKILL_REACTIONS = 45746
     skills = {
         'science': 0,
         'industry': 0,
         'adv_industry': 0,
         'metallurgy': 0,
         'research': 0,
+        'reactions': 0,
     }
     if char:
         science = char.skills.filter_by(
@@ -57,6 +59,9 @@ def get_common_industry_skill(char):
         metallurgy = char.skills.filter_by(
             skill_id=SKILL_METALLURGY
         ).one_or_none()
+        reactions = char.skills.filter_by(
+            skill_id=SKILL_REACTIONS
+        ).one_or_none()
 
         if science:
             skills['science'] = science.level
@@ -68,6 +73,8 @@ def get_common_industry_skill(char):
             skills['research'] = research.level
         if metallurgy:
             skills['metallurgy'] = metallurgy.level
+        if reactions:
+            skills['reactions'] = reactions.level
 
     return skills
 
