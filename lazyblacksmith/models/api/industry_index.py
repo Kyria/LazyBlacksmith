@@ -32,3 +32,5 @@ class IndustryIndex(db.Model):
             return Activity.RESEARCH_MATERIAL_EFFICIENCY
         if activity_string == 'copying':
             return Activity.COPYING
+        if activity_string == 'reaction':
+            return Activity.REACTIONS
