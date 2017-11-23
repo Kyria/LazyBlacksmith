@@ -54,7 +54,25 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         priceOtherRegion: false,
         priceOtherType: false,
         characterId: null,
+        teImplant: false,
     };
+
+    var reactionSettings = {
+        reactionFacility: false,
+        reactionMeRig: false,
+        reactionTeRig: false,
+        reactionSecurity: false,
+        reactionSystem: false,
+        manufFacility: false,
+        manufMeRig: false,
+        manufTeRig: false,
+        manufSecurity: false,
+        manufSystem: false,
+        manufTeImplant: false,
+        priceRegion: false,
+        priceType: false,
+        characterId: null,
+    }
 
 
     /* ---------------------------------------------------------------------- */
@@ -175,8 +193,81 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
             $('#main-facility-prod').val(productionSettings.facility)
             $('#comp-facility-prod').val(productionSettings.componentFacility);
 
+            $('#te-implant-prod input[value="'+productionSettings.teImplant+'"]').parent().button("toggle");
+
             var charId = (productionSettings.characterId) ? productionSettings.characterId : 0;
             $("#char-prod").val(charId);
+        });
+    };
+
+    /**
+     * Init the reaction settings reset button action
+     */
+    var _resetReactionSettings = function() {
+        $('#btn-reset-reaction').on('click', function(event) {
+            $('#me-rig-reaction input[value='+reactionSettings.reactionMeRig+']').parent().button("toggle");
+            $('#te-rig-reaction input[value='+reactionSettings.reactionTeRig+']').parent().button("toggle");
+            $('#manufacturing-me-rig-reaction input[value='+reactionSettings.manufMeRig+']').parent().button("toggle");
+            $('#manufacturing-te-rig-reaction input[value='+reactionSettings.manufTeRig+']').parent().button("toggle");
+
+            $('#sec-status-reaction input[value='+reactionSettings.reactionSecurity+']').parent().button("toggle");
+            $('#manufacturing-sec-status-reaction input[value='+reactionSettings.manufSecurity+']').parent().button("toggle");
+
+            $('#order-type-reaction input[value='+reactionSettings.priceType+']').parent().button("toggle");
+            $("#region-reaction").val(reactionSettings.priceRegion);
+
+            $('#system-reaction').val(reactionSettings.reactionSystem);
+            $('#manufacturing-system-reaction').val(reactionSettings.manufSystem);
+
+            $('#facility-reaction').val(reactionSettings.reactionFacility)
+            $('#manufacturing-facility-reaction').val(reactionSettings.manufFacility);
+
+            $('#te-implant-reaction input[value="'+reactionSettings.manufTeImplant+'"]').parent().button("toggle");
+
+            var charId = (reactionSettings.characterId) ? reactionSettings.characterId : 0;
+            $("#char-reaction").val(charId);
+        });
+    };
+
+    /**
+     * Reaction save event.
+     * Send a POST call to the backend to set the new settings
+     */
+    var _saveReactionSettings = function(event) {
+        $('#btn-save-reaction').on('click', function(event) {
+            var charId = $("#char-reaction").val();
+            var reactionSettingsTmp = {
+                reactionFacility: parseInt($('#facility-reaction').val()),
+                reactionMeRig: parseInt($('#me-rig-reaction input:checked').val()),
+                reactionTeRig: parseInt($('#te-rig-reaction input:checked').val()),
+                reactionSecurity: $('#sec-status-reaction input:checked').val(),
+                reactionSystem: $('#system-reaction').val(),
+                manufFacility: parseInt($('#manufacturing-facility-reaction').val()),
+                manufMeRig: parseInt($('#manufacturing-me-rig-reaction input:checked').val()),
+                manufTeRig: parseInt($('#manufacturing-te-rig-reaction input:checked').val()),
+                manufSecurity: $('#manufacturing-sec-status-reaction input:checked').val(),
+                manufSystem: $('#manufacturing-system-reaction').val(),
+                manufTeImplant: $('#te-implant-reaction input:checked').val(),
+                priceRegion: parseInt($("#region-reaction").val()),
+                priceType: $('#order-type-reaction input:checked').val(),
+                characterId: (charId == '0') ? null : charId,
+            }
+
+            utils.ajaxPostCallJson(
+                lb.urls.updatePreferenceUrl,
+                JSON.stringify({reaction: reactionSettingsTmp}),
+                function(data) {
+                    utils.flashNotify(data.message, data.status);
+                    if(data.status != 'success') {
+                        reactionSettingsTmp.reactionSystem = reactionSettings.reactionSystem;
+                        reactionSettingsTmp.manufSystem = reactionSettings.manufSystem;
+                    }
+                    reactionSettings = reactionSettingsTmp;
+                },
+                function(errorData) {
+                    utils.flashNotify(errorData.responseJSON['message'], 'danger');
+                }
+            )
         });
     };
 
@@ -209,6 +300,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
                 priceOtherRegion: parseInt($("#region-others-prod").val()),
                 priceOtherType: $('#order-type-others-prod input:checked').val(),
                 characterId: (charId == '0') ? null : charId,
+                teImplant: $('#te-implant-prod input:checked').val(),
             };
 
             utils.ajaxPostCallJson(
@@ -380,9 +472,11 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         _resetInventionSettings();
         _resetResearchSettings();
         _resetProdSettings();
+        _resetReactionSettings();
         _saveInventionSettings();
         _saveResearchSettings();
         _saveProdSettings();
+        _saveReactionSettings();
     };
 
     /**
@@ -393,6 +487,8 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         eveUtils.initSolarSystemTypeahead('#comp-system-prod');
         eveUtils.initSolarSystemTypeahead('#system-research');
         eveUtils.initSolarSystemTypeahead('#system-invention');
+        eveUtils.initSolarSystemTypeahead('#system-reaction');
+        eveUtils.initSolarSystemTypeahead('#manufacturing-system-reaction');
     };
 
     /**
@@ -416,6 +512,7 @@ var accountDashboard = (function($, lb, utils, eveUtils, eveData) {
         inventionSettings: inventionSettings,
         researchSettings: researchSettings,
         productionSettings: productionSettings,
+        reactionSettings: reactionSettings,
         regions:regions,
         character_list: character_list,
     };

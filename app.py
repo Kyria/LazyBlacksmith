@@ -1,12 +1,17 @@
 # -*- encoding: utf-8 -*-
-import config
+""" Main app entry / wsgi entry point """
 import logging
+import sys
+
+import config
 
 from lazyblacksmith.app import create_app
 
-app = create_app(config)
+APP = create_app(config)
 
-if __name__ == '__main__':
+
+def set_loggers():
+    """ Define logger format and level for the whole app """
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     console = logging.StreamHandler()
@@ -25,4 +30,16 @@ if __name__ == '__main__':
     logger.addHandler(console)
     logger.setLevel(logging.ERROR)  # DEBUG for queries + results
 
-    app.run(port=config.PORT, host=config.HOST)
+
+if __name__ == '__main__':
+    set_loggers()
+
+    if config.DEBUG:
+        try:
+            from flask_debugtoolbar import DebugToolbarExtension
+            DebugToolbarExtension(APP)
+        except ImportError:
+            print "Library 'flask-debugtoolbar' is missing. Please install it using 'pip'"
+            sys.exit()
+
+    APP.run(port=config.PORT, host=config.HOST)

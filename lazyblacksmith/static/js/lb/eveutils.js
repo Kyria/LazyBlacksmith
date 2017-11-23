@@ -47,14 +47,14 @@ var eveUtils = (function(utils) {
     };
 
     /**
-     * Calculate the manufacturing time with the given informations.
+     * Calculate the manufacturing / reactions time with the given informations.
      * Note: T2Time must never be used for subcomponents (as it's only required for tech2 items)
      *
      * @param timePerUnit the base production time
      * @param runs the number of runs
      * @param facilityTimeBonus the facility bonus
      * @param timeEfficiency the blueprint time efficiency level
-     * @param industrySkillLevel the industry skill level
+     * @param industryReactionsSkillLevel the industry skill level
      * @param advancedIndustrySkillLevel the advanced industry skill level
      * @param t2ConstructionSkillLevel the <object> construction skill level (frig, cruiser, capitals...)
      * @param primaryScienceSkillLevel the primary science skill level
@@ -67,12 +67,12 @@ var eveUtils = (function(utils) {
      *
      */
     var calculateJobTime = function(timePerUnit, runs, facilityTimeBonus, timeEfficiency,
-                            industrySkillLevel, advancedIndustrySkillLevel,
+                            implantModifier, industryReactionsSkillLevel, advancedIndustrySkillLevel,
                             t2ConstructionSkillLevel, primaryScienceSkillLevel, secondaryScienceSkilllevel,
                             rigBonus, rigMultiplier, isStructure, useT2Time) {
         var timeBonus = (1.00-timeEfficiency/100.00);
-        var time = timePerUnit * timeBonus * facilityTimeBonus * runs;
-        time *= (1 - industrySkillLevel * 0.04);
+        var time = timePerUnit * timeBonus * facilityTimeBonus * runs * implantModifier;
+        time *= (1 - industryReactionsSkillLevel * 0.04);
         time *= (1 - advancedIndustrySkillLevel * 0.03);
         if(useT2Time) {
             time *= (1 - t2ConstructionSkillLevel * 0.01);

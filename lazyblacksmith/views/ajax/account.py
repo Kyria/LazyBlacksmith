@@ -168,6 +168,9 @@ def update_user_industry_preference():
 
         if 'invention' in preferences:
             return update_invention_preference(preferences['invention'])
+
+        if 'reaction' in preferences:
+            return update_reaction_preference(preferences['reaction'])
     else:
         return 'Cannot call this page directly', 403
 
@@ -207,6 +210,7 @@ def update_production_preference(preferences):
             pref.prod_price_region_others = preferences['priceOtherRegion']
             pref.prod_price_type_others = preferences['priceOtherType']
             pref.prod_character_id = preferences['characterId']
+            pref.prod_te_implant = preferences['teImplant']
 
             db.session.commit()
 
@@ -217,6 +221,59 @@ def update_production_preference(preferences):
                  "as the system does not exist or does not have any index."
                  if not check else
                  "Production preferences successfuly saved."),
+                200
+            )
+
+        except:
+            logger.exception('Cannot update preferences')
+            db.session.rollback()
+            return json_response('danger',
+                                 'Error while updating preferences',
+                                 500)
+    else:
+        return json_response('danger', 'Error: preferences are empty', 500)
+
+
+def update_reaction_preference(preferences):
+    """ Called by update_user_industry_preference, update the reaction
+    preferences """
+    if preferences:
+        pref = current_user.pref
+
+        try:
+            solar_system, check_main = check_solar_system_name_index(
+                preferences['reactionSystem']
+            )
+            manuf_solar_system, check_manuf = check_solar_system_name_index(
+                preferences['manufSystem']
+            )
+            if check_main:
+                pref.reaction_system = solar_system
+            if check_manuf:
+                pref.reaction_manuf_system = manuf_solar_system
+
+            pref.reaction_facility = preferences['reactionFacility']
+            pref.reaction_me_rig = preferences['reactionMeRig']
+            pref.reaction_te_rig = preferences['reactionTeRig']
+            pref.reaction_security = preferences['reactionSecurity']
+            pref.reaction_manuf_facility = preferences['manufFacility']
+            pref.reaction_manuf_me_rig = preferences['manufMeRig']
+            pref.reaction_manuf_te_rig = preferences['manufTeRig']
+            pref.reaction_manuf_security = preferences['manufSecurity']
+            pref.reaction_price_regions = preferences['priceRegion']
+            pref.reaction_price_type = preferences['priceType']
+            pref.reaction_character_id = preferences['characterId']
+            pref.reaction_manuf_te_implant = preferences['manufTeImplant']
+
+            db.session.commit()
+
+            check = check_main and check_manuf
+            return json_response(
+                'success' if check else 'warning',
+                ("Reaction preferences updated, solarsystem not updated "
+                 "as the system does not exist or does not have any index."
+                 if not check else
+                 "Reaction preferences successfuly saved."),
                 200
             )
 

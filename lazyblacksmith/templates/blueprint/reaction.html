@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}:: Manufacturing :: {{ blueprint.name }}{% endblock %}
+{% block title %}:: Reactions :: {{ blueprint.name }}{% endblock %}
 
 {% block js %}
 {% set pref = current_user.pref %}
@@ -10,13 +10,13 @@
         lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
         lb.urls.tplModalPriceUrl    = "{{ url_for('template.manufacturing_modal_price') }}";
 
-        manufacturingBlueprint.options.hasManufacturedComponent = {% if has_manufactured_components %}true{% else %}false{% endif %};
-        manufacturingBlueprint.options.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
-        manufacturingBlueprint.materialsData.productItemId = {{ product.product.id }};
+        reactionBlueprint.options.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
+        reactionBlueprint.materialsData.productItemId = {{ product.product.id }};
 
-        manufacturingBlueprint.materialsData.materials[{{ product.product.id }}] = {
+        reactionBlueprint.materialsData.materials[{{ product.product.id }}] = {
             'id': {{ product.product.id }},
-            'isManufactured': true,
+            'isFromReaction': true,
+            'isManufactured': false,
             'runsPerJob': {{ product.blueprint.max_production_limit }},
             'maxRunPerBp': {{ product.blueprint.max_production_limit }},
             'resultQtyPerRun': {{ product.quantity }},
@@ -24,33 +24,26 @@
             'qtyAdjusted': {{ product.quantity }},
             'qtyJob': {{ product.quantity }},
             'timePerRun': {{ activity.time }},
+            'effectiveTimePerRun': {{ activity.time }},
             'timeTotal': {{ activity.time }},
             'name': '{{ product.product.name }}',
             'icon': '{{ product.product.icon_32() }}',
-            'factorySystem': '{{ pref.prod_system|lower }}',
-            'factorySystemPrevious': '{{ pref.prod_system|lower }}',
-            'facility': {{ pref.prod_facility }},
-            'structureTeRig': {{ pref.prod_te_rig}},
-            'structureMeRig': {{ pref.prod_me_rig}},
-            'structureSecStatus': '{{ pref.prod_security }}',
-            'priceType': 'sell',
-            {% if product.product.is_moon_goo() -%}
-            'priceRegion': {{ pref.prod_price_region_moongoo }},
-            {%- elif product.product.is_pi() -%}
-            'priceRegion': {{ pref.prod_price_region_pi }},
-            {%- elif product.product.is_mineral_salvage() -%}
-            'priceRegion': {{ pref.prod_price_region_minerals }},
-            {%- else -%}
-            'priceRegion': {{ pref.prod_price_region_others }},
-            {%- endif %}
-
+            'factorySystem': '{{ pref.reaction_system|lower }}',
+            'factorySystemPrevious': '{{ pref.reaction_system|lower }}',
+            'facility': {{ pref.reaction_facility }},
+            'structureTeRig': {{ pref.reaction_te_rig}},
+            'structureMeRig': {{ pref.reaction_me_rig}},
+            'structureSecStatus': '{{ pref.reaction_security }}',
+            'priceType': '{{ pref.reaction_price_type }}',
+            'priceRegion': {{ pref.reaction_price_regions }},
         };
 
         {% for material in materials.all() %}
-        manufacturingBlueprint.materialsData.componentIdList.push({{ material.material.id }});
-        manufacturingBlueprint.materialsData.materials[{{ material.material.id }}] = {
+        reactionBlueprint.materialsData.componentIdList.push({{ material.material.id }});
+        reactionBlueprint.materialsData.materials[{{ material.material.id }}] = {
             'id': {{ material.material.id }},
             'isManufactured': {% if material.material.is_from_manufacturing %}true{% else %}false{% endif %},
+            'isFromReaction': {% if material.material.is_from_reaction %}true{% else %}false{% endif %},
             'runsPerJob': -1,
             'maxRunPerBp': -1,
             'resultQtyPerRun': -1,
@@ -59,49 +52,42 @@
             'qtyJob': {{ material.quantity }},
             'timePerRun': 0,
             'timeTotal': 0,
+            'effectiveTimePerRun': 0,
             'runs': -1,
             'name': '{{ material.material.name }}',
             'icon': '{{ material.material.icon_32() }}',
             'materials': {},
             'componentIdList': [],
-            'materialEfficiency': 10,
-            'timeEfficiency': 20,
-            'factorySystem': '{{ pref.prod_sub_system|lower }}',
-            'factorySystemPrevious': '{{ pref.prod_sub_system|lower }}',
-            'facility': {{ pref.prod_sub_facility }},
-            'structureTeRig': {{ pref.prod_sub_te_rig }},
-            'structureMeRig': {{ pref.prod_sub_me_rig }},
-            'structureSecStatus': '{{ pref.prod_sub_security }}',
-            {% if material.material.is_moon_goo() -%}
-            'priceType': '{{ pref.prod_price_type_moongoo }}',
-            'priceRegion': {{ pref.prod_price_region_moongoo }},
-            {%- elif material.material.is_pi()-%}
-            'priceType': '{{ pref.prod_price_type_pi }}',
-            'priceRegion': {{ pref.prod_price_region_pi }},
-            {%- elif material.material.is_mineral_salvage() -%}
-            'priceType': '{{ pref.prod_price_type_minerals }}',
-            'priceRegion': {{ pref.prod_price_region_minerals }},
-            {%- else -%}
-            'priceType': '{{ pref.prod_price_type_others }}',
-            'priceRegion': {{ pref.prod_price_region_others }},
-            {%- endif %}
+            'materialEfficiency': {% if material.material.is_from_manufacturing %}10{% else %}0{% endif %},
+            'timeEfficiency':  {% if material.material.is_from_manufacturing %}20{% else %}0{% endif %},
+            {% if material.material.is_from_manufacturing %}
+            'factorySystem': '{{ pref.reaction_manuf_system|lower }}',
+            'factorySystemPrevious': '{{ pref.reaction_manuf_system|lower }}',
+            'facility': {{ pref.reaction_manuf_facility }},
+            'structureTeRig': {{ pref.reaction_manuf_te_rig}},
+            'structureMeRig': {{ pref.reaction_manuf_me_rig}},
+            'structureSecStatus': '{{ pref.reaction_manuf_security }}',
+            {% else %}
+            'factorySystem': '{{ pref.reaction_system|lower }}',
+            'factorySystemPrevious': '{{ pref.reaction_system|lower }}',
+            'facility': {{ pref.reaction_facility }},
+            'structureTeRig': {{ pref.reaction_te_rig}},
+            'structureMeRig': {{ pref.reaction_me_rig}},
+            'structureSecStatus': '{{ pref.reaction_security }}',
+            {% endif %}
+            'priceType': 'buy',
+            'priceRegion': 10000002,
         };
-        {% endfor %}
-
-        manufacturingBlueprint.options.materialEfficiency = {{ me }};
-        manufacturingBlueprint.options.timeEfficiency = {{ te }};
-        manufacturingBlueprint.options.manufTeImplant = {{ pref.prod_te_implant }};
-        manufacturingBlueprint.options.industryLvl = {{ industry_skills['industry'] }};
-        manufacturingBlueprint.options.advancedIndustryLvl = {{ industry_skills['adv_industry'] }};
-        {% if t2_manufacturing_skill %}
-        manufacturingBlueprint.options.t2ConstructionLvl = {{ t2_manufacturing_skill.level }};
+        {% if material.material.is_from_manufacturing -%}
+        reactionBlueprint.materialsData.manufacturedMaterials.push({{ material.material.id }});
         {% endif %}
-        {% for skill in science_skill %}
-        manufacturingBlueprint.options.datacoreLevel{{loop.index}} = {{ skill.level }};
-        {%- endfor %}
+        {% endfor %}
+        reactionBlueprint.options.industryLvl = {{ industry_skills['industry'] }};
+        reactionBlueprint.options.advancedIndustryLvl = {{ industry_skills['adv_industry'] }};
+        reactionBlueprint.options.reactionsLvl = {{ industry_skills['reactions'] }};
+        reactionBlueprint.options.manufTeImplant = {{ pref.reaction_manuf_te_implant }};
 
-
-        lb.run('manufacturingBlueprint');
+        lb.run('reactionBlueprint');
     </script>
 {% endblock %}
 
@@ -110,8 +96,8 @@
 <div class="row">
     <div class="col-md-12">
         <ul class="nav nav-tabs" id="bp-tabs" role="tablist">
-            <li class="nav-item"><a class="active nav-link" href="#tab-bp">Blueprint</a></li>
-            {% if has_manufactured_components %}<li class="nav-item" id='subcomp-tab'><a class="nav-link" href="#tab-subcomp">Components Blueprints</a></li>{% endif %}
+            <li class="nav-item"><a class="active nav-link" href="#tab-bp">Reaction</a></li>
+            <li class="nav-item" id='subcomp-tab'><a class="nav-link" href="#tab-subcomp">Reaction Component</a></li>
             <li class="nav-item" id='summary-tab'><a class="nav-link" href="#tab-summary">Material Summary</a></li>
             <li class="nav-item" id='price-tab'><a class="nav-link" href="#tab-price">Prices</a></li>
         </ul>
@@ -123,56 +109,50 @@
                             <div class="card-body">
                                 Facility<br>
                                 <select name="facility" id="facility" class="form-control form-control-sm mt-1">
-                                    <option value="0" {% if pref.prod_facility == 0 -%}selected{%- endif %}>Station</option>
-                                    <option value="1" {% if pref.prod_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
-                                    <option value="2" {% if pref.prod_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
-                                    <option value="3" {% if pref.prod_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
-                                    <option value="4" {% if pref.prod_facility == 4 -%}selected{%- endif %}>Other Structures</option>
+                                    <option value="5" {% if pref.reaction_facility == 5 -%}selected{%- endif %}>Athanor</option>
+                                    <option value="6" {% if pref.reaction_facility == 6 -%}selected{%- endif %}>Tatara</option>
                                 </select>
-                                <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                                <div class="structure-configs mt-3">
                                     Rigs<br>
                                     <div class="btn-group w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_me_rig == 0 -%}active{%- endif %}">
-                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.prod_me_rig == 0 -%}checked{%- endif %}>None
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_me_rig == 0 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.reaction_me_rig == 0 -%}checked{%- endif %}>None
                                         </label>
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_me_rig == 1 -%}active{%- endif %}">
-                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.prod_me_rig == 1 -%}checked{%- endif %}>ME T1
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_me_rig == 1 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.reaction_me_rig == 1 -%}checked{%- endif %}>ME T1
                                         </label>
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_me_rig == 2 -%}active{%- endif %}">
-                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.prod_me_rig == 2 -%}checked{%- endif %}>ME T2
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_me_rig == 2 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.reaction_me_rig == 2 -%}checked{%- endif %}>ME T2
                                         </label>
                                     </div>
                                     <div class="btn-group w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_te_rig == 0 -%}active{%- endif %}">
-                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.prod_te_rig == 0 -%}checked{%- endif %}>None
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_te_rig == 0 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.reaction_te_rig == 0 -%}checked{%- endif %}>None
                                         </label>
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_te_rig == 1 -%}active{%- endif %}">
-                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.prod_te_rig == 1 -%}checked{%- endif %}>TE T1
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_te_rig == 1 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.reaction_te_rig == 1 -%}checked{%- endif %}>TE T1
                                         </label>
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_te_rig == 2 -%}active{%- endif %}">
-                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.prod_te_rig == 2 -%}checked{%- endif %}>TE T2
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_te_rig == 2 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.reaction_te_rig == 2 -%}checked{%- endif %}>TE T2
                                         </label>
                                     </div>
                                 </div>
 
-                                <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
+                                <div class="structure-configs mt-3">
                                     System Security<br>
                                     <div class="btn-group w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_security == 'h' -%}active{%- endif %}">
-                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.prod_security == 'h' -%}checked{%- endif %}>HS
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_security == 'l' -%}active{%- endif %}">
+                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.reaction_security == 'l' -%}checked{%- endif %}>LowSec
                                         </label>
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_security == 'l' -%}active{%- endif %}">
-                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.prod_security == 'l' -%}checked{%- endif %}>LS
-                                        </label>
-                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_security == 'n' -%}active{%- endif %}">
-                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.prod_security == 'n' -%}checked{%- endif %}>NS/WH
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_security == 'n' -%}active{%- endif %}">
+                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.reaction_security == 'n' -%}checked{%- endif %}>NullSec / WH
                                         </label>
                                     </div>
                                 </div>
 
                                 <div class="mt-3">
                                     System<br>
-                                    <input id="system" type="text" class="form-control form-control-sm typeahead mt-1" value="{{ pref.prod_system }}">
+                                    <input id="system" type="text" class="form-control form-control-sm typeahead mt-1" value="{{ pref.reaction_system }}">
                                 </div>
                             </div>
                         </div>
@@ -185,29 +165,12 @@
                                 <div class="mt-3">
                                     Runs Per Jobs<br>   
                                     <div class="input-group mt-1">
-                                        <input id="runsPerJob" type="text" class="form-control form-control-sm" value="{{ product.blueprint.max_production_limit }}">
+                                        <input id="runsPerJob" type="text" class="form-control form-control-sm" value="{{ (3600 * 24 * 30 / activity.time)|int }}">
 
                                         <span class="input-group-btn">
-                                            <button id="maxRunBpc" class="btn btn-secondary btn-sm">Max Run/BPC</button>
+                                            <button id="maxRunBpc" class="btn btn-secondary btn-sm">Max Run/30d</button>
                                         </span>
                                     </div>
-                                </div>
-                                <div class="slider mt-3">
-                                    ME Level (<span id="ME-Level">{{ me }}%</span>)<br>
-                                    <div id="ME"></div>
-                                </div>
-                                <div class="slider">
-                                    TE Level (<span id="TE-Level">{{ te }}%</span>)<br>
-                                    <div id="TE"></div>
-                                </div>
-                                <div class="mt-3">
-                                    Manufacturing TE Implant<br>
-                                    <select name="manufTeImplant" id="manufTeImplant" class="form-control form-control-sm mt-1">
-                                        <option value="1.00" {% if pref.prod_te_implant == 1.00 %}selected{% endif %}>None</option>
-                                        <option value="0.99" {% if pref.prod_te_implant == 0.99 %}selected{% endif %}>BX-801</option>
-                                        <option value="0.98" {% if pref.prod_te_implant == 0.98 %}selected{% endif %}>BX-802</option>
-                                        <option value="0.96" {% if pref.prod_te_implant == 0.96 %}selected{% endif %}>BX-804</option>
-                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -221,30 +184,21 @@
                                     Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
                                     <div id="adv-industry-level"></div>
                                 </div>
+                                <div class="slider">
+                                    Reactions (<span id="reactions-level-display">{{ industry_skills['reactions'] }}</span>)<br>
+                                    <div id="reactions-level"></div>
+                                </div>
+                                <div class="mt-3">
+                                    Manufacturing TE Implant<br>
+                                    <select name="manufTeImplant" id="manufTeImplant" class="form-control form-control-sm mt-1">
+                                        <option value="1.00" {% if pref.reaction_manuf_te_implant == 1.00 %}selected{% endif %}>None</option>
+                                        <option value="0.99" {% if pref.reaction_manuf_te_implant == 0.99 %}selected{% endif %}>BX-801</option>
+                                        <option value="0.98" {% if pref.reaction_manuf_te_implant == 0.98 %}selected{% endif %}>BX-802</option>
+                                        <option value="0.96" {% if pref.reaction_manuf_te_implant == 0.96 %}selected{% endif %}>BX-804</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-
-                        {% if science_skill | length > 0 or t2_manufacturing_skill %}
-                        <div class="card bg-light mb-5">
-                            <div class="card-body">
-                                {% for skill in science_skill %}
-                                <div class="slider">
-                                    {{ skill.name }}
-                                    (<span id="t2-science{{loop.index}}-display">{{ skill.level }}</span>)<br>
-                                    <div id="t2-science{{loop.index}}"></div>
-                                </div>
-                                {%- endfor %}
-                                {% if t2_manufacturing_skill %}
-                                <div class="slider">
-                                    {{ t2_manufacturing_skill.name }}
-                                    (<span id="t2-level-display">{{ t2_manufacturing_skill.level }}</span>)<br>
-                                    <div id="t2-level"></div>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endif %}
-
                     </div>
 
                     <div class="col-md-9 col-sm-8 main-list">
@@ -302,7 +256,6 @@
                 </div>
             </div>
 
-            {% if has_manufactured_components %}
             <div class="fade tab-pane pt-4" id="tab-subcomp">
                 <div class="row content">
                     <div class="col-md-12">
@@ -310,7 +263,6 @@
                     </div>
                 </div>
             </div>
-            {% endif %}
 
             <div class="fade tab-pane pt-4" id="tab-summary">
                 <div class="row">
@@ -322,7 +274,6 @@
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
                             </button>
 
-                            {% if has_manufactured_components %}
                             <span class="raw-component-btn">
                                 <span id="raw-components" data-toggle="buttons">
                                     <label class="btn btn-danger btn-sm m-0">
@@ -330,8 +281,13 @@
                                         Raw components: <span class="state">NO</span>
                                     </label>
                                 </span>
+                                <span id="build-fuel" data-toggle="buttons">
+                                    <label class="btn btn-success btn-sm m-0 active">
+                                        <input type="checkbox" autocomplete="off" checked>
+                                        Build Fuel: <span class="state">Main Reaction</span>
+                                    </label>
+                                </span>
                             </span>
-                            {% endif %}
                         </h4>
                         <table class="lb-table-sm lb-list" id="materials-requirement">
                             <thead>
@@ -524,7 +480,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="subComponentBpConfigModal">Configure Blueprint <span id="componentModalBpName"></span></h4>
+                <h4 class="modal-title">Configure Blueprint <span id="componentModalBpName"></span></h4>
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
@@ -532,56 +488,58 @@
                         <div class="col-md-6">
                             Facility<br>
                             <select name="modal-facility" id="modal-facility" class="form-control form-control-sm mt-1">
-                                <option value="0" {% if pref.prod_facility == 0 -%}selected{%- endif %}>Station</option>
-                                <option value="1" {% if pref.prod_facility == 1 -%}selected{%- endif %}>Raitaru (M-EC)</option>
-                                <option value="2" {% if pref.prod_facility == 2 -%}selected{%- endif %}>Azbel (L-EC)</option>
-                                <option value="3" {% if pref.prod_facility == 3 -%}selected{%- endif %}>Sotiyo (XL-EC)</option>
-                                <option value="4" {% if pref.prod_facility == 4 -%}selected{%- endif %}>Other Structures</option>
+                                <option class="manufacturing-strct" value="0">Station</option>
+                                <option class="manufacturing-strct" value="1">Raitaru (M-EC)</option>
+                                <option class="manufacturing-strct" value="2">Azbel (L-EC)</option>
+                                <option class="manufacturing-strct" value="3">Sotiyo (XL-EC)</option>
+                                <option class="manufacturing-strct" value="4">Other Structures</option>
+                                <option value="5">Athanor</option>
+                                <option value="6">Tatara</option>
                             </select>
 
-                            <div class="modal-structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                            <div class="modal-structure-configs mt-3">
                                 Rigs<br>
                                 <div class="btn-group w-100 mt-1" id="modal-structure-me-rig" data-toggle="buttons">
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_me_rig == 0 -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0" {% if pref.prod_sub_me_rig == 0 -%}checked{%- endif %}>None
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0">None
                                     </label>
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_me_rig == 1 -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="1" {% if pref.prod_sub_me_rig == 1 -%}checked{%- endif %}>ME T1
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="1">ME T1
                                     </label>
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_me_rig == 2 -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2" {% if pref.prod_sub_me_rig == 2 -%}checked{%- endif %}>ME T2
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2" >ME T2
                                     </label>
                                 </div>
                                 <div class="btn-group w-100 mt-1" id="modal-structure-te-rig" data-toggle="buttons">
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_te_rig == 0 -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0" {% if pref.prod_sub_te_rig == 0 -%}checked{%- endif %}>None
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0">None
                                     </label>
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_te_rig == 1 -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="1" {% if pref.prod_sub_te_rig == 1 -%}checked{%- endif %}>TE T1
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="1">TE T1
                                     </label>
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_te_rig == 2 -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="2" {% if pref.prod_sub_te_rig == 2 -%}checked{%- endif %}>TE T2
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="2">TE T2
                                     </label>
                                 </div>
                             </div>
 
-                            <div class="modal-structure-configs mt-3" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
+                            <div class="modal-structure-configs mt-3">
                                 System Security<br>
                                 <div class="btn-group w-100 mt-1" id="modal-structure-sec-status" data-toggle="buttons">
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_security == 'h' -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="h" {% if pref.prod_sub_security == 'h' -%}checked{%- endif %}>HS
+                                    <label class="btn col btn-sm btn-secondary manufacturing-strct">
+                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="h">HS
                                     </label>
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_security == 'l' -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="l" {% if pref.prod_sub_security == 'l' -%}checked{%- endif %}>LS
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="l">LS
                                     </label>
-                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_security == 'n' -%}active{%- endif %}">
-                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="n" {% if pref.prod_sub_security == 'n' -%}checked{%- endif %}>NS/WH
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="n">NS/WH
                                     </label>
                                 </div>
                             </div>
                             <div class="mt-3">
                                 System<br>
-                                <input id="modal-system" type="text" class="form-control form-control-sm typeahead mt-1" value="{{ pref.prod_sub_system }}">
+                                <input id="modal-system" type="text" class="form-control form-control-sm typeahead mt-1" value="">
                             </div>
                         </div>
 
@@ -592,16 +550,16 @@
                                     <input id="modalRunsPerJob" type="text" class="form-control form-control-sm" value="1">
                                     <span class="input-group-btn" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
                                         <label class="btn btn-secondary btn-sm m-0">
-                                            <input type="checkbox" autocomplete="off">Max Run/BPC
+                                            <input type="checkbox" autocomplete="off">Max Run/30d
                                         </label>
                                     </span>
                                 </div>
                             </div>
-                            <div class="slider mt-3">
+                            <div class="slider mt-3 manufacturing-strct">
                                 ME Level (<span id="Modal-ME-Level">0</span>%)<br>
                                 <div id="ModalME"></div>
                             </div>
-                            <div class="slider">
+                            <div class="slider manufacturing-strct">
                                 TE Level (<span id="Modal-TE-Level">0</span>)<br>
                                 <div id="ModalTE"></div>
                             </div>

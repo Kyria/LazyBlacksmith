@@ -1,7 +1,7 @@
-var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
+var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     "use strict";
 
-    var ACTIVITY_MANUFACTURING = 1;
+    var ACTIVITY_REACTIONS = 11;
 
     // template variables
     var tplSublistBlock = '';
@@ -13,7 +13,6 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
     // page options
     var options = {
-        hasManufacturedComponent: false,
         useIcons: false,
 
         // bp informations
@@ -24,9 +23,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         // skill infos
         industryLvl: 0,
         advancedIndustryLvl: 0,
-        t2ConstructionLvl: 0,
-        datacoreLevel1: 0,
-        datacoreLevel2: 0,
+        reactionsLvl: 0,
 
         // implant
         manufTeImplant: 1.00,
@@ -68,6 +65,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         // components
         materials: {},
         componentIdList: [],
+        manufacturedMaterials: [],
     };
 
     var materialQuantityList;
@@ -81,6 +79,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
     // assembly informations
     var facilityStats = eveData.facilities;
     var structureRigs = eveData.structureIndustryRigs;
+    var refinerySecStatusMultiplier = eveData.refinerySecStatusMultiplier;
     var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
 
 
@@ -97,13 +96,13 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var _generateMaterialListQuantity = function() {
         var materialList = {};
-        var onlySubComponents = (useComponents && options.hasManufacturedComponent);
+        var onlySubComponents = (useComponents);
 
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
 
             // we want all material, or at least, those that cannot be manufactured (PI, moongoo...)
-            if(!material.isManufactured || !onlySubComponents) {
+            if((!material.isManufactured && !material.isFromReaction) || !onlySubComponents ) {
                 materialList[material.id] = materialList[material.id] || {
                     qty: 0,
                     name: material.name,
@@ -161,7 +160,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 };
             }
 
-            if(material.isManufactured) {
+            if(material.isManufactured || material.isFromReaction) {
                 for(var j in material.componentIdList) {
                     var subMaterial = material.materials[material.componentIdList[j]];
 
@@ -213,7 +212,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * @private
      */
     var _getComponentMaterials = function() {
-        if(isMaterialListLoaded || !options.hasManufacturedComponent) {
+        if(isMaterialListLoaded) {
             _generateMaterialListPrice();
             _generateMaterialListQuantity();
             return;
@@ -229,11 +228,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             for(var i in materialList) {
                 var rows = '';
                 var tmpMaterial = materialList[i];
-                var material = materialsData.materials[tmpMaterial['product_id']]
+                var material = materialsData.materials[tmpMaterial['product_id']];
+                var secStatusMultiplier = (material.isManufactured) ? structureSecStatusMultiplier : refinerySecStatusMultiplier;
+
                 material.blueprint_id = tmpMaterial['id'];
                 material.blueprint_name = tmpMaterial['name'];
                 material.blueprint_icon = tmpMaterial['icon'];
-                material.runsPerJob = tmpMaterial['max_run_per_bp'];
                 material.maxRunPerBp = tmpMaterial['max_run_per_bp'];
 
                 // quantity and runs
@@ -243,22 +243,30 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 // production time per run (base time)
                 material.timePerRun = tmpMaterial['time'];
 
+                var industryReactionLevel = (material.isManufactured) ? options.industryLvl : options.reactionsLvl;
+                var advancedIndustryLvl = (material.isManufactured) ? options.advancedIndustryLvl : 0;
+                var timeEfficiency = (material.isManufactured) ? material.timeEfficiency : 0;
+                var facilityTeBonus = (material.isManufactured) ? facilityStats[material.facility].bpTe : facilityStats[material.facility].reactionTime;
+
                 var timePerRun = eveUtils.calculateJobTime(
-                    material.timePerRun, 1, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                    material.timePerRun, 1, facilityTeBonus, timeEfficiency, 
                     (material.isManufactured) ? options.manufTeImplant : 1.00,
-                    options.industryLvl, options.advancedIndustryLvl,
+                    industryReactionLevel, advancedIndustryLvl,
                     0, 0, 0,
-                    structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                    structureRigs[material.structureTeRig].timeBonus, secStatusMultiplier[material.structureSecStatus],
                     facilityStats[material.facility].structure, false
                 );
                 material.timeTotal = eveUtils.calculateJobTime(
-                    material.timePerRun, material.runs, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                    material.timePerRun, material.runs, facilityTeBonus, timeEfficiency,
                     (material.isManufactured) ? options.manufTeImplant : 1.00,
-                    options.industryLvl, options.advancedIndustryLvl,
+                    industryReactionLevel, advancedIndustryLvl,
                     0, 0, 0,
-                    structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                    structureRigs[material.structureTeRig].timeBonus, secStatusMultiplier[material.structureSecStatus],
                     facilityStats[material.facility].structure, false
                 );
+
+                material.effectiveTimePerRun = timePerRun;
+                material.runsPerJob = Math.floor(3600 * 24 * 30 / timePerRun);
 
                 var timeHuman = utils.durationToString(timePerRun);
                 var timeTotalHuman = utils.durationToString(material.timeTotal);
@@ -282,7 +290,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                         material.materialEfficiency,
                         facilityStats[material.facility].bpMe,
                         structureRigs[material.structureMeRig].materialBonus,
-                        structureSecStatusMultiplier[material.structureSecStatus],
+                        secStatusMultiplier[material.structureSecStatus],
                         facilityStats[material.facility].structure
                     );
 
@@ -302,6 +310,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                                         .replace(/@@ICON@@/g, subMaterial.icon)
                                         .replace(/@@NAME@@/g, subMaterial.name);
                 }
+
                 html += tplSublistBlock.replace(/@@ICON@@/g, material.blueprint_icon)
                                      .replace(/@@NAME@@/g, material.blueprint_name)
                                      .replace(/@@ID@@/g, material.id)
@@ -315,6 +324,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                                      .replace(/@@ACTIVITY_TIME_HUMAN@@/g, timeHuman)
                                      .replace(/@@ACTIVITY_TIME_TOTAL@@/g, timeTotalHuman)
                                      .replace(/@@BOM@@/g, rows);
+
             }
 
             $('#tab-subcomp .content').html(html);
@@ -331,6 +341,10 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             for(var i in materialsData.componentIdList) {
                 var componentId = materialsData.componentIdList[i];
                 _updateComponentBpInfoDisplay(componentId);
+
+                if(materialsData.materials[componentId].isFromReaction) {
+                    $('.sub-list-' + componentId + ' .manufacturing-efficiency').remove();
+                }
             }
 
             _updateSummaryTabs();
@@ -343,7 +357,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * @private
      */
     var _getSystemCostIndex = function() {
-        if((!isMaterialListLoaded && options.hasManufacturedComponent) || !priceData.isLoaded) {
+        if(!isMaterialListLoaded || !priceData.isLoaded) {
             // if any required data is not yet set, try again in 1sec
             return setTimeout(_getSystemCostIndex, 100);
         }
@@ -403,6 +417,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
             var parentMaterial = materialsData.materials[materialsData.productItemId];
+            var secStatusMultiplier = (parentMaterial.isManufactured) ? structureSecStatusMultiplier : refinerySecStatusMultiplier;
 
             var facility = parseInt($('#facility').val());
             var quantityAdjusted = eveUtils.calculateAdjustedQuantity(
@@ -410,7 +425,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 options.materialEfficiency,
                 facilityStats[parentMaterial.facility].bpMe,
                 structureRigs[parentMaterial.structureMeRig].materialBonus,
-                structureSecStatusMultiplier[parentMaterial.structureSecStatus],
+                secStatusMultiplier[parentMaterial.structureSecStatus],
                 facilityStats[parentMaterial.facility].structure
             );
 
@@ -439,15 +454,16 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * @private
      */
     var _updateComponentMaterial = function() {
-        if(!isMaterialListLoaded || !options.hasManufacturedComponent) {
+        if(!isMaterialListLoaded) {
             return;
         }
 
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
+            var secStatusMultiplier = (material.isManufactured) ? structureSecStatusMultiplier : refinerySecStatusMultiplier;
 
             // if it's not a manufactured material, we stop here
-            if(!material.isManufactured) {
+            if(!material.isManufactured && !material.isFromReaction) {
                 continue;
             }
 
@@ -468,7 +484,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                     material.materialEfficiency,
                     facilityStats[material.facility].bpMe,
                     structureRigs[material.structureMeRig].materialBonus,
-                    structureSecStatusMultiplier[material.structureSecStatus],
+                    secStatusMultiplier[material.structureSecStatus],
                     facilityStats[material.facility].structure
                 );
 
@@ -496,27 +512,34 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var _updateTime = function() {
         var material = materialsData.materials[materialsData.productItemId];
+
+        var industryReactionLevel = (material.isManufactured) ? options.industryLvl : options.reactionsLvl;
+        var advancedIndustryLvl = (material.isManufactured) ? options.advancedIndustryLvl : 0;
+        var timeEfficiency = (material.isManufactured) ? material.timeEfficiency : 0;
+        var secStatusMultiplier = (material.isManufactured) ? structureSecStatusMultiplier : refinerySecStatusMultiplier;
+        var facilityTeBonus = (material.isManufactured) ? facilityStats[material.facility].bpTe : facilityStats[material.facility].reactionTime;
+
         var time_per_run = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
-            1, facilityStats[material.facility].bpTe, options.timeEfficiency,
+            1, facilityTeBonus, timeEfficiency,
             (material.isManufactured) ? options.manufTeImplant : 1.00,
-            options.industryLvl, options.advancedIndustryLvl,
-            options.t2ConstructionLvl, options.datacoreLevel1, options.datacoreLevel2,
-            structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
-            facilityStats[material.facility].structure, true
+            industryReactionLevel, advancedIndustryLvl,
+            0, 0, 0,
+            structureRigs[material.structureTeRig].timeBonus, secStatusMultiplier[material.structureSecStatus],
+            facilityStats[material.facility].structure, false
         );
         var time = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
-            options.runs, facilityStats[material.facility].bpTe, options.timeEfficiency,
+            options.runs, facilityTeBonus, timeEfficiency, 
             (material.isManufactured) ? options.manufTeImplant : 1.00,
-            options.industryLvl, options.advancedIndustryLvl,
-            options.t2ConstructionLvl, options.datacoreLevel1, options.datacoreLevel2,
-            structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
-            facilityStats[material.facility].structure, true
+            industryReactionLevel, advancedIndustryLvl,
+            0, 0, 0,
+            structureRigs[material.structureTeRig].timeBonus, secStatusMultiplier[material.structureSecStatus],
+            facilityStats[material.facility].structure, false
         );
 
         materialsData.materials[materialsData.productItemId].timeTotal = time;
-
+        materialsData.materials[materialsData.productItemId].effectiveTimePerRun = time_per_run;
         var time_text = utils.durationToString(time);
         var time_per_run_text = utils.durationToString(time_per_run);
         $('.main-list .total-time').html(time_text);
@@ -529,36 +552,43 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * @private
      */
     var _updateComponentTime = function() {
-        if(!isMaterialListLoaded || !options.hasManufacturedComponent) {
+        if(!isMaterialListLoaded) {
             return;
         }
 
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
+            var secStatusMultiplier = (material.isManufactured) ? structureSecStatusMultiplier : refinerySecStatusMultiplier;
 
-            if(!material.isManufactured) {
+            if(!material.isManufactured && !material.isFromReaction) {
                 continue;
             }
 
+            var industryReactionLevel = (material.isManufactured) ? options.industryLvl : options.reactionsLvl;
+            var advancedIndustryLvl = (material.isManufactured) ? options.advancedIndustryLvl : 0;
+            var timeEfficiency = (material.isManufactured) ? material.timeEfficiency : 0;
+            var facilityTeBonus = (material.isManufactured) ? facilityStats[material.facility].bpTe : facilityStats[material.facility].reactionTime;
+
             var time = eveUtils.calculateJobTime(
-                material.timePerRun, material.runs, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                material.timePerRun, material.runs, facilityTeBonus, timeEfficiency,
                 (material.isManufactured) ? options.manufTeImplant : 1.00,
-                options.industryLvl, options.advancedIndustryLvl,
+                industryReactionLevel, advancedIndustryLvl,
                 0, 0, 0,
-                structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                structureRigs[material.structureTeRig].timeBonus, secStatusMultiplier[material.structureSecStatus],
                 facilityStats[material.facility].structure, false
             );
 
             var time_per_run = eveUtils.calculateJobTime(
-                material.timePerRun, 1, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                material.timePerRun, 1, facilityTeBonus, timeEfficiency,
                 (material.isManufactured) ? options.manufTeImplant : 1.00,
-                options.industryLvl, options.advancedIndustryLvl,
+                industryReactionLevel, advancedIndustryLvl, 
                 0, 0, 0,
-                structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
+                structureRigs[material.structureTeRig].timeBonus, secStatusMultiplier[material.structureSecStatus],
                 facilityStats[material.facility].structure, false
             );
 
             material.timeTotal = time;
+            material.effectiveTimePerRun = time_per_run;
 
             var time_text = utils.durationToString(time);
             var time_per_run_text = utils.durationToString(time_per_run);
@@ -581,6 +611,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         } else {
             components = [parseInt($('#componentModalBpName').attr('data-bp-id'))];
         }
+        var modalIsFromReaction = materialsData.materials[parseInt($('#componentModalBpName').attr('data-bp-id'))].isFromReaction;
 
         // get data
         var system = $('#modal-system').val().toLowerCase();
@@ -597,19 +628,34 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         for(var i in components) {
             var componentId = components[i];
-            materialsData.materials[componentId].factorySystemPrevious = materialsData.materials[componentId].factorySystem;
-            materialsData.materials[componentId].factorySystem = system;
-            materialsData.materials[componentId].facility = facility;
-            materialsData.materials[componentId].materialEfficiency = ME;
-            materialsData.materials[componentId].timeEfficiency = TE;
-            materialsData.materials[componentId].structureMeRig = structureMeRig;
-            materialsData.materials[componentId].structureTeRig = structureTeRig;
-            materialsData.materials[componentId].structureSecStatus = structureSecStatus;
+            var material = materialsData.materials[componentId];
+            material.factorySystemPrevious = material.factorySystem;
+            material.factorySystem = system;
+            material.facility = (material.isFromReaction && facility != 5 && facility != 6) ? 5 : facility;
+            material.materialEfficiency = (material.isManufactured && !modalIsFromReaction) ? ME : material.materialEfficiency;
+            material.timeEfficiency = (material.isManufactured && !modalIsFromReaction) ? TE : material.timeEfficiency;
+            material.structureMeRig = structureMeRig;
+            material.structureTeRig = structureTeRig;
+            material.structureSecStatus = (material.isFromReaction && structureSecStatus == 'h') ? 'l' : structureSecStatus;
 
             if(isNaN(runsPerJob) || !runsPerJob || parseInt(runsPerJob) <= 0) {
-                materialsData.materials[componentId].runsPerJob = materialsData.materials[componentId].maxRunPerBp;
+                // need to calculate here the time per run, else it's / might be outdated 
+                var industryReactionLevel = (material.isManufactured) ? options.industryLvl : options.reactionsLvl;
+                var advancedIndustryLvl = (material.isManufactured) ? options.advancedIndustryLvl : 0;
+                var timeEfficiency = (material.isManufactured) ? material.timeEfficiency : 0;
+                var facilityTeBonus = (material.isManufactured) ? facilityStats[material.facility].bpTe : facilityStats[material.facility].reactionTime;
+                var secStatusMultiplier = (material.isManufactured) ? structureSecStatusMultiplier : refinerySecStatusMultiplier;
+                material.effectiveTimePerRun = eveUtils.calculateJobTime(
+                    material.timePerRun, 1, facilityTeBonus, timeEfficiency,
+                    (material.isManufactured) ? options.manufTeImplant : 1.00,
+                    industryReactionLevel, advancedIndustryLvl, 
+                    0, 0, 0,
+                    structureRigs[material.structureTeRig].timeBonus, secStatusMultiplier[material.structureSecStatus],
+                    facilityStats[material.facility].structure, false
+                );
+                material.runsPerJob = Math.floor(3600 * 24 * 30 / material.effectiveTimePerRun);
             } else {
-                materialsData.materials[componentId].runsPerJob = parseInt(runsPerJob);
+                material.runsPerJob = parseInt(runsPerJob);
             }
 
             _updateComponentBpInfoDisplay(componentId);
@@ -655,7 +701,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var _updateSummaryTabs = function() {
         // wait until materials are fully loaded
-        if(!isMaterialListLoaded && options.hasManufacturedComponent) {
+        if(!isMaterialListLoaded) {
             return;
         }
         _updateMaterialSummaryTable();
@@ -681,7 +727,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         for(var i in materialList) {
             var material = materialsData.materials[materialList[i]];
-            if(material.isManufactured) {
+            if(material.isManufactured || material.isFromReaction) {
                 output += rowTime.replace(/@@ICON@@/g, material.icon)
                                  .replace(/@@NAME@@/g, material.name)
                                  .replace(/@@TIME@@/g, utils.durationToString(material.timeTotal));
@@ -764,7 +810,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      * @private
      */
     var _updateTaxTable = function() {
-        var onlySubComponents = (useComponents && options.hasManufacturedComponent);
+        var onlySubComponents = (useComponents);
         var totalInstallationCost = 0;
 
         var iconColumn = '';
@@ -777,7 +823,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         // set the main blueprint
         var taxPrice = _calculateBaseCost(materialsData.productItemId);
-        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].factorySystem][ACTIVITY_MANUFACTURING];
+        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].factorySystem][ACTIVITY_REACTIONS];
         totalInstallationCost += taxPrice;
 
         var output = rowTax.replace(/@@ICON@@/g, materialsData.materials[materialsData.productItemId].icon)
@@ -789,9 +835,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         for(var i in materialsData.componentIdList) {
             var material = materialsData.materials[materialsData.componentIdList[i]];
 
-            if(material.isManufactured) {
+            if(material.isManufactured || material.isFromReaction) {
                 var taxPrice = _calculateBaseCost(material.id);
-                taxPrice *= 1.1 * costIndex[material.factorySystem][ACTIVITY_MANUFACTURING];
+                taxPrice *= 1.1 * costIndex[material.factorySystem][ACTIVITY_REACTIONS];
 
                 output += rowTax.replace(/@@ICON@@/g, material.icon)
                                 .replace(/@@NAME@@/g, material.name)
@@ -918,7 +964,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             _updateMaterial();
         });
         $("#structure-te-rig input[type='radio']").on('change', function() {
-            materialsData.materials[materialsData.productItemId].structureTeRig = parseInt($(this).val())
+            materialsData.materials[materialsData.productItemId].structureTeRig = parseInt($(this).val());
             _updateTime();
         });
         $("#structure-me-rig input[type='radio']").on('change', function() {
@@ -932,6 +978,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         });
 
         $("#raw-components input[type='checkbox']").on('change', _componentButtonOnStateChange);
+        $("#build-fuel input[type='checkbox']").on('change', _fuelButtonOnStateChange);
+
 
         $("#toggleMaxRunPerBpcModal input[type='checkbox']").on('change', _toggleMaxRunPerBpcModal);
         $('#maxRunBpc').on('click', _setMaxRunBpc);
@@ -1014,22 +1062,20 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         utils.noUiSliderCreate('#ModalME', meSliderConf);
         utils.noUiSliderCreate('#TE', teSliderConf);
         utils.noUiSliderCreate('#ModalTE', teSliderConf);
-        utils.noUiSliderCreate('#industry-level, #adv-industry-level, #t2-level, #t2-science1, #t2-science2', skillSliderConf);
+        utils.noUiSliderCreate('#industry-level, #adv-industry-level, #reactions-level', skillSliderConf);
 
         utils.noUiSliderSetValue('#ME', options.materialEfficiency);
         utils.noUiSliderSetValue('#TE', options.timeEfficiency);
         utils.noUiSliderSetValue('#adv-industry-level', options.advancedIndustryLvl);
         utils.noUiSliderSetValue('#industry-level', options.industryLvl);
-        utils.noUiSliderSetValue('#t2-level', options.t2ConstructionLvl);
-        utils.noUiSliderSetValue('#t2-science1', options.datacoreLevel1);
-        utils.noUiSliderSetValue('#t2-science2', options.datacoreLevel2);
+        utils.noUiSliderSetValue('#reactions-level', options.reactionsLvl);
 
         utils.noUiSliderBind('#ME', 'slide', _materialEfficiencyOnUpdate);
         utils.noUiSliderBind('#TE', 'slide', _timeEfficiencyOnUpdate);
         utils.noUiSliderBind('#ModalME', 'slide', _modalMaterialEfficiencyOnUpdate);
         utils.noUiSliderBind('#ModalTE', 'slide', _modalTimeEfficiencyOnUpdate);
         utils.noUiSliderBind(
-            '#industry-level, #adv-industry-level, #t2-level, #t2-science1, #t2-science2',
+            '#industry-level, #adv-industry-level, #reactions-level',
             'slide', _skillOnUpdate
         );
     };
@@ -1043,6 +1089,14 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             var button = $(event.relatedTarget);
             var id = button.attr('data-id');
             var name = materialsData.materials[id].name;
+
+            if(materialsData.materials[id].isFromReaction) {
+                $('#subComponentBpConfigModal .manufacturing-strct').hide();
+                $('#subComponentBpConfigModal .reaction-strct').show();
+            } else {
+                $('#subComponentBpConfigModal .manufacturing-strct').show();
+                $('#subComponentBpConfigModal .reaction-strct').hide();
+            }
 
             var system = materialsData.materials[id].factorySystem;
             var facility = materialsData.materials[id].facility;
@@ -1286,21 +1340,21 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         var tab = $(this).attr('href');
 
         // use component button events.
-        if(options.hasManufacturedComponent) {
-            switch(tab) {
-                case '#tab-summary':
-                    if(lastTab == "#tab-price") {
-                        $('#raw-components').detach().appendTo(tab + ' .raw-component-btn');
-                        lastTab = tab;
-                    }
-                    break;
-                case '#tab-price':
-                    if(lastTab == "#tab-summary") {
-                        $('#raw-components').detach().appendTo(tab + ' .raw-component-btn');
-                        lastTab = tab;
-                    }
-                    break;
-            }
+        switch(tab) {
+            case '#tab-summary':
+                if(lastTab == "#tab-price") {
+                    $('#raw-components').detach().appendTo(tab + ' .raw-component-btn');
+                    $('#build-fuel').detach().appendTo(tab + ' .raw-component-btn');
+                    lastTab = tab;
+                }
+                break;
+            case '#tab-price':
+                if(lastTab == "#tab-summary") {
+                    $('#raw-components').detach().appendTo(tab + ' .raw-component-btn');
+                    $('#build-fuel').detach().appendTo(tab + ' .raw-component-btn');
+                    lastTab = tab;
+                }
+                break;
         }
 
         // only update when on summary / price tables
@@ -1375,19 +1429,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 $('#adv-industry-level-display').html(value);
                 break;
 
-            case 't2-level':
-                options.t2ConstructionLvl = value;
-                $('#t2-level-display').html(value);
-                break;
-
-            case 't2-science1':
-                options.datacoreLevel1 = value;
-                $('#t2-science1-display').html(value);
-                break;
-
-            case 't2-science2':
-                options.datacoreLevel2 = value;
-                $('#t2-science2-display').html(value);
+            case 'reactions-level':
+                options.reactionsLvl = value;
+                $('#reactions-display').html(value);
                 break;
         };
         _updateTime();
@@ -1424,7 +1468,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             $('#modalRunsPerJob').val(materialsData.materials[id].runsPerJob);
             $('#modalRunsPerJob').attr('disabled', false);
         } else {
-            $('#modalRunsPerJob').val("Max BPC Run");
+            $('#modalRunsPerJob').val("Max Run / 30d");
             $('#modalRunsPerJob').prop('disabled', true);
         }
     }
@@ -1435,8 +1479,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var _setMaxRunBpc = function() {
         var id = materialsData.productItemId;
-        $('#runsPerJob').val(materialsData.materials[id].maxRunPerBp);
-        materialsData.materials[id].runsPerJob = materialsData.materials[id].maxRunPerBp;
+        $('#runsPerJob').val(Math.floor(3600 * 24 * 30 / materialsData.materials[id].effectiveTimePerRun));
+        materialsData.materials[id].runsPerJob = Math.floor(3600 * 24 * 30 / materialsData.materials[id].effectiveTimePerRun);
 
         _updateMaterial();
         _updateTime();
@@ -1467,6 +1511,33 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         _generateMaterialListQuantity();
         _updateSummaryTabs();
     };
+
+    /**
+     * Update button "build fuel" state and update everything
+     */
+    var _fuelButtonOnStateChange = function() {
+        // update button styles
+        var state = "Main Reaction";
+        var style = 'btn-danger';
+        var newStyle = 'btn-success';
+
+        if(!this.checked) {
+            state = "None";
+            style = 'btn-success';
+            newStyle = 'btn-danger';
+        }
+        $('#build-fuel .state').html(state);
+        $('#build-fuel .btn').removeClass(style).addClass(newStyle);
+
+        // update material tables infos.
+        for(var i in materialsData.manufacturedMaterials) {
+            var material = materialsData.materials[materialsData.manufacturedMaterials[i]];
+            material.isManufactured = this.checked;
+        }
+
+        _generateMaterialListQuantity();
+        _updateSummaryTabs(); 
+    }
 
     /**
      * (Un)Check all checkbox in price modal
@@ -1554,4 +1625,4 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
     };
 })(jQuery, lb, utils, eveUtils, eveData, Humanize);
 
-lb.registerModule('manufacturingBlueprint', manufacturingBlueprint);
+lb.registerModule('reactionBlueprint', reactionBlueprint);

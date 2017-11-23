@@ -11,6 +11,10 @@ class Item(db.Model):
     market_group_id = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
 
+    # calculated field on import
+    is_from_manufacturing = db.Column(db.Boolean(), default=True)
+    is_from_reaction = db.Column(db.Boolean(), default=True)
+
     # foreign keys
     activities = db.relationship(
         'Activity',
@@ -71,13 +75,6 @@ class Item(db.Model):
     def icon_64(self):
         static_url = "ccp/Types/%d_64.png" % self.id
         return url_for('static', filename=static_url)
-
-    def is_manufactured(self):
-        if self.product_for_activities.filter_by(
-            activity=Activity.ACTIVITY_MANUFACTURING
-        ).count() > 0:
-            return True
-        return False
 
     def is_moon_goo(self):
         return self.market_group_id == 499

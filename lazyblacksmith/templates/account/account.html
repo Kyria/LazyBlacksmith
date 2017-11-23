@@ -54,6 +54,22 @@
         accountDashboard.productionSettings.priceOtherRegion = {{ pref.prod_price_region_others }};
         accountDashboard.productionSettings.priceOtherType = '{{ pref.prod_price_type_others }}';
         accountDashboard.productionSettings.characterId =  {% if pref.prod_character %}{{ pref.prod_character_id }}{% else %}null{% endif %};
+        accountDashboard.productionSettings.teImplant = '{{ pref.prod_te_implant | floatcomma }}';
+
+        accountDashboard.reactionSettings.reactionFacility = {{ pref.reaction_facility }};
+        accountDashboard.reactionSettings.reactionMeRig = {{ pref.reaction_me_rig }};
+        accountDashboard.reactionSettings.reactionTeRig = {{ pref.reaction_te_rig }};
+        accountDashboard.reactionSettings.reactionSecurity = '{{ pref.reaction_security }}';
+        accountDashboard.reactionSettings.reactionSystem = '{{ pref.reaction_system }}';
+        accountDashboard.reactionSettings.manufFacility = {{ pref.reaction_manuf_facility }};
+        accountDashboard.reactionSettings.manufMeRig = {{ pref.reaction_manuf_me_rig }};
+        accountDashboard.reactionSettings.manufTeRig = {{ pref.reaction_manuf_te_rig }};
+        accountDashboard.reactionSettings.manufSecurity = '{{ pref.reaction_manuf_security }}';
+        accountDashboard.reactionSettings.manufSystem = '{{ pref.reaction_manuf_system }}';
+        accountDashboard.reactionSettings.manufTeImplant = {{ pref.reaction_manuf_te_implant }};
+        accountDashboard.reactionSettings.priceRegion = {{ pref.reaction_price_regions }};
+        accountDashboard.reactionSettings.priceType = '{{ pref.reaction_price_type }}';
+        accountDashboard.reactionSettings.characterId = {% if pref.reaction_character %}{{ pref.reaction_character_id }}{% else %}null{% endif %};
 
         // run
         lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_industry_preference') }}";
@@ -81,7 +97,7 @@
             <a class="nav-link" id="bp-cfg-prod-tab" data-toggle="pill" href="#bp-cfg-prod" aria-controls="bp-cfg-prod" role="tab">Production</a>
             <a class="nav-link" id="bp-cfg-research-tab" data-toggle="pill" href="#bp-cfg-research" aria-controls="bp-cfg-research" role="tab">Research</a>
             <a class="nav-link" id="bp-cfg-invention-tab" data-toggle="pill" href="#bp-cfg-invention" aria-controls="bp-cfg-invention" role="tab">Invention</a>
-            <a class="nav-link disabled" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab" data-toggle="tooltip" data-placement="top" title="Soon&trade;">Reaction</a>
+            <a class="nav-link" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab">Reaction</a>
         </div>
     </div>
     <div class="col-lg-10 col-md-9 col-sm-8">

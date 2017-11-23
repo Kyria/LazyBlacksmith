@@ -22,7 +22,6 @@ class Importer(object):
     DELETE = 0
     UPDATE = 1
 
-
     # Import object in the list must be class from models to work
     IMPORT_ORDER = [
         (Item, UPDATE),
@@ -56,9 +55,12 @@ class Importer(object):
         print '=> %s:' % text,
         sys.stdout.flush()
 
-        added, total = f()
+        added, total, comment = f()
 
-        print '%d/%d (%0.2fs)' % (added, total, time.time() - start)
+        if comment:
+            print '%d/%d (%0.2fs) [%s]' % (added, total, time.time() - start, comment)
+        else:
+            print '%d/%d (%0.2fs)' % (added, total, time.time() - start)
 
     def import_all(self):
         """
@@ -122,10 +124,17 @@ class Importer(object):
                 , ib.maxProductionLimit
                 , i.marketGroupID
                 , ig.categoryID
-                , i.marketGroupID
+                , iap.typeID
+                , iap2.typeID
             FROM invTypes i
             LEFT JOIN industryBlueprints ib
                 ON ib.typeID = i.typeID
+            LEFT JOIN industryActivityProducts iap
+                ON iap.productTypeID = i.typeID
+                AND iap.activityID = 1
+            LEFT JOIN industryActivityProducts iap2
+                ON iap2.productTypeID = i.typeID
+                AND iap2.activityID = 11
             JOIN invGroups ig
                 ON ig.groupID = i.groupID
             WHERE i.published=1
@@ -150,11 +159,14 @@ class Importer(object):
                 'max_production_limit': int(data[1]) if data[1] else None,
                 'market_group_id': int(data[2]) if data[2] else None,
                 'category_id': int(data[3]) if data[3] else None,
+                'is_from_manufacturing': (data[4] is not None),
+                'is_from_reaction': (data[5] is not None),
             }
 
             if id in item_list:
                 item['update_id'] = id
                 update.append(item)
+                item_list.remove(id)
             else:
                 item['id'] = id
                 new.append(item)
@@ -177,8 +189,26 @@ class Importer(object):
                 update_stmt,
                 update,
             )
+        db.session.commit()
 
-        return (added, total)
+        delete_stmt = Item.__table__.delete()
+        delete_stmt = delete_stmt.where(
+            Item.id == db.bindparam('delete_id')
+        )
+        items_left = []
+        for item_id in item_list:
+            try:
+                db.engine.execute(
+                    delete_stmt,
+                    {'delete_id': item_id},
+                )
+            except:
+                items_left.append(item_id)
+
+        if items_left:
+            comment = "Cannot remove items: %s" % items_left
+
+        return (added, total, comment if items_left else "")
 
     def import_orerefining(self):
         """
@@ -248,7 +278,7 @@ class Importer(object):
                 new
             )
 
-        return (added, total)
+        return (added, total, "")
 
     def import_decryptor(self):
         """
@@ -301,7 +331,7 @@ class Importer(object):
                 new
             )
 
-        return (added, total)
+        return (added, total, "")
 
     def import_activity(self):
         """
@@ -353,7 +383,7 @@ class Importer(object):
                 new
             )
 
-        return (added, total)
+        return (added, total, "")
 
     def import_activitymaterial(self):
         """
@@ -410,7 +440,7 @@ class Importer(object):
                 new
             )
 
-        return (added, total)
+        return (added, total, "")
 
     def import_activityproduct(self):
         """
@@ -474,7 +504,7 @@ class Importer(object):
                 new
             )
 
-        return (added, total)
+        return (added, total, "")
 
     def import_activityskill(self):
         """
@@ -531,7 +561,7 @@ class Importer(object):
                 new
             )
 
-        return (added, total)
+        return (added, total, "")
 
     def import_region(self):
         """
@@ -601,7 +631,7 @@ class Importer(object):
                 update,
             )
 
-        return (added, total)
+        return (added, total, "")
 
     def import_constellation(self):
         """
@@ -668,7 +698,7 @@ class Importer(object):
                 update_stmt,
                 update,
             )
-        return (added, total)
+        return (added, total, "")
 
     def import_solarsystem(self):
         """
@@ -738,4 +768,4 @@ class Importer(object):
                 update,
             )
 
-        return (added, total)
+        return (added, total, "")
