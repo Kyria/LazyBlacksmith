@@ -67,11 +67,11 @@ var eveUtils = (function(utils) {
      *
      */
     var calculateJobTime = function(timePerUnit, runs, facilityTimeBonus, timeEfficiency,
-                            industryReactionsSkillLevel, advancedIndustrySkillLevel,
+                            implantModifier, industryReactionsSkillLevel, advancedIndustrySkillLevel,
                             t2ConstructionSkillLevel, primaryScienceSkillLevel, secondaryScienceSkilllevel,
                             rigBonus, rigMultiplier, isStructure, useT2Time) {
         var timeBonus = (1.00-timeEfficiency/100.00);
-        var time = timePerUnit * timeBonus * facilityTimeBonus * runs;
+        var time = timePerUnit * timeBonus * facilityTimeBonus * runs * implantModifier;
         time *= (1 - industryReactionsSkillLevel * 0.04);
         time *= (1 - advancedIndustrySkillLevel * 0.03);
         if(useT2Time) {

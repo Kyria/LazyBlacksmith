@@ -21,6 +21,7 @@ from lazyblacksmith.utils.industry import calculate_base_cost
 from lazyblacksmith.utils.industry import calculate_build_cost
 from lazyblacksmith.utils.industry import get_common_industry_skill
 from lazyblacksmith.utils.industry import get_skill_data
+from lazyblacksmith.utils.models import get_regions
 
 blueprint = FlaskBlueprint('blueprint', __name__)
 
@@ -112,7 +113,7 @@ def manufacturing(item_id, me=0, te=0):
     has_manufactured_components = False
 
     for material in materials:
-        if material.material.is_manufactured():
+        if material.material.is_from_manufacturing:
             has_manufactured_components = True
             break
 
@@ -346,4 +347,28 @@ def invention(item_id):
 
 @blueprint.route('/reaction/<int:item_id>')
 def reaction(item_id):
-    pass
+    """ Display the manufacturing page with all data """
+    item = Item.query.get(item_id)
+    char = current_user.pref.prod_character
+
+    if item is None or item.max_production_limit is None:
+        abort(404)
+
+    activity = item.activities.filter_by(
+        activity=Activity.REACTIONS
+    ).one()
+    materials = item.activity_materials.filter_by(
+        activity=Activity.REACTIONS
+    )
+    product = item.activity_products.filter_by(
+        activity=Activity.REACTIONS
+    ).one()
+
+    return render_template('blueprint/reaction.html', **{
+        'blueprint': item,
+        'materials': materials,
+        'activity': activity,
+        'product': product,
+        'regions': get_regions(),
+        'industry_skills': get_common_industry_skill(char),
+    })
