@@ -152,6 +152,26 @@
     </div>
 </div>
 
+<div class="form-group row">
+    <label for="te-implant-prod" class="settings-label">Manuf. TE Implant</label>
+    <div class="settings-field">
+        <div class="btn-group" id="te-implant-prod" data-toggle="buttons" >
+            <label class="btn btn-outline-secondary {% if pref.prod_te_implant == 1.00 %}active{% endif %}">
+                <input type="radio" name="te-implant-prod" autocomplete="off" value="1.00" {% if pref.prod_te_implant == 1.00 %}checked{% endif %}>None
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_te_implant == 0.99 %}active{% endif %}">
+                <input type="radio" name="te-implant-prod" autocomplete="off" value="0.99" {% if pref.prod_te_implant == 0.99 %}checked{% endif %}>BX-801
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_te_implant == 0.98 %}active{% endif %}">
+                <input type="radio" name="te-implant-prod" autocomplete="off" value="0.98" {% if pref.prod_te_implant == 0.97 %}checked{% endif %}>BX-802
+            </label>
+            <label class="btn btn-outline-secondary {% if pref.prod_te_implant == 0.96 %}active{% endif %}">
+                <input type="radio" name="te-implant-prod" autocomplete="off" value="0.96" {% if pref.prod_te_implant == 0.96 %}checked{% endif %}>BX-804
+            </label>
+        </div>
+    </div>
+</div>
+
 <br>
 
 <div class="form-group row">

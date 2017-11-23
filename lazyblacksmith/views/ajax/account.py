@@ -207,6 +207,7 @@ def update_production_preference(preferences):
             pref.prod_price_region_others = preferences['priceOtherRegion']
             pref.prod_price_type_others = preferences['priceOtherType']
             pref.prod_character_id = preferences['characterId']
+            pref.prod_te_implant = preferences['teImplant']
 
             db.session.commit()
 

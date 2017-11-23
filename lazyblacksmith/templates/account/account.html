@@ -54,6 +54,7 @@
         accountDashboard.productionSettings.priceOtherRegion = {{ pref.prod_price_region_others }};
         accountDashboard.productionSettings.priceOtherType = '{{ pref.prod_price_type_others }}';
         accountDashboard.productionSettings.characterId =  {% if pref.prod_character %}{{ pref.prod_character_id }}{% else %}null{% endif %};
+        accountDashboard.productionSettings.teImplant = '{{ pref.prod_te_implant | floatcomma }}';
 
         // run
         lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_industry_preference') }}";
