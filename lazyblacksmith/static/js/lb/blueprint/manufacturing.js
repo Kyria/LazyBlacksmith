@@ -27,6 +27,9 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         t2ConstructionLvl: 0,
         datacoreLevel1: 0,
         datacoreLevel2: 0,
+
+        // implant
+        manufTeImplant: 1.00,
     };
 
     // urls
@@ -241,20 +244,16 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                 material.timePerRun = tmpMaterial['time'];
 
                 var timePerRun = eveUtils.calculateJobTime(
-                    material.timePerRun,
-                    1,
-                    facilityStats[material.facility].bpTe,
-                    material.timeEfficiency,
+                    material.timePerRun, 1, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                    (material.isManufactured) ? options.manufTeImplant : 1.00,
                     options.industryLvl, options.advancedIndustryLvl,
                     0, 0, 0,
                     structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
                     facilityStats[material.facility].structure, false
                 );
                 material.timeTotal = eveUtils.calculateJobTime(
-                    material.timePerRun,
-                    material.runs,
-                    facilityStats[material.facility].bpTe,
-                    material.timeEfficiency,
+                    material.timePerRun, material.runs, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                    (material.isManufactured) ? options.manufTeImplant : 1.00,
                     options.industryLvl, options.advancedIndustryLvl,
                     0, 0, 0,
                     structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
@@ -499,9 +498,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         var material = materialsData.materials[materialsData.productItemId];
         var time_per_run = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
-            1,
-            facilityStats[material.facility].bpTe,
-            options.timeEfficiency,
+            1, facilityStats[material.facility].bpTe, options.timeEfficiency,
+            (material.isManufactured) ? options.manufTeImplant : 1.00,
             options.industryLvl, options.advancedIndustryLvl,
             options.t2ConstructionLvl, options.datacoreLevel1, options.datacoreLevel2,
             structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
@@ -509,9 +507,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         );
         var time = eveUtils.calculateJobTime(
             materialsData.materials[materialsData.productItemId].timePerRun,
-            options.runs,
-            facilityStats[material.facility].bpTe,
-            options.timeEfficiency,
+            options.runs, facilityStats[material.facility].bpTe, options.timeEfficiency,
+            (material.isManufactured) ? options.manufTeImplant : 1.00,
             options.industryLvl, options.advancedIndustryLvl,
             options.t2ConstructionLvl, options.datacoreLevel1, options.datacoreLevel2,
             structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
@@ -544,10 +541,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             }
 
             var time = eveUtils.calculateJobTime(
-                material.timePerRun,
-                material.runs,
-                facilityStats[material.facility].bpTe,
-                material.timeEfficiency,
+                material.timePerRun, material.runs, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                (material.isManufactured) ? options.manufTeImplant : 1.00,
                 options.industryLvl, options.advancedIndustryLvl,
                 0, 0, 0,
                 structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
@@ -555,10 +550,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             );
 
             var time_per_run = eveUtils.calculateJobTime(
-                material.timePerRun,
-                1,
-                facilityStats[material.facility].bpTe,
-                material.timeEfficiency,
+                material.timePerRun, 1, facilityStats[material.facility].bpTe, material.timeEfficiency,
+                (material.isManufactured) ? options.manufTeImplant : 1.00,
                 options.industryLvl, options.advancedIndustryLvl,
                 0, 0, 0,
                 structureRigs[material.structureTeRig].timeBonus, structureSecStatusMultiplier[material.structureSecStatus],
@@ -945,6 +938,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         $('#runsPerJob').on('keyup', _runsPerJobOnKeyUp)
                         .on('change', _runsPerJobOnChange);
 
+        $('#manufTeImplant').on('change', function() {
+            options.manufTeImplant = parseFloat($('#manufTeImplant').val());
+            _updateTime();
+            _updateComponentTime();
+        });
     };
 
     /**

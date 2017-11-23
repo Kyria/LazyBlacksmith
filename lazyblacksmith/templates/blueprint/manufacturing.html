@@ -90,6 +90,7 @@
 
         manufacturingBlueprint.options.materialEfficiency = {{ me }};
         manufacturingBlueprint.options.timeEfficiency = {{ te }};
+        manufacturingBlueprint.options.manufTeImplant = {{ pref.prod_te_implant }};
         manufacturingBlueprint.options.industryLvl = {{ industry_skills['industry'] }};
         manufacturingBlueprint.options.advancedIndustryLvl = {{ industry_skills['adv_industry'] }};
         {% if t2_manufacturing_skill %}
@@ -98,6 +99,7 @@
         {% for skill in science_skill %}
         manufacturingBlueprint.options.datacoreLevel{{loop.index}} = {{ skill.level }};
         {%- endfor %}
+
 
         lb.run('manufacturingBlueprint');
     </script>
@@ -197,6 +199,15 @@
                                 <div class="slider">
                                     TE Level (<span id="TE-Level">{{ te }}%</span>)<br>
                                     <div id="TE"></div>
+                                </div>
+                                <div class="mt-3">
+                                    Manufacturing TE Implant<br>
+                                    <select name="manufTeImplant" id="manufTeImplant" class="form-control form-control-sm mt-1">
+                                        <option value="1.00" {% if pref.prod_te_implant == 1.00 %}selected{% endif %}>None</option>
+                                        <option value="0.99" {% if pref.prod_te_implant == 0.99 %}selected{% endif %}>BX-801</option>
+                                        <option value="0.98" {% if pref.prod_te_implant == 0.98 %}selected{% endif %}>BX-802</option>
+                                        <option value="0.96" {% if pref.prod_te_implant == 0.96 %}selected{% endif %}>BX-804</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
