@@ -311,7 +311,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
                                      .replace(/@@QTY@@/g, material.qtyJob)
                                      .replace(/@@RUN@@/g, material.runs)
                                      .replace(/@@RUNPERJOB@@/g, material.runsPerJob)
-                                     .replace(/@@SYSTEM@@/g, material.manufacturingSystem)
+                                     .replace(/@@SYSTEM@@/g, material.factorySystem)
                                      .replace(/@@FACILITY_NAME@@/g, facilityStats[material.facility].name)
                                      .replace(/@@ACTIVITY_TIME_HUMAN@@/g, timeHuman)
                                      .replace(/@@ACTIVITY_TIME_TOTAL@@/g, timeTotalHuman)
@@ -353,7 +353,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
         var systemList = [];
 
         for(var i in materialList) {
-            var system = materialsData.materials[materialList[i]].manufacturingSystem;
+            var system = materialsData.materials[materialList[i]].factorySystem;
             if(!(system in costIndex) && $.inArray(system,systemList) == -1) {
                 systemList.push(system);
             }
@@ -372,11 +372,11 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
             // find where solarsystem are bad, and revert to previous.
             for(var i in materialList) {
-                var system = materialsData.materials[materialList[i]].manufacturingSystem;
+                var system = materialsData.materials[materialList[i]].factorySystem;
 
                 if(!(system in costIndex)) {
-                    var systemPrevious = materialsData.materials[materialList[i]].manufacturingSystemPrevious;
-                    materialsData.materials[materialList[i]].manufacturingSystem = systemPrevious;
+                    var systemPrevious = materialsData.materials[materialList[i]].factorySystemPrevious;
+                    materialsData.materials[materialList[i]].factorySystem = systemPrevious;
 
                     if(materialList[i] != materialsData.productItemId) {
                         _updateComponentBpInfoDisplay(materialList[i]);
@@ -604,8 +604,8 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         for(var i in components) {
             var componentId = components[i];
-            materialsData.materials[componentId].manufacturingSystemPrevious = materialsData.materials[componentId].manufacturingSystem;
-            materialsData.materials[componentId].manufacturingSystem = system;
+            materialsData.materials[componentId].factorySystemPrevious = materialsData.materials[componentId].factorySystem;
+            materialsData.materials[componentId].factorySystem = system;
             materialsData.materials[componentId].facility = facility;
             materialsData.materials[componentId].materialEfficiency = ME;
             materialsData.materials[componentId].timeEfficiency = TE;
@@ -648,7 +648,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             $('.sub-list-'+ id +' .display-structure-config').hide();
         }
 
-        $('.sub-list-'+ id +' .system').html(materialsData.materials[id].manufacturingSystem);
+        $('.sub-list-'+ id +' .system').html(materialsData.materials[id].factorySystem);
         $('.sub-list-'+ id +' .me').html(materialsData.materials[id].materialEfficiency);
         $('.sub-list-'+ id +' .te').html(materialsData.materials[id].timeEfficiency);
         $('.sub-list-'+ id +' .facility').html(facilityStats[materialsData.materials[id].facility].name);
@@ -784,7 +784,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
         // set the main blueprint
         var taxPrice = _calculateBaseCost(materialsData.productItemId);
-        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].manufacturingSystem][ACTIVITY_MANUFACTURING];
+        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].factorySystem][ACTIVITY_MANUFACTURING];
         totalInstallationCost += taxPrice;
 
         var output = rowTax.replace(/@@ICON@@/g, materialsData.materials[materialsData.productItemId].icon)
@@ -798,7 +798,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
 
             if(material.isManufactured) {
                 var taxPrice = _calculateBaseCost(material.id);
-                taxPrice *= 1.1 * costIndex[material.manufacturingSystem][ACTIVITY_MANUFACTURING];
+                taxPrice *= 1.1 * costIndex[material.factorySystem][ACTIVITY_MANUFACTURING];
 
                 output += rowTax.replace(/@@ICON@@/g, material.icon)
                                 .replace(/@@NAME@@/g, material.name)
@@ -967,12 +967,12 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
      */
     var _initTypeahead = function() {
         eveUtils.initSolarSystemTypeahead('#system', function(event, suggestion) {
-            var manufSystem = materialsData.materials[materialsData.productItemId].manufacturingSystem;
+            var manufSystem = materialsData.materials[materialsData.productItemId].factorySystem;
             if(manufSystem == $(this).typeahead('val').toLowerCase()) {
                 return;
             }
-            materialsData.materials[materialsData.productItemId].manufacturingSystemPrevious = manufSystem;
-            materialsData.materials[materialsData.productItemId].manufacturingSystem = $(this).typeahead('val').toLowerCase();
+            materialsData.materials[materialsData.productItemId].factorySystemPrevious = manufSystem;
+            materialsData.materials[materialsData.productItemId].factorySystem = $(this).typeahead('val').toLowerCase();
             _getSystemCostIndex();
         });
         eveUtils.initSolarSystemTypeahead('#modal-system');
@@ -1046,7 +1046,7 @@ var manufacturingBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize
             var id = button.attr('data-id');
             var name = materialsData.materials[id].name;
 
-            var system = materialsData.materials[id].manufacturingSystem;
+            var system = materialsData.materials[id].factorySystem;
             var facility = materialsData.materials[id].facility;
 
             var structureMeRig = materialsData.materials[id].structureMeRig;
