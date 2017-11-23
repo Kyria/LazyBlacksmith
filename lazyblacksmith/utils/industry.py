@@ -7,6 +7,13 @@ from lazyblacksmith.models import ItemPrice
 
 from . import logger
 
+SKILL_SCIENCE_ID = 3402
+SKILL_ADV_INDUSTRY_ID = 3388
+SKILL_INDUSTRY = 3380
+SKILL_RESEARCH = 3403
+SKILL_METALLURGY = 3409
+SKILL_REACTIONS = 45746
+
 
 def get_skill_data(skill, char):
     """ return formatted skill data to be used in the template """
@@ -29,12 +36,6 @@ def get_common_industry_skill(char):
     - industry
     - advanced industry
     """
-    SKILL_SCIENCE_ID = 3402
-    SKILL_ADV_INDUSTRY_ID = 3388
-    SKILL_INDUSTRY = 3380
-    SKILL_RESEARCH = 3403
-    SKILL_METALLURGY = 3409
-    SKILL_REACTIONS = 45746
     skills = {
         'science': 0,
         'industry': 0,
