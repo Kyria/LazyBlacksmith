@@ -1,0 +1,579 @@
+{% extends "base.html" %}
+
+{% block title %}:: Reactions :: {{ blueprint.name }}{% endblock %}
+
+{% block js %}
+{% set pref = current_user.pref %}
+    <script>
+        lb.urls.materialBOMUrl      = "{{ url_for('ajax_eve_sde.blueprint_bom', blueprint_id=blueprint.id) }}";
+        lb.urls.tplSublistBlockUrl  = "{{ url_for('template.manufacturing_sublist_block') }}";
+        lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
+        lb.urls.tplModalPriceUrl    = "{{ url_for('template.manufacturing_modal_price') }}";
+
+        reactionBlueprint.options.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
+        reactionBlueprint.materialsData.productItemId = {{ product.product.id }};
+
+        reactionBlueprint.materialsData.materials[{{ product.product.id }}] = {
+            'id': {{ product.product.id }},
+            'isFromReaction': true,
+            'isManufactured': false,
+            'runsPerJob': {{ product.blueprint.max_production_limit }},
+            'maxRunPerBp': {{ product.blueprint.max_production_limit }},
+            'resultQtyPerRun': {{ product.quantity }},
+            'qtyRequiredPerRun': {{ product.quantity }},
+            'qtyAdjusted': {{ product.quantity }},
+            'qtyJob': {{ product.quantity }},
+            'timePerRun': {{ activity.time }},
+            'effectiveTimePerRun': {{ activity.time }},
+            'timeTotal': {{ activity.time }},
+            'name': '{{ product.product.name }}',
+            'icon': '{{ product.product.icon_32() }}',
+            'factorySystem': '{{ pref.reaction_system|lower }}',
+            'factorySystemPrevious': '{{ pref.reaction_system|lower }}',
+            'facility': {{ pref.reaction_facility }},
+            'structureTeRig': {{ pref.reaction_te_rig}},
+            'structureMeRig': {{ pref.reaction_me_rig}},
+            'structureSecStatus': '{{ pref.reaction_security }}',
+            'priceType': '{{ pref.reaction_price_type }}',
+            'priceRegion': {{ pref.reaction_price_regions }},
+        };
+
+        {% for material in materials.all() %}
+        reactionBlueprint.materialsData.componentIdList.push({{ material.material.id }});
+        reactionBlueprint.materialsData.materials[{{ material.material.id }}] = {
+            'id': {{ material.material.id }},
+            'isManufactured': {% if material.material.is_from_manufacturing %}true{% else %}false{% endif %},
+            'isFromReaction': {% if material.material.is_from_reaction %}true{% else %}false{% endif %},
+            'runsPerJob': -1,
+            'maxRunPerBp': -1,
+            'resultQtyPerRun': -1,
+            'qtyRequiredPerRun': {{ material.quantity }},
+            'qtyAdjusted': {{ material.quantity }},
+            'qtyJob': {{ material.quantity }},
+            'timePerRun': 0,
+            'timeTotal': 0,
+            'effectiveTimePerRun': 0,
+            'runs': -1,
+            'name': '{{ material.material.name }}',
+            'icon': '{{ material.material.icon_32() }}',
+            'materials': {},
+            'componentIdList': [],
+            'materialEfficiency': {% if material.material.is_from_manufacturing %}10{% else %}0{% endif %},
+            'timeEfficiency':  {% if material.material.is_from_manufacturing %}20{% else %}0{% endif %},
+            {% if material.material.is_from_manufacturing %}
+            'factorySystem': '{{ pref.reaction_manuf_system|lower }}',
+            'factorySystemPrevious': '{{ pref.reaction_manuf_system|lower }}',
+            'facility': {{ pref.reaction_manuf_facility }},
+            'structureTeRig': {{ pref.reaction_manuf_te_rig}},
+            'structureMeRig': {{ pref.reaction_manuf_me_rig}},
+            'structureSecStatus': '{{ pref.reaction_manuf_security }}',
+            {% else %}
+            'factorySystem': '{{ pref.reaction_system|lower }}',
+            'factorySystemPrevious': '{{ pref.reaction_system|lower }}',
+            'facility': {{ pref.reaction_facility }},
+            'structureTeRig': {{ pref.reaction_te_rig}},
+            'structureMeRig': {{ pref.reaction_me_rig}},
+            'structureSecStatus': '{{ pref.reaction_security }}',
+            {% endif %}
+            'priceType': 'buy',
+            'priceRegion': 10000002,
+        };
+        {% if material.material.is_from_manufacturing -%}
+        reactionBlueprint.materialsData.manufacturedMaterials.push({{ material.material.id }});
+        {% endif %}
+        {% endfor %}
+        reactionBlueprint.options.industryLvl = {{ industry_skills['industry'] }};
+        reactionBlueprint.options.advancedIndustryLvl = {{ industry_skills['adv_industry'] }};
+        reactionBlueprint.options.reactionsLvl = {{ industry_skills['reactions'] }};
+        reactionBlueprint.options.manufTeImplant = {{ pref.reaction_manuf_te_implant }};
+
+        lb.run('reactionBlueprint');
+    </script>
+{% endblock %}
+
+{% block content %}
+{% set pref = current_user.pref %}
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs" id="bp-tabs" role="tablist">
+            <li class="nav-item"><a class="active nav-link" href="#tab-bp">Reaction</a></li>
+            <li class="nav-item" id='subcomp-tab'><a class="nav-link" href="#tab-subcomp">Reaction Component</a></li>
+            <li class="nav-item" id='summary-tab'><a class="nav-link" href="#tab-summary">Material Summary</a></li>
+            <li class="nav-item" id='price-tab'><a class="nav-link" href="#tab-price">Prices</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="fade show active tab-pane pt-4" id="tab-bp">
+                <div class="row">
+                    <div class="col-md-3 col-sm-4">
+                        <div class="card bg-light mb-5">
+                            <div class="card-body">
+                                Facility<br>
+                                <select name="facility" id="facility" class="form-control form-control-sm mt-1">
+                                    <option value="5" {% if pref.reaction_facility == 5 -%}selected{%- endif %}>Athanor</option>
+                                    <option value="6" {% if pref.reaction_facility == 6 -%}selected{%- endif %}>Tatara</option>
+                                </select>
+                                <div class="structure-configs mt-3">
+                                    Rigs<br>
+                                    <div class="btn-group w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_me_rig == 0 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.reaction_me_rig == 0 -%}checked{%- endif %}>None
+                                        </label>
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_me_rig == 1 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="1" {% if pref.reaction_me_rig == 1 -%}checked{%- endif %}>ME T1
+                                        </label>
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_me_rig == 2 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.reaction_me_rig == 2 -%}checked{%- endif %}>ME T2
+                                        </label>
+                                    </div>
+                                    <div class="btn-group w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_te_rig == 0 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.reaction_te_rig == 0 -%}checked{%- endif %}>None
+                                        </label>
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_te_rig == 1 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="1" {% if pref.reaction_te_rig == 1 -%}checked{%- endif %}>TE T1
+                                        </label>
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_te_rig == 2 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.reaction_te_rig == 2 -%}checked{%- endif %}>TE T2
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="structure-configs mt-3">
+                                    System Security<br>
+                                    <div class="btn-group w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_security == 'l' -%}active{%- endif %}">
+                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.reaction_security == 'l' -%}checked{%- endif %}>LowSec
+                                        </label>
+                                        <label class="btn col btn-sm btn-secondary {% if pref.reaction_security == 'n' -%}active{%- endif %}">
+                                            <input type="radio" name="structure-sec-status" autocomplete="off" value="n" {% if pref.reaction_security == 'n' -%}checked{%- endif %}>NullSec / WH
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    System<br>
+                                    <input id="system" type="text" class="form-control form-control-sm typeahead mt-1" value="{{ pref.reaction_system }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card bg-light mb-5">
+                            <div class="card-body">
+                                <div>
+                                    Runs <br>
+                                    <input id="runs" type="text" class="form-control form-control-sm mt-1" value="1">
+                                </div>
+                                <div class="mt-3">
+                                    Runs Per Jobs<br>   
+                                    <div class="input-group mt-1">
+                                        <input id="runsPerJob" type="text" class="form-control form-control-sm" value="{{ (3600 * 24 * 30 / activity.time)|int }}">
+
+                                        <span class="input-group-btn">
+                                            <button id="maxRunBpc" class="btn btn-secondary btn-sm">Max Run/30d</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card bg-light mb-5">
+                            <div class="card-body">
+                                <div class="slider">
+                                    Industry (<span id="industry-level-display">{{ industry_skills['industry'] }}</span>)<br>
+                                    <div id="industry-level"></div>
+                                </div>
+                                <div class="slider">
+                                    Adv. Industry (<span id="adv-industry-level-display">{{ industry_skills['adv_industry'] }}</span>)<br>
+                                    <div id="adv-industry-level"></div>
+                                </div>
+                                <div class="slider">
+                                    Reactions (<span id="reactions-level-display">{{ industry_skills['reactions'] }}</span>)<br>
+                                    <div id="reactions-level"></div>
+                                </div>
+                                <div class="mt-3">
+                                    Manufacturing TE Implant<br>
+                                    <select name="manufTeImplant" id="manufTeImplant" class="form-control form-control-sm mt-1">
+                                        <option value="1.00" {% if pref.reaction_manuf_te_implant == 1.00 %}selected{% endif %}>None</option>
+                                        <option value="0.99" {% if pref.reaction_manuf_te_implant == 0.99 %}selected{% endif %}>BX-801</option>
+                                        <option value="0.98" {% if pref.reaction_manuf_te_implant == 0.98 %}selected{% endif %}>BX-802</option>
+                                        <option value="0.96" {% if pref.reaction_manuf_te_implant == 0.96 %}selected{% endif %}>BX-804</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9 col-sm-8 main-list">
+                        <div class="row">
+                            <div class="col-10 align-self-center">
+                                <h5>
+                                    {{ blueprint.name }}
+                                    <span class="small text-muted">
+                                        ({{ product.product.name }} x
+                                        <span id="qty-required-{{ product.product.id }}">{{ product.quantity|intcomma }}</span>) -
+                                        <strong>Time per run: </strong><span class="time-per-run">{{ activity.time|duration }}</span> -
+                                        <strong>Total time: </strong><span class="total-time">{{ activity.time|duration }}</span>
+                                    </span>
+                                </h5>
+                            </div>
+                            <div class="col-2 text-right">
+                                {% if config.USE_CCP_ICONS -%}
+                                    <img src="{{ blueprint.icon_32() }}" alt="{{ blueprint.name }}">
+                                {%- endif %}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <table class="lb-table-sm lb-list">
+                                    <thead>
+                                        <tr>
+                                            {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                            <th>Name</th>
+                                            <th class="text-right">Base Qty</th>
+                                            <th class="text-right">Adjusted Qty</th>
+                                            <th class="text-right">Job Qty</th>
+                                        </tr>
+                                    </thead>
+                                {% for material in materials.all() %}
+                                    <tr class="material" data-id="{{material.material.id}}">
+                                        {% if config.USE_CCP_ICONS -%}
+                                        <td class="icon">
+                                            <img src="{{ material.material.icon_32() }}" alt="{{ material.material.name }}">
+                                        </td>
+                                        {%- endif %}
+                                        <td>
+                                            {{- material.material.name -}}
+                                        </td>
+                                        <td class="quantity" data-name="quantity">
+                                            {{- material.quantity | intcomma -}}
+                                        </td>
+                                        <td class="quantity" data-name="quantity-adjusted">{{ material.quantity | floatcomma }}</td>
+                                        <td class="quantity" data-name="quantity-job">{{ material.quantity | intcomma }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fade tab-pane pt-4" id="tab-subcomp">
+                <div class="row content">
+                    <div class="col-md-12">
+                        <strong>Loading materials... please wait a second</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fade tab-pane pt-4" id="tab-summary">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>
+                            Material requirements
+
+                            <button class="btn btn-outline-secondary btn-sm" id="multibuy" data-toggle="tooltip" data-placement="bottom" title="Copy to clipboard - Multibuy">
+                                <i class="fa fa-clipboard" aria-hidden="true"></i>
+                            </button>
+
+                            <span class="raw-component-btn">
+                                <span id="raw-components" data-toggle="buttons">
+                                    <label class="btn btn-danger btn-sm m-0">
+                                        <input type="checkbox" autocomplete="off">
+                                        Raw components: <span class="state">NO</span>
+                                    </label>
+                                </span>
+                                <span id="build-fuel" data-toggle="buttons">
+                                    <label class="btn btn-success btn-sm m-0 active">
+                                        <input type="checkbox" autocomplete="off" checked>
+                                        Build Fuel: <span class="state">Main Reaction</span>
+                                    </label>
+                                </span>
+                            </span>
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-requirement">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h4>
+                            Production times
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-time">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fade tab-pane pt-4" id="tab-price">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>
+                            Material Prices
+                            <button type="button" class="btn btn-outline-dark btn-sm" data-toggle="modal" data-target="#priceConfigModal">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <span class="raw-component-btn"></span>
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-prices">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price Per Unit</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Materials Total Cost</td>
+                                    <td id="mat-total-price"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Installation Cost</td>
+                                    <td id="installation-cost"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Unit Cost</td>
+                                    <td id="total-cost-per-unit"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">{{ product.product.name }} Sell Value</td>
+                                    <td id="product-price"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Margin</td>
+                                    <td id="margin"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">% Margin</td>
+                                    <td id="margin-percent"></td>
+                                </tr>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">% Markup</td>
+                                    <td id="markup-percent"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h4>
+                            Industry Taxes
+                            <span class='small' data-toggle="tooltip" data-placement="top" title="Industry taxes may be wrong, as they will take the highest prices possible. Never forget to double check !">
+                                    <i class="fa fa-exclamation-circle"></i>
+                            </span>
+                        </h4>
+                        <table class="lb-table-sm lb-list" id="materials-taxes">
+                            <thead>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Tax Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block modal %}
+{% set pref = current_user.pref %}
+<!-- Prices config modals -->
+<div class="modal fade" role="dialog" id="priceConfigModal" aria-labelledby="priceConfigModal" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Configure Prices</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="input-group">
+                            <select name="modal-region-all" id="modal-region-all" class="form-control form-control-sm">
+                                <option disabled selected>Select a region</option>
+                                {% for region in regions %}
+                                <option value="{{ region.id }}">{{ region.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <span class="input-group-btn">
+                                <button class="btn btn-sm btn-primary" id="modal-region-apply-all" type="button">Apply to selected</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="input-group">
+                            <select name="modal-order-all" id="modal-order-all" class="form-control form-control-sm">
+                                <option value="buy" selected>Use buy orders</option>
+                                <option value="sell">Use sell orders</option>
+                            </select>
+                            <span class="input-group-btn">
+                                <button class="btn btn-sm btn-primary" id="modal-order-type-apply-all" type="button">Apply to selected</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <div>
+                    <table class="lb-table-sm lb-list">
+                        <thead>
+                            <tr>
+                                {% if config.USE_CCP_ICONS -%}<th class="icon">&nbsp;</th>{%- endif %}
+                                <th>Name</th>
+                                <th style="width:35%">Price Settings</th>
+                                <th class="checkbox-cell"><input type="checkbox" id="modal-price-checkall"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Sub component config modals -->
+<div class="modal fade" role="dialog" id="subComponentBpConfigModal" aria-labelledby="subComponentBpConfigModal" aria-hidden="true" data-bp-id="">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Configure Blueprint <span id="componentModalBpName"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            Facility<br>
+                            <select name="modal-facility" id="modal-facility" class="form-control form-control-sm mt-1">
+                                <option class="manufacturing-strct" value="0">Station</option>
+                                <option class="manufacturing-strct" value="1">Raitaru (M-EC)</option>
+                                <option class="manufacturing-strct" value="2">Azbel (L-EC)</option>
+                                <option class="manufacturing-strct" value="3">Sotiyo (XL-EC)</option>
+                                <option class="manufacturing-strct" value="4">Other Structures</option>
+                                <option value="5">Athanor</option>
+                                <option value="6">Tatara</option>
+                            </select>
+
+                            <div class="modal-structure-configs mt-3">
+                                Rigs<br>
+                                <div class="btn-group w-100 mt-1" id="modal-structure-me-rig" data-toggle="buttons">
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0">None
+                                    </label>
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="1">ME T1
+                                    </label>
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2" >ME T2
+                                    </label>
+                                </div>
+                                <div class="btn-group w-100 mt-1" id="modal-structure-te-rig" data-toggle="buttons">
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0">None
+                                    </label>
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="1">TE T1
+                                    </label>
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="2">TE T2
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="modal-structure-configs mt-3">
+                                System Security<br>
+                                <div class="btn-group w-100 mt-1" id="modal-structure-sec-status" data-toggle="buttons">
+                                    <label class="btn col btn-sm btn-secondary manufacturing-strct">
+                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="h">HS
+                                    </label>
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="l">LS
+                                    </label>
+                                    <label class="btn col btn-sm btn-secondary">
+                                        <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="n">NS/WH
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                System<br>
+                                <input id="modal-system" type="text" class="form-control form-control-sm typeahead mt-1" value="">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div>
+                                Runs Per Batch<br>   
+                                <div class="input-group mt-1">
+                                    <input id="modalRunsPerJob" type="text" class="form-control form-control-sm" value="1">
+                                    <span class="input-group-btn" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
+                                        <label class="btn btn-secondary btn-sm m-0">
+                                            <input type="checkbox" autocomplete="off">Max Run/30d
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="slider mt-3 manufacturing-strct">
+                                ME Level (<span id="Modal-ME-Level">0</span>%)<br>
+                                <div id="ModalME"></div>
+                            </div>
+                            <div class="slider manufacturing-strct">
+                                TE Level (<span id="Modal-TE-Level">0</span>)<br>
+                                <div id="ModalTE"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-apply" data-dismiss="modal" class="btn btn-primary">Apply</button>
+                <button type="button" id="modal-apply-all" data-dismiss="modal" class="btn btn-success">Apply to all blueprints</button>
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

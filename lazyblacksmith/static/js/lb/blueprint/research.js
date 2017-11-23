@@ -57,7 +57,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
     // assembly informations
     var facilityStats = eveData.facilities;
-    var structureRigs = eveData.structureRigs;
+    var structureRigs = eveData.structureIndustryRigs;
     var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
 
 
@@ -315,30 +315,51 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      * @private
      */
     var _initSliders = function() {
-        $('#ME').slider({
-            min: 0,
-            max: 10,
-            range: "min",
-            slide: _materialEfficiencyOnUpdate,
-        });
-        $('#TE').slider({
-            min: 0,
-            max: 20,
+        var skillSliderConf = {
+            start: 0,
+            connect: [true, false],
+            step: 1,
+            range: {
+                min: 0,
+                max: 5
+            }
+        };
+        var meSliderConf = {
+            start: 0,
+            connect: [true, false],
+            step: 1,
+            range: {
+                min: 0,
+                max: 10
+            }
+        };
+        var teSliderConf = {
+            start: 0,
+            connect: [true, false],
             step: 2,
-            range: "min",
-            slide: _timeEfficiencyOnUpdate,
-        });
-        $('#adv-industry-level, #research-level, #science-level, #metallurgy-level').slider({
-            min: 0,
-            max: 5,
-            range: "min",
-            slide: _skillOnUpdate,
-        });
+            range: {
+                min: 0,
+                max: 20
+            }
+        };
 
-        $('#adv-industry-level').slider('option', 'value', options.advancedIndustryLevel);
-        $('#science-level').slider('option', 'value', options.scienceLevel);
-        $('#research-level').slider('option', 'value', options.researchLevel);
-        $('#metallurgy-level').slider('option', 'value', options.metallurgyLevel);
+        utils.noUiSliderCreate('#ME', meSliderConf);
+        utils.noUiSliderCreate('#TE', teSliderConf);
+        utils.noUiSliderCreate('#adv-industry-level, #research-level, #science-level, #metallurgy-level', skillSliderConf);
+
+        utils.noUiSliderSetValue('#ME', options.materialEfficiency);
+        utils.noUiSliderSetValue('#TE', options.timeEfficiency);
+        utils.noUiSliderSetValue('#adv-industry-level', options.advancedIndustryLevel);
+        utils.noUiSliderSetValue('#research-level', options.researchLevel);
+        utils.noUiSliderSetValue('#science-level', options.scienceLevel);
+        utils.noUiSliderSetValue('#metallurgy-level', options.metallurgyLevel);
+
+        utils.noUiSliderBind('#ME', 'slide', _materialEfficiencyOnUpdate);
+        utils.noUiSliderBind('#TE', 'slide', _timeEfficiencyOnUpdate);
+        utils.noUiSliderBind(
+            '#adv-industry-level, #research-level, #science-level, #metallurgy-level',
+            'slide', _skillOnUpdate
+        );
     };
 
 
@@ -346,9 +367,10 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      * Function called on event update on the material efficiency slider
      * @private
      */
-    var _materialEfficiencyOnUpdate = function(event, ui) {
-        $('#ME-Level').html(ui.value+"%");
-        options.materialEfficiency = parseInt(ui.value);
+    var _materialEfficiencyOnUpdate = function(value) {
+        var value = parseInt(value);
+        $('#ME-Level').html(value+"%");
+        options.materialEfficiency = value;
         _updateResearchTimeAndCost();
     };
 
@@ -357,9 +379,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      * Function called on event update on the time efficiency slider
      * @private
      */
-    var _timeEfficiencyOnUpdate = function(event, ui) {
-        $('#TE-Level').html(ui.value+"%");
-        options.timeEfficiency = parseInt(ui.value);
+    var _timeEfficiencyOnUpdate = function(value) {
+        var value = parseInt(value);
+
+        $('#TE-Level').html(value+"%");
+        options.timeEfficiency = value;
         _updateResearchTimeAndCost();
     };
 
@@ -387,9 +411,9 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      * Function called on event update on the skill level sliders
      * @private
      */
-    var _skillOnUpdate = function(event, ui) {
-        var id = $(this).attr('id');
-        var value = parseInt(ui.value);
+    var _skillOnUpdate = function(value) {
+        var id = $(this.target).attr('id');
+        var value = parseInt(value);
 
         switch(id) {
             case 'adv-industry-level':

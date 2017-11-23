@@ -81,7 +81,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
     // assembly informations
     var facilityStats = eveData.facilities;
-    var structureRigs = eveData.structureRigs;
+    var structureRigs = eveData.structureIndustryRigs;
     var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
 
 
@@ -449,26 +449,39 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      * @private
      */
     var _initSliders = function() {
-        $('#adv-industry-level, #science-level, #encryption-level, #datacore1-level, #datacore2-level').slider({
-            min: 0,
-            max: 5,
-            range: "min",
-            slide: _skillOnUpdate,
-        });
-        $('#adv-industry-level').slider('option', 'value', options.advancedIndustryLevel);
-        $('#science-level').slider('option', 'value', options.scienceLevel);
-        $('#encryption-level').slider('option', 'value', options.encryptionLevel);
-        $('#datacore1-level').slider('option', 'value', options.datacoreLevel1);
-        $('#datacore2-level').slider('option', 'value', options.datacoreLevel2);
+        var sliderConf = {
+            start: 0,
+            connect: [true, false],
+            step: 1,
+            range: {
+                min: 0,
+                max: 5
+            }
+        };
+
+        utils.noUiSliderCreate(
+            '#adv-industry-level, #science-level, #encryption-level, #datacore1-level, #datacore2-level',
+            sliderConf
+        );
+
+        utils.noUiSliderSetValue('#adv-industry-level', options.advancedIndustryLevel);
+        utils.noUiSliderSetValue('#science-level', options.scienceLevel);
+        utils.noUiSliderSetValue('#encryption-level', options.encryptionLevel);
+        utils.noUiSliderSetValue('#datacore1-level', options.datacoreLevel1);
+        utils.noUiSliderSetValue('#datacore2-level', options.datacoreLevel2);
+        utils.noUiSliderBind(
+            '#adv-industry-level, #science-level, #encryption-level, #datacore1-level, #datacore2-level',
+            'slide', _skillOnUpdate
+        );
     };
 
     /**
      * Function called on event update on the skill level sliders
      * @private
      */
-    var _skillOnUpdate = function(event, ui) {
-        var id = $(this).attr('id');
-        var value = parseInt(ui.value);
+    var _skillOnUpdate = function(value) {
+        var id = $(this.target).attr('id');
+        var value = parseInt(value);
 
         switch(id) {
             case 'adv-industry-level':

@@ -36,6 +36,9 @@ def index():
     prod_price_region_others = Region.query.get(
         current_user.pref.prod_price_region_others
     )
+    reaction_price_region = Region.query.get(
+        current_user.pref.reaction_price_regions
+    )
     # if no region is found (wrong number) set the default to the forge
     if not invention_price_region:
         invention_price_region = the_forge_region
@@ -47,6 +50,8 @@ def index():
         prod_price_region_moongoo = the_forge_region
     if not prod_price_region_others:
         prod_price_region_others = the_forge_region
+    if not reaction_price_region:
+        reaction_price_region = the_forge_region
 
     # get all characters that have skill scope attached to them
     list_character_skills = User.query.filter(
@@ -64,6 +69,7 @@ def index():
         'prod_price_region_pi': prod_price_region_pi,
         'prod_price_region_moongoo': prod_price_region_moongoo,
         'prod_price_region_others': prod_price_region_others,
+        'reaction_price_region': reaction_price_region,
         'list_character_skills': list_character_skills,
         'regions': all_regions,
     })

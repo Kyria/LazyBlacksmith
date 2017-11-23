@@ -1,0 +1,24 @@
+span.twitter-typeahead {
+  width: 100%;
+
+  .tt-menu {
+    @extend .dropdown-menu;
+  }
+
+  .tt-suggestion {
+    @extend .dropdown-item;
+    cursor: pointer;
+  }
+
+  .tt-suggestion.tt-cursor {
+     @extend .dropdown-item.active;
+  }
+
+
+  .input-group & {
+    display: block !important;
+    .tt-menu {
+      top:(2 * $input-btn-padding-y + $input-btn-line-height) !important;
+    }
+  }
+}

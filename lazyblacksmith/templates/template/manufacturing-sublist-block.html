@@ -1,11 +1,11 @@
-<div class="col-md-12 sub-list-@@ID@@">
-    <div class="row">
-        <div class="col-xs-10">
-            <h4>
+<div class="col-12 sub-list-@@ID@@ mb-5">
+    <div class="row mb-1">
+        <div class="col-10 align-self-center">
+            <h5>
                 @@NAME@@
-            </h4>
+            </h5>
         </div>
-        <div class="col-xs-2 text-right">
+        <div class="col-2 text-right">
             {% if config.USE_CCP_ICONS -%}
                 <img src="@@ICON@@" alt="@@NAME@@"/>
             {%- endif %}
@@ -14,39 +14,65 @@
 
     <div class="row">
         <div class="col-md-2 col-sm-3">
-            <div class="well">
-                <span class="small">
-                    <button type="button" class="pull-right btn btn-default btn-xs" data-toggle="modal" data-target="#subComponentBpConfigModal" data-id="@@ID@@">
+            <div class="card bg-light mb-3">
+                <div class="card-body small">
+                    <button type="button" class="float-right btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#subComponentBpConfigModal" data-id="@@ID@@">
                         <i class="fa fa-cog"></i>
                     </button>
 
-                    <strong>@@PRODUCT_NAME@@</strong> <br>
-                    Qty/run: @@PRODUCT_QTY@@ <br>
-                    <strong>Required: </strong><span class="qty-required">@@QTY@@</span> <br>
-                    <strong>Runs: </strong><span class="run-required">@@RUN@@</span> <br>
-                    <strong>Runs per batch: </strong><span class="run-per-job">@@RUNPERJOB@@</span> <br>
-                    ME: <span class="me"></span>% <br>
-                    TE: <span class="te"></span>% <br>
-                    Facility: <span class="facility"></span><br>
-                    <span class="display-structure-config"  style="display: none;">
-                        Security: <span class="structure-ss"></span><br>
-                        Rigs: <span class="structure-rigs"></span><br>
-                    </span>
-                    System: <span class="system"></span><br>
-                    Time/run: <span class="time-per-run">@@ACTIVITY_TIME_HUMAN@@</span><br>
-                    <strong>Total time: </strong><span class="total-time">@@ACTIVITY_TIME_TOTAL@@</span>
-                </span>
+                    <div>
+                        <strong>@@PRODUCT_NAME@@</strong>
+                    </div>
+                    <div class="mt-2">
+                        Qty/run: @@PRODUCT_QTY@@
+                    </div>
+                    <div class="mt-2">
+                        <strong>Required: </strong><span class="qty-required">@@QTY@@</span>
+                    </div>
+                    <div class="mt-2">
+                        <strong>Runs: </strong><span class="run-required">@@RUN@@</span>
+                    </div>
+                    <div class="mt-2">
+                        <strong>Runs per batch: </strong><span class="run-per-job">@@RUNPERJOB@@</span>
+                    </div>
+                    <div class="mt-2 manufacturing-efficiency">
+                        ME: <span class="me"></span>%
+                    </div>
+                    <div class="mt-2 manufacturing-efficiency">
+                        TE: <span class="te"></span>%
+                    </div>
+                    <div class="mt-2">
+                        Facility: <span class="facility"></span>
+                    </div>
+                    <div class="display-structure-config mt-2" style="display: none;">
+                        Security: <span class="structure-ss"></span>
+                    </div>
+                    <div class="display-structure-config mt-2" style="display: none;">
+                        Rigs: <span class="structure-rigs"></span>
+                    </div>
+                    <div class="mt-2">
+                        System: <span class="system"></span>
+                    </div>
+                    <div class="mt-2">
+                        Time/run: <span class="time-per-run">@@ACTIVITY_TIME_HUMAN@@</span>
+                    </div>
+                    <div class="mt-2">
+                        <strong>Total time: </strong><span class="total-time">@@ACTIVITY_TIME_TOTAL@@</span>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-10 col-sm-9">
-            <table class="table table-condensed materials-list table-hover table-striped">
-                <tr>
-                    {% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}
-                    <th>Name</th>
-                    <th>Base Qty</th>
-                    <th>Adjusted Qty</th>
-                    <th>Job Qty</th>
-                </tr>
+            <table class="lb-table-sm lb-list">
+                <thead>
+                    <tr>
+                        {% if config.USE_CCP_ICONS %}<th>&nbsp;</th>{% endif %}
+                        <th>Name</th>
+                        <th class="text-right">Base Qty</th>
+                        <th class="text-right">Adjusted Qty</th>
+                        <th class="text-right">Job Qty</th>
+                    </tr>
+                </thead>
                 @@BOM@@
             </table>
         </div>

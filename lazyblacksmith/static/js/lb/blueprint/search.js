@@ -3,7 +3,7 @@ var searchBlueprint = (function ($, lb, utils) {
 
     var blueprintBodyResult = '#searchBlueprintResult tbody';
     var noResultMessage = '<tr><td colspan="2">No results.</td></tr>';
-    var resultBtn = '<a href="@@LINK@@" class="btn btn-default btn-xs pull-right">@@NAME@@</a> ';
+    var resultBtn = '<a href="@@LINK@@" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="@@NAME@@">@@ICON@@</a> ';
 
     var showCorporationBlueprints = false;
 
@@ -24,11 +24,11 @@ var searchBlueprint = (function ($, lb, utils) {
         if(this.checked) {
             $('.blueprint-corporation').show();
             $('.blueprint-character').hide();
-            $("#toggleCorporationBlueprints label").removeClass('btn-default').addClass('btn-info');
+            $("#toggleCorporationBlueprints label").removeClass('btn-secondary').addClass('btn-info');
         } else {
             $('.blueprint-corporation').hide();
             $('.blueprint-character').show();
-            $("#toggleCorporationBlueprints label").removeClass('btn-info').addClass('btn-default');
+            $("#toggleCorporationBlueprints label").removeClass('btn-info').addClass('btn-secondary');
         }
         showCorporationBlueprints = this.checked;
         _searchOwnedBlueprint($('#ownedBlueprintSearch').val().toLowerCase());
@@ -71,12 +71,29 @@ var searchBlueprint = (function ($, lb, utils) {
                 var inventionLink = lb.urls.inventionUrl.replace(/999999999/, data[item].id);
                 var manufacturingLink = lb.urls.manufacturingUrl.replace(/999999999/, data[item].id);
                 var researchLink = lb.urls.researchUrl.replace(/999999999/, data[item].id);
+                var reactionLink = lb.urls.reactionUrl.replace(/999999999/, data[item].id);
 
-                var invention = (data[item].invention) ? resultBtn.replace(/@@LINK@@/, inventionLink).replace(/@@NAME@@/, 'Invention') : '';
-                var research = resultBtn.replace(/@@LINK@@/, researchLink).replace(/@@NAME@@/, 'Research/Copy');
-                var manufacturing = resultBtn.replace(/@@LINK@@/, manufacturingLink).replace(/@@NAME@@/, 'Manufacture');
+                var invention = (!data[item].invention) ? '' : resultBtn.replace(/@@LINK@@/, inventionLink)
+                                                                        .replace(/@@NAME@@/, 'Invention')
+                                                                        .replace(/@@ICON@@/, '<i class="fa fa-flask" aria-hidden="true"></i>');
 
-                htmlResult += "<tr><td>" + data[item].name + '</td><td>' + manufacturing + research + invention + '</td></tr>';
+                var reaction = (!data[item].reaction) ? '' : resultBtn.replace(/@@LINK@@/, reactionLink)
+                                                                        .replace(/@@NAME@@/, 'Reaction')
+                                                                        .replace(/@@ICON@@/, '<i class="fa fa-share-alt" aria-hidden="true"></i>');
+
+                var research = resultBtn.replace(/@@LINK@@/, researchLink)
+                                        .replace(/@@NAME@@/, 'Research')
+                                        .replace(/@@ICON@@/, '<i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>');
+                var manufacturing = resultBtn.replace(/@@LINK@@/, manufacturingLink)
+                                             .replace(/@@NAME@@/, 'Manufacture')
+                                             .replace(/@@ICON@@/, '<i class="fa fa-industry" aria-hidden="true"></i>');
+
+                htmlResult += '<tr><td>' + data[item].name + '</td>';
+                if(!data[item].reaction) {
+                    htmlResult += '<td class="text-right"><div class="btn-group" role="group">' + invention  + research + manufacturing + '</div></td></tr>';
+                } else {
+                    htmlResult += '<td class="text-right"><div class="btn-group" role="group">' + reaction + '</div></td></tr>';
+                }
             }
 
             // display result
@@ -85,6 +102,7 @@ var searchBlueprint = (function ($, lb, utils) {
             } else {
                 $(blueprintBodyResult).html(htmlResult);
             }
+            $('[data-toggle="tooltip"]').tooltip();
         }, function() {
             $(blueprintBodyResult).html('<tr><td colspan="2">Error while trying to get results.</td></tr>');
         });
@@ -132,6 +150,7 @@ var searchBlueprint = (function ($, lb, utils) {
             }
         );
         $("#toggleCorporationBlueprints input[type='checkbox']").on('change', _toggleCorporationBlueprintsOnChange);
+        $('[data-toggle="tooltip"]').tooltip();
     };
 
 

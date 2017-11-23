@@ -17,7 +17,7 @@ var itemPriceLookup = (function ($, lb, Humanize, utils) {
         itemSearchUrl: false,
     });
 
-    var resultRow = '<a href="#" data-id="@@ID@@" data-icon="@@ICON@@" data-name="@@NAME@@" class="list-group-item search-price">@@NAME@@</a>';
+    var resultRow = '<a href="#" data-id="@@ID@@" data-icon="@@ICON@@" data-name="@@NAME@@" class="list-group-item list-group-item-action search-price">@@NAME@@</a>';
     var itemOldValue = "";
     var itemSearchBodyResult = '#resultList';
 
@@ -114,9 +114,9 @@ var itemPriceLookup = (function ($, lb, Humanize, utils) {
             var output = "";
             for(var regionId in prices) {
                 output += "<tr><td>" + regions[regionId] + "</td>";
-                output += "<td>" + Humanize.intcomma(prices[regionId][item_id].sell, 2) + "</td>";
-                output += "<td>" + Humanize.intcomma(prices[regionId][item_id].buy, 2) + "</td>";
-                output += "<td>" + prices[regionId][item_id].updated_at + "</td></tr>";
+                output += "<td class='text-right'>" + Humanize.intcomma(prices[regionId][item_id].sell, 2) + "</td>";
+                output += "<td class='text-right'>" + Humanize.intcomma(prices[regionId][item_id].buy, 2) + "</td>";
+                output += "<td class='text-right'>" + prices[regionId][item_id].updated_at + "</td></tr>";
             }
             $('.price-list tbody').html(output);
             $(".price-list").trigger("update",[sorting]);
@@ -144,32 +144,12 @@ var itemPriceLookup = (function ($, lb, Humanize, utils) {
             }
         );
 
-        // overwrite still to match ours
-        $.tablesorter.themes.bootstrap = {
-            table        : '',
-            caption      : 'caption',
-            header       : '',
-            sortNone     : '',
-            sortAsc      : '',
-            sortDesc     : '',
-            active       : '',
-            hover        : '',
-            icons        : '',
-            iconSortNone : 'fa fa-sort',
-            iconSortAsc  : 'fa fa-sort-asc',
-            iconSortDesc : 'fa fa-sort-desc',
-            filterRow    : '',
-            footerRow    : '',
-            footerCells  : '',
-            even         : '',
-            odd          : ''
-        };
-
-
         $('.price-list').tablesorter({
             theme: "bootstrap",
             headerTemplate : '{content} {icon}',
-            widgets : ["uitheme"],
+            cssIconAsc: 'fa fa-sort-asc',
+            cssIconDesc: 'fa fa-sort-desc',
+            cssIconNone: 'fa fa-sort',
         });
 
         // if hash is present, load data and prices

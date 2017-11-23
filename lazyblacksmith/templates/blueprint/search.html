@@ -8,6 +8,7 @@
         lb.urls.inventionUrl        = '{{ url_for('blueprint.invention', item_id='999999999') }}';
         lb.urls.manufacturingUrl    = '{{ url_for('blueprint.manufacturing', item_id='999999999') }}';
         lb.urls.researchUrl         = '{{ url_for('blueprint.research', item_id='999999999') }}';
+        lb.urls.reactionUrl         = '{{ url_for('blueprint.reaction', item_id='999999999') }}';
         lb.run('searchBlueprint');
     </script>
 {% endblock %}
@@ -16,25 +17,25 @@
 <div class="row">
     {% if blueprints %}
     <div class="col-lg-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Owned Blueprints</h3>
-            </div>
-            <div class="panel-body">
+        <div class="card bg-light mb-3">
+            <div class="card-header">Owned Blueprints</div>
+            <div class="card-body">
                 <div class="input-group">
                     <input id="ownedBlueprintSearch" type="text" class="form-control" placeholder="Search">
+                    {% if has_corp_bp -%}
                     <span class="input-group-btn" data-toggle="buttons" id="toggleCorporationBlueprints">
-                        <label class="btn btn-default">
+                        <label class="btn btn-secondary mb-0" type="button">
                             <input type="checkbox" autocomplete="off">Corp. Blueprints
                         </label>
                     </span>
+                    {%- endif %}
                 </div>
-                <table class="table table-striped table-hover" id="ownedBlueprints">
+                <table class="lb-table-sm" id="ownedBlueprints">
                     <thead>
                         <th>Blueprint Name</th>
-                        <th>ME</th>
-                        <th>TE</th>
-                        <th>Runs</th>
+                        <th class="text-right">ME</th>
+                        <th class="text-right">TE</th>
+                        <th class="text-right">Runs</th>
                         <th>&nbsp;</th>
                     </thead>
                     <tbody>
@@ -42,25 +43,40 @@
                         <tr class="blueprint-{% if blueprint.corporation %}corporation{% else %}character{% endif %}" style="{% if blueprint.corporation %}display:none{% endif %}">
                             <td class="name">
                                 {% if blueprint.original %}
-                                    <span class="label label-primary">BPO</span>
+                                    <span class="badge badge-primary">BPO</span>
                                 {% else %}
-                                    <span class="label label-warning">BPC</span>
+                                    <span class="badge badge-warning">BPC</span>
                                 {% endif %}
-                                <strong>{{ blueprint.item.name }}</strong></td>
-                            <td>{{ blueprint.material_efficiency }}</td>
-                            <td>{{ blueprint.time_efficiency }}</td>
-                            <td>{% if blueprint.original %}&infin;{% else %}{{ blueprint.total_runs }}{% endif %}</td>
-                            <td>
-                                {# hack for ancient relics... cat_id = 34 #}
-                                {% if blueprint.item.category_id != 34 %}
-                                    <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-default btn-xs pull-right">Manufacture</a>
-                                    {% if blueprint.original %}
-                                    <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-default btn-xs pull-right">Research/Copy</a>
+                                {{ blueprint.item.name }}
+                            </td>
+                            <td class="text-right">{{ blueprint.material_efficiency }}</td>
+                            <td class="text-right">{{ blueprint.time_efficiency }}</td>
+                            <td class="text-right">{% if blueprint.original %}&infin;{% else %}{{ blueprint.total_runs }}{% endif %}</td>
+                            <td class="lb-search-bp-icon">
+                                <div class="btn-group" role="group">
+                                    {% if blueprint.item.activity_products__eager and blueprint.item.activity_products__eager[0].activity == 11 %}
+                                        <a href="{{ url_for('blueprint.reaction', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Reaction">
+                                            <i class="fa fa-share-alt" aria-hidden="true"></i>
+                                        </a>
+                                    {%- else -%}
+                                        {% if blueprint.item.activity_products__eager %}
+                                        <a href="{{ url_for('blueprint.invention', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Invention">
+                                            <i class="fa fa-flask" aria-hidden="true"></i>
+                                        </a>
+                                        {%- endif %}
+                                        {# hack for ancient relics... cat_id = 34 #}
+                                        {% if blueprint.item.category_id != 34 %}
+                                            {% if blueprint.original %}
+                                            <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Research">
+                                                <i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>
+                                            </a>
+                                            {%- endif %}
+                                            <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-outline-secondary btn-sm"  data-toggle="tooltip" data-placement="top" title="Manufacturing">
+                                                <i class="fa fa-industry" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
                                     {%- endif %}
-                                {% endif %}
-                                {% if blueprint.item.activity_products__eager %}
-                                <a href="{{ url_for('blueprint.invention', item_id=blueprint.item_id) }}" class="btn btn-default btn-xs pull-right">Invention</a>
-                                {%- endif %}
+                                </div>
                             </td>
                         </tr>
                         {%- else -%}
@@ -69,18 +85,15 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div>  
     </div>
     {% endif %}
     <div class="col-lg-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Search Blueprint</h3>
-            </div>
-            <div class="panel-body">
+        <div class="card bg-light mb-3">
+            <div class="card-header">Search Blueprint</div>
+            <div class="card-body">
                 <input id="blueprint" type="text" class="form-control" placeholder="Item name">
-                <br />
-                <table class="table table-striped table-hover" id="searchBlueprintResult">
+                <table class="lb-table-sm" id="searchBlueprintResult">
                     <thead>
                         <th>Blueprint Name</th>
                         <th>&nbsp;</th>

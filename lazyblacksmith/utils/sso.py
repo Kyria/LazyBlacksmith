@@ -21,8 +21,13 @@ from lazyblacksmith.models import UserPreference
 from lazyblacksmith.models import db
 
 from . import logger
+from .purge import delete_account
 
 import base64
+import config
+import hashlib
+import hmac
+import random
 
 
 def check_get_user(id, owner_hash, in_login=False):
@@ -46,7 +51,7 @@ def check_get_user(id, owner_hash, in_login=False):
             ).one()
             # if no exception is triggered, it mean we have a registered charID
             # but with another account: owner has changed, we'll wipe all data.
-            wipe_character_data(user)
+            delete_account(user)
             if in_login:
                 logout_user()
 
@@ -135,7 +140,7 @@ def wipe_character_data(user):
     Skill.query.filter(Skill.character_id == user.character_id).delete()
 
     # remove user
-    User.query.filter_by(character_id = user.character_id).delete()
+    User.query.filter_by(character_id=user.character_id).delete()
 
     # commit
     db.session.commit()
@@ -146,7 +151,7 @@ def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return (test_url.scheme in ('http', 'https')
-           and ref_url.netloc == test_url.netloc)
+            and ref_url.netloc == test_url.netloc)
 
 
 def get_redirect_target():
@@ -170,10 +175,13 @@ def build_state_token(**kwargs):
     """ Build the authorization state token with some data """
     redirect_uri = kwargs.pop('redirect', 'home.index')
     scopes = kwargs.pop('scopes', [])
+    token = generate_token()
+    session['token'] = token
 
     json_string = json.dumps({
         'redirect': redirect_uri,
         'scopes': scopes,
+        'token': token,
     })
     b64_json = base64.urlsafe_b64encode(json_string)
     return quote(b64_json)
@@ -187,5 +195,14 @@ def extract_state_token(token_string):
 
     redirect = json_state.get('redirect', 'home.index')
     scopes = json_state.get('scopes', [])
+    token = json_state.get('token', None)
 
-    return redirect, scopes
+    return redirect, scopes, token
+
+
+def generate_token():
+    """Generates a non-guessable OAuth token """
+    chars = ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+    rand = random.SystemRandom()
+    random_string = ''.join(rand.choice(chars) for _ in range(40))
+    return hmac.new(config.SECRET_KEY, random_string, hashlib.sha256).hexdigest()

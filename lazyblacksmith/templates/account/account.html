@@ -54,11 +54,32 @@
         accountDashboard.productionSettings.priceOtherRegion = {{ pref.prod_price_region_others }};
         accountDashboard.productionSettings.priceOtherType = '{{ pref.prod_price_type_others }}';
         accountDashboard.productionSettings.characterId =  {% if pref.prod_character %}{{ pref.prod_character_id }}{% else %}null{% endif %};
+        accountDashboard.productionSettings.teImplant = '{{ pref.prod_te_implant | floatcomma }}';
+
+        accountDashboard.reactionSettings.reactionFacility = {{ pref.reaction_facility }};
+        accountDashboard.reactionSettings.reactionMeRig = {{ pref.reaction_me_rig }};
+        accountDashboard.reactionSettings.reactionTeRig = {{ pref.reaction_te_rig }};
+        accountDashboard.reactionSettings.reactionSecurity = '{{ pref.reaction_security }}';
+        accountDashboard.reactionSettings.reactionSystem = '{{ pref.reaction_system }}';
+        accountDashboard.reactionSettings.manufFacility = {{ pref.reaction_manuf_facility }};
+        accountDashboard.reactionSettings.manufMeRig = {{ pref.reaction_manuf_me_rig }};
+        accountDashboard.reactionSettings.manufTeRig = {{ pref.reaction_manuf_te_rig }};
+        accountDashboard.reactionSettings.manufSecurity = '{{ pref.reaction_manuf_security }}';
+        accountDashboard.reactionSettings.manufSystem = '{{ pref.reaction_manuf_system }}';
+        accountDashboard.reactionSettings.manufTeImplant = {{ pref.reaction_manuf_te_implant }};
+        accountDashboard.reactionSettings.priceRegion = {{ pref.reaction_price_regions }};
+        accountDashboard.reactionSettings.priceType = '{{ pref.reaction_price_type }}';
+        accountDashboard.reactionSettings.characterId = {% if pref.reaction_character %}{{ pref.reaction_character_id }}{% else %}null{% endif %};
 
         // run
         lb.urls.updatePreferenceUrl = "{{ url_for('ajax_account.update_user_industry_preference') }}";
         lb.urls.loginUrl = "{{ url_for('sso.login', scopes='SCOPE_REPLACE') }}";
         lb.urls.deleteScopeUrl = "{{ url_for('ajax_account.delete_scope', scope='SCOPE_REPLACE', character_id=123456789) }}";
+        lb.urls.purgeSkillsUrl = "{{ url_for('ajax_account.delete_characters_skills') }}";
+        lb.urls.purgeCharBpUrl = "{{ url_for('ajax_account.delete_characters_blueprint') }}";
+        lb.urls.purgeCorpBpUrl = "{{ url_for('ajax_account.delete_corporation_blueprint') }}";
+        lb.urls.deleteAccountUrl = "{{ url_for('ajax_account.delete_user_account') }}";
+
         lb.run('accountDashboard');
     </script>
 {% endblock %}
@@ -66,21 +87,39 @@
 {% block content %}
 {% set pref = current_user.pref %}
 <div class="row">
-    <div class="col-md-12">
-        <ul class="nav nav-tabs" role="tablist" id="account-tabs">
-            <li class="active"><a href="#tab-char" role="tab" data-toggle="tab">API Settings</a></li>
-            <li><a href="#tab-bp" role="tab" data-toggle="tab">Blueprint Settings</a></li>
-            {% if current_user.is_admin -%}<li><a href="#tab-admin" role="tab" data-toggle="tab">Admin Dashboard</a></li>{%- endif %}
-        </ul>
-        <div class="tab-content">
-            {% include 'account/api_settings.html' %}
-            {% include 'account/blueprint_settings.html' %}
+    <div class="col-lg-2 col-md-3 col-sm-4">
+        <div class="nav flex-column nav-pills" role="tablist">
+            <span class="nav-link disabled pl-1 pb-1 mt-2" style="color:gray">Account Settings</span>
+            <a class="nav-link active" id="api-tab" data-toggle="pill" href="#api" aria-controls="api" role="tab">API Settings</a>
+            <a class="nav-link lb-nav-danger" id="purge-data-tab" data-toggle="pill" href="#purge-data" aria-controls="purge-data" role="tab">Purge Data</a>
 
-            {% if current_user.is_admin -%}
-            <div class="row fade tab-pane" id="tab-admin">
-            bwahaha!
+            <span class="nav-link disabled pl-1 pb-1 mt-2" style="color:gray">Industry Settings</span>
+            <a class="nav-link" id="bp-cfg-prod-tab" data-toggle="pill" href="#bp-cfg-prod" aria-controls="bp-cfg-prod" role="tab">Production</a>
+            <a class="nav-link" id="bp-cfg-research-tab" data-toggle="pill" href="#bp-cfg-research" aria-controls="bp-cfg-research" role="tab">Research</a>
+            <a class="nav-link" id="bp-cfg-invention-tab" data-toggle="pill" href="#bp-cfg-invention" aria-controls="bp-cfg-invention" role="tab">Invention</a>
+            <a class="nav-link" id="bp-cfg-reaction-tab" data-toggle="pill" href="#bp-cfg-reaction" aria-controls="bp-cfg-reaction" role="tab">Reaction</a>
+        </div>
+    </div>
+    <div class="col-lg-10 col-md-9 col-sm-8">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="api" role="tabpanel" aria-labelledby="api" aria-expanded="true">
+                {% include 'account/api_settings.html' %}
             </div>
-            {%- endif %}
+            <div class="tab-pane fade" id="purge-data" role="tabpanel" aria-labelledby="api" aria-expanded="true">
+                {% include 'account/account_purge_data.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-prod" role="tabpanel" aria-labelledby="bp-cfg-prod" aria-expanded="false">
+                {% include 'account/bp_prod_settings.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-research" role="tabpanel" aria-labelledby="bp-cfg-research" aria-expanded="false">
+                {% include 'account/bp_research_settings.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-invention" role="tabpanel" aria-labelledby="bp-cfg-invention" aria-expanded="false">
+                {% include 'account/bp_invention_settings.html' %}
+            </div>
+            <div class="tab-pane fade" id="bp-cfg-reaction" role="tabpanel" aria-labelledby="bp-cfg-reaction" aria-expanded="false">
+                {% include 'account/bp_reaction_settings.html' %}
+            </div>
         </div>
     </div>
 </div>
@@ -88,7 +127,21 @@
 
 <!-- config modals -->
 {% block modal %}
+<div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-modal" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+                Please confirm you wish to delete <strong id="modal-confirm-element"></strong>. 
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modal-confirm" class="btn btn-danger">Confirm Delete</button>
+                <button type="button" id="modal-cancel" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 {% set pref = current_user.pref %}
-{% include 'account/dialog.html' %}
 {% endblock %}
 
