@@ -1,2 +1,2 @@
 [TYPECHECK]
-ignored-classes=scoped_session
+ignored-classes=scoped_session,SQLAlchemy,alembic,alembic.op
