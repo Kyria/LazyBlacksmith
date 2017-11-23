@@ -28,7 +28,7 @@ var eveData = (function() {
     };
 
     // as refineries can't be in highsec, multiplier are different..
-    var refinerySectatusMultiplier = {
+    var refinerySecStatusMultiplier = {
         'h': 0,
         'l': 1,
         'n': 1.1,
@@ -147,6 +147,7 @@ var eveData = (function() {
 
     return {
         structureIndustryRigs: structureIndustryRigs,
+        refinerySecStatusMultiplier: refinerySecStatusMultiplier,
         structureSecStatusMultiplier: structureSecStatusMultiplier,
         facilities: facilities,
         securityStatus: securityStatus,
