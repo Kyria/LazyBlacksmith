@@ -104,18 +104,18 @@ class UserPreference(db.Model):
     # --------------------------------------------------------
     # Invention preferences
     # --------------------------------------------------------
-    invention_facility = db.Column(db.Integer, nullable=False, default=0)
-    invention_invention_rig = db.Column(db.Integer, nullable=False, default=0)
-    invention_copy_rig = db.Column(db.Integer, nullable=False, default=0)
-    invention_security = db.Column(db.String(1), nullable=False, default='h')
+    invention_facility = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    invention_invention_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    invention_copy_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    invention_security = db.Column(db.String(1), nullable=False, default='h', server_default='h')
     invention_system = db.Column(
-        db.String(100), nullable=False, default='Jita'
+        db.String(100), nullable=False, default='Jita', server_default='Jita'
     )
     invention_price_region = db.Column(
-        db.Integer, nullable=False, default=10000002
+        db.Integer, nullable=False, default=10000002, server_default='10000002'
     )
     invention_price_type = db.Column(
-        db.String(4), nullable=False, default='buy'
+        db.String(4), nullable=False, default='buy', server_default='buy'
     )
     invention_character_id = db.Column(
         db.BigInteger,
@@ -135,12 +135,12 @@ class UserPreference(db.Model):
     # --------------------------------------------------------
     # Research preferences
     # --------------------------------------------------------
-    research_facility = db.Column(db.Integer, nullable=False, default=0)
-    research_me_rig = db.Column(db.Integer, nullable=False, default=0)
-    research_te_rig = db.Column(db.Integer, nullable=False, default=0)
-    research_copy_rig = db.Column(db.Integer, nullable=False, default=0)
-    research_security = db.Column(db.String(1), nullable=False, default='h')
-    research_system = db.Column(db.String(100), nullable=False, default='Jita')
+    research_facility = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    research_me_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    research_te_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    research_copy_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    research_security = db.Column(db.String(1), nullable=False, default='h', server_default='h')
+    research_system = db.Column(db.String(100), nullable=False, default='Jita', server_default='Jita')
     research_character_id = db.Column(
         db.BigInteger,
         db.ForeignKey('user.character_id'),
@@ -169,40 +169,40 @@ class UserPreference(db.Model):
     # --------------------------------------------------------
     # Manufacturing preferences
     # --------------------------------------------------------
-    prod_facility = db.Column(db.Integer, nullable=False, default=0)
-    prod_me_rig = db.Column(db.Integer, nullable=False, default=0)
-    prod_te_rig = db.Column(db.Integer, nullable=False, default=0)
-    prod_security = db.Column(db.String(1), nullable=False, default='h')
-    prod_system = db.Column(db.String(100), nullable=False, default='Jita')
-    prod_sub_facility = db.Column(db.Integer, nullable=False, default=0)
-    prod_sub_me_rig = db.Column(db.Integer, nullable=False, default=0)
-    prod_sub_te_rig = db.Column(db.Integer, nullable=False, default=0)
-    prod_sub_security = db.Column(db.String(1), nullable=False, default='h')
-    prod_sub_system = db.Column(db.String(100), nullable=False, default='Jita')
+    prod_facility = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    prod_me_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    prod_te_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    prod_security = db.Column(db.String(1), nullable=False, default='h', server_default='h')
+    prod_system = db.Column(db.String(100), nullable=False, default='Jita', server_default='Jita')
+    prod_sub_facility = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    prod_sub_me_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    prod_sub_te_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    prod_sub_security = db.Column(db.String(1), nullable=False, default='h', server_default='h')
+    prod_sub_system = db.Column(db.String(100), nullable=False, default='Jita', server_default='Jita')
     prod_price_region_minerals = db.Column(
-        db.Integer, nullable=False, default=10000002
+        db.Integer, nullable=False, default=10000002, server_default='10000002'
     )
     prod_price_region_pi = db.Column(
-        db.Integer, nullable=False, default=10000002
+        db.Integer, nullable=False, default=10000002, server_default='10000002'
     )
     prod_price_region_moongoo = db.Column(
-        db.Integer, nullable=False, default=10000002
+        db.Integer, nullable=False, default=10000002, server_default='10000002'
     )
     prod_price_region_others = db.Column(
-        db.Integer, nullable=False, default=10000002
+        db.Integer, nullable=False, default=10000002, server_default='10000002'
     )
 
     prod_price_type_minerals = db.Column(
-        db.String(4), nullable=False, default='buy'
+        db.String(4), nullable=False, default='buy', server_default='buy'
     )
     prod_price_type_pi = db.Column(
-        db.String(4), nullable=False, default='buy'
+        db.String(4), nullable=False, default='buy', server_default='buy'
     )
     prod_price_type_moongoo = db.Column(
-        db.String(4), nullable=False, default='buy'
+        db.String(4), nullable=False, default='buy', server_default='buy'
     )
     prod_price_type_others = db.Column(
-        db.String(4), nullable=False, default='buy'
+        db.String(4), nullable=False, default='buy', server_default='buy'
     )
     prod_character_id = db.Column(
         db.BigInteger,
@@ -222,26 +222,26 @@ class UserPreference(db.Model):
     # --------------------------------------------------------
     # Reaction preferences
     # --------------------------------------------------------
-    reaction_facility = db.Column(db.Integer, nullable=False, default=0)
-    reaction_me_rig = db.Column(db.Integer, nullable=False, default=0)
-    reaction_te_rig = db.Column(db.Integer, nullable=False, default=0)
-    reaction_security = db.Column(db.String(1), nullable=False, default='l')
-    reaction_system = db.Column(db.String(100), nullable=False, default='Jita')
-    reaction_manuf_facility = db.Column(db.Integer, nullable=False, default=0)
-    reaction_manuf_me_rig = db.Column(db.Integer, nullable=False, default=0)
-    reaction_manuf_te_rig = db.Column(db.Integer, nullable=False, default=0)
-    reaction_manuf_security = db.Column(db.String(1), nullable=False, default='h')
-    reaction_manuf_system = db.Column(db.String(100), nullable=False, default='Jita')
+    reaction_facility = db.Column(db.Integer, nullable=False, default=5, server_default='5')
+    reaction_me_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    reaction_te_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    reaction_security = db.Column(db.String(1), nullable=False, default='l', server_default='l')
+    reaction_system = db.Column(db.String(100), nullable=False, default='Rakapas', server_default='Rakapas')
+    reaction_manuf_facility = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    reaction_manuf_me_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    reaction_manuf_te_rig = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    reaction_manuf_security = db.Column(db.String(1), nullable=False, default='h', server_default='h')
+    reaction_manuf_system = db.Column(db.String(100), nullable=False, default='Jita', server_default='Jita')
     reaction_manuf_te_implant = db.Column(
         db.Numeric(precision=3, scale=2,
                    decimal_return_scale=2, asdecimal=False),
         nullable=False, server_default='1.00'
     )
     reaction_price_regions = db.Column(
-        db.Integer, nullable=False, default=10000002
+        db.Integer, nullable=False, default=10000002, server_default='10000002'
     )
     reaction_price_type = db.Column(
-        db.String(4), nullable=False, default='buy'
+        db.String(4), nullable=False, default='buy', server_default='buy'
     )
     reaction_character_id = db.Column(
         db.BigInteger,
