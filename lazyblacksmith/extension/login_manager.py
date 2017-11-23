@@ -47,6 +47,19 @@ class LazyAnonymous(AnonymousUserMixin):
         self.pref.prod_price_type_pi = 'buy'
         self.pref.prod_price_type_moongoo = 'buy'
         self.pref.prod_price_type_others = 'buy'
+        self.pref.reaction_facility = 5
+        self.pref.reaction_me_rig = 0
+        self.pref.reaction_te_rig = 0
+        self.pref.reaction_security = 'l'
+        self.pref.reaction_system = 'Rakapas'
+        self.pref.reaction_manuf_facility = 0
+        self.pref.reaction_manuf_me_rig = 0
+        self.pref.reaction_manuf_te_rig = 0
+        self.pref.reaction_manuf_security = 'h'
+        self.pref.reaction_manuf_system = 'Jita'
+        self.pref.reaction_manuf_te_implant = 1.00
+        self.pref.reaction_price_regions = 10000002
+        self.pref.reaction_price_type = 'buy'
 
 
 login_manager = LoginManager()
@@ -57,6 +70,3 @@ login_manager.login_view = 'sso.login'
 @login_manager.user_loader
 def load_user(character_id):
     return User.query.get(character_id)
-
-
-
