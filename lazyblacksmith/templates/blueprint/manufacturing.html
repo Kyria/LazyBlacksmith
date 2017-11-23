@@ -50,7 +50,7 @@
         manufacturingBlueprint.materialsData.componentIdList.push({{ material.material.id }});
         manufacturingBlueprint.materialsData.materials[{{ material.material.id }}] = {
             'id': {{ material.material.id }},
-            'isManufactured': {% if material.material.is_manufactured() %}true{% else %}false{% endif %},
+            'isManufactured': {% if material.material.is_from_manufacturing %}true{% else %}false{% endif %},
             'runsPerJob': -1,
             'maxRunPerBp': -1,
             'resultQtyPerRun': -1,

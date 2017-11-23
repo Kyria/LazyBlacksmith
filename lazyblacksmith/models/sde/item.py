@@ -76,13 +76,6 @@ class Item(db.Model):
         static_url = "ccp/Types/%d_64.png" % self.id
         return url_for('static', filename=static_url)
 
-    def is_manufactured(self):
-        if self.product_for_activities.filter_by(
-            activity=Activity.MANUFACTURING
-        ).count() > 0:
-            return True
-        return False
-
     def is_moon_goo(self):
         return self.market_group_id == 499
 
