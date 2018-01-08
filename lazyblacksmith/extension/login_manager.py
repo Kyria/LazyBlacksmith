@@ -29,6 +29,7 @@ class LazyAnonymous(AnonymousUserMixin):
         self.pref.research_me_implant = 1.00
         self.pref.research_te_implant = 1.00
         self.pref.research_copy_implant = 1.00
+
         self.pref.prod_facility = 0
         self.pref.prod_me_rig = 0
         self.pref.prod_te_rig = 0
@@ -47,6 +48,8 @@ class LazyAnonymous(AnonymousUserMixin):
         self.pref.prod_price_type_pi = 'buy'
         self.pref.prod_price_type_moongoo = 'buy'
         self.pref.prod_price_type_others = 'buy'
+        self.pref.prod_te_implant = 1.00
+
         self.pref.reaction_facility = 5
         self.pref.reaction_me_rig = 0
         self.pref.reaction_te_rig = 0

@@ -10,7 +10,7 @@ from esipy import App
 from esipy import EsiClient
 from esipy import EsiSecurity
 from esipy.cache import BaseCache
-from esipy.events import after_token_refresh
+from esipy.events import AFTER_TOKEN_REFRESH
 from requests.adapters import HTTPAdapter
 
 
@@ -18,6 +18,7 @@ class LbCache(BaseCache):
     """ Custom BaseCache implementation for Lazyblacksmith
         used in esipy, to use the flask cache
     """
+
     def set(self, key, value, timeout=300):
         cache.set(key, value, timeout)
 
@@ -52,4 +53,4 @@ esiclient = EsiClient(
 )
 
 # register observers
-after_token_refresh.add_receiver(token_update_observer)
+AFTER_TOKEN_REFRESH.add_receiver(token_update_observer)

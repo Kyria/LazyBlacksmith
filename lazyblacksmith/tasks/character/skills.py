@@ -45,12 +45,12 @@ def task_update_character_skills(self, character_id):
             ).one_or_none()
 
             if char_skill:
-                char_skill.level = skill_object.current_skill_level
+                char_skill.level = skill_object.active_skill_level
             else:
                 skill = Skill(
                     character=character,
                     skill_id=skill_object.skill_id,
-                    level=skill_object.current_skill_level,
+                    level=skill_object.active_skill_level,
                 )
                 db.session.merge(skill)
             skill_number += 1

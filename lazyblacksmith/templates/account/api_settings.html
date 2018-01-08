@@ -86,9 +86,15 @@
         {%- endfor %}
         {% for alt in current_user.alts_characters.all() -%}
             {%- for token in alt.tokens -%}
-            <tr id="scope-{{ alt.character_id }}" data-scope="{{ token.scope }}">
+            <tr id="scope-{{ alt.character_id }}" data-scope="{{ token.scope }}" {% if not token.valid %}class="bg-danger" data-toggle="tooltip" data-placement="top" title="This scope is no longer valid (too many errors). It won't be updated unless you delete it and add a new one."{% endif %}>
                 <td>{{ alt.character_name }}</td>
-                <td>{{ token.scope }}</td>
+                <td>{{ token.scope }}
+                    {% if not token.valid %}
+                        <span class="label label-danger">
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid
+                        </span>
+                    {% endif %}
+                </td>
                 <td>{{ token.get_last_update_string() }}</td>
                 <td class="td-valign-middle">
                     <button style="margin-left:5px" class="btn btn-sm btn-danger float-right delete-scope" data-scope="{{ token.scope }}" data-char-id="{{ alt.character_id }}">
