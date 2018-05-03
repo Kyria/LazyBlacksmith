@@ -16,14 +16,13 @@ from lazyblacksmith.utils.tasks import is_task_running
 from lazyblacksmith.utils.time import utcnow
 
 from . import logger
-from ratelimiter import RateLimiter
 
 import datetime
 
 CHAR_TASK_SCOPE = {
     TokenScope.SCOPE_SKILL: task_update_character_skills,
     TokenScope.SCOPE_CHAR_BLUEPRINTS: task_update_character_blueprints,
-    # TokenScope.SCOPE_CORP_ASSETS: task_update_corporation_blueprints,
+    TokenScope.SCOPE_CORP_BLUEPRINTS: task_update_corporation_blueprints,
 }
 
 UNIVERSE_TASKS = [
@@ -46,9 +45,6 @@ def spawn_character_tasks():
 
     all_tokens = TokenScope.query.filter_by(valid=True).all()
 
-    # XMLAPI have 30/sec req/s, so we'll just do a little less
-    rate_limiter = RateLimiter(max_calls=25, period=1)
-
     for token_scope in all_tokens:
         if skip_scope(token_scope):
             continue
@@ -58,22 +54,21 @@ def spawn_character_tasks():
                 (not token_scope.cached_until or
                     token_scope.cached_until <= now)):
 
-            with rate_limiter:
-                task = CHAR_TASK_SCOPE[token_scope.scope]
-                task_id = "%s-%s-%s" % (
-                    now.strftime('%Y%m%d-%H%M%S'),
-                    task.__name__,
-                    token_scope.user_id
-                )
-                token_state = TaskState(
-                    task_id=task_id,
-                    id=token_scope.user_id,
-                    scope=token_scope.scope,
-                )
-                db.session.add(token_state)
-                db.session.commit()
+            task = CHAR_TASK_SCOPE[token_scope.scope]
+            task_id = "%s-%s-%s" % (
+                now.strftime('%Y%m%d-%H%M%S'),
+                task.__name__,
+                token_scope.user_id
+            )
+            token_state = TaskState(
+                task_id=task_id,
+                id=token_scope.user_id,
+                scope=token_scope.scope,
+            )
+            db.session.add(token_state)
+            db.session.commit()
 
-                task.s(token_scope.user_id).apply_async(task_id=task_id)
+            task.s(token_scope.user_id).apply_async(task_id=task_id)
 
 
 @celery_app.task(name="schedule.universe_task_spawner")
