@@ -15,6 +15,7 @@ class TokenScope(db.Model):
     # known scopes
     SCOPE_SKILL = 'esi-skills.read_skills.v1'
     SCOPE_CHAR_BLUEPRINTS = 'esi-characters.read_blueprints.v1'
+    SCOPE_CORP_BLUEPRINTS = 'esi-characters.read_corporation_roles.v1+esi-corporations.read_blueprints.v1'
 
     # model
     user_id = db.Column(

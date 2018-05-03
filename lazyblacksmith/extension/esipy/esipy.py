@@ -38,7 +38,7 @@ transport_adapter = HTTPAdapter(
 )
 
 # ESI objects to be imported
-esiapp = EsiApp.create(cache=lbcache, cache_time=0, datasource=config.ESI_DATASOURCE)
+esiapp = EsiApp(cache=lbcache, cache_time=0, datasource=config.ESI_DATASOURCE)
 esisecurity = EsiSecurity(
     app=esiapp.get_latest_swagger,
     redirect_uri="%s%s" % (

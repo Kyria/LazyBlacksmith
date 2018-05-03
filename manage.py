@@ -6,15 +6,16 @@ from flask_script import Manager
 import config
 
 from lazyblacksmith.app import create_app
-from lazyblacksmith.commands.admin import LbAdmin
-from lazyblacksmith.commands.manual_celery_tasks import ManualCeleryTasks
-from lazyblacksmith.commands.sde_import import SdeImport
 from lazyblacksmith.models import db
 
 app = create_app(config)
 
 db.init_app(app)
 migrate = Migrate(app, db)
+
+from lazyblacksmith.commands.admin import LbAdmin
+from lazyblacksmith.commands.manual_celery_tasks import ManualCeleryTasks
+from lazyblacksmith.commands.sde_import import SdeImport
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
