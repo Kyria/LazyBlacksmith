@@ -3,15 +3,15 @@ from __future__ import absolute_import
 
 from .esipy import esiapp
 
-get_industry_systems = esiapp.op['get_industry_systems']
-get_markets_prices = esiapp.op['get_markets_prices']
+# universe / api endpoints
+get_status = esiapp.get_v1_swagger.op['get_status']
+get_industry_systems = esiapp.get_v1_swagger.op['get_industry_systems']
+get_markets_prices = esiapp.get_v1_swagger.op['get_markets_prices']
+get_markets_region_id_orders = esiapp.get_v1_swagger.op['get_markets_region_id_orders']
 
-# require region_id, order_type=(all|buy|sell)
-# optional: type_id, page
-get_markets_region_id_orders = esiapp.op['get_markets_region_id_orders']
+# character endpoints
+get_characters_skills = esiapp.get_v4_swagger.op['get_characters_character_id_skills']
+get_characters_blueprints = esiapp.get_v2_swagger.op['get_characters_character_id_blueprints']
 
-# require character_id
-# get_characters_location = esiapp.op['get_characters_character_id_location']
-
-# require character_id
-get_characters_skills = esiapp.op['get_characters_character_id_skills']
+# corporation endpoints
+get_corporations_blueprints = esiapp.get_v1_swagger.op['get_corporations_corporation_id_blueprints']

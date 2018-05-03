@@ -9,6 +9,7 @@ from .market.market_order import spawn_market_price_tasks
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiapp
 from lazyblacksmith.extension.esipy import esiclient
+from lazyblacksmith.extension.esipy.operations import get_status
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import db
@@ -106,7 +107,6 @@ def spawn_universe_tasks():
 
 def skip_scope(token_scope):
     """ Return True if we must skip that token_scope
-
     This function return True in the following cases:
     - The user didn't log in for more than 30days
     - The user didn't log in for more than 7days, and we already updated the
@@ -143,6 +143,5 @@ def skip_scope(token_scope):
 
 def is_server_online():
     """ return true if server looks online, else otherwise """
-    op = esiapp.op['get_status']()
-    res = esiclient.request(op)
+    res = esiclient.request(get_status())
     return (res.status == 200 and 'vip' not in res.data)

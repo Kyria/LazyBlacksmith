@@ -6,7 +6,7 @@ import config
 from .esipy_observers import token_update_observer
 from lazyblacksmith.extension.cache import cache
 
-from esipy import App
+from esipy import EsiApp
 from esipy import EsiClient
 from esipy import EsiSecurity
 from esipy.cache import BaseCache
@@ -30,15 +30,17 @@ class LbCache(BaseCache):
         cache.delete(key)
 
 
+lbcache = LbCache()
+
 transport_adapter = HTTPAdapter(
     pool_connections=20,
     pool_maxsize=300,
 )
 
 # ESI objects to be imported
-esiapp = App.create(config.ESI_SWAGGER_JSON)
+esiapp = EsiApp.create(cache=lbcache, cache_time=0, datasource=config.ESI_DATASOURCE)
 esisecurity = EsiSecurity(
-    app=esiapp,
+    app=esiapp.get_latest_swagger,
     redirect_uri="%s%s" % (
         config.ESI_REDIRECT_DOMAIN, '/sso/callback',
     ),
@@ -48,7 +50,7 @@ esisecurity = EsiSecurity(
 esiclient = EsiClient(
     security=esisecurity,
     transport_adapter=transport_adapter,
-    cache=LbCache(),
+    cache=lbcache,
     headers={'User-Agent': config.ESI_USER_AGENT}
 )
 
