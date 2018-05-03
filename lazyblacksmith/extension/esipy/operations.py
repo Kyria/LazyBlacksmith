@@ -16,4 +16,4 @@ get_characters_blueprints = esiapp.get_v2_swagger.op['get_characters_character_i
 
 # corporation related endpoints
 get_characters_roles = esiapp.get_v2_swagger.op['get_characters_character_id_roles']
-get_corporations_blueprints = esiapp.get_v1_swagger.op['get_corporations_corporation_id_blueprints']
+get_corporations_blueprints = esiapp.get_v2_swagger.op['get_corporations_corporation_id_blueprints']
