@@ -89,32 +89,33 @@ def task_update_character_blueprints(self, character_id):
 
     # parse the response and save everything
     for req, response in [(op_blueprint[0], bp_one)] + bp_list:
+        for blueprint in response.data:
 
-        original = (response.data.quantity != -2)
-        runs = response.data.runs
-        me = response.data.material_efficiency
-        te = response.data.time_efficiency
-        item_id = response.data.type_id
+            original = (blueprint.quantity != -2)
+            runs = blueprint.runs
+            me = blueprint.material_efficiency
+            te = blueprint.time_efficiency
+            item_id = blueprint.type_id
 
-        key = "%s-%d-%d-%d" % (item_id, original, me, te)
+            key = "%s-%d-%d-%d" % (item_id, original, me, te)
 
-        if key not in blueprint_updated_list:
-            blueprint_updated_list.add(key)
+            if key not in blueprint_updated_list:
+                blueprint_updated_list.add(key)
 
-        if key not in blueprints:
-            blueprints[key] = Blueprint(
-                item_id=item_id,
-                original=original,
-                total_runs=runs,
-                material_efficiency=me,
-                time_efficiency=te,
-                character_id=character_id,
-            )
-            db.session.add(blueprints[key])
-            continue
+            if key not in blueprints:
+                blueprints[key] = Blueprint(
+                    item_id=item_id,
+                    original=original,
+                    total_runs=runs,
+                    material_efficiency=me,
+                    time_efficiency=te,
+                    character_id=character_id,
+                )
+                db.session.add(blueprints[key])
+                continue
 
-        if not original:
-            blueprints[key].total_runs += runs
+            if not original:
+                blueprints[key].total_runs += runs
 
     # delete every blueprint that have not been updated
     for key in (blueprint_init_list - blueprint_updated_list):
