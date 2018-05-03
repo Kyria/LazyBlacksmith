@@ -1,17 +1,18 @@
 # -*- encoding: utf-8 -*-
 from __future__ import absolute_import
 
-import config
-
-from .esipy_observers import token_update_observer
-from lazyblacksmith.extension.cache import cache
-
 from esipy import EsiApp
 from esipy import EsiClient
 from esipy import EsiSecurity
 from esipy.cache import BaseCache
+from esipy.cache import _hash
 from esipy.events import AFTER_TOKEN_REFRESH
 from requests.adapters import HTTPAdapter
+
+from .esipy_observers import token_update_observer
+from lazyblacksmith.extension.cache import cache
+
+import config
 
 
 class LbCache(BaseCache):
@@ -20,15 +21,14 @@ class LbCache(BaseCache):
     """
 
     def set(self, key, value, timeout=300):
-        cache.set(key, value, timeout)
+        cache.set(_hash(key), value, timeout)
 
     def get(self, key, default=None):
-        cached = cache.get(key)
+        cached = cache.get(_hash(key))
         return cached if cached is not None else default
 
     def invalidate(self, key):
-        cache.delete(key)
-
+        cache.delete(_hash(key))
 
 lbcache = LbCache()
 
