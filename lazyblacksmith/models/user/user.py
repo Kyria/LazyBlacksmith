@@ -18,9 +18,12 @@ class User(db.Model, UserMixin):
     character_name = db.Column(db.String(200))
     is_admin = db.Column(db.Boolean, default=False)
 
+    is_corp_director = db.Column(db.Boolean, default=False)
+    corporation_id = db.Column(db.BigInteger, nullable=True)
+
     current_login_at = db.Column(
-       UTCDateTime(timezone=True),
-       server_default=func.now(),
+        UTCDateTime(timezone=True),
+        server_default=func.now(),
     )
 
     created_at = db.Column(
@@ -28,9 +31,9 @@ class User(db.Model, UserMixin):
         server_default=func.now()
     )
     updated_at = db.Column(
-       UTCDateTime(timezone=True),
-       server_default=func.now(),
-       onupdate=func.now()
+        UTCDateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
     )
 
     # foreign keys
@@ -49,10 +52,10 @@ class User(db.Model, UserMixin):
     def get_portrait_url(self, datasource='tranquility', size=128):
         """returns URL to Character portrait from EVE Image Server"""
         return "{0}Character/{1}_{2}.jpg".format(
-             EsiClient.__image_server__[datasource],
-             self.character_id,
-             size
-         )
+            EsiClient.__image_server__[datasource],
+            self.character_id,
+            size
+        )
 
     def get_id(self):
         return self.character_id

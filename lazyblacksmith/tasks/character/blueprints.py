@@ -16,7 +16,6 @@ from datetime import datetime
 from email.utils import parsedate
 
 import pytz
-import requests
 
 
 @celery_app.task(name="update_character_blueprints", base=LbTask, bind=True)
