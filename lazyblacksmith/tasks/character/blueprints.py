@@ -3,7 +3,8 @@ from .. import logger
 from ..lb_task import LbTask
 
 from lazyblacksmith.extension.celery_app import celery_app
-from lazyblacksmith.extension.esipy import esisecurity
+from lazyblacksmith.extension.esipy import esiclient
+from lazyblacksmith.extension.esipy.operations import get_characters_blueprints
 from lazyblacksmith.models import Blueprint
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
@@ -11,10 +12,8 @@ from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
-import evelink.api
-import evelink.char
-
 from datetime import datetime
+from email.utils import parsedate
 
 import pytz
 import requests
@@ -32,7 +31,7 @@ def task_update_character_blueprints(self, character_id):
     # get token
     token = self.get_token_update_esipy(
         character_id=character_id,
-        scope=TokenScope.SCOPE_CHAR_ASSETS
+        scope=TokenScope.SCOPE_CHAR_BLUEPRINTS
     )
 
     # get current blueprints
@@ -59,59 +58,74 @@ def task_update_character_blueprints(self, character_id):
     blueprint_init_list = set(blueprints.keys())
     blueprint_updated_list = set()
 
-    try:
-        # init evelink
-        api = evelink.api.API(sso_token=(token.access_token, 'character'))
-        char = evelink.char.Char(char_id=character.character_id, api=api)
-        api_bp_list = char.blueprints()
+    # get the first page to have the page number
+    op_blueprint = get_characters_blueprints(
+        character_id=character_id,
+        page=1
+    )
 
-        for blueprint in api_bp_list.result.values():
-            original = blueprint['quantity'] != -2
-            runs = blueprint['runs']
-            me = blueprint['material_efficiency']
-            te = blueprint['time_efficiency']
-            item_id = blueprint['type_id']
+    bp_one = esiclient.request(op_blueprint)
 
-            key = "%s-%d-%d-%d" % (item_id, original, me, te)
-
-            if key not in blueprint_updated_list:
-                blueprint_updated_list.add(key)
-
-            if key not in blueprints:
-                blueprints[key] = Blueprint(
-                    item_id=item_id,
-                    original=original,
-                    total_runs=runs,
-                    material_efficiency=me,
-                    time_efficiency=te,
-                    character_id=character_id,
-                )
-                db.session.add(blueprints[key])
-                continue
-
-            if not original:
-                blueprints[key].total_runs += runs
-
-        # delete every blueprint that have not been updated
-        for key in (blueprint_init_list - blueprint_updated_list):
-            db.session.delete(blueprints[key])
-
-        # update the token and the state
-        token.request_try = 0
-        token.last_update = utcnow()
-        token.cached_until = datetime.fromtimestamp(
-            api_bp_list.expires,
-            tz=pytz.utc
-        )
-        db.session.commit()
-        self.end(TaskState.SUCCESS)
-
-    except evelink.api.APIError as e:
-        self.inc_fail_token_scope(token, e.code, True)
-        logger.exception(e.message)
+    if bp_one.status != 200:
+        logger.error('Request failed [%s, %s, %d]: %s' % (
+            op_blueprint[0].url,
+            op_blueprint[0].query,
+            bp_one.status,
+            bp_one.raw,
+        ))
         self.end(TaskState.ERROR)
+        return
 
-    except requests.HTTPError as e:
-        self.inc_fail_token_scope(token, e.response.status_code)
-        logger.exception(e.message)
-        self.end(TaskState.ERROR)
+    # prepare all other pages
+    total_page = bp_one.header['X-Pages'][0]
+    operations = []
+    for page in range(2, total_page + 1):
+        operations.append(get_characters_blueprints(
+            character_id=character_id,
+            page=page
+        ))
+
+    # query all other pages and add the first page
+    bp_list = esiclient.multi_request(operations)
+
+    # parse the response and save everything
+    for req, response in [(op_blueprint[0], bp_one)] + bp_list:
+
+        original = (response.data.quantity != -2)
+        runs = response.data.runs
+        me = response.data.material_efficiency
+        te = response.data.time_efficiency
+        item_id = response.data.type_id
+
+        key = "%s-%d-%d-%d" % (item_id, original, me, te)
+
+        if key not in blueprint_updated_list:
+            blueprint_updated_list.add(key)
+
+        if key not in blueprints:
+            blueprints[key] = Blueprint(
+                item_id=item_id,
+                original=original,
+                total_runs=runs,
+                material_efficiency=me,
+                time_efficiency=te,
+                character_id=character_id,
+            )
+            db.session.add(blueprints[key])
+            continue
+
+        if not original:
+            blueprints[key].total_runs += runs
+
+    # delete every blueprint that have not been updated
+    for key in (blueprint_init_list - blueprint_updated_list):
+        db.session.delete(blueprints[key])
+
+    # update the token and the state
+    token.request_try = 0
+    token.last_update = utcnow()
+    token.cached_until = datetime(
+        *parsedate(bp_one.header['Expires'][0])[:6]
+    ).replace(tzinfo=pytz.utc)
+    db.session.commit()
+    self.end(TaskState.SUCCESS)
