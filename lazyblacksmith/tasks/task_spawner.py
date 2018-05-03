@@ -7,8 +7,8 @@ from .market.adjusted_price import task_update_adjusted_price
 from .market.market_order import spawn_market_price_tasks
 
 from lazyblacksmith.extension.celery_app import celery_app
-from lazyblacksmith.extension.esipy import esiapp
 from lazyblacksmith.extension.esipy import esiclient
+from lazyblacksmith.extension.esipy.operations import get_status
 from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.models import db
@@ -16,14 +16,13 @@ from lazyblacksmith.utils.tasks import is_task_running
 from lazyblacksmith.utils.time import utcnow
 
 from . import logger
-from ratelimiter import RateLimiter
 
 import datetime
 
 CHAR_TASK_SCOPE = {
     TokenScope.SCOPE_SKILL: task_update_character_skills,
-    TokenScope.SCOPE_CHAR_ASSETS: task_update_character_blueprints,
-    TokenScope.SCOPE_CORP_ASSETS: task_update_corporation_blueprints,
+    TokenScope.SCOPE_CHAR_BLUEPRINTS: task_update_character_blueprints,
+    TokenScope.SCOPE_CORP_BLUEPRINTS: task_update_corporation_blueprints,
 }
 
 UNIVERSE_TASKS = [
@@ -46,9 +45,6 @@ def spawn_character_tasks():
 
     all_tokens = TokenScope.query.filter_by(valid=True).all()
 
-    # XMLAPI have 30/sec req/s, so we'll just do a little less
-    rate_limiter = RateLimiter(max_calls=25, period=1)
-
     for token_scope in all_tokens:
         if skip_scope(token_scope):
             continue
@@ -58,22 +54,21 @@ def spawn_character_tasks():
                 (not token_scope.cached_until or
                     token_scope.cached_until <= now)):
 
-            with rate_limiter:
-                task = CHAR_TASK_SCOPE[token_scope.scope]
-                task_id = "%s-%s-%s" % (
-                    now.strftime('%Y%m%d-%H%M%S'),
-                    task.__name__,
-                    token_scope.user_id
-                )
-                token_state = TaskState(
-                    task_id=task_id,
-                    id=token_scope.user_id,
-                    scope=token_scope.scope,
-                )
-                db.session.add(token_state)
-                db.session.commit()
+            task = CHAR_TASK_SCOPE[token_scope.scope]
+            task_id = "%s-%s-%s" % (
+                now.strftime('%Y%m%d-%H%M%S'),
+                task.__name__,
+                token_scope.user_id
+            )
+            token_state = TaskState(
+                task_id=task_id,
+                id=token_scope.user_id,
+                scope=token_scope.scope,
+            )
+            db.session.add(token_state)
+            db.session.commit()
 
-                task.s(token_scope.user_id).apply_async(task_id=task_id)
+            task.s(token_scope.user_id).apply_async(task_id=task_id)
 
 
 @celery_app.task(name="schedule.universe_task_spawner")
@@ -106,7 +101,6 @@ def spawn_universe_tasks():
 
 def skip_scope(token_scope):
     """ Return True if we must skip that token_scope
-
     This function return True in the following cases:
     - The user didn't log in for more than 30days
     - The user didn't log in for more than 7days, and we already updated the
@@ -143,6 +137,5 @@ def skip_scope(token_scope):
 
 def is_server_online():
     """ return true if server looks online, else otherwise """
-    op = esiapp.op['get_status']()
-    res = esiclient.request(op)
+    res = esiclient.request(get_status())
     return (res.status == 200 and 'vip' not in res.data)
