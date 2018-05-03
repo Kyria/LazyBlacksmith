@@ -7,7 +7,6 @@ from .market.adjusted_price import task_update_adjusted_price
 from .market.market_order import spawn_market_price_tasks
 
 from lazyblacksmith.extension.celery_app import celery_app
-from lazyblacksmith.extension.esipy import esiapp
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_status
 from lazyblacksmith.models import TaskState
@@ -23,8 +22,8 @@ import datetime
 
 CHAR_TASK_SCOPE = {
     TokenScope.SCOPE_SKILL: task_update_character_skills,
-    TokenScope.SCOPE_CHAR_ASSETS: task_update_character_blueprints,
-    TokenScope.SCOPE_CORP_ASSETS: task_update_corporation_blueprints,
+    TokenScope.SCOPE_CHAR_BLUEPRINTS: task_update_character_blueprints,
+    # TokenScope.SCOPE_CORP_ASSETS: task_update_corporation_blueprints,
 }
 
 UNIVERSE_TASKS = [

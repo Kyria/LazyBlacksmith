@@ -14,8 +14,7 @@ from sqlalchemy import func
 class TokenScope(db.Model):
     # known scopes
     SCOPE_SKILL = 'esi-skills.read_skills.v1'
-    SCOPE_CHAR_ASSETS = 'characterAssetsRead'
-    SCOPE_CORP_ASSETS = 'corporationAssetsRead'
+    SCOPE_CHAR_BLUEPRINTS = 'esi-characters.read_blueprints.v1'
 
     # model
     user_id = db.Column(
@@ -41,9 +40,9 @@ class TokenScope(db.Model):
         server_default=func.now()
     )
     updated_at = db.Column(
-       UTCDateTime(timezone=True),
-       server_default=func.now(),
-       onupdate=func.now()
+        UTCDateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
     )
 
     def update_token(self, token_response):
