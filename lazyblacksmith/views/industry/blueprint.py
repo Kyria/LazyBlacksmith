@@ -17,6 +17,7 @@ from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import User
 from lazyblacksmith.models import db
+from lazyblacksmith.utils.industry import IGNORED_PROD_SKILLS
 from lazyblacksmith.utils.industry import calculate_base_cost
 from lazyblacksmith.utils.industry import calculate_build_cost
 from lazyblacksmith.utils.industry import get_common_industry_skill
@@ -102,6 +103,8 @@ def manufacturing(item_id, me=0, te=0):
     science_skill = []
     t2_manufacturing_skill = None
     for activity_skill in manufacturing_skills:
+        if activity_skill.skill_id in IGNORED_PROD_SKILLS:
+            continue
         skill = get_skill_data(activity_skill.skill, char)
         if activity_skill.skill.market_group_id == 369:
             t2_manufacturing_skill = skill
