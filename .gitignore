@@ -68,16 +68,20 @@ lazyblacksmith/static/ccp/Types/
 *.sqlite
 *.sublime-*
 env3/
+config_docker\.py
 
-lazyblacksmith/static/css/lb-combined\.css
-lazyblacksmith/static/js/lb\.js
+lazyblacksmith/static/css/bootstrap_lb\.css
 
 lazyblacksmith/static/css/lb\.css
 
-lazyblacksmith/static/css/lb-combined\.min\.css
+lazyblacksmith/static/css/lb\.min\.css
+
+lazyblacksmith/static/css/lb\.min\.css\.map
 
 lazyblacksmith/static/js/bootstrap\.js
 
-lazyblacksmith/static/js/lazybl-combined\.min\.js
+lazyblacksmith/static/js/lb\.js
 
-config_docker\.py
+lazyblacksmith/static/js/lb\.min\.js
+
+lazyblacksmith/static/js/lb\.min\.js\.map

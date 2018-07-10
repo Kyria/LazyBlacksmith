@@ -89,7 +89,7 @@
                 </div>
                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
                     Invention Time Rigs<br>
-                    <div class="btn-group w-100 mt-1" id="structure-invention-rig" data-toggle="buttons">
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-invention-rig" data-toggle="buttons">
                         <label class="col btn btn-sm btn-secondary {% if pref.invention_invention_rig == 0 -%}active{%- endif %}">
                             <input type="radio" name="structure-invention-rig" autocomplete="off" value="0" {% if pref.invention_invention_rig == 0 -%}checked{%- endif %}>None
                         </label>
@@ -103,7 +103,7 @@
                 </div>
                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
                     Copy Time Rigs<br>
-                    <div class="btn-group w-100 mt-1" id="structure-copy-rig" data-toggle="buttons">
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-copy-rig" data-toggle="buttons">
                         <label class="col btn btn-sm btn-secondary {% if pref.invention_copy_rig == 0 -%}active{%- endif %}">
                             <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.invention_copy_rig == 0 -%}checked{%- endif %}>None
                         </label>
@@ -117,7 +117,7 @@
                 </div>
                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
                     System Security<br>
-                    <div class="btn-group w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
                         <label class="col btn btn-sm btn-secondary {% if pref.invention_security == 'h' -%}active{%- endif %}">
                             <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.invention_security == 'h' -%}checked{%- endif %}>HS
                         </label>
@@ -144,7 +144,7 @@
                         {% endfor %}
                     </select>
                     <span class="input-group-btn">
-                        <div class="btn-group" id="region-order-type" data-toggle="buttons">
+                        <div class="btn-group btn-group-toggle" id="region-order-type" data-toggle="buttons">
                             <label class="btn btn-secondary btn-sm btn-sell {% if pref.invention_price_type == 'sell' -%}active{%- endif %}">
                                 <input type="radio" name="region-order-type" autocomplete="off" value="sell" {% if pref.invention_price_type == 'sell' -%}checked{%- endif %}>Sell
                             </label>
@@ -416,4 +416,3 @@
     </div>
 </div>
 {% endblock %}
-

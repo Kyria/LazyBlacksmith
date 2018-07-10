@@ -14,7 +14,7 @@
 <div class="form-group row">
     <label for="me-rig-reaction" class="settings-label">Reaction Facility ME Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="me-rig-reaction" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="me-rig-reaction" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.reaction_me_rig == 0 %}active{% endif %}">
                 <input type="radio" name="me-rig-reaction" autocomplete="off" value="0" {% if pref.reaction_me_rig == 0 %}checked{% endif %}>None
             </label>
@@ -30,7 +30,7 @@
 <div class="form-group row">
     <label for="te-rig-reaction" class="settings-label">Reaction Facility TE Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="te-rig-reaction" data-toggle="buttons">
+        <div class="btn-group btn-group-toggle" id="te-rig-reaction" data-toggle="buttons">
             <label class="btn btn-outline-secondary {% if pref.reaction_te_rig == 0 %}active{% endif %}">
                 <input type="radio" name="te-rig-reaction" autocomplete="off" value="0" {% if pref.reaction_te_rig == 0 %}checked{% endif %}>None
             </label>
@@ -46,7 +46,7 @@
 <div class="form-group row">
     <label for="sec-status-reaction" class="settings-label">System Security</label>
     <div class="settings-field">
-        <div class="btn-group" id="sec-status-reaction" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="sec-status-reaction" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.reaction_security == 'l' %}active{% endif %}">
                 <input type="radio" name="sec-status-reaction" autocomplete="off" value="l" {% if pref.reaction_security == 'l' %}checked{% endif %}>LS
             </label>
@@ -59,7 +59,7 @@
 <div class="form-group row">
     <label for="xxxx" class="settings-label">System Index</label>
     <div class="settings-field">
-        <input id="system-reaction" type="text" class="form-control typeahead" value="{{ pref.reaction_system }}"> 
+        <input id="system-reaction" type="text" class="form-control typeahead" value="{{ pref.reaction_system }}">
     </div>
 </div>
 
@@ -82,7 +82,7 @@
 <div class="form-group row">
     <label for="manufacturing-me-rig-reaction" class="settings-label">Manufacturing ME Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="manufacturing-me-rig-reaction" data-toggle="buttons">
+        <div class="btn-group btn-group-toggle" id="manufacturing-me-rig-reaction" data-toggle="buttons">
             <label class="btn btn-outline-secondary {% if pref.reaction_manuf_me_rig == 0 %}active{% endif %}">
                 <input type="radio" name="manufacturing-me-rig-reaction" autocomplete="off" value="0" {% if pref.reaction_manuf_me_rig == 0 %}checked{% endif %}>None
             </label>
@@ -98,7 +98,7 @@
 <div class="form-group row">
     <label for="manufacturing-te-rig-reaction" class="settings-label">Manufacturing TE Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="manufacturing-te-rig-reaction" data-toggle="buttons">
+        <div class="btn-group btn-group-toggle" id="manufacturing-te-rig-reaction" data-toggle="buttons">
             <label class="btn btn-outline-secondary {% if pref.reaction_manuf_te_rig == 0 %}active{% endif %}">
                 <input type="radio" name="manufacturing-te-rig-reaction" autocomplete="off" value="0" {% if pref.reaction_manuf_te_rig == 0 %}checked{% endif %}>None
             </label>
@@ -114,7 +114,7 @@
 <div class="form-group row">
     <label for="manufacturing-sec-status-reaction" class="settings-label">Manuf. System Security</label>
     <div class="settings-field">
-        <div class="btn-group" id="manufacturing-sec-status-reaction" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="manufacturing-sec-status-reaction" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.reaction_manuf_security == 'h' %}active{% endif %}">
                 <input type="radio" name="manufacturing-sec-status-reaction" autocomplete="off" value="h" {% if pref.reaction_manuf_security == 'h' %}checked{% endif %}>HS
             </label>
@@ -130,7 +130,7 @@
 <div class="form-group row">
     <label for="manufacturing-system-reaction" class="settings-label">Manuf. System index</label>
     <div class="settings-field">
-        <input id="manufacturing-system-reaction" type="text" class="form-control typeahead" value="{{ pref.reaction_manuf_system }}"> 
+        <input id="manufacturing-system-reaction" type="text" class="form-control typeahead" value="{{ pref.reaction_manuf_system }}">
     </div>
 </div>
 
@@ -151,7 +151,7 @@
 <div class="form-group row">
     <label for="te-implant-reaction" class="settings-label">Manuf. TE Implant</label>
     <div class="settings-field">
-        <div class="btn-group" id="te-implant-reaction" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="te-implant-reaction" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.reaction_manuf_te_implant == 1.00 %}active{% endif %}">
                 <input type="radio" name="te-implant-reaction" autocomplete="off" value="1.00" {% if pref.reaction_manuf_te_implant == 1.00 %}checked{% endif %}>None
             </label>
@@ -180,7 +180,7 @@
                 {% endfor %}
             </select>
             <span class="input-group-btn">
-                <div class="btn-group" id="order-type-reaction" data-toggle="buttons">
+                <div class="btn-group btn-group-toggle" id="order-type-reaction" data-toggle="buttons">
                     <label class="btn btn-outline-secondary {% if pref.reaction_price_type == 'sell' %}active{% endif %}">
                         <input type="radio" name="order-type-reaction" autocomplete="off" value="sell" {% if pref.reaction_price_type_pi == 'sell' %}checked{% endif %}>Sell
                     </label>

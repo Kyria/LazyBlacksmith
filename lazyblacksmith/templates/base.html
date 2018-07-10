@@ -18,7 +18,7 @@
     <link href="{{ url_for('static', filename='css/animate.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/font-awesome.css') }}" rel="stylesheet">
 {% else %}
-    <link href="{{ url_for('static', filename='css/lb-combined.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/lb.min.css') }}" rel="stylesheet">
 {% endif %}
 </head>
 
@@ -67,8 +67,8 @@
         <div class="container-fluid text-muted">
             <a href="https://github.com/Kyria/LazyBlacksmith">Github</a> - &copy; Kyria
             <div class="float-right font-italic">
-                All <a href="{{ url_for('home.legal') }}">EVE related materials</a> are property of <a href="http://www.ccpgames.com/">CCP Games</a> 
-                / <a href="{{ url_for('home.legal') }}">CCP Copyright Notice</a> 
+                All <a href="{{ url_for('home.legal') }}">EVE related materials</a> are property of <a href="http://www.ccpgames.com/">CCP Games</a>
+                / <a href="{{ url_for('home.legal') }}">CCP Copyright Notice</a>
                 / <a href="{{ url_for('home.legal') }}">Cookies</a>
             </div>
         </div>
@@ -98,7 +98,7 @@
     <script src="{{ url_for('static', filename='js/lb/price/price.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lb/account/account.js') }}"></script>
 {% else %}
-    <script src="{{ url_for('static', filename='js/lazybl-combined.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lb.min.js') }}"></script>
 {% endif %}
     <script>
         lb.urls.indexActivityUrl    = "{{ url_for('ajax_eve_api.get_index_activity', solar_system_names='SYSTEM_LIST_TO_REPLACE') }}";

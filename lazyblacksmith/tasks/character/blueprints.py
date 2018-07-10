@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
-from .. import logger
-from ..lb_task import LbTask
+""" BLueprint task """
+from datetime import datetime
+from email.utils import parsedate
+import pytz
 
 from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
@@ -12,10 +14,8 @@ from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
-from datetime import datetime
-from email.utils import parsedate
-
-import pytz
+from .. import logger
+from ..lb_task import LbTask
 
 
 @celery_app.task(name="update_character_blueprints", base=LbTask, bind=True)
