@@ -74,7 +74,7 @@ a.lb-nav-danger.nav-link {
     // specific format for research tabs
     &.copy-data {
         width: 300px;
-        margin: 20px auto;
+        margin-top: 20px;
         tbody td {
             text-align: right;
         }
@@ -104,7 +104,7 @@ a.lb-nav-danger.nav-link {
 
     &.te-list, &.me-list {
         width: 75%;
-        margin: 20px auto;
+        margin-top: 20px;
 
         thead th {
             text-align: center;
@@ -164,4 +164,3 @@ a.lb-nav-danger.nav-link {
         };
     };
 }
-

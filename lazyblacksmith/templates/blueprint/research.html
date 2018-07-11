@@ -220,6 +220,39 @@
 
                     <!-- ME Tab -->
                     <div class="fade show active tab-pane" role="tabpanel" id="me-tab">
+
+                        {% if research_materials[4]['mats'] -%}
+                        <div class="mt-4">
+                            <strong>Required items per level of material effiency research</strong><br>
+                            <table class="lb-table-sm lb-list" style="width:30%">
+                                <thead>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th class="text-right">Quantity</th>
+                                        <th class="text-right">Jita Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for id, material in research_materials[4]['mats'].items() -%}
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>{{ material['item'].icon_32() }}</td>{%- endif %}
+                                        <td>{{ material['item'].name }}</td>
+                                        <td class="quantity">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="price">{{ material['price'] | floatcomma }}</td>
+                                    </tr>
+                                    {%- endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                        <td class="title" colspan="2">Estimate Total Price Per level</td>
+                                        <td>{{ research_materials[4]['total'] | floatcomma }}</td>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {%- endif %}
+
                         <table class="me-list lb-table-sm">
                             <thead>
                                 <tr>
@@ -316,6 +349,39 @@
 
                     <!-- TE Tab -->
                     <div class="fade tab-pane" id="te-tab">
+
+                        {% if research_materials[3]['mats'] -%}
+                        <div class="mt-4">
+                            <strong>Required items per level of time effiency research</strong><br>
+                            <table class="lb-table-sm lb-list" style="width:30%">
+                                <thead>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th class="text-right">Quantity</th>
+                                        <th class="text-right">Jita Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for id, material in research_materials[3]['mats'].items() -%}
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>{{ material['item'].icon_32() }}</td>{%- endif %}
+                                        <td>{{ material['item'].name }}</td>
+                                        <td class="quantity">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="price">{{ material['price'] | floatcomma }}</td>
+                                    </tr>
+                                    {%- endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                        <td class="title" colspan="2">Estimate Total Price Per level</td>
+                                        <td>{{ research_materials[3]['total'] | floatcomma }}</td>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {%- endif %}
+
                         <table class="te-list lb-table-sm">
                             <thead>
                                 <tr>
@@ -341,6 +407,39 @@
 
                     <!-- Copy Tab -->
                     <div class="fade tab-pane" id="copy-tab">
+
+                        {% if research_materials[5]['mats'] -%}
+                        <div class="mt-4">
+                            <strong>Required items per run per copy</strong><br>
+                            <table class="lb-table-sm lb-list" style="width:30%">
+                                <thead>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th class="text-right">Quantity</th>
+                                        <th class="text-right">Jita Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for id, material in research_materials[5]['mats'].items() -%}
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>{{ material['item'].icon_32() }}</td>{%- endif %}
+                                        <td>{{ material['item'].name }}</td>
+                                        <td class="quantity">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="price">{{ material['price'] | floatcomma }}</td>
+                                    </tr>
+                                    {%- endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                        <td class="title" colspan="2">Estimate Total Price Per level</td>
+                                        <td>{{ research_materials[5]['total'] | floatcomma }}</td>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {%- endif %}
+
                         <table class="copy-data lb-table-sm">
                             <tr>
                                 <th>Copy time</th>

@@ -13,6 +13,7 @@ from lazyblacksmith.models import Blueprint
 from lazyblacksmith.models import Decryptor
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
+from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import User
@@ -156,6 +157,8 @@ def research(item_id):
         activity=Activity.COPYING
     ).one()
 
+    research_activity_materials = item.activity_materials.all()
+
     # indexes
     indexes = IndustryIndex.query.filter(
         IndustryIndex.solarsystem_id == SolarSystem.id,
@@ -237,6 +240,33 @@ def research(item_id):
             'cost': te_cost,
         }
 
+    # get materials for all activities except manuf/reaction
+    research_materials = {
+        Activity.COPYING: {'total': 0, 'mats': {}},
+        Activity.RESEARCH_TIME_EFFICIENCY: {'total': 0, 'mats': {}},
+        Activity.RESEARCH_MATERIAL_EFFICIENCY: {'total': 0, 'mats': {}},
+    }
+
+    for material in research_activity_materials:
+        if material.activity in research_materials:
+            mat_item = Item.query.get(material.material_id)
+
+            mat_price = ItemPrice.query.filter_by(
+                item_id=mat_item.id, region_id=10000002
+            ).one_or_none()
+            if mat_price is None:
+                mat_price = 0
+            else:
+                mat_price = mat_price.sell_price
+
+            research_materials[material.activity]['mats'][material.material_id] = {
+                'quantity': material.quantity,
+                'item': mat_item,
+                'price': mat_price
+            }
+            research_materials[material.activity]['total'] += (
+                material.quantity * mat_price)
+
     # display
     return render_template('blueprint/research.html', **{
         'blueprint': item,
@@ -249,6 +279,7 @@ def research(item_id):
         'industry_skills': get_common_industry_skill(char),
         'me_time': me_time,
         'te_time': te_time,
+        'research_materials': research_materials,
     })
 
 
