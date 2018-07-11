@@ -1,6 +1,6 @@
 # LazyBlacksmith
 
-![Logo](https://raw.githubusercontent.com/Kyria/LazyBlacksmith/new-theme/lazyblacksmith/static/img/logo128.png)
+![Logo](https://raw.githubusercontent.com/Kyria/LazyBlacksmith/master/lazyblacksmith/static/img/logo128.png)
 
 An EVE Online Industry application for lazy people.
 
