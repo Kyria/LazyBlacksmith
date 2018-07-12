@@ -48,6 +48,13 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         structureCopyRig: 0,
         structureSecStatus: 'h',
 
+        // material configs and informations
+        hasCopyMaterial: false,
+        hasTeMaterial: false,
+        hasMeMaterial: false,
+        copyMaterialCost: 0,
+        teMaterialCost: 0,
+        meMaterialCost: 0,
     };
 
     $.extend(lb.urls, {
@@ -114,8 +121,20 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             1.1
         );
 
+        var copyMaterialCostTotal = options.copyMaterialCost * options.copyNumber * options.runPerCopy;
+
         $('.copy-time').html(utils.durationToString(copyTime));
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
+        $('.copy-total-cost').html(Humanize.intcomma(copyCost + copyMaterialCostTotal, 2));
+
+        // update materials required for copy
+        $('#copy-materials tbody tr').each(
+            function() {
+                var qty = parseInt($(this).attr('data-qty'));
+                qty *= options.copyNumber * options.runPerCopy;
+                $(this).find('td.jobqty').html(Humanize.intcomma(qty))
+            }
+        )
     };
 
 
@@ -182,9 +201,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         $('#ME-' + level + ' .total').html(utils.durationToString(METime));
         $('#ME-' + level + ' .delta').html(utils.durationToString(METime - MEDelta));
         $('#ME-' + level + ' .price').html(Humanize.intcomma(MECost, 2));
+        $('#ME-' + level + ' .ptotal').html(Humanize.intcomma(MECost + options.meMaterialCost, 2));
         $('#TE-' + level + ' .total').html(utils.durationToString(TETime));
         $('#TE-' + level + ' .delta').html(utils.durationToString(TETime - TEDelta));
         $('#TE-' + level + ' .price').html(Humanize.intcomma(TECost, 2));
+        $('#TE-' + level + ' .ptotal').html(Humanize.intcomma(TECost + options.teMaterialCost, 2));
     };
 
 

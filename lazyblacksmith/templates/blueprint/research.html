@@ -33,6 +33,13 @@
         researchBlueprint.options.teImplant = {{ pref.research_te_implant }};
         researchBlueprint.options.copyImplant = {{ pref.research_copy_implant }};
 
+        researchBlueprint.options.hasCopyMaterial = {% if research_materials[5]['mats'] %}true{% else %}false{% endif %};
+        researchBlueprint.options.hasMeMaterial = {% if research_materials[4]['mats'] %}true{% else %}false{% endif %};
+        researchBlueprint.options.hasTeMaterial = {% if research_materials[3]['mats'] %}true{% else %}false{% endif %};
+        researchBlueprint.options.copyMaterialCost = {{ research_materials[5]['total'] }};
+        researchBlueprint.options.meMaterialCost = {{ research_materials[4]['total'] }};
+        researchBlueprint.options.teMaterialCost = {{ research_materials[3]['total'] }};
+
         lb.run('researchBlueprint');
     </script>
 {% endblock %}
@@ -260,6 +267,7 @@
                                     <th>Time</th>
                                     <th>Time from current level</th>
                                     <th>Installation Cost</th>
+                                    {% if research_materials[4]['mats'] -%}<th>Total Cost</th>{% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -269,6 +277,9 @@
                                     <td class="total">{{ me_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ me_time[level]['duration'] | duration }}</td>
                                     <td class="price">{{ me_time[level]['cost'] | floatcomma }}</td>
+                                    {% if research_materials[4]['mats'] -%}
+                                    <td class="ptotal">{{ (me_time[level]['cost'] + research_materials[4]['total']) | floatcomma }}</td>
+                                    {%- endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -389,6 +400,7 @@
                                     <th>Time</th>
                                     <th>Time from current level</th>
                                     <th>Installation Cost</th>
+                                    {% if research_materials[3]['mats'] -%}<th>Total Cost</th>{% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -398,6 +410,9 @@
                                     <td class="total">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="price">{{ te_time[level]['cost'] | floatcomma }}</td>
+                                    {% if research_materials[4]['mats'] -%}
+                                    <td class="ptotal">{{ (te_time[level]['cost'] + research_materials[3]['total']) | floatcomma }}</td>
+                                    {%- endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -411,21 +426,23 @@
                         {% if research_materials[5]['mats'] -%}
                         <div class="mt-4">
                             <strong>Required items per run per copy</strong><br>
-                            <table class="lb-table-sm lb-list" style="width:30%">
+                            <table id="copy-materials" class="lb-table-sm lb-list" style="width:40%">
                                 <thead>
                                     <tr>
                                         {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
                                         <th>Name</th>
                                         <th class="text-right">Quantity</th>
+                                        <th class="text-right">Job Qty</th>
                                         <th class="text-right">Jita Price</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for id, material in research_materials[5]['mats'].items() -%}
-                                    <tr>
+                                    <tr data-qty="{{ material['quantity'] }}">
                                         {% if config.USE_CCP_ICONS -%}<td>{{ material['item'].icon_32() }}</td>{%- endif %}
                                         <td>{{ material['item'].name }}</td>
                                         <td class="quantity">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="quantity jobqty">{{ material['quantity'] | intcomma }}</td>
                                         <td class="price">{{ material['price'] | floatcomma }}</td>
                                     </tr>
                                     {%- endfor %}
@@ -433,8 +450,8 @@
                                 <tfoot>
                                     <tr>
                                         {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
-                                        <td class="title" colspan="2">Estimate Total Price Per level</td>
-                                        <td>{{ research_materials[5]['total'] | floatcomma }}</td>
+                                        <td class="title" colspan="3">Estimate Total Price Per level</td>
+                                        <td class="copy-material-price">{{ research_materials[5]['total'] | floatcomma }}</td>
                                 </tfoot>
                             </table>
                         </div>
@@ -446,10 +463,16 @@
                                 <td class="copy-time">{{ activity_copy.time | duration }}</td>
                             </tr>
                             <tr>
-                                <th>Installation Cost</th>
+                                <th>Copy Installation Cost</th>
                                 {% set copy_cost = (base_cost * index_list[5] * 0.02) -%}
                                 <td class="copy-cost">{{ copy_cost | floatcomma }}</td>
                             </tr>
+                            {% if research_materials[5]['mats'] -%}
+                            <tr>
+                                <th>Total Copy Cost</th>
+                                <td class="copy-total-cost">{{ (copy_cost + research_materials[5]['total']) | floatcomma }}</td>
+                            </tr>
+                            {%- endif %}
                         </table>
                     </div>
 
