@@ -40,6 +40,15 @@
         researchBlueprint.options.meMaterialCost = {{ research_materials[4]['total'] }};
         researchBlueprint.options.teMaterialCost = {{ research_materials[3]['total'] }};
 
+        {% for material in manufacturing_materials -%}
+        researchBlueprint.materials.ids.push({{ material.material_id }});
+        researchBlueprint.materials.bom[{{ material.material_id }}] = {
+            id: {{ material.material.id }},
+            qtyRequiredPerRun: {{ material.quantity }},
+            price: {{ prices[material.material_id] }}
+        };
+        {%- endfor %}
+
         lb.run('researchBlueprint');
     </script>
 {% endblock %}
@@ -103,6 +112,21 @@
                 </div>
 
                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                    Material Rigs <br>
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-mat-rig" data-toggle="buttons" style="width:100%">
+                        <label class="btn col btn-sm btn-secondary active">
+                            <input type="radio" name="structure-mat-rig" autocomplete="off" value="0" checked>None
+                        </label>
+                        <label class="btn col btn-sm btn-secondary">
+                            <input type="radio" name="structure-mat-rig" autocomplete="off" value="1">T1
+                        </label>
+                        <label class="btn col btn-sm btn-secondary">
+                            <input type="radio" name="structure-mat-rig" autocomplete="off" value="2">T2
+                        </label>
+                    </div>
+                </div>
+
+                <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
                     System Security<br>
                     <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-sec-status" data-toggle="buttons" style="width:100%">
                         <label class="btn col btn-sm btn-secondary {% if pref.research_security == 'h' -%}active{%- endif %}">
@@ -144,6 +168,10 @@
                 <div class="mt-3">
                     Runs/copy (max: {{ blueprint.max_production_limit }})<br>
                     <input id="run-per-copy" type="text" class="form-control form-control-sm mt-1" value="1">
+                </div>
+                <div class="mt-3">
+                    Number of production run<br>
+                    <input id="runs" type="text" class="form-control form-control-sm mt-1" value="1">
                 </div>
             </div>
         </div>
@@ -219,9 +247,9 @@
             <div class="col-md-12">
                 <ul class="nav nav-tabs" id="tab-links" role="tablist">
                     <li class="nav-item"><a class="active nav-link" href="#me-tab">Material Efficiency</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#me-eff-tab">Cost / ME</a></li>
                     <li class="nav-item"><a class="nav-link" href="#te-tab">Time Efficiency</a></li>
                     <li class="nav-item"><a class="nav-link" href="#copy-tab">Copy</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#me-eff-tab">Cost / ME</a></li>
                 </ul>
                 <div class="tab-content">
 
@@ -284,78 +312,6 @@
                                 {% endfor %}
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- Cost / ME Tab -->
-                    <div class="fade tab-pane" id="me-eff-tab">
-                        <table class="me-profit lb-table-sm">
-                            <thead>
-                                <tr>
-                                    <th style="width:30px">ME</th>
-                                    <th>
-                                        Build Cost
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Based on The Forge prices. Values may be inaccurate but the only goal is to provide a comparison between build costs for each ME level, when built in station.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-                                    </th>
-                                    <th colspan="2">Profit / ME 0%</th>
-                                    <th colspan="2">Profit / Previous ME</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for level in range(0,11) -%}
-                                <tr id="ME-profit-{{ level }}">
-                                    <td class="level">{{ level }}</td>
-                                    <td>{{ cost_per_me[level]['run'] | floatcomma }}</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_prev_me'] | floatcomma }}%</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-
-                        <table class="me-profit lb-table-sm">
-                            <thead>
-                                <tr>
-                                    <th style="width:30px">ME</th>
-                                    <th>
-                                        Build Cost (max BPC run)
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Same as build cost, but using max run to test adjusted quantities.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-                                    </th>
-                                    <th colspan="2">
-                                        Profit / ME 0% (max BPC run)
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-
-                                    </th>
-                                    <th colspan="2">
-                                        Profit / Previous ME (max BPC run)
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for level in range(0,11) -%}
-                                <tr id="ME-profit-max-run-{{ level }}">
-                                    <td class="level">{{ level }}</td>
-                                    <td>{{ cost_per_me[level]['run'] | floatcomma }}</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_prev_me'] | floatcomma }}%</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-
                     </div>
 
                     <!-- TE Tab -->
@@ -476,6 +432,36 @@
                         </table>
                     </div>
 
+                    <!-- Cost / ME Tab -->
+                    <div class="fade tab-pane" id="me-eff-tab">
+                        <table class="me-profit lb-table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px">ME</th>
+                                    <th class="text-right">
+                                        Build Cost - <span id="nb-run">1</span> run(s) 
+                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Based on The Forge prices. Values may be inaccurate but the only goal is to provide a comparison between build costs for each ME level, when built in station.">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                        </span>
+                                    </th>
+                                    <th colspan="2" class="text-right">Profit / ME 0%</th>
+                                    <th colspan="2" class="text-right">Profit / Previous ME</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for level in range(0,11) -%}
+                                <tr id="ME-profit-{{ level }}">
+                                    <td class="level">{{ level }}</td>
+                                    <td class="build-cost"></td>
+                                    <td class="delta me-0"></td>
+                                    <td class="price-percent me-0-percent"></td>
+                                    <td class="delta me-prev"></td>
+                                    <td class="price-percent me-prev-percent"></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -12,6 +12,7 @@ from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Blueprint
 from lazyblacksmith.models import Decryptor
 from lazyblacksmith.models import IndustryIndex
+from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
@@ -167,47 +168,38 @@ def research(item_id):
     for index in indexes:
         index_list[index.activity] = index.cost_index
 
-    # calculate baseCost and build cost per ME
-    materials = item.activity_materials.filter_by(
+    # get materials and prices
+    manufacturing_materials = item.activity_materials.filter_by(
         activity=Activity.MANUFACTURING
-    )
-    base_cost = calculate_base_cost(materials)
-    cost = calculate_build_cost(
-        materials,
-        10000002,
-        xrange(0, 11),
-        item.max_production_limit
-    )
+    ).all()
 
-    cost_prev_me = cost[0]['run']
-    cost_prev_me_max = cost[0]['max_bpc_run']
-    for level in xrange(0, 11):
-        # cost
-        current_cost = cost[level]['run']
-        delta_me0 = cost[0]['run'] - current_cost
-        delta_prev_me = cost_prev_me - current_cost
-        delta_pct_me0 = (1 - current_cost / cost[0]['run']) * 100
-        delta_pct_prev_me = (1 - current_cost / cost_prev_me) * 100
+    prices = {}
+    for material in manufacturing_materials:
+        price = 0.0
+        item_price = ItemPrice.query.filter(
+            ItemPrice.item_id == material.material_id,
+            ItemPrice.region_id == 10000002,
+        ).one_or_none()
+        if not item_price:
+            item_adjusted_price = ItemAdjustedPrice.query.get(
+                material.material_id
+            )
+            price = item_adjusted_price.price
 
-        current_cost = cost[level]['max_bpc_run']
-        max_delta_me0 = cost[0]['max_bpc_run'] - current_cost
-        max_delta_prev_me = cost_prev_me_max - current_cost
-        max_delta_pct_me0 = (1 - current_cost / cost[0]['max_bpc_run']) * 100
-        max_delta_pct_prev_me = (1 - current_cost / cost_prev_me_max) * 100
+        else:
+            # we want the average price,
+            # since this is used only in research/invention
+            nb = 0.0
+            if item_price.buy_price:
+                price += item_price.buy_price
+                nb += 1.0
 
-        cost[level].update({
-            'delta_me0': delta_me0,
-            'delta_prev_me': delta_prev_me,
-            'delta_pct_me0': delta_pct_me0,
-            'delta_pct_prev_me': delta_pct_prev_me,
-            'max_delta_me0': max_delta_me0,
-            'max_delta_prev_me': max_delta_prev_me,
-            'max_delta_pct_me0': max_delta_pct_me0,
-            'max_delta_pct_prev_me': max_delta_pct_prev_me,
-        })
+            if item_price.sell_price:
+                price += item_price.sell_price
+                nb += 1.0
 
-        cost_prev_me = cost[level]['run']
-        cost_prev_me_max = cost[level]['max_bpc_run']
+            price /= nb
+        prices[material.material_id] = price
 
     me_time = {}
     te_time = {}
@@ -217,11 +209,11 @@ def research(item_id):
         me_duration = activity_material.time * level_modifier
         te_duration = activity_time.time * level_modifier
         me_cost = (
-            base_cost * 0.02 * level_modifier * 1.1 *
+            item.base_cost * 0.02 * level_modifier * 1.1 *
             index_list[Activity.RESEARCH_MATERIAL_EFFICIENCY]
         )
         te_cost = (
-            base_cost * 0.02 * level_modifier * 1.1 *
+            item.base_cost * 0.02 * level_modifier * 1.1 *
             index_list[Activity.RESEARCH_TIME_EFFICIENCY]
         )
 
@@ -267,13 +259,14 @@ def research(item_id):
         'activity_copy': activity_copy,
         'activity_material': activity_material,
         'activity_time': activity_time,
-        'base_cost': base_cost,
+        'base_cost': item.base_cost,
         'index_list': index_list,
-        'cost_per_me': cost,
         'industry_skills': get_common_industry_skill(char),
         'me_time': me_time,
         'te_time': te_time,
         'research_materials': research_materials,
+        'manufacturing_materials': manufacturing_materials,
+        'prices': prices,
     })
 
 
