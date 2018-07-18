@@ -15,6 +15,16 @@ class Item(db.Model):
     is_from_manufacturing = db.Column(db.Boolean(), default=True)
     is_from_reaction = db.Column(db.Boolean(), default=True)
 
+    base_price = db.Column(
+        db.Numeric(
+            precision=17,
+            scale=2,
+            decimal_return_scale=2,
+            asdecimal=False
+        ),
+        nullable=True,
+    )
+
     # foreign keys
     activities = db.relationship(
         'Activity',

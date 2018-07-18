@@ -3,7 +3,7 @@ from .character.blueprints import task_update_character_blueprints
 from .character.skills import task_update_character_skills
 from .corporation.blueprints import task_update_corporation_blueprints
 from .industry.indexes import task_update_industry_indexes
-from .market.adjusted_price import task_update_adjusted_price
+from .market.adjusted_price import task_update_adjusted_price_base_cost
 from .market.market_order import spawn_market_price_tasks
 
 from lazyblacksmith.extension.celery_app import celery_app
@@ -26,7 +26,7 @@ CHAR_TASK_SCOPE = {
 }
 
 UNIVERSE_TASKS = [
-    task_update_adjusted_price,
+    task_update_adjusted_price_base_cost,
     task_update_industry_indexes,
     spawn_market_price_tasks,
 ]
