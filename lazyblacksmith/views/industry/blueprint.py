@@ -88,12 +88,6 @@ def manufacturing(item_id, me=0, te=0):
         activity=Activity.MANUFACTURING
     ).one()
 
-    regions = Region.query.filter(
-        Region.id.in_(config.ESI_REGION_PRICE)
-    ).filter_by(
-        wh=False
-    )
-
     # get science skill name, if applicable
     manufacturing_skills = item.activity_skills.filter_by(
         activity=Activity.MANUFACTURING,
@@ -126,7 +120,7 @@ def manufacturing(item_id, me=0, te=0):
         'materials': materials,
         'activity': activity,
         'product': product,
-        'regions': regions,
+        'regions': get_regions(),
         'has_manufactured_components': has_manufactured_components,
         't2_manufacturing_skill': t2_manufacturing_skill,
         'science_skill': science_skill,
@@ -348,13 +342,6 @@ def invention(item_id):
     # get decryptor
     decryptors = Decryptor.query.all()
 
-    # get regions
-    regions = Region.query.filter(
-        Region.id.in_(config.ESI_REGION_PRICE)
-    ).filter_by(
-        wh=False
-    )
-
     # display
     return render_template('blueprint/invention.html', **{
         'blueprint': item,
@@ -374,7 +361,7 @@ def invention(item_id):
         'invention_products': item.activity_products.filter_by(
             activity=Activity.INVENTION
         ).all(),
-        'regions': regions,
+        'regions': get_regions(),
         'industry_skills': get_common_industry_skill(char),
     })
 
