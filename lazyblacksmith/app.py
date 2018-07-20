@@ -3,6 +3,7 @@ from flask import Flask
 from flask import flash
 from flask import g
 from flask import render_template
+from flask import request
 from flask_wtf.csrf import CSRFProtect
 
 import flask_login
@@ -39,6 +40,7 @@ def create_app(config_object):
 
 
 def register_blueprints(app):
+    """ register blueprints & helper blueprints """
     # blueprint import, only here because of exts
     from lazyblacksmith.views import ajax_eve_api
     from lazyblacksmith.views import ajax_eve_sde
@@ -50,7 +52,6 @@ def register_blueprints(app):
     from lazyblacksmith.views import template
     from lazyblacksmith.views import account
 
-    """ register blueprints & helper blueprints """
     app.register_blueprint(ajax_eve_api, url_prefix='/ajax/eveapi')
     app.register_blueprint(ajax_eve_sde, url_prefix='/ajax/evesde')
     app.register_blueprint(ajax_account, url_prefix='/ajax/account')
@@ -92,24 +93,25 @@ def register_before_requests(app):
 
     def check_and_update_user():
         """ check for invalid token and print message and update last seen """
-        if flask_login.current_user.is_authenticated:
+        if flask_login.current_user.is_authenticated and not request.is_xhr:
             char_id = flask_login.current_user.character_id
+            current_user = flask_login.current_user
             count_error = TokenScope.query.filter_by(
                 valid=False
             ).join(User).filter(
                 ((User.main_character_id.is_(None)) &
-                    (User.character_id == char_id)) |
+                 (User.character_id == char_id)) |
                 (User.main_character_id == char_id)
             ).filter(
                 ((TokenScope.last_update.is_(None)) &
-                    (TokenScope.updated_at >= User.current_login_at)) |
-                (User.current_login_at.is_(None)) |
-                (TokenScope.last_update >= User.current_login_at)
+                 (TokenScope.updated_at >= current_user.current_login_at)) |
+                (TokenScope.last_update >= current_user.current_login_at)
             ).count()
 
             if count_error > 0:
                 flash('You have at least one scope that have been invalidate.'
-                      ' Please take a moment to check and update it, or remove it.', 'danger')
+                      ' Please take a moment to check and update it, '
+                      ' or remove it.', 'danger')
 
             flask_login.current_user.current_login_at = utcnow()
             db.session.commit()

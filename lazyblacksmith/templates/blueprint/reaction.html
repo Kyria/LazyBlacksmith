@@ -114,7 +114,7 @@
                                 </select>
                                 <div class="structure-configs mt-3">
                                     Rigs<br>
-                                    <div class="btn-group w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
+                                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
                                         <label class="btn col btn-sm btn-secondary {% if pref.reaction_me_rig == 0 -%}active{%- endif %}">
                                             <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.reaction_me_rig == 0 -%}checked{%- endif %}>None
                                         </label>
@@ -125,7 +125,7 @@
                                             <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.reaction_me_rig == 2 -%}checked{%- endif %}>ME T2
                                         </label>
                                     </div>
-                                    <div class="btn-group w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
+                                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
                                         <label class="btn col btn-sm btn-secondary {% if pref.reaction_te_rig == 0 -%}active{%- endif %}">
                                             <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.reaction_te_rig == 0 -%}checked{%- endif %}>None
                                         </label>
@@ -140,7 +140,7 @@
 
                                 <div class="structure-configs mt-3">
                                     System Security<br>
-                                    <div class="btn-group w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
+                                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
                                         <label class="btn col btn-sm btn-secondary {% if pref.reaction_security == 'l' -%}active{%- endif %}">
                                             <input type="radio" name="structure-sec-status" autocomplete="off" value="l" {% if pref.reaction_security == 'l' -%}checked{%- endif %}>LowSec
                                         </label>
@@ -163,7 +163,7 @@
                                     <input id="runs" type="text" class="form-control form-control-sm mt-1" value="1">
                                 </div>
                                 <div class="mt-3">
-                                    Runs Per Jobs<br>   
+                                    Runs Per Jobs<br>
                                     <div class="input-group mt-1">
                                         <input id="runsPerJob" type="text" class="form-control form-control-sm" value="{{ (3600 * 24 * 30 / activity.time)|int }}">
 
@@ -499,7 +499,7 @@
 
                             <div class="modal-structure-configs mt-3">
                                 Rigs<br>
-                                <div class="btn-group w-100 mt-1" id="modal-structure-me-rig" data-toggle="buttons">
+                                <div class="btn-group btn-group-toggle w-100 mt-1" id="modal-structure-me-rig" data-toggle="buttons">
                                     <label class="btn col btn-sm btn-secondary">
                                         <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0">None
                                     </label>
@@ -510,7 +510,7 @@
                                         <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2" >ME T2
                                     </label>
                                 </div>
-                                <div class="btn-group w-100 mt-1" id="modal-structure-te-rig" data-toggle="buttons">
+                                <div class="btn-group btn-group-toggle w-100 mt-1" id="modal-structure-te-rig" data-toggle="buttons">
                                     <label class="btn col btn-sm btn-secondary">
                                         <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0">None
                                     </label>
@@ -545,7 +545,7 @@
 
                         <div class="col-md-6">
                             <div>
-                                Runs Per Batch<br>   
+                                Runs Per Batch<br>
                                 <div class="input-group mt-1">
                                     <input id="modalRunsPerJob" type="text" class="form-control form-control-sm" value="1">
                                     <span class="input-group-btn" data-toggle="buttons" id="toggleMaxRunPerBpcModal">

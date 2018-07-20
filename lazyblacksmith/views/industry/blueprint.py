@@ -12,11 +12,14 @@ from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Blueprint
 from lazyblacksmith.models import Decryptor
 from lazyblacksmith.models import IndustryIndex
+from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import Item
+from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import User
 from lazyblacksmith.models import db
+from lazyblacksmith.utils.industry import IGNORED_PROD_SKILLS
 from lazyblacksmith.utils.industry import calculate_base_cost
 from lazyblacksmith.utils.industry import calculate_build_cost
 from lazyblacksmith.utils.industry import get_common_industry_skill
@@ -86,12 +89,6 @@ def manufacturing(item_id, me=0, te=0):
         activity=Activity.MANUFACTURING
     ).one()
 
-    regions = Region.query.filter(
-        Region.id.in_(config.ESI_REGION_PRICE)
-    ).filter_by(
-        wh=False
-    )
-
     # get science skill name, if applicable
     manufacturing_skills = item.activity_skills.filter_by(
         activity=Activity.MANUFACTURING,
@@ -102,6 +99,8 @@ def manufacturing(item_id, me=0, te=0):
     science_skill = []
     t2_manufacturing_skill = None
     for activity_skill in manufacturing_skills:
+        if activity_skill.skill_id in IGNORED_PROD_SKILLS:
+            continue
         skill = get_skill_data(activity_skill.skill, char)
         if activity_skill.skill.market_group_id == 369:
             t2_manufacturing_skill = skill
@@ -111,19 +110,22 @@ def manufacturing(item_id, me=0, te=0):
 
     # is any of the materials manufactured ?
     has_manufactured_components = False
+    has_cap_part_components = False
 
     for material in materials:
         if material.material.is_from_manufacturing:
             has_manufactured_components = True
-            break
+        if material.material.is_cap_part():
+            has_cap_part_components = True
 
     return render_template('blueprint/manufacturing.html', **{
         'blueprint': item,
         'materials': materials,
         'activity': activity,
         'product': product,
-        'regions': regions,
+        'regions': get_regions(),
         'has_manufactured_components': has_manufactured_components,
+        'has_cap_part_components': has_cap_part_components,
         't2_manufacturing_skill': t2_manufacturing_skill,
         'science_skill': science_skill,
         'industry_skills': get_common_industry_skill(char),
@@ -153,6 +155,8 @@ def research(item_id):
         activity=Activity.COPYING
     ).one()
 
+    research_activity_materials = item.activity_materials.all()
+
     # indexes
     indexes = IndustryIndex.query.filter(
         IndustryIndex.solarsystem_id == SolarSystem.id,
@@ -167,47 +171,38 @@ def research(item_id):
     for index in indexes:
         index_list[index.activity] = index.cost_index
 
-    # calculate baseCost and build cost per ME
-    materials = item.activity_materials.filter_by(
+    # get materials and prices
+    manufacturing_materials = item.activity_materials.filter_by(
         activity=Activity.MANUFACTURING
-    )
-    base_cost = calculate_base_cost(materials)
-    cost = calculate_build_cost(
-        materials,
-        10000002,
-        xrange(0, 11),
-        item.max_production_limit
-    )
+    ).all()
 
-    cost_prev_me = cost[0]['run']
-    cost_prev_me_max = cost[0]['max_bpc_run']
-    for level in xrange(0, 11):
-        # cost
-        current_cost = cost[level]['run']
-        delta_me0 = cost[0]['run'] - current_cost
-        delta_prev_me = cost_prev_me - current_cost
-        delta_pct_me0 = (1 - current_cost / cost[0]['run']) * 100
-        delta_pct_prev_me = (1 - current_cost / cost_prev_me) * 100
+    prices = {}
+    for material in manufacturing_materials:
+        price = 0.0
+        item_price = ItemPrice.query.filter(
+            ItemPrice.item_id == material.material_id,
+            ItemPrice.region_id == 10000002,
+        ).one_or_none()
+        if not item_price:
+            item_adjusted_price = ItemAdjustedPrice.query.get(
+                material.material_id
+            )
+            price = item_adjusted_price.price
 
-        current_cost = cost[level]['max_bpc_run']
-        max_delta_me0 = cost[0]['max_bpc_run'] - current_cost
-        max_delta_prev_me = cost_prev_me_max - current_cost
-        max_delta_pct_me0 = (1 - current_cost / cost[0]['max_bpc_run']) * 100
-        max_delta_pct_prev_me = (1 - current_cost / cost_prev_me_max) * 100
+        else:
+            # we want the average price,
+            # since this is used only in research/invention
+            nb = 0.0
+            if item_price.buy_price:
+                price += item_price.buy_price
+                nb += 1.0
 
-        cost[level].update({
-            'delta_me0': delta_me0,
-            'delta_prev_me': delta_prev_me,
-            'delta_pct_me0': delta_pct_me0,
-            'delta_pct_prev_me': delta_pct_prev_me,
-            'max_delta_me0': max_delta_me0,
-            'max_delta_prev_me': max_delta_prev_me,
-            'max_delta_pct_me0': max_delta_pct_me0,
-            'max_delta_pct_prev_me': max_delta_pct_prev_me,
-        })
+            if item_price.sell_price:
+                price += item_price.sell_price
+                nb += 1.0
 
-        cost_prev_me = cost[level]['run']
-        cost_prev_me_max = cost[level]['max_bpc_run']
+            price /= nb
+        prices[material.material_id] = price
 
     me_time = {}
     te_time = {}
@@ -217,11 +212,11 @@ def research(item_id):
         me_duration = activity_material.time * level_modifier
         te_duration = activity_time.time * level_modifier
         me_cost = (
-            base_cost * 0.02 * level_modifier * 1.1 *
+            item.base_cost * 0.02 * level_modifier * 1.1 *
             index_list[Activity.RESEARCH_MATERIAL_EFFICIENCY]
         )
         te_cost = (
-            base_cost * 0.02 * level_modifier * 1.1 *
+            item.base_cost * 0.02 * level_modifier * 1.1 *
             index_list[Activity.RESEARCH_TIME_EFFICIENCY]
         )
 
@@ -234,18 +229,48 @@ def research(item_id):
             'cost': te_cost,
         }
 
+    # get materials for all activities except manuf/reaction
+    research_materials = {
+        Activity.COPYING: {'total': 0, 'mats': []},
+        Activity.RESEARCH_TIME_EFFICIENCY: {'total': 0, 'mats': []},
+        Activity.RESEARCH_MATERIAL_EFFICIENCY: {'total': 0, 'mats': []},
+    }
+
+    for material in research_activity_materials:
+        if material.activity in research_materials:
+            mat_item = Item.query.get(material.material_id)
+
+            mat_price = ItemPrice.query.filter_by(
+                item_id=mat_item.id, region_id=10000002
+            ).one_or_none()
+            if mat_price is None:
+                mat_price = 0
+            else:
+                mat_price = mat_price.sell_price
+
+            research_materials[material.activity]['mats'].append({
+                'id': material.material_id,
+                'quantity': material.quantity,
+                'item': mat_item,
+                'price': mat_price
+            })
+            research_materials[material.activity]['total'] += (
+                material.quantity * mat_price)
+
     # display
     return render_template('blueprint/research.html', **{
         'blueprint': item,
         'activity_copy': activity_copy,
         'activity_material': activity_material,
         'activity_time': activity_time,
-        'base_cost': base_cost,
+        'base_cost': item.base_cost,
         'index_list': index_list,
-        'cost_per_me': cost,
         'industry_skills': get_common_industry_skill(char),
         'me_time': me_time,
         'te_time': te_time,
+        'research_materials': research_materials,
+        'manufacturing_materials': manufacturing_materials,
+        'prices': prices,
     })
 
 
@@ -314,13 +339,6 @@ def invention(item_id):
     # get decryptor
     decryptors = Decryptor.query.all()
 
-    # get regions
-    regions = Region.query.filter(
-        Region.id.in_(config.ESI_REGION_PRICE)
-    ).filter_by(
-        wh=False
-    )
-
     # display
     return render_template('blueprint/invention.html', **{
         'blueprint': item,
@@ -340,7 +358,7 @@ def invention(item_id):
         'invention_products': item.activity_products.filter_by(
             activity=Activity.INVENTION
         ).all(),
-        'regions': regions,
+        'regions': get_regions(),
         'industry_skills': get_common_industry_skill(char),
     })
 

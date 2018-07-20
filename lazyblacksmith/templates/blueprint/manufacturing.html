@@ -17,8 +17,9 @@
         manufacturingBlueprint.materialsData.materials[{{ product.product.id }}] = {
             'id': {{ product.product.id }},
             'isManufactured': true,
-            'runsPerJob': {{ product.blueprint.max_production_limit }},
-            'maxRunPerBp': {{ product.blueprint.max_production_limit }},
+            'isCapPart': {% if blueprint.is_cap_part() %}true{% else %}false{% endif %},
+            'runsPerJob': {{ blueprint.max_production_limit }},
+            'maxRunPerBp': {{ blueprint.max_production_limit }},
             'resultQtyPerRun': {{ product.quantity }},
             'qtyRequiredPerRun': {{ product.quantity }},
             'qtyAdjusted': {{ product.quantity }},
@@ -51,6 +52,7 @@
         manufacturingBlueprint.materialsData.materials[{{ material.material.id }}] = {
             'id': {{ material.material.id }},
             'isManufactured': {% if material.material.is_from_manufacturing %}true{% else %}false{% endif %},
+            'isCapPart': {% if material.material.is_cap_part() %}true{% else %}false{% endif %},
             'runsPerJob': -1,
             'maxRunPerBp': -1,
             'resultQtyPerRun': -1,
@@ -131,7 +133,7 @@
                                 </select>
                                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
                                     Rigs<br>
-                                    <div class="btn-group w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
+                                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
                                         <label class="btn col btn-sm btn-secondary {% if pref.prod_me_rig == 0 -%}active{%- endif %}">
                                             <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.prod_me_rig == 0 -%}checked{%- endif %}>None
                                         </label>
@@ -141,8 +143,13 @@
                                         <label class="btn col btn-sm btn-secondary {% if pref.prod_me_rig == 2 -%}active{%- endif %}">
                                             <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.prod_me_rig == 2 -%}checked{%- endif %}>ME T2
                                         </label>
+                                        {% if blueprint.is_cap_part() %}
+                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_me_rig == 3 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-me-rig" autocomplete="off" value="3" {% if pref.prod_me_rig == 3 -%}checked{%- endif %}>Thukker
+                                        </label>
+                                        {% endif %}
                                     </div>
-                                    <div class="btn-group w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
+                                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
                                         <label class="btn col btn-sm btn-secondary {% if pref.prod_te_rig == 0 -%}active{%- endif %}">
                                             <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.prod_te_rig == 0 -%}checked{%- endif %}>None
                                         </label>
@@ -152,12 +159,17 @@
                                         <label class="btn col btn-sm btn-secondary {% if pref.prod_te_rig == 2 -%}active{%- endif %}">
                                             <input type="radio" name="structure-te-rig" autocomplete="off" value="2" {% if pref.prod_te_rig == 2 -%}checked{%- endif %}>TE T2
                                         </label>
+                                        {% if blueprint.is_cap_part() %}
+                                        <label class="btn col btn-sm btn-secondary {% if pref.prod_te_rig == 3 -%}active{%- endif %}">
+                                            <input type="radio" name="structure-te-rig" autocomplete="off" value="3" {% if pref.prod_te_rig == 3 -%}checked{%- endif %}>Thukker
+                                        </label>
+                                        {% endif %}
                                     </div>
                                 </div>
 
                                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
                                     System Security<br>
-                                    <div class="btn-group w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
+                                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-sec-status" data-toggle="buttons">
                                         <label class="btn col btn-sm btn-secondary {% if pref.prod_security == 'h' -%}active{%- endif %}">
                                             <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.prod_security == 'h' -%}checked{%- endif %}>HS
                                         </label>
@@ -183,9 +195,9 @@
                                     <input id="runs" type="text" class="form-control form-control-sm mt-1" value="1">
                                 </div>
                                 <div class="mt-3">
-                                    Runs Per Jobs<br>   
+                                    Runs Per Jobs<br>
                                     <div class="input-group mt-1">
-                                        <input id="runsPerJob" type="text" class="form-control form-control-sm" value="{{ product.blueprint.max_production_limit }}">
+                                        <input id="runsPerJob" type="text" class="form-control form-control-sm" value="{{ blueprint.max_production_limit }}">
 
                                         <span class="input-group-btn">
                                             <button id="maxRunBpc" class="btn btn-secondary btn-sm">Max Run/BPC</button>
@@ -324,7 +336,7 @@
 
                             {% if has_manufactured_components %}
                             <span class="raw-component-btn">
-                                <span id="raw-components" data-toggle="buttons">
+                                <span id="raw-components" class="btn-group-toggle" data-toggle="buttons">
                                     <label class="btn btn-danger btn-sm m-0">
                                         <input type="checkbox" autocomplete="off">
                                         Raw components: <span class="state">NO</span>
@@ -541,7 +553,7 @@
 
                             <div class="modal-structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
                                 Rigs<br>
-                                <div class="btn-group w-100 mt-1" id="modal-structure-me-rig" data-toggle="buttons">
+                                <div class="btn-group btn-group-toggle w-100 mt-1" id="modal-structure-me-rig" data-toggle="buttons">
                                     <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_me_rig == 0 -%}active{%- endif %}">
                                         <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="0" {% if pref.prod_sub_me_rig == 0 -%}checked{%- endif %}>None
                                     </label>
@@ -551,8 +563,13 @@
                                     <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_me_rig == 2 -%}active{%- endif %}">
                                         <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="2" {% if pref.prod_sub_me_rig == 2 -%}checked{%- endif %}>ME T2
                                     </label>
+                                    {% if has_cap_part_components %}
+                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_me_rig == 3 -%}active{%- endif %}">
+                                        <input type="radio" name="modal-structure-me-rig" autocomplete="off" value="3" {% if pref.prod_sub_me_rig == 3 -%}checked{%- endif %}>Thukker
+                                    </label>
+                                    {% endif %}
                                 </div>
-                                <div class="btn-group w-100 mt-1" id="modal-structure-te-rig" data-toggle="buttons">
+                                <div class="btn-group btn-group-toggle w-100 mt-1" id="modal-structure-te-rig" data-toggle="buttons">
                                     <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_te_rig == 0 -%}active{%- endif %}">
                                         <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="0" {% if pref.prod_sub_te_rig == 0 -%}checked{%- endif %}>None
                                     </label>
@@ -562,12 +579,17 @@
                                     <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_te_rig == 2 -%}active{%- endif %}">
                                         <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="2" {% if pref.prod_sub_te_rig == 2 -%}checked{%- endif %}>TE T2
                                     </label>
+                                    {% if has_cap_part_components %}
+                                    <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_te_rig == 3 -%}active{%- endif %}">
+                                        <input type="radio" name="modal-structure-te-rig" autocomplete="off" value="3" {% if pref.prod_sub_te_rig == 3 -%}checked{%- endif %}>Thukker
+                                    </label>
+                                    {% endif %}
                                 </div>
                             </div>
 
                             <div class="modal-structure-configs mt-3" style="{% if not pref.is_structure(pref.invention_facility) -%}display: none;{%- endif %}">
                                 System Security<br>
-                                <div class="btn-group w-100 mt-1" id="modal-structure-sec-status" data-toggle="buttons">
+                                <div class="btn-group btn-group-toggle w-100 mt-1" id="modal-structure-sec-status" data-toggle="buttons">
                                     <label class="btn col btn-sm btn-secondary {% if pref.prod_sub_security == 'h' -%}active{%- endif %}">
                                         <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="h" {% if pref.prod_sub_security == 'h' -%}checked{%- endif %}>HS
                                     </label>
@@ -587,10 +609,10 @@
 
                         <div class="col-md-6">
                             <div>
-                                Runs Per Batch<br>   
+                                Runs Per Batch<br>
                                 <div class="input-group mt-1">
                                     <input id="modalRunsPerJob" type="text" class="form-control form-control-sm" value="1">
-                                    <span class="input-group-btn" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
+                                    <span class="btn-group-toggle" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
                                         <label class="btn btn-secondary btn-sm m-0">
                                             <input type="checkbox" autocomplete="off">Max Run/BPC
                                         </label>

@@ -17,7 +17,7 @@
 <div class="form-group row">
     <label for="structure-time-rig-invention" class="settings-label">Invention Time Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="structure-time-rig-invention" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="structure-time-rig-invention" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.invention_invention_rig == 0 %}active{% endif %}">
                 <input type="radio" name="structure-time-rig-invention" autocomplete="off" value="0" {% if pref.invention_invention_rig == 0 %}checked{% endif %}>None
             </label>
@@ -34,7 +34,7 @@
 <div class="form-group row">
     <label for="structure-copy-rig-invention" class="settings-label">Copy Time Rig</label>
     <div class="settings-field">
-        <div class="btn-group" id="structure-copy-rig-invention" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="structure-copy-rig-invention" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.invention_copy_rig == 0 %}active{% endif %}">
                 <input type="radio" name="structure-copy-rig-invention" autocomplete="off" value="0" {% if pref.invention_copy_rig == 0 %}checked{% endif %}>None
             </label>
@@ -51,7 +51,7 @@
 <div class="form-group row">
     <label for="structure-sec-status-invention" class="settings-label">System Security</label>
     <div class="settings-field">
-        <div class="btn-group" id="structure-sec-status-invention" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="structure-sec-status-invention" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.invention_security == 'h' %}active{% endif %}">
                 <input type="radio" name="structure-sec-status-invention" autocomplete="off" value="h" {% if pref.invention_security == 'h' %}checked{% endif %}>HS
             </label>
@@ -68,7 +68,7 @@
 <div class="form-group row">
     <label for="system-invention" class="settings-label">System Index</label>
     <div class="settings-field">
-        <input id="system-invention" type="text" class="form-control typeahead" value="{{ pref.invention_system }}"> 
+        <input id="system-invention" type="text" class="form-control typeahead" value="{{ pref.invention_system }}">
     </div>
 </div>
 
@@ -89,7 +89,7 @@
 <div class="form-group row">
     <label for="copy-implant-invention" class="settings-label">Implant Copy</label>
     <div class="settings-field">
-        <div class="btn-group" id="copy-implant-invention" data-toggle="buttons" >
+        <div class="btn-group btn-group-toggle" id="copy-implant-invention" data-toggle="buttons" >
             <label class="btn btn-outline-secondary {% if pref.invention_copy_implant == 1.00 %}active{% endif %}">
                 <input type="radio" name="copy-implant-invention" autocomplete="off" value="1.00" {% if pref.invention_copy_implant == 1.00 %}checked{% endif %}>None
             </label>
@@ -118,7 +118,7 @@
                 {% endfor %}
             </select>
             <span class="input-group-btn">
-                <div class="btn-group" id="order-type-invention" data-toggle="buttons">
+                <div class="btn-group btn-group-toggle" id="order-type-invention" data-toggle="buttons">
                     <label class="btn btn-outline-secondary {% if pref.invention_price_type == 'sell' %}active{% endif %}">
                         <input type="radio" name="order-type-invention" autocomplete="off" value="sell" {% if pref.invention_price_type == 'sell' %}checked{% endif %}>Sell
                     </label>

@@ -33,6 +33,22 @@
         researchBlueprint.options.teImplant = {{ pref.research_te_implant }};
         researchBlueprint.options.copyImplant = {{ pref.research_copy_implant }};
 
+        researchBlueprint.options.hasCopyMaterial = {% if research_materials[5]['mats'] %}true{% else %}false{% endif %};
+        researchBlueprint.options.hasMeMaterial = {% if research_materials[4]['mats'] %}true{% else %}false{% endif %};
+        researchBlueprint.options.hasTeMaterial = {% if research_materials[3]['mats'] %}true{% else %}false{% endif %};
+        researchBlueprint.options.copyMaterialCost = {{ research_materials[5]['total'] }};
+        researchBlueprint.options.meMaterialCost = {{ research_materials[4]['total'] }};
+        researchBlueprint.options.teMaterialCost = {{ research_materials[3]['total'] }};
+
+        {% for material in manufacturing_materials -%}
+        researchBlueprint.materials.ids.push({{ material.material_id }});
+        researchBlueprint.materials.bom[{{ material.material_id }}] = {
+            id: {{ material.material.id }},
+            qtyRequiredPerRun: {{ material.quantity }},
+            price: {{ prices[material.material_id] }}
+        };
+        {%- endfor %}
+
         lb.run('researchBlueprint');
     </script>
 {% endblock %}
@@ -56,7 +72,7 @@
 
                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
                     Time Reduction Rigs<br>
-                    <div class="btn-group w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-me-rig" data-toggle="buttons">
                         <label class="btn col btn-sm btn-secondary {% if pref.research_me_rig == 0 -%}active{%- endif %}">
                             <input type="radio" name="structure-me-rig" autocomplete="off" value="0" {% if pref.research_me_rig == 0 -%}checked{%- endif %}>None
                         </label>
@@ -67,7 +83,7 @@
                             <input type="radio" name="structure-me-rig" autocomplete="off" value="2" {% if pref.research_me_rig == 2 -%}checked{%- endif %}>ME T2
                         </label>
                     </div>
-                    <div class="btn-group w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-te-rig" data-toggle="buttons">
                         <label class="btn col btn-sm btn-secondary {% if pref.research_te_rig == 0 -%}active{%- endif %}">
                             <input type="radio" name="structure-te-rig" autocomplete="off" value="0" {% if pref.research_te_rig == 0 -%}checked{%- endif %}>None
                         </label>
@@ -82,7 +98,7 @@
 
                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
                     Copy Time Rigs <br>
-                    <div class="btn-group w-100 mt-1" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-copy-rig" data-toggle="buttons" style="width:100%">
                         <label class="btn col btn-sm btn-secondary {% if pref.research_copy_rig == 0 -%}active{%- endif %}">
                             <input type="radio" name="structure-copy-rig" autocomplete="off" value="0" {% if pref.research_copy_rig == 0 -%}checked{%- endif %}>None
                         </label>
@@ -96,8 +112,23 @@
                 </div>
 
                 <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
+                    Material Rigs <br>
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-mat-rig" data-toggle="buttons" style="width:100%">
+                        <label class="btn col btn-sm btn-secondary active">
+                            <input type="radio" name="structure-mat-rig" autocomplete="off" value="0" checked>None
+                        </label>
+                        <label class="btn col btn-sm btn-secondary">
+                            <input type="radio" name="structure-mat-rig" autocomplete="off" value="1">T1
+                        </label>
+                        <label class="btn col btn-sm btn-secondary">
+                            <input type="radio" name="structure-mat-rig" autocomplete="off" value="2">T2
+                        </label>
+                    </div>
+                </div>
+
+                <div class="structure-configs mt-3" style="{% if not pref.is_structure(pref.prod_facility) -%}display: none;{%- endif %}">
                     System Security<br>
-                    <div class="btn-group w-100 mt-1" id="structure-sec-status" data-toggle="buttons" style="width:100%">
+                    <div class="btn-group btn-group-toggle w-100 mt-1" id="structure-sec-status" data-toggle="buttons" style="width:100%">
                         <label class="btn col btn-sm btn-secondary {% if pref.research_security == 'h' -%}active{%- endif %}">
                             <input type="radio" name="structure-sec-status" autocomplete="off" value="h" {% if pref.research_security == 'h' -%}checked{%- endif %}>HS
                         </label>
@@ -127,7 +158,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="card bg-light mb-5">
             <div class="card-body">
                 <div>
@@ -138,9 +169,13 @@
                     Runs/copy (max: {{ blueprint.max_production_limit }})<br>
                     <input id="run-per-copy" type="text" class="form-control form-control-sm mt-1" value="1">
                 </div>
+                <div class="mt-3">
+                    Number of production run<br>
+                    <input id="runs" type="text" class="form-control form-control-sm mt-1" value="1">
+                </div>
             </div>
         </div>
-        
+
         <div class="card bg-light mb-5">
             <div class="card-body">
                 <div>
@@ -172,7 +207,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="card bg-light mb-5">
             <div class="card-body">
                 <div class="slider">
@@ -212,14 +247,47 @@
             <div class="col-md-12">
                 <ul class="nav nav-tabs" id="tab-links" role="tablist">
                     <li class="nav-item"><a class="active nav-link" href="#me-tab">Material Efficiency</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#me-eff-tab">Cost / ME</a></li>
                     <li class="nav-item"><a class="nav-link" href="#te-tab">Time Efficiency</a></li>
                     <li class="nav-item"><a class="nav-link" href="#copy-tab">Copy</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#me-eff-tab">Cost / ME</a></li>
                 </ul>
                 <div class="tab-content">
 
                     <!-- ME Tab -->
                     <div class="fade show active tab-pane" role="tabpanel" id="me-tab">
+
+                        {% if research_materials[4]['mats'] -%}
+                        <div class="mt-4">
+                            <strong>Required items per level of material effiency research</strong><br>
+                            <table class="lb-table-sm lb-list" style="width:30%">
+                                <thead>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th class="text-right">Quantity</th>
+                                        <th class="text-right">Jita Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for material in research_materials[4]['mats'] -%}
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td><img src="{{ material['item'].icon_32()  }}" alt="{{ material['item'].name }}"></td>{%- endif %}
+                                        <td>{{ material['item'].name }}</td>
+                                        <td class="quantity">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="price">{{ material['price'] | floatcomma }}</td>
+                                    </tr>
+                                    {%- endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                        <td class="title" colspan="2">Estimate Total Price Per level</td>
+                                        <td>{{ research_materials[4]['total'] | floatcomma }}</td>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {%- endif %}
+
                         <table class="me-list lb-table-sm">
                             <thead>
                                 <tr>
@@ -227,6 +295,7 @@
                                     <th>Time</th>
                                     <th>Time from current level</th>
                                     <th>Installation Cost</th>
+                                    {% if research_materials[4]['mats'] -%}<th>Total Cost</th>{% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -236,86 +305,50 @@
                                     <td class="total">{{ me_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ me_time[level]['duration'] | duration }}</td>
                                     <td class="price">{{ me_time[level]['cost'] | floatcomma }}</td>
+                                    {% if research_materials[4]['mats'] -%}
+                                    <td class="ptotal">{{ (me_time[level]['cost'] + research_materials[4]['total']) | floatcomma }}</td>
+                                    {%- endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- Cost / ME Tab -->
-                    <div class="fade tab-pane" id="me-eff-tab">
-                        <table class="me-profit lb-table-sm">
-                            <thead>
-                                <tr>
-                                    <th style="width:30px">ME</th>
-                                    <th>
-                                        Build Cost
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Based on The Forge prices. Values may be inaccurate but the only goal is to provide a comparison between build costs for each ME level, when built in station.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-                                    </th>
-                                    <th colspan="2">Profit / ME 0%</th>
-                                    <th colspan="2">Profit / Previous ME</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for level in range(0,11) -%}
-                                <tr id="ME-profit-{{ level }}">
-                                    <td class="level">{{ level }}</td>
-                                    <td>{{ cost_per_me[level]['run'] | floatcomma }}</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_prev_me'] | floatcomma }}%</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-
-                        <table class="me-profit lb-table-sm">
-                            <thead>
-                                <tr>
-                                    <th style="width:30px">ME</th>
-                                    <th>
-                                        Build Cost (max BPC run)
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Same as build cost, but using max run to test adjusted quantities.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-                                    </th>
-                                    <th colspan="2">
-                                        Profit / ME 0% (max BPC run)
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-
-                                    </th>
-                                    <th colspan="2">
-                                        Profit / Previous ME (max BPC run)
-                                        <span class='small' data-toggle="tooltip" data-placement="top" title="This value takes adjusted quantities when building more than one item, as the game only round quantities after taking run into account.">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                        </span>
-
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for level in range(0,11) -%}
-                                <tr id="ME-profit-max-run-{{ level }}">
-                                    <td class="level">{{ level }}</td>
-                                    <td>{{ cost_per_me[level]['run'] | floatcomma }}</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_me0'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_me0'] | floatcomma }}%</td>
-                                    <td class="delta">{{ cost_per_me[level]['delta_prev_me'] | floatcomma }}</td>
-                                    <td class="price-percent">{{ cost_per_me[level]['delta_pct_prev_me'] | floatcomma }}%</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-
                     </div>
 
                     <!-- TE Tab -->
                     <div class="fade tab-pane" id="te-tab">
+
+                        {% if research_materials[3]['mats'] -%}
+                        <div class="mt-4">
+                            <strong>Required items per level of time effiency research</strong><br>
+                            <table class="lb-table-sm lb-list" style="width:30%">
+                                <thead>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th class="text-right">Quantity</th>
+                                        <th class="text-right">Jita Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for material in research_materials[3]['mats'] -%}
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td><img src="{{ material['item'].icon_32()  }}" alt="{{ material['item'].name }}"></td>{%- endif %}
+                                        <td>{{ material['item'].name }}</td>
+                                        <td class="quantity">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="price">{{ material['price'] | floatcomma }}</td>
+                                    </tr>
+                                    {%- endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                        <td class="title" colspan="2">Estimate Total Price Per level</td>
+                                        <td>{{ research_materials[3]['total'] | floatcomma }}</td>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {%- endif %}
+
                         <table class="te-list lb-table-sm">
                             <thead>
                                 <tr>
@@ -323,6 +356,7 @@
                                     <th>Time</th>
                                     <th>Time from current level</th>
                                     <th>Installation Cost</th>
+                                    {% if research_materials[3]['mats'] -%}<th>Total Cost</th>{% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -332,6 +366,9 @@
                                     <td class="total">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="price">{{ te_time[level]['cost'] | floatcomma }}</td>
+                                    {% if research_materials[3]['mats'] -%}
+                                    <td class="ptotal">{{ (te_time[level]['cost'] + research_materials[3]['total']) | floatcomma }}</td>
+                                    {%- endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -341,19 +378,90 @@
 
                     <!-- Copy Tab -->
                     <div class="fade tab-pane" id="copy-tab">
+
+                        {% if research_materials[5]['mats'] -%}
+                        <div class="mt-4">
+                            <strong>Required items per run per copy</strong><br>
+                            <table id="copy-materials" class="lb-table-sm lb-list" style="width:40%">
+                                <thead>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
+                                        <th>Name</th>
+                                        <th class="text-right">Quantity</th>
+                                        <th class="text-right">Job Qty</th>
+                                        <th class="text-right">Jita Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for material in research_materials[5]['mats'] -%}
+                                    <tr data-qty="{{ material['quantity'] }}">
+                                        {% if config.USE_CCP_ICONS -%}<td><img src="{{ material['item'].icon_32()  }}" alt="{{ material['item'].name }}"></td>{%- endif %}
+                                        <td>{{ material['item'].name }}</td>
+                                        <td class="quantity">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="quantity jobqty">{{ material['quantity'] | intcomma }}</td>
+                                        <td class="price">{{ material['price'] | floatcomma }}</td>
+                                    </tr>
+                                    {%- endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                        <td class="title" colspan="3">Estimate Total Price Per level</td>
+                                        <td class="copy-material-price">{{ research_materials[5]['total'] | floatcomma }}</td>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {%- endif %}
+
                         <table class="copy-data lb-table-sm">
                             <tr>
                                 <th>Copy time</th>
                                 <td class="copy-time">{{ activity_copy.time | duration }}</td>
                             </tr>
                             <tr>
-                                <th>Installation Cost</th>
+                                <th>Copy Installation Cost</th>
                                 {% set copy_cost = (base_cost * index_list[5] * 0.02) -%}
                                 <td class="copy-cost">{{ copy_cost | floatcomma }}</td>
                             </tr>
+                            {% if research_materials[5]['mats'] -%}
+                            <tr>
+                                <th>Total Copy Cost</th>
+                                <td class="copy-total-cost">{{ (copy_cost + research_materials[5]['total']) | floatcomma }}</td>
+                            </tr>
+                            {%- endif %}
                         </table>
                     </div>
 
+                    <!-- Cost / ME Tab -->
+                    <div class="fade tab-pane" id="me-eff-tab">
+                        <table class="me-profit lb-table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px">ME</th>
+                                    <th class="text-right">
+                                        Build Cost - <span id="nb-run">1</span> run(s)
+                                        <span class='small' data-toggle="tooltip" data-placement="top" title="Based on The Forge prices. Values may be inaccurate but the only goal is to provide a comparison between build costs for each ME level, when built in station.">
+                                            <i class="fa fa-exclamation-circle"></i>
+                                        </span>
+                                    </th>
+                                    <th colspan="2" class="text-right">Profit / ME 0%</th>
+                                    <th colspan="2" class="text-right">Profit / Previous ME</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for level in range(0,11) -%}
+                                <tr id="ME-profit-{{ level }}">
+                                    <td class="level">{{ level }}</td>
+                                    <td class="build-cost"></td>
+                                    <td class="delta me-0"></td>
+                                    <td class="price-percent me-0-percent"></td>
+                                    <td class="delta me-prev"></td>
+                                    <td class="price-percent me-prev-percent"></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -363,4 +471,3 @@
 
 
 {% endblock %}
-

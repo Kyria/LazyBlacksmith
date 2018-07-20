@@ -9,11 +9,22 @@ class Item(db.Model):
     name = db.Column(db.String(100), nullable=True)
     max_production_limit = db.Column(db.Integer, nullable=True)
     market_group_id = db.Column(db.Integer)
+    group_id = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
 
     # calculated field on import
     is_from_manufacturing = db.Column(db.Boolean(), default=True)
     is_from_reaction = db.Column(db.Boolean(), default=True)
+
+    base_cost = db.Column(
+        db.Numeric(
+            precision=17,
+            scale=2,
+            decimal_return_scale=2,
+            asdecimal=False
+        ),
+        nullable=True,
+    )
 
     # foreign keys
     activities = db.relationship(
@@ -87,3 +98,10 @@ class Item(db.Model):
 
     def is_ancient_relic(self):
         return self.category_id == 34
+
+    def is_cap_part(self):
+        """ Return if the item is a cap part / blueprint of cap part.
+
+        914 / 915 are Blueprints
+        913 / 873 are their respective items """
+        return self.group_id in [914, 915, 913, 873]

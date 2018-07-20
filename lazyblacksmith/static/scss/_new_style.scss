@@ -74,7 +74,7 @@ a.lb-nav-danger.nav-link {
     // specific format for research tabs
     &.copy-data {
         width: 300px;
-        margin: 20px auto;
+        margin-top: 20px;
         tbody td {
             text-align: right;
         }
@@ -82,7 +82,7 @@ a.lb-nav-danger.nav-link {
 
     &.me-profit {
         width: 75%;
-        margin: 20px auto;
+        margin-top: 20px;
 
         thead th {
             text-align: center;
@@ -104,20 +104,19 @@ a.lb-nav-danger.nav-link {
 
     &.te-list, &.me-list {
         width: 75%;
-        margin: 20px auto;
+        margin-top: 20px;
 
         thead th {
-            text-align: center;
+            text-align: right;
         }
 
         tbody {
             text-align: right;
             .level {
-                width: 50px;
+                width: 40px;
             };
-            .total, .delta, .price {
-                width: 33.33%; /* older browsers fallback */
-                width: calc(100% / 3);
+            .total, .delta, .price, .ptotal {
+                @extend .w-auto;
             };
         };
     }
@@ -164,4 +163,3 @@ a.lb-nav-danger.nav-link {
         };
     };
 }
-

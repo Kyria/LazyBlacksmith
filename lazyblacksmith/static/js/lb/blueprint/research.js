@@ -1,9 +1,9 @@
-var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
-    "use strict"
+var researchBlueprint = (function ($, lb, utils, eveUtils, eveData, Humanize) {
+    'use strict'
 
-    var ACTIVITY_RESEARCHING_TIME_EFFICIENCY = 3;
-    var ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY = 4;
-    var ACTIVITY_COPYING = 5;
+    var ACTIVITY_RESEARCHING_TIME_EFFICIENCY = 3
+    var ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY = 4
+    var ACTIVITY_COPYING = 5
 
     var options = {
         // base values
@@ -39,27 +39,86 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         runPerCopy: 1,
         maxRunPerCopy: 1,
         // system
-        system: "jita",
-        systemPrevious: "jita",
+        system: 'jita',
+        systemPrevious: 'jita',
+        // runsPerJob
+        runs: 1,
 
         // structure configs
         structureTeRig: 0,
         structureMeRig: 0,
         structureCopyRig: 0,
+        structureMaterialRig: 0,
         structureSecStatus: 'h',
 
-    };
+        // material configs and informations
+        hasCopyMaterial: false,
+        hasTeMaterial: false,
+        hasMeMaterial: false,
+        copyMaterialCost: 0,
+        teMaterialCost: 0,
+        meMaterialCost: 0
+    }
+
+    // list of materials
+    var materials = {
+        ids: [],
+        bom: {}
+    }
 
     $.extend(lb.urls, {
         systemUrls: false,
-        indexActivityUrl: false,
-    });
+        indexActivityUrl: false
+    })
 
     // assembly informations
-    var facilityStats = eveData.facilities;
-    var structureRigs = eveData.structureIndustryRigs;
-    var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier;
+    var facilityStats = eveData.facilities
+    var structureRigs = eveData.structureIndustryRigs
+    var structureSecStatusMultiplier = eveData.structureSecStatusMultiplier
 
+    /**
+     * Update the cost per ME table to compare ME and production cost
+     */
+    var _updateCostPerMe = function () {
+        var price = {}
+        var previousME = 0
+        for (var ME = 0; ME <= 10; ME++) {
+            price[ME] = 0.0
+            for (var i in materials.ids) {
+                var material = materials.bom[materials.ids[i]]
+
+                var qtyAdjusted = eveUtils.calculateAdjustedQuantity(
+                    material.qtyRequiredPerRun,
+                    ME,
+                    facilityStats[options.facility].bpMe,
+                    structureRigs[options.structureMaterialRig].materialBonus,
+                    structureSecStatusMultiplier[options.structureSecStatus],
+                    facilityStats[options.facility].structure
+                )
+
+                var quantityJob = eveUtils.calculateJobQuantity(
+                    qtyAdjusted,
+                    options.runs
+                )
+
+                price[ME] += quantityJob * material.price
+            }
+
+            var currentCost = price[ME]
+            var deltaMe0 = price[0] - currentCost
+            var deltaPrevMe = price[previousME] - currentCost
+            var deltaMe0Percent = (1 - currentCost / price[0]) * 100
+            var deltaPrevMePercent = (1 - currentCost / price[previousME]) * 100
+
+            $('#ME-profit-' + ME + ' .build-cost').html(Humanize.intcomma(currentCost, 2))
+            $('#ME-profit-' + ME + ' .me-0').html(Humanize.intcomma(deltaMe0, 2))
+            $('#ME-profit-' + ME + ' .me-0-percent').html(Humanize.intcomma(deltaMe0Percent, 2) + '%')
+            $('#ME-profit-' + ME + ' .me-prev').html(Humanize.intcomma(deltaPrevMe, 2))
+            $('#ME-profit-' + ME + ' .me-prev-percent').html(Humanize.intcomma(deltaPrevMePercent, 2) + '%')
+
+            previousME = ME
+        }
+    }
 
     /**
      * Get the indexes of the missing solar systems
@@ -114,8 +173,20 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             1.1
         );
 
+        var copyMaterialCostTotal = options.copyMaterialCost * options.copyNumber * options.runPerCopy;
+
         $('.copy-time').html(utils.durationToString(copyTime));
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2));
+        $('.copy-total-cost').html(Humanize.intcomma(copyCost + copyMaterialCostTotal, 2));
+
+        // update materials required for copy
+        $('#copy-materials tbody tr').each(
+            function() {
+                var qty = parseInt($(this).attr('data-qty'));
+                qty *= options.copyNumber * options.runPerCopy;
+                $(this).find('td.jobqty').html(Humanize.intcomma(qty))
+            }
+        )
     };
 
 
@@ -182,9 +253,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         $('#ME-' + level + ' .total').html(utils.durationToString(METime));
         $('#ME-' + level + ' .delta').html(utils.durationToString(METime - MEDelta));
         $('#ME-' + level + ' .price').html(Humanize.intcomma(MECost, 2));
+        $('#ME-' + level + ' .ptotal').html(Humanize.intcomma(MECost + options.meMaterialCost, 2));
         $('#TE-' + level + ' .total').html(utils.durationToString(TETime));
         $('#TE-' + level + ' .delta').html(utils.durationToString(TETime - TEDelta));
         $('#TE-' + level + ' .price').html(Humanize.intcomma(TECost, 2));
+        $('#TE-' + level + ' .ptotal').html(Humanize.intcomma(TECost + options.teMaterialCost, 2));
     };
 
 
@@ -200,12 +273,16 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         $('#run-per-copy').on('keyup', _runPerCopyOnKeyUp)
                           .on('change', _runPerCopyOnChange);
 
+        $('#runs').on('keyup', _runsOnKeyUp)
+                  .on('change', _runsOnChange);
+
 
         $('#facility').on('change', function() {
             options.facility = parseInt($('#facility').val());
             _toggleStructureConfigsDisplay(facilityStats[options.facility].structure);
             _updateResearchTimeAndCost();
             _updateCopyTimeAndCost();
+            _updateCostPerMe();
         });
 
         $('#meImplant').on('change', function() {
@@ -226,6 +303,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             options.structureSecStatus = $(this).val();
             _updateResearchTimeAndCost();
             _updateCopyTimeAndCost();
+            _updateCostPerMe();
         });
         $("#structure-te-rig input[type='radio']").on('change', function() {
             options.structureTeRig = parseInt($(this).val())
@@ -239,6 +317,11 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             options.structureCopyRig = parseInt($(this).val());
             _updateCopyTimeAndCost();
         });
+        $("#structure-mat-rig input[type='radio']").on('change', function() {
+            options.structureMaterialRig = parseInt($(this).val());
+            _updateCostPerMe();
+        });
+
 
     };
 
@@ -292,6 +375,32 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         $(this).val(options.runPerCopy);
         return false;
     };
+
+    /**
+     * Run per copy on keyup event
+     * @private
+     */
+    var _runsOnKeyUp = function(event) {
+        if(!$.isNumeric($(this).val()) || $(this).val() < 1) {
+            options.runs = 1;
+            $(this).val(options.runs);
+        } else {
+            options.runs = parseInt($(this).val());
+        }
+        $('#nb-run').html(options.runs)
+        _updateCostPerMe();
+    };
+
+
+    /**
+     * Run per copy on change event
+     * @private
+     */
+    var _runsOnChange = function(event) {
+        $(this).val(options.runs);
+        return false;
+    };
+
 
 
     /**
@@ -368,7 +477,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
      * @private
      */
     var _materialEfficiencyOnUpdate = function(value) {
-        var value = parseInt(value);
+        value = parseInt(value);
         $('#ME-Level').html(value+"%");
         options.materialEfficiency = value;
         _updateResearchTimeAndCost();
@@ -466,6 +575,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         // run one recalculation, in case we are not using default data
         _updateResearchTimeAndCost();
         _updateCopyTimeAndCost();
+        _updateCostPerMe();
     };
 
 
@@ -475,7 +585,7 @@ var researchBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     return {
         // required objects
         options: options,
-
+        materials: materials,
         // functions
         run: run,
     };

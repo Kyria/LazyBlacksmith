@@ -46,6 +46,7 @@ esisecurity = EsiSecurity(
     ),
     client_id=config.ESI_CLIENT_ID,
     secret_key=config.ESI_SECRET_KEY,
+    headers={'User-Agent': config.ESI_USER_AGENT}
 )
 esiclient = EsiClient(
     security=esisecurity,

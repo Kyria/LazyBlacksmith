@@ -4,17 +4,17 @@
 
 // colors
 
-$white:  #fff;
+$white:    #fff;
 $gray-100: #f8f9fa;
 $gray-200: #e9ecef;
 $gray-300: #dee2e6;
 $gray-400: #ced4da;
 $gray-500: #adb5bd;
-$gray-600: #868e96;
+$gray-600: #6c757d;
 $gray-700: #495057;
 $gray-800: #343a40;
 $gray-900: #212529;
-$black:  #000;
+$black:    #000;
 
 $blue:    #007bff;
 $indigo:  #6610f2;
@@ -27,33 +27,44 @@ $green:   #28a745;
 $teal:    #20c997;
 $cyan:    #17a2b8;
 
-$colors: (
-  blue: $blue,
-  indigo: $indigo,
-  purple: $purple,
-  pink: $pink,
-  red: $red,
-  orange: $orange,
-  yellow: $yellow,
-  green: $green,
-  teal: $teal,
-  cyan: $cyan,
-  white: $white,
-  gray-light: $gray-300,
-  gray: $gray-600,
-  gray-dark: $gray-800
-);
+$colors: ();
+$colors: map-merge((
+  "blue":       $blue,
+  "indigo":     $indigo,
+  "purple":     $purple,
+  "pink":       $pink,
+  "red":        $red,
+  "orange":     $orange,
+  "yellow":     $yellow,
+  "green":      $green,
+  "teal":       $teal,
+  "cyan":       $cyan,
+  "white":      $white,
+  "gray-light": $gray-300,
+  "gray":       $gray-600,
+  "gray-dark":  $gray-800
+), $colors);
 
-$theme-colors: (
-  primary: $blue,
-  secondary: $gray-600,
-  success: $green,
-  info: $cyan,
-  warning: $yellow,
-  danger: $red,
-  light: $gray-100,
-  dark: $gray-800
-);
+$primary:       $blue;
+$secondary:     $gray-600;
+$success:       $green;
+$info:          $cyan;
+$warning:       $yellow;
+$danger:        $red;
+$light:         $gray-100;
+$dark:          $gray-800;
+
+$theme-colors: ();
+$theme-colors: map-merge((
+  "primary":    $primary,
+  "secondary":  $secondary,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
+  "light":      $light,
+  "dark":       $dark
+), $theme-colors);
 
 // size helper
 $sizes: (
@@ -68,27 +79,39 @@ $sizes: (
   '80': 80%,
   '100': 100%
 );
-
+$sizes: ();
+$sizes: map-merge((
+  10: 10%,
+  20: 20%,
+  25: 25%,
+  30: 30%,
+  40: 40%,
+  50: 50%,
+  60: 60%,
+  75: 75%,
+  80: 80%,
+  100: 100%,
+  auto: auto
+), $sizes);
 
 // Options
 //
 // Quickly modify global styling by enabling or disabling optional features.
-
+$enable-caret:              true;
 $enable-rounded:            true;
 $enable-shadows:            false;
 $enable-gradients:          false;
 $enable-transitions:        true;
-$enable-hover-media-query:  false;
 $enable-grid-classes:       true;
 $enable-print-styles:       true;
 
 // reduce spacer from 1rem
-$spacer: .5rem;
+$spacer: .5rem; //1rem !default;
 
 // fonts
 $font-size-base: 1rem;
-$font-size-lg:   1.25rem;
-$font-size-sm:   .825rem;
+$font-size-lg:   1.25rem; // ($font-size-base * 1.25) !default;
+$font-size-sm:   .825rem; // ($font-size-base * .875) !default;
 $line-height-base: 1.44; // 1.5
 
 // cards
@@ -96,6 +119,6 @@ $card-spacer-y: .55rem; // default 0.75
 $card-spacer-x: 1.25rem; // default 1.25
 
 // table
-$table-accent-bg: rgba($black,.035);
-$table-border-color: $gray-300;
-$table-cell-padding-sm: .4rem;
+$table-accent-bg: rgba($black,.035); //rgba($black, .05) !default;
+$table-border-color: $gray-300;  // $gray-300 !default;
+$table-cell-padding-sm: .4rem; // .3rem !default;

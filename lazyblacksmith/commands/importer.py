@@ -8,12 +8,9 @@ from lazyblacksmith.models import ActivityProduct
 from lazyblacksmith.models import ActivitySkill
 from lazyblacksmith.models import Constellation
 from lazyblacksmith.models import Decryptor
-from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import Item
-from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import OreRefining
 from lazyblacksmith.models import Region
-from lazyblacksmith.models import Skill
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import db
 
@@ -123,9 +120,10 @@ class Importer(object):
                 , i.typeName
                 , ib.maxProductionLimit
                 , i.marketGroupID
+                , i.groupID
                 , ig.categoryID
-                , iap.typeID
-                , iap2.typeID
+                , iap.typeID            as manufacturing_bp
+                , iap2.typeID           as reaction_bp
             FROM invTypes i
             LEFT JOIN industryBlueprints ib
                 ON ib.typeID = i.typeID
@@ -147,20 +145,28 @@ class Importer(object):
         for item in items:
             item_list.append(item.id)
 
-        # for each item from SDE, check valid data and check if it doesn't exist yet in our db
+        # for each item from SDE, check valid data
+        # and check if it doesn't exist yet in our db
         for id, data in bulk_data.items():
             total += 1
 
             if not data[0]:
-                continue
+                # do not change items that already exist but bugged in SDE
+                if id in item_list:
+                    item_list.remove(id)
+                    continue
+                else:
+                    nameFix = "Unknown Name SDE"
+
 
             item = {
-                'name': data[0],
+                'name': data[0] or nameFix,
                 'max_production_limit': int(data[1]) if data[1] else None,
                 'market_group_id': int(data[2]) if data[2] else None,
-                'category_id': int(data[3]) if data[3] else None,
-                'is_from_manufacturing': (data[4] is not None),
-                'is_from_reaction': (data[5] is not None),
+                'group_id': int(data[3]) if data[3] else None,
+                'category_id': int(data[4]) if data[4] else None,
+                'is_from_manufacturing': (data[5] is not None),
+                'is_from_reaction': (data[6] is not None),
             }
 
             if id in item_list:

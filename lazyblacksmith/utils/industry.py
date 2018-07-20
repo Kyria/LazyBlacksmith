@@ -14,6 +14,9 @@ SKILL_RESEARCH = 3403
 SKILL_METALLURGY = 3409
 SKILL_REACTIONS = 45746
 
+# outpost construction, capital ship construction
+IGNORED_PROD_SKILLS = [3400, 22242]
+
 
 def get_skill_data(skill, char):
     """ return formatted skill data to be used in the template """
