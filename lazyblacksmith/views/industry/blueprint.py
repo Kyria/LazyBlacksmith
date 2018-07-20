@@ -110,11 +110,13 @@ def manufacturing(item_id, me=0, te=0):
 
     # is any of the materials manufactured ?
     has_manufactured_components = False
+    has_cap_part_components = False
 
     for material in materials:
         if material.material.is_from_manufacturing:
             has_manufactured_components = True
-            break
+        if material.material.is_cap_part():
+            has_cap_part_components = True
 
     return render_template('blueprint/manufacturing.html', **{
         'blueprint': item,
@@ -123,6 +125,7 @@ def manufacturing(item_id, me=0, te=0):
         'product': product,
         'regions': get_regions(),
         'has_manufactured_components': has_manufactured_components,
+        'has_cap_part_components': has_cap_part_components,
         't2_manufacturing_skill': t2_manufacturing_skill,
         'science_skill': science_skill,
         'industry_skills': get_common_industry_skill(char),
