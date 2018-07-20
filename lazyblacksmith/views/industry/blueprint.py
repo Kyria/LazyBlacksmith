@@ -228,9 +228,9 @@ def research(item_id):
 
     # get materials for all activities except manuf/reaction
     research_materials = {
-        Activity.COPYING: {'total': 0, 'mats': {}},
-        Activity.RESEARCH_TIME_EFFICIENCY: {'total': 0, 'mats': {}},
-        Activity.RESEARCH_MATERIAL_EFFICIENCY: {'total': 0, 'mats': {}},
+        Activity.COPYING: {'total': 0, 'mats': []},
+        Activity.RESEARCH_TIME_EFFICIENCY: {'total': 0, 'mats': []},
+        Activity.RESEARCH_MATERIAL_EFFICIENCY: {'total': 0, 'mats': []},
     }
 
     for material in research_activity_materials:
@@ -245,11 +245,12 @@ def research(item_id):
             else:
                 mat_price = mat_price.sell_price
 
-            research_materials[material.activity]['mats'][material.material_id] = {
+            research_materials[material.activity]['mats'].append({
+                'id': material.material_id,
                 'quantity': material.quantity,
                 'item': mat_item,
                 'price': mat_price
-            }
+            })
             research_materials[material.activity]['total'] += (
                 material.quantity * mat_price)
 

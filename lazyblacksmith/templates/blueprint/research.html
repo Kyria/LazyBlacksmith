@@ -269,9 +269,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for id, material in research_materials[4]['mats'].items() -%}
+                                    {% for material in research_materials[4]['mats'] -%}
                                     <tr>
-                                        {% if config.USE_CCP_ICONS -%}<td>{{ material['item'].icon_32() }}</td>{%- endif %}
+                                        {% if config.USE_CCP_ICONS -%}<td><img src="{{ material['item'].icon_32()  }}" alt="{{ material['item'].name }}"></td>{%- endif %}
                                         <td>{{ material['item'].name }}</td>
                                         <td class="quantity">{{ material['quantity'] | intcomma }}</td>
                                         <td class="price">{{ material['price'] | floatcomma }}</td>
@@ -330,9 +330,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for id, material in research_materials[3]['mats'].items() -%}
+                                    {% for material in research_materials[3]['mats'] -%}
                                     <tr>
-                                        {% if config.USE_CCP_ICONS -%}<td>{{ material['item'].icon_32() }}</td>{%- endif %}
+                                        {% if config.USE_CCP_ICONS -%}<td><img src="{{ material['item'].icon_32()  }}" alt="{{ material['item'].name }}"></td>{%- endif %}
                                         <td>{{ material['item'].name }}</td>
                                         <td class="quantity">{{ material['quantity'] | intcomma }}</td>
                                         <td class="price">{{ material['price'] | floatcomma }}</td>
@@ -366,7 +366,7 @@
                                     <td class="total">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="delta">{{ te_time[level]['duration'] | duration }}</td>
                                     <td class="price">{{ te_time[level]['cost'] | floatcomma }}</td>
-                                    {% if research_materials[4]['mats'] -%}
+                                    {% if research_materials[3]['mats'] -%}
                                     <td class="ptotal">{{ (te_time[level]['cost'] + research_materials[3]['total']) | floatcomma }}</td>
                                     {%- endif %}
                                 </tr>
@@ -393,9 +393,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for id, material in research_materials[5]['mats'].items() -%}
+                                    {% for material in research_materials[5]['mats'] -%}
                                     <tr data-qty="{{ material['quantity'] }}">
-                                        {% if config.USE_CCP_ICONS -%}<td>{{ material['item'].icon_32() }}</td>{%- endif %}
+                                        {% if config.USE_CCP_ICONS -%}<td><img src="{{ material['item'].icon_32()  }}" alt="{{ material['item'].name }}"></td>{%- endif %}
                                         <td>{{ material['item'].name }}</td>
                                         <td class="quantity">{{ material['quantity'] | intcomma }}</td>
                                         <td class="quantity jobqty">{{ material['quantity'] | intcomma }}</td>
@@ -439,7 +439,7 @@
                                 <tr>
                                     <th style="width:30px">ME</th>
                                     <th class="text-right">
-                                        Build Cost - <span id="nb-run">1</span> run(s) 
+                                        Build Cost - <span id="nb-run">1</span> run(s)
                                         <span class='small' data-toggle="tooltip" data-placement="top" title="Based on The Forge prices. Values may be inaccurate but the only goal is to provide a comparison between build costs for each ME level, when built in station.">
                                             <i class="fa fa-exclamation-circle"></i>
                                         </span>

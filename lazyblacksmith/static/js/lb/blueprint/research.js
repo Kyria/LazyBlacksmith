@@ -80,7 +80,7 @@ var researchBlueprint = (function ($, lb, utils, eveUtils, eveData, Humanize) {
      * Update the cost per ME table to compare ME and production cost
      */
     var _updateCostPerMe = function () {
-        var price = {};
+        var price = {}
         var previousME = 0
         for (var ME = 0; ME <= 10; ME++) {
             price[ME] = 0.0
@@ -303,6 +303,7 @@ var researchBlueprint = (function ($, lb, utils, eveUtils, eveData, Humanize) {
             options.structureSecStatus = $(this).val();
             _updateResearchTimeAndCost();
             _updateCopyTimeAndCost();
+            _updateCostPerMe();
         });
         $("#structure-te-rig input[type='radio']").on('change', function() {
             options.structureTeRig = parseInt($(this).val())
