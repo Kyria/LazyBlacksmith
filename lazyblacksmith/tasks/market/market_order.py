@@ -127,8 +127,8 @@ def task_update_region_order_price(self, region_id, item_id_list):
         if response.status != 200:
             fail = True
             logger.error('Request failed [%s, %s, %d]: %s' % (
-                req[0].url,
-                req[0].query,
+                req.url,
+                req.query,
                 response.status,
                 response.raw,
             ))
