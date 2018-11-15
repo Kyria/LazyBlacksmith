@@ -35,7 +35,7 @@ class LbAdmin(Command):
             ).one_or_none()
 
             if user is None:
-                print "The character %s does not exist" % add
+                print("The character %s does not exist" % add)
                 return
 
             user.is_admin = True
@@ -46,15 +46,15 @@ class LbAdmin(Command):
             ).one_or_none()
 
             if user is None:
-                print "The character %s does not exist" % delete
+                print("The character %s does not exist" % delete)
                 return
 
             user.is_admin = False
 
         else:
-            print "You either need to set --add or --delete parameter"
+            print("You either need to set --add or --delete parameter")
             return
 
         db.session.merge(user)
         db.session.commit()
-        print "Character %s status has been changed." % user.character_name
+        print("Character %s status has been changed." % user.character_name)

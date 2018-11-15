@@ -39,7 +39,7 @@ class Importer(object):
         """
         if sde_connection is not None:
             # sqlite3 UTF drama workaround
-            sde_connection.text_factory = lambda x: unicode(x, "utf-8", "ignore")
+            sde_connection.text_factory = lambda x: str(x, "utf-8", "ignore")
             self.sde_cursor = sde_connection.cursor()
 
         self.lb_engine = lb_engine
@@ -49,22 +49,22 @@ class Importer(object):
         Trace function that show time used for each functions
         """
         start = time.time()
-        print '=> %s:' % text,
+        print('=> %s: ' % text, end='')
         sys.stdout.flush()
 
         added, total, comment = f()
 
         if comment:
-            print '%d/%d (%0.2fs) [%s]' % (added, total, time.time() - start, comment)
+            print('%d/%d (%0.2fs) [%s]' % (added, total, time.time() - start, comment))
         else:
-            print '%d/%d (%0.2fs)' % (added, total, time.time() - start)
+            print('%d/%d (%0.2fs)' % (added, total, time.time() - start))
 
     def import_all(self):
         """
         Import all tables from SDE using the IMPORT_ORDER to launch import functions
         """
-        print "\nIMPORT ALL TABLES"
-        print "================="
+        print("\nIMPORT ALL TABLES")
+        print("=================")
         for table in self.IMPORT_ORDER:
             self.import_table(table[0].__name__.lower())
 
@@ -78,7 +78,7 @@ class Importer(object):
         """
         Delete the content of the given table in the LB database
         """
-        print "Deleting rows from %s " % table
+        print("Deleting rows from %s " % table)
         self.lb_engine.execute("DELETE FROM %s" % table)
 
     def delete_all(self):
@@ -86,8 +86,8 @@ class Importer(object):
         Delete the content of all tables in LB Database using IMPORT_ORDER to
         determine dependencies.
         """
-        print "\nDELETE ALL TABLES"
-        print "================="
+        print("\nDELETE ALL TABLES")
+        print("=================")
         delete_order = list(self.IMPORT_ORDER)
         delete_order.reverse()
         for table in delete_order:
