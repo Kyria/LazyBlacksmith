@@ -88,12 +88,16 @@ var searchBlueprint = (function ($, lb, utils) {
                                              .replace(/@@NAME@@/, 'Manufacture')
                                              .replace(/@@ICON@@/, '<i class="fa fa-industry" aria-hidden="true"></i>');
 
-                htmlResult += '<tr><td>' + data[item].name + '</td>';
+                htmlResult += '<tr><td>' + data[item].name + '</td><td class="text-right"><div class="btn-group" role="group">';
                 if(!data[item].reaction) {
-                    htmlResult += '<td class="text-right"><div class="btn-group" role="group">' + invention  + research + manufacturing + '</div></td></tr>';
+                    htmlResult += invention;
+                    if(!data[item].relic) {
+                        htmlResult += research + manufacturing;
+                    }
                 } else {
-                    htmlResult += '<td class="text-right"><div class="btn-group" role="group">' + reaction + '</div></td></tr>';
+                    htmlResult += reaction;
                 }
+                htmlResult += '</div></td></tr>';
             }
 
             // display result

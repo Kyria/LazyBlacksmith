@@ -19,7 +19,7 @@
         inventionBlueprint.options.copyImplant = {{ pref.invention_copy_implant }};
 
         inventionBlueprint.indexes['{{ pref.invention_system|lower }}'] = {};
-        {% for activity, index in index_list.iteritems() -%}
+        {% for activity, index in index_list.items() -%}
         inventionBlueprint.indexes['{{ pref.invention_system|lower }}'][{{ activity }}] = {{ index }};
         {% endfor %}
 
@@ -201,7 +201,7 @@
                 {% for skill in datacore_skills %}
                 <div class="slider">
                     {{ skill.name }}
-                    (<span id="datacore1-display">{{ skill.level }}</span>)<br>
+                    (<span id="datacore{{loop.index}}-display">{{ skill.level }}</span>)<br>
                     <div id="datacore{{loop.index}}-level"></div>
                 </div>
                 {% endfor %}

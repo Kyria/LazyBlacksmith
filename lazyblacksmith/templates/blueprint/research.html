@@ -12,7 +12,7 @@
         researchBlueprint.options.maxRunPerCopy = {{ blueprint.max_production_limit }};
 
         researchBlueprint.options.indexes['{{ pref.research_system|lower }}'] = {};
-        {% for activity, index in index_list.iteritems() -%}
+        {% for activity, index in index_list.items() -%}
         researchBlueprint.options.indexes['{{ pref.research_system|lower }}'][{{ activity }}] = {{ index }};
         {% endfor %}
 

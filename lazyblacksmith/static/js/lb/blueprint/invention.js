@@ -496,17 +496,17 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
             case 'encryption-level':
                 options.encryptionLevel = value;
-                $('#encryption-level-display').html(value);
+                $('#encryption-display').html(value);
                 break;
 
             case 'datacore1-level':
                 options.datacoreLevel1 = value;
-                $('#datacore1-level-display').html(value);
+                $('#datacore1-display').html(value);
                 break;
 
             case 'datacore2-level':
                 options.datacoreLevel2 = value;
-                $('#datacore2-level-display').html(value);
+                $('#datacore2-display').html(value);
                 break;
         };
         _updateInventionData();

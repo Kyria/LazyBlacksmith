@@ -78,7 +78,8 @@ def blueprint_search(name):
                     'id': bp.id,
                     'name': bp.name,
                     'invention': invention,
-                    'reaction': reaction
+                    'reaction': reaction,
+                    'relic': bp.category_id == 34,
                 })
 
             # cache for 7 day as it does not change that often
@@ -173,7 +174,7 @@ def blueprint_bom(blueprint_id):
                     'price_region': price_region,
                 })
 
-        return jsonify(result=data.values())
+        return jsonify(result=list(data.values()))
 
     else:
         return 'Cannot call this page directly', 403

@@ -206,7 +206,7 @@ def research(item_id):
 
     me_time = {}
     te_time = {}
-    for level in xrange(1, 11):
+    for level in range(1, 11):
         # time
         level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)
         me_duration = activity_material.time * level_modifier
