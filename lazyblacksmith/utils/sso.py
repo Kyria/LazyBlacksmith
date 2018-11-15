@@ -11,8 +11,8 @@ from flask_login import logout_user
 from requests.utils import quote
 from requests.utils import unquote
 from sqlalchemy.orm.exc import NoResultFound
-from urlparse import urljoin
-from urlparse import urlparse
+from urllib.parse import urlparse
+from urllib.parse import urljoin
 
 from lazyblacksmith.models import Skill
 from lazyblacksmith.models import TokenScope
@@ -67,12 +67,12 @@ def check_get_user(id, owner_hash, in_login=False):
 def login_user_oauth(cdata, auth_response):
     """ Login the user and update his data """
     user = check_get_user(
-        cdata['CharacterID'],
-        cdata['CharacterOwnerHash'],
+        cdata['sub'].split(':')[2],
+        cdata['owner'],
         True
     )
-    user.character_owner_hash = cdata['CharacterOwnerHash']
-    user.character_name = cdata['CharacterName']
+    user.character_owner_hash = cdata['owner']
+    user.character_name = cdata['name']
 
     try:
         db.session.merge(user)
@@ -99,11 +99,11 @@ def add_scopes(cdata, auth_response, scopes, current_user):
     """ Add a new scope to a logged user """
     # get or create the character
     user = check_get_user(
-        cdata['CharacterID'],
-        cdata['CharacterOwnerHash'],
+        cdata['sub'].split(':')[2],
+        cdata['owner'],
     )
-    user.character_owner_hash = cdata['CharacterOwnerHash']
-    user.character_name = cdata['CharacterName']
+    user.character_owner_hash = cdata['owner']
+    user.character_name = cdata['name']
 
     # if it's a new, let's federate him with the main one
     if current_user.character_id != user.character_id:
@@ -118,7 +118,8 @@ def add_scopes(cdata, auth_response, scopes, current_user):
         db.session.merge(token_scope)
         try:
             db.session.commit()
-        except:
+        except Exception as e:
+            logger.error(e)
             db.session.rollback()
 
     flash('You have successfully added new scopes')
@@ -183,7 +184,7 @@ def build_state_token(**kwargs):
         'scopes': scopes,
         'token': token,
     })
-    b64_json = base64.urlsafe_b64encode(json_string)
+    b64_json = base64.urlsafe_b64encode(json_string.encode('utf-8'))
     return quote(b64_json)
 
 
@@ -204,5 +205,5 @@ def generate_token():
     """Generates a non-guessable OAuth token """
     chars = ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
     rand = random.SystemRandom()
-    random_string = ''.join(rand.choice(chars) for _ in range(40))
-    return hmac.new(config.SECRET_KEY, random_string, hashlib.sha256).hexdigest()
+    random_string = ''.join(rand.choice(chars) for _ in range(40)).encode('utf-8')
+    return hmac.new(config.SECRET_KEY.encode('utf-8'), random_string, hashlib.sha256).hexdigest()
