@@ -46,8 +46,10 @@ def search():
             ),
         ).outerjoin(
             ActivityProduct,
-            ((Blueprint.item_id == ActivityProduct.item_id) &
-             (ActivityProduct.activity == Activity.INVENTION))
+            (Blueprint.item_id == ActivityProduct.item_id) & (
+                (ActivityProduct.activity == Activity.INVENTION) |
+                (ActivityProduct.activity == Activity.REACTIONS)
+            )
         ).options(
             db.contains_eager(Blueprint.item)
             .contains_eager(Item.activity_products__eager)

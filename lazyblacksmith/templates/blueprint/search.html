@@ -42,7 +42,9 @@
                         {% for blueprint in blueprints -%}
                         <tr class="blueprint-{% if blueprint.corporation %}corporation{% else %}character{% endif %}" style="{% if blueprint.corporation %}display:none{% endif %}">
                             <td class="name">
-                                {% if blueprint.original %}
+                                {% if blueprint.item.activity_products__eager and blueprint.item.activity_products__eager[0].activity == 11 %}
+                                    <span class="badge badge-success">REA</span>
+                                {% elif blueprint.original %}
                                     <span class="badge badge-primary">BPO</span>
                                 {% else %}
                                     <span class="badge badge-warning">BPC</span>
