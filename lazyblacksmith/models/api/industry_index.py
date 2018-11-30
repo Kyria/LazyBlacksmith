@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from . import db
-from lazyblacksmith.models import Activity
+from lazyblacksmith.models.enums import ActivityEnum
 
 
 class IndustryIndex(db.Model):
@@ -23,14 +23,14 @@ class IndustryIndex(db.Model):
     @classmethod
     def activity_string_to_activity(cls, activity_string):
         if activity_string == 'invention':
-            return Activity.INVENTION
+            return ActivityEnum.INVENTION.id
         if activity_string == 'manufacturing':
-            return Activity.MANUFACTURING
+            return ActivityEnum.MANUFACTURING.id
         if activity_string == 'researching_time_efficiency':
-            return Activity.RESEARCH_TIME_EFFICIENCY
+            return ActivityEnum.RESEARCH_TIME_EFFICIENCY.id
         if activity_string == 'researching_material_efficiency':
-            return Activity.RESEARCH_MATERIAL_EFFICIENCY
+            return ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id
         if activity_string == 'copying':
-            return Activity.COPYING
+            return ActivityEnum.COPYING.id
         if activity_string == 'reaction':
-            return Activity.REACTIONS
+            return ActivityEnum.REACTIONS.id

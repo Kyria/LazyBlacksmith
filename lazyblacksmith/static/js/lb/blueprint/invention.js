@@ -1,9 +1,6 @@
 var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     "use strict"
 
-    var ACTIVITY_COPYING = 5;
-    var ACTIVITY_INVENTION = 8;
-
     var options = {
         blueprintId: 0,
         // base values
@@ -187,7 +184,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
         var inventionCost = eveUtils.calculateInventionCost(
             options.inventionBaseCost,
-            indexes[options.system][ACTIVITY_INVENTION],
+            indexes[options.system][eveData.activity.invention],
             options.runs,
             1.1
         );
@@ -207,7 +204,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
         var copyCost = eveUtils.calculateCopyInstallationCost(
             options.copyBaseCost,
-            indexes[options.system][ACTIVITY_COPYING],
+            indexes[options.system][eveData.activity.copy],
             options.runs,
             1,
             1.1
@@ -309,14 +306,14 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             var outputCost = outputPrices[outputME];
             var inventionCost = eveUtils.calculateInventionCost(
                 options.inventionBaseCost,
-                indexes[options.system][ACTIVITY_INVENTION],
+                indexes[options.system][eveData.activity.invention],
                 options.runs,
                 1.1
             );
 
             var copyCost = eveUtils.calculateCopyInstallationCost(
                 options.copyBaseCost,
-                indexes[options.system][ACTIVITY_COPYING],
+                indexes[options.system][eveData.activity.copy],
                 options.runs,
                 1,
                 1.1

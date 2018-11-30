@@ -1,8 +1,6 @@
 var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     "use strict";
 
-    var ACTIVITY_REACTIONS = 11;
-
     // template variables
     var tplSublistBlock = '';
     var tplSublistRow = '';
@@ -823,7 +821,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
         // set the main blueprint
         var taxPrice = _calculateBaseCost(materialsData.productItemId);
-        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].factorySystem][ACTIVITY_REACTIONS];
+        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].factorySystem][eveData.activity.reaction];
         totalInstallationCost += taxPrice;
 
         var output = rowTax.replace(/@@ICON@@/g, materialsData.materials[materialsData.productItemId].icon)
@@ -837,7 +835,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
             if(material.isManufactured || material.isFromReaction) {
                 var taxPrice = _calculateBaseCost(material.id);
-                taxPrice *= 1.1 * costIndex[material.factorySystem][ACTIVITY_REACTIONS];
+                taxPrice *= 1.1 * costIndex[material.factorySystem][eveData.activity.reaction];
 
                 output += rowTax.replace(/@@ICON@@/g, material.icon)
                                 .replace(/@@NAME@@/g, material.name)

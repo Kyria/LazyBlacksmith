@@ -11,6 +11,8 @@ import flask_login
 # helpers
 from lazyblacksmith.utils.template_filter import templatefilter
 from lazyblacksmith.utils.time import utcnow
+from lazyblacksmith.utils.context_processor import inject_user
+from lazyblacksmith.utils.context_processor import inject_enums
 
 # db
 from lazyblacksmith.models import TokenScope
@@ -122,12 +124,8 @@ def register_before_requests(app):
 
 def register_context_processors(app):
     """Register context_processor functions."""
-    def inject_user():
-        try:
-            return {'user': g.user}
-        except AttributeError:
-            return {'user': None}
     app.context_processor(inject_user)
+    app.context_processor(inject_enums)
 
 
 def register_teardown_appcontext(app):

@@ -18,6 +18,7 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import db
+from lazyblacksmith.models.enums import ActivityEnum
 
 
 ajax_eve_sde = Blueprint('ajax_eve_sde', __name__)
@@ -47,8 +48,8 @@ def blueprint_search(name):
                 ActivityProduct,
                 (
                     (Item.id == ActivityProduct.item_id) & (
-                        (ActivityProduct.activity == Activity.INVENTION) |
-                        (ActivityProduct.activity == Activity.REACTIONS)
+                        (ActivityProduct.activity == ActivityEnum.INVENTION.id) |
+                        (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
                     )
                 )
             ).options(
@@ -67,11 +68,11 @@ def blueprint_search(name):
                 if bp.activity_products__eager:
                     invention = (
                         bp.activity_products__eager[0].activity ==
-                        Activity.INVENTION
+                        ActivityEnum.INVENTION.id
                     )
                     reaction = (
                         bp.activity_products__eager[0].activity ==
-                        Activity.REACTIONS
+                        ActivityEnum.REACTIONS.id
                     )
 
                 data.append({
@@ -107,8 +108,8 @@ def blueprint_bom(blueprint_id):
         blueprints = ActivityMaterial.query.filter(
             ActivityMaterial.item_id == blueprint_id,
             (
-                (ActivityMaterial.activity == Activity.MANUFACTURING) |
-                (ActivityMaterial.activity == Activity.REACTIONS)
+                (ActivityMaterial.activity == ActivityEnum.MANUFACTURING.id) |
+                (ActivityMaterial.activity == ActivityEnum.REACTIONS.id)
             )
         ).all()
 
@@ -119,21 +120,21 @@ def blueprint_bom(blueprint_id):
             try:
                 product = bp.material.product_for_activities
                 product = product.filter(
-                    (ActivityProduct.activity == Activity.MANUFACTURING) |
-                    (ActivityProduct.activity == Activity.REACTIONS)
+                    (ActivityProduct.activity == ActivityEnum.MANUFACTURING.id) |
+                    (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
                 ).one()
                 bp_final = product.blueprint
             except NoResultFound:
                 continue
 
             activity = bp_final.activities.filter(
-                (Activity.activity == Activity.MANUFACTURING) |
-                (Activity.activity == Activity.REACTIONS)
+                (Activity.activity == ActivityEnum.MANUFACTURING.id) |
+                (Activity.activity == ActivityEnum.REACTIONS.id)
             ).one()
 
             mats = bp_final.activity_materials.filter(
-                (ActivityMaterial.activity == Activity.MANUFACTURING) |
-                (ActivityMaterial.activity == Activity.REACTIONS)
+                (ActivityMaterial.activity == ActivityEnum.MANUFACTURING.id) |
+                (ActivityMaterial.activity == ActivityEnum.REACTIONS.id)
             ).all()
 
             if bp_final.id not in data:
@@ -243,7 +244,7 @@ def build_cost_item(material_efficiency, blueprint_id, region_id):
     """
     material_list = ActivityMaterial.query.filter_by(
         item_id=blueprint_id,
-        activity=Activity.MANUFACTURING
+        activity=ActivityEnum.MANUFACTURING.id
     ).all()
 
     me_list = material_efficiency.split(',')
