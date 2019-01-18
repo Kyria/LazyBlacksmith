@@ -25,6 +25,7 @@ ajax_eve_sde = Blueprint('ajax_eve_sde', __name__)
 
 
 @ajax_eve_sde.route('/blueprint/search/<string:name>', methods=['GET'])
+@cache.memoize(timeout=3600 * 24 * 7, unless=is_not_ajax)
 def blueprint_search(name):
     """
     Return JSON result for a specific search
@@ -37,57 +38,47 @@ def blueprint_search(name):
         if name_lower == '%' * len(name_lower):
             return jsonify(result=[])
 
-        cache_key = 'blueprint:search:%s' % (name_lower.replace(" ", ""),)
-
-        data = cache.get(cache_key)
-        if data is None:
-            blueprints = Item.query.filter(
-                Item.name.ilike('%' + name_lower + '%'),
-                Item.max_production_limit.isnot(None)
-            ).outerjoin(
-                ActivityProduct,
-                (
-                    (Item.id == ActivityProduct.item_id) & (
-                        (ActivityProduct.activity == ActivityEnum.INVENTION.id) |
-                        (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
-                    )
+        blueprints = Item.query.filter(
+            Item.name.ilike('%' + name_lower + '%'),
+            Item.max_production_limit.isnot(None)
+        ).outerjoin(
+            ActivityProduct,
+            (
+                (Item.id == ActivityProduct.item_id) & (
+                    (ActivityProduct.activity == ActivityEnum.INVENTION.id) |
+                    (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
                 )
-            ).options(
-                db.contains_eager(Item.activity_products__eager)
-            ).order_by(
-                Item.name.asc()
-            ).all()
+            )
+        ).options(
+            db.contains_eager(Item.activity_products__eager)
+        ).order_by(
+            Item.name.asc()
+        ).all()
 
-            data = []
-            for bp in blueprints:
-                invention = False
-                reaction = False
+        data = []
+        for bp in blueprints:
+            invention = False
+            reaction = False
 
-                # we can't have invention AND reaction
-                # at the same time as product.
-                if bp.activity_products__eager:
-                    invention = (
-                        bp.activity_products__eager[0].activity ==
-                        ActivityEnum.INVENTION.id
-                    )
-                    reaction = (
-                        bp.activity_products__eager[0].activity ==
-                        ActivityEnum.REACTIONS.id
-                    )
+            # we can't have invention AND reaction
+            # at the same time as product.
+            if bp.activity_products__eager:
+                invention = (
+                    bp.activity_products__eager[0].activity ==
+                    ActivityEnum.INVENTION.id
+                )
+                reaction = (
+                    bp.activity_products__eager[0].activity ==
+                    ActivityEnum.REACTIONS.id
+                )
 
-                data.append({
-                    'id': bp.id,
-                    'name': bp.name,
-                    'invention': invention,
-                    'reaction': reaction,
-                    'relic': bp.category_id == 34,
-                })
-
-            # cache for 7 day as it does not change that often
-            cache.set(cache_key, json.dumps(data), 24 * 3600 * 7)
-
-        else:
-            data = json.loads(data)
+            data.append({
+                'id': bp.id,
+                'name': bp.name,
+                'invention': invention,
+                'reaction': reaction,
+                'relic': bp.is_ancient_relic(),
+            })
 
         return jsonify(result=data)
     else:
@@ -95,7 +86,6 @@ def blueprint_search(name):
 
 
 @ajax_eve_sde.route('/blueprint/bom/<int:blueprint_id>', methods=['GET'])
-@cache.memoize(timeout=3600 * 24 * 7, unless=is_not_ajax)
 def blueprint_bom(blueprint_id):
     """
     Return JSON with the list of all bill of material for
@@ -115,41 +105,48 @@ def blueprint_bom(blueprint_id):
 
         data = OrderedDict()
         for bp in blueprints:
+            cache_key = 'blueprint:bom:%d' % (bp.item_id,)
+            data = cache.get(cache_key)
 
-            # As some item cannot be manufactured, catch the exception
-            try:
-                product = bp.material.product_for_activities
-                product = product.filter(
-                    (ActivityProduct.activity == ActivityEnum.MANUFACTURING.id) |
-                    (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
+            if not data:
+                # As some item cannot be manufactured, catch the exception
+                try:
+                    product = bp.material.product_for_activities
+                    product = product.filter(
+                        (ActivityProduct.activity == ActivityEnum.MANUFACTURING.id) |
+                        (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
+                    ).one()
+                    bp_final = product.blueprint
+                except NoResultFound:
+                    continue
+    
+                activity = bp_final.activities.filter(
+                    (Activity.activity == ActivityEnum.MANUFACTURING.id) |
+                    (Activity.activity == ActivityEnum.REACTIONS.id)
                 ).one()
-                bp_final = product.blueprint
-            except NoResultFound:
-                continue
-
-            activity = bp_final.activities.filter(
-                (Activity.activity == ActivityEnum.MANUFACTURING.id) |
-                (Activity.activity == ActivityEnum.REACTIONS.id)
-            ).one()
-
-            mats = bp_final.activity_materials.filter(
-                (ActivityMaterial.activity == ActivityEnum.MANUFACTURING.id) |
-                (ActivityMaterial.activity == ActivityEnum.REACTIONS.id)
-            ).all()
-
-            if bp_final.id not in data:
-                data[bp_final.id] = {
-                    'id': bp_final.id,
-                    'icon': bp_final.icon_32(),
-                    'name': bp_final.name,
-                    'materials': [],
-                    'time': activity.time,
-                    'product_id': bp.material.id,
-                    'product_name': bp.material.name,
-                    'product_qty_per_run': product.quantity,
-                    'max_run_per_bp': bp_final.max_production_limit,
-                }
-
+    
+                mats = bp_final.activity_materials.filter(
+                    (ActivityMaterial.activity == ActivityEnum.MANUFACTURING.id) |
+                    (ActivityMaterial.activity == ActivityEnum.REACTIONS.id)
+                ).all()
+    
+                if bp_final.id not in data:
+                    data[bp_final.id] = {
+                        'id': bp_final.id,
+                        'icon': bp_final.icon_32(),
+                        'name': bp_final.name,
+                        'materials': [],
+                        'time': activity.time,
+                        'product_id': bp.material.id,
+                        'product_name': bp.material.name,
+                        'product_qty_per_run': product.quantity,
+                        'max_run_per_bp': bp_final.max_production_limit,
+                    }
+             
+                # cache for 7 day as it does not change that often
+                cache.set(cache_key, data, 24 * 3600 * 7)
+    
+    
             for mat in mats:
                 pref = current_user.pref
 
@@ -198,6 +195,7 @@ def solarsystems():
 
 
 @ajax_eve_sde.route('/item/search/<string:name>', methods=['GET'])
+@cache.memoize(timeout=3600 * 24 * 7, unless=is_not_ajax)
 def item_search(name):
     """
     Return JSON result for a specific search
