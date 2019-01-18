@@ -105,47 +105,41 @@ def blueprint_bom(blueprint_id):
 
         data = OrderedDict()
         for bp in blueprints:
-            cache_key = 'blueprint:bom:%d' % (bp.item_id,)
-            data = cache.get(cache_key)
-
-            if not data:
-                # As some item cannot be manufactured, catch the exception
-                try:
-                    product = bp.material.product_for_activities
-                    product = product.filter(
-                        (ActivityProduct.activity == ActivityEnum.MANUFACTURING.id) |
-                        (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
-                    ).one()
-                    bp_final = product.blueprint
-                except NoResultFound:
-                    continue
-    
-                activity = bp_final.activities.filter(
-                    (Activity.activity == ActivityEnum.MANUFACTURING.id) |
-                    (Activity.activity == ActivityEnum.REACTIONS.id)
+            # As some item cannot be manufactured, catch the exception
+            try:
+                product = bp.material.product_for_activities
+                product = product.filter(
+                    (ActivityProduct.activity == ActivityEnum.MANUFACTURING.id) |
+                    (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
                 ).one()
-    
-                mats = bp_final.activity_materials.filter(
-                    (ActivityMaterial.activity == ActivityEnum.MANUFACTURING.id) |
-                    (ActivityMaterial.activity == ActivityEnum.REACTIONS.id)
-                ).all()
-    
-                if bp_final.id not in data:
-                    data[bp_final.id] = {
-                        'id': bp_final.id,
-                        'icon': bp_final.icon_32(),
-                        'name': bp_final.name,
-                        'materials': [],
-                        'time': activity.time,
-                        'product_id': bp.material.id,
-                        'product_name': bp.material.name,
-                        'product_qty_per_run': product.quantity,
-                        'max_run_per_bp': bp_final.max_production_limit,
-                    }
+                bp_final = product.blueprint
+            except NoResultFound:
+                continue
+
+            activity = bp_final.activities.filter(
+                (Activity.activity == ActivityEnum.MANUFACTURING.id) |
+                (Activity.activity == ActivityEnum.REACTIONS.id)
+            ).one()
+
+            mats = bp_final.activity_materials.filter(
+                (ActivityMaterial.activity == ActivityEnum.MANUFACTURING.id) |
+                (ActivityMaterial.activity == ActivityEnum.REACTIONS.id)
+            ).all()
+
+            if bp_final.id not in data:
+                data[bp_final.id] = {
+                    'id': bp_final.id,
+                    'icon': bp_final.icon_32(),
+                    'name': bp_final.name,
+                    'volume': bp.material.volume,
+                    'materials': [],
+                    'time': activity.time,
+                    'product_id': bp.material.id,
+                    'product_name': bp.material.name,
+                    'product_qty_per_run': product.quantity,
+                    'max_run_per_bp': bp_final.max_production_limit,
+                }
              
-                # cache for 7 day as it does not change that often
-                cache.set(cache_key, data, 24 * 3600 * 7)
-    
     
             for mat in mats:
                 pref = current_user.pref
@@ -167,6 +161,7 @@ def blueprint_bom(blueprint_id):
                     'id': mat.material.id,
                     'name': mat.material.name,
                     'quantity': mat.quantity,
+                    'volume': mat.material.volume,
                     'icon': mat.material.icon_32(),
                     'price_type': price_type,
                     'price_region': price_region,

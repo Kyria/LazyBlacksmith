@@ -105,7 +105,8 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
                 materialList[material.id] = materialList[material.id] || {
                     qty: 0,
                     name: material.name,
-                    icon: material.icon
+                    icon: material.icon,
+                    volume: material.volume
                 }
                 materialList[material.id].qty += material.qtyJob
             } else {
@@ -114,7 +115,8 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
                     materialList[subMaterial.id] = materialList[subMaterial.id] || {
                         qty: 0,
                         name: subMaterial.name,
-                        icon: subMaterial.icon
+                        icon: subMaterial.icon,
+                        volume: subMaterial.volume
                     }
                     materialList[subMaterial.id].qty += subMaterial.qtyJob
                 }
@@ -229,6 +231,7 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
                 material.blueprint_icon = tmpMaterial['icon']
                 material.runsPerJob = tmpMaterial['max_run_per_bp']
                 material.maxRunPerBp = tmpMaterial['max_run_per_bp']
+                material.volume = tmpMaterial['volume']
 
                 // quantity and runs
                 material.resultQtyPerRun = tmpMaterial['product_qty_per_run']
@@ -268,7 +271,8 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
                         'icon': tmpSubMaterial['icon'],
                         'qtyRequiredPerRun': tmpSubMaterial['quantity'],
                         'priceType': tmpSubMaterial['price_type'],
-                        'priceRegion': tmpSubMaterial['price_region']
+                        'priceRegion': tmpSubMaterial['price_region'],
+                        'volume': tmpSubMaterial['volume']
                     }
 
                     subMaterial.qtyAdjusted = eveUtils.calculateAdjustedQuantity(
@@ -700,17 +704,24 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
         if (options.useIcons) {
             iconColumn = '<td class="icon"><img src="@@ICON@@" alt="@@NAME@@" /></td>'
         }
-        var rowMaterial = '<tr>' + iconColumn + '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td></tr>'
+        var rowMaterial = '<tr>' + iconColumn
+        rowMaterial += '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td>'
+        rowMaterial += '<td class="quantity">@@VOLUME@@</td><td class="quantity">@@TOTAL_VOLUME@@</td></tr>'
         var output = ''
         multiBuy = ''
 
+        var globalVolume = 0.0
         for (var id in materialQuantityList) {
+            var totalVolume = materialQuantityList[id].volume * materialQuantityList[id].qty
+            globalVolume += totalVolume
             output += rowMaterial.replace(/@@ICON@@/g, materialQuantityList[id].icon)
                                  .replace(/@@NAME@@/g, materialQuantityList[id].name)
                                  .replace(/@@QTY@@/g, Humanize.intcomma(materialQuantityList[id].qty))
+                                 .replace(/@@VOLUME@@/g, Humanize.intcomma(materialQuantityList[id].volume, 2))
+                                 .replace(/@@TOTAL_VOLUME@@/g, Humanize.intcomma(totalVolume, 2))
             multiBuy += materialQuantityList[id].name + ' ' + materialQuantityList[id].qty + '\n'
         }
-
+        $('#materials-requirement #mat-total-volume').html(Humanize.intcomma(globalVolume, 2))
         $('#materials-requirement tbody').html(output)
     }
 

@@ -11,6 +11,7 @@ class Item(db.Model):
     market_group_id = db.Column(db.Integer)
     group_id = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
+    volume = db.Column(db.Numeric(precision=16, scale=4, decimal_return_scale=4, asdecimal=False), nullable=True)
 
     # calculated field on import
     is_from_manufacturing = db.Column(db.Boolean(), default=True)

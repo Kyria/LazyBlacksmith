@@ -32,6 +32,35 @@ class Importer(object):
         (Constellation, UPDATE),
         (SolarSystem, UPDATE),
     ]
+    
+    PACKAGED = { # groupID: Volume
+        25: 2500,    # frigate
+        26: 10000,   # cruiser
+        27: 50000,   # battleship
+        28: 20000,   # industrial
+        31: 500,     # shuttle
+        324: 2500,   # assault ship
+        358: 10000,  # heavy assault ship
+        380: 20000,  # transport ship
+        419: 15000,  # battlecruiser
+        420: 5000,   # destroyer
+        463: 3750,   # mining barge
+        540: 15000,  # command ship
+        541: 5000,   # interdictor
+        543: 3750,   # exhumer
+        830: 2500,   # covert ops
+        831: 2500,   # interceptor
+        832: 10000,  # logistics
+        833: 10000,  # force recon
+        834: 2500,   # stealth bomber
+        893: 2500,   # electronic attack ship
+        894: 10000,  # heavy interdictor
+        898: 50000,  # black ops
+        900: 50000,  # marauder
+        906: 10000,  # combat recon
+        963: 5000,   # strategic cruiser
+    }
+
 
     def __init__(self, sde_connection, lb_engine):
         """
@@ -124,6 +153,7 @@ class Importer(object):
                 , ig.categoryID
                 , iap.typeID            as manufacturing_bp
                 , iap2.typeID           as reaction_bp
+                , i.volume
             FROM invTypes i
             LEFT JOIN industryBlueprints ib
                 ON ib.typeID = i.typeID
@@ -167,6 +197,7 @@ class Importer(object):
                 'category_id': int(data[4]) if data[4] else None,
                 'is_from_manufacturing': (data[5] is not None),
                 'is_from_reaction': (data[6] is not None),
+                'volume': (Importer.PACKAGED.get(int(data[3]), float(data[7])))
             }
 
             if id in item_list:
