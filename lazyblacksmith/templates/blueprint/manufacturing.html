@@ -24,6 +24,7 @@
             'qtyRequiredPerRun': {{ product.quantity }},
             'qtyAdjusted': {{ product.quantity }},
             'qtyJob': {{ product.quantity }},
+            'volume': {{ product.product.volume }},
             'timePerRun': {{ activity.time }},
             'timeTotal': {{ activity.time }},
             'name': '{{ product.product.name }}',
@@ -59,6 +60,7 @@
             'qtyRequiredPerRun': {{ material.quantity }},
             'qtyAdjusted': {{ material.quantity }},
             'qtyJob': {{ material.quantity }},
+            'volume': {{ material.material.volume }},
             'timePerRun': 0,
             'timeTotal': 0,
             'runs': -1,
@@ -350,12 +352,21 @@
                                 <tr>
                                     {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
                                     <th>Name</th>
-                                    <th>Quantity</th>
+                                    <th class="text-right">Quantity</th>
+                                    <th class="text-right">Volume (m&sup3;)</th>
+                                    <th class="text-right">Total Volume</th>
                                 </tr>
                             </thead>
                             <tbody>
 
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Total Volume</td>
+                                    <td id="mat-total-volume"></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
 

@@ -51,7 +51,7 @@ def update_adjusted_price():
         )
         db.engine.execute(
             ItemAdjustedPrice.__table__.insert(),
-            item_adjusted_price.values()
+            list(item_adjusted_price.values())
         )
         db.session.commit()
         return item_adjusted_price

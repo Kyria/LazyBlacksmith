@@ -32,6 +32,35 @@ class Importer(object):
         (Constellation, UPDATE),
         (SolarSystem, UPDATE),
     ]
+    
+    PACKAGED = { # groupID: Volume
+        25: 2500,    # frigate
+        26: 10000,   # cruiser
+        27: 50000,   # battleship
+        28: 20000,   # industrial
+        31: 500,     # shuttle
+        324: 2500,   # assault ship
+        358: 10000,  # heavy assault ship
+        380: 20000,  # transport ship
+        419: 15000,  # battlecruiser
+        420: 5000,   # destroyer
+        463: 3750,   # mining barge
+        540: 15000,  # command ship
+        541: 5000,   # interdictor
+        543: 3750,   # exhumer
+        830: 2500,   # covert ops
+        831: 2500,   # interceptor
+        832: 10000,  # logistics
+        833: 10000,  # force recon
+        834: 2500,   # stealth bomber
+        893: 2500,   # electronic attack ship
+        894: 10000,  # heavy interdictor
+        898: 50000,  # black ops
+        900: 50000,  # marauder
+        906: 10000,  # combat recon
+        963: 5000,   # strategic cruiser
+    }
+
 
     def __init__(self, sde_connection, lb_engine):
         """
@@ -39,7 +68,7 @@ class Importer(object):
         """
         if sde_connection is not None:
             # sqlite3 UTF drama workaround
-            sde_connection.text_factory = lambda x: unicode(x, "utf-8", "ignore")
+            sde_connection.text_factory = lambda x: str(x, "utf-8", "ignore")
             self.sde_cursor = sde_connection.cursor()
 
         self.lb_engine = lb_engine
@@ -49,22 +78,22 @@ class Importer(object):
         Trace function that show time used for each functions
         """
         start = time.time()
-        print '=> %s:' % text,
+        print('=> %s: ' % text, end='')
         sys.stdout.flush()
 
         added, total, comment = f()
 
         if comment:
-            print '%d/%d (%0.2fs) [%s]' % (added, total, time.time() - start, comment)
+            print('%d/%d (%0.2fs) [%s]' % (added, total, time.time() - start, comment))
         else:
-            print '%d/%d (%0.2fs)' % (added, total, time.time() - start)
+            print('%d/%d (%0.2fs)' % (added, total, time.time() - start))
 
     def import_all(self):
         """
         Import all tables from SDE using the IMPORT_ORDER to launch import functions
         """
-        print "\nIMPORT ALL TABLES"
-        print "================="
+        print("\nIMPORT ALL TABLES")
+        print("=================")
         for table in self.IMPORT_ORDER:
             self.import_table(table[0].__name__.lower())
 
@@ -78,7 +107,7 @@ class Importer(object):
         """
         Delete the content of the given table in the LB database
         """
-        print "Deleting rows from %s " % table
+        print("Deleting rows from %s " % table)
         self.lb_engine.execute("DELETE FROM %s" % table)
 
     def delete_all(self):
@@ -86,8 +115,8 @@ class Importer(object):
         Delete the content of all tables in LB Database using IMPORT_ORDER to
         determine dependencies.
         """
-        print "\nDELETE ALL TABLES"
-        print "================="
+        print("\nDELETE ALL TABLES")
+        print("=================")
         delete_order = list(self.IMPORT_ORDER)
         delete_order.reverse()
         for table in delete_order:
@@ -124,6 +153,7 @@ class Importer(object):
                 , ig.categoryID
                 , iap.typeID            as manufacturing_bp
                 , iap2.typeID           as reaction_bp
+                , i.volume
             FROM invTypes i
             LEFT JOIN industryBlueprints ib
                 ON ib.typeID = i.typeID
@@ -167,6 +197,7 @@ class Importer(object):
                 'category_id': int(data[4]) if data[4] else None,
                 'is_from_manufacturing': (data[5] is not None),
                 'is_from_reaction': (data[6] is not None),
+                'volume': (Importer.PACKAGED.get(int(data[3]), float(data[7])))
             }
 
             if id in item_list:

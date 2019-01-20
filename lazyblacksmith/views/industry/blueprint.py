@@ -19,6 +19,7 @@ from lazyblacksmith.models import Region
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import User
 from lazyblacksmith.models import db
+from lazyblacksmith.models.enums import ActivityEnum
 from lazyblacksmith.utils.industry import IGNORED_PROD_SKILLS
 from lazyblacksmith.utils.industry import calculate_base_cost
 from lazyblacksmith.utils.industry import calculate_build_cost
@@ -46,8 +47,10 @@ def search():
             ),
         ).outerjoin(
             ActivityProduct,
-            ((Blueprint.item_id == ActivityProduct.item_id) &
-             (ActivityProduct.activity == Activity.INVENTION))
+            (Blueprint.item_id == ActivityProduct.item_id) & (
+                (ActivityProduct.activity == ActivityEnum.INVENTION.id) |
+                (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
+            )
         ).options(
             db.contains_eager(Blueprint.item)
             .contains_eager(Item.activity_products__eager)
@@ -80,18 +83,18 @@ def manufacturing(item_id, me=0, te=0):
         abort(404)
 
     activity = item.activities.filter_by(
-        activity=Activity.MANUFACTURING
+        activity=ActivityEnum.MANUFACTURING.id
     ).one()
     materials = item.activity_materials.filter_by(
-        activity=Activity.MANUFACTURING
+        activity=ActivityEnum.MANUFACTURING.id
     )
     product = item.activity_products.filter_by(
-        activity=Activity.MANUFACTURING
+        activity=ActivityEnum.MANUFACTURING.id
     ).one()
 
     # get science skill name, if applicable
     manufacturing_skills = item.activity_skills.filter_by(
-        activity=Activity.MANUFACTURING,
+        activity=ActivityEnum.MANUFACTURING.id,
     ).filter(
         ActivitySkill.skill_id != 3380  # industry
     )
@@ -144,15 +147,15 @@ def research(item_id):
         abort(404)
 
     activity_material = item.activities.filter_by(
-        activity=Activity.RESEARCH_MATERIAL_EFFICIENCY
+        activity=ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id
     ).one()
 
     activity_time = item.activities.filter_by(
-        activity=Activity.RESEARCH_TIME_EFFICIENCY
+        activity=ActivityEnum.RESEARCH_TIME_EFFICIENCY.id
     ).one()
 
     activity_copy = item.activities.filter_by(
-        activity=Activity.COPYING
+        activity=ActivityEnum.COPYING.id
     ).one()
 
     research_activity_materials = item.activity_materials.all()
@@ -162,9 +165,9 @@ def research(item_id):
         IndustryIndex.solarsystem_id == SolarSystem.id,
         SolarSystem.name == current_user.pref.research_system,
         IndustryIndex.activity.in_([
-            Activity.COPYING,
-            Activity.RESEARCH_MATERIAL_EFFICIENCY,
-            Activity.RESEARCH_TIME_EFFICIENCY,
+            ActivityEnum.COPYING.id,
+            ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id,
+            ActivityEnum.RESEARCH_TIME_EFFICIENCY.id,
         ])
     )
     index_list = {}
@@ -173,7 +176,7 @@ def research(item_id):
 
     # get materials and prices
     manufacturing_materials = item.activity_materials.filter_by(
-        activity=Activity.MANUFACTURING
+        activity=ActivityEnum.MANUFACTURING.id
     ).all()
 
     prices = {}
@@ -206,18 +209,18 @@ def research(item_id):
 
     me_time = {}
     te_time = {}
-    for level in xrange(1, 11):
+    for level in range(1, 11):
         # time
         level_modifier = (250 * 2**(1.25 * level - 2.5) / 105)
         me_duration = activity_material.time * level_modifier
         te_duration = activity_time.time * level_modifier
         me_cost = (
             item.base_cost * 0.02 * level_modifier * 1.1 *
-            index_list[Activity.RESEARCH_MATERIAL_EFFICIENCY]
+            index_list[ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id]
         )
         te_cost = (
             item.base_cost * 0.02 * level_modifier * 1.1 *
-            index_list[Activity.RESEARCH_TIME_EFFICIENCY]
+            index_list[ActivityEnum.RESEARCH_TIME_EFFICIENCY.id]
         )
 
         me_time[level] = {
@@ -231,9 +234,9 @@ def research(item_id):
 
     # get materials for all activities except manuf/reaction
     research_materials = {
-        Activity.COPYING: {'total': 0, 'mats': []},
-        Activity.RESEARCH_TIME_EFFICIENCY: {'total': 0, 'mats': []},
-        Activity.RESEARCH_MATERIAL_EFFICIENCY: {'total': 0, 'mats': []},
+        ActivityEnum.COPYING.id: {'total': 0, 'mats': []},
+        ActivityEnum.RESEARCH_TIME_EFFICIENCY.id: {'total': 0, 'mats': []},
+        ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id: {'total': 0, 'mats': []},
     }
 
     for material in research_activity_materials:
@@ -285,11 +288,11 @@ def invention(item_id):
 
     # global activity
     activity_copy = item.activities.filter_by(
-        activity=Activity.COPYING
+        activity=ActivityEnum.COPYING.id
     ).first()
 
     invention_skills = item.activity_skills.filter_by(
-        activity=Activity.INVENTION
+        activity=ActivityEnum.INVENTION.id
     ).all()
 
     # copy stuff
@@ -297,7 +300,7 @@ def invention(item_id):
     if activity_copy is not None:
         # copy base cost, as it's different from the invention
         materials = item.activity_materials.filter_by(
-            activity=Activity.MANUFACTURING
+            activity=ActivityEnum.MANUFACTURING.id
         )
         copy_base_cost = calculate_base_cost(materials)
 
@@ -316,9 +319,9 @@ def invention(item_id):
 
     # calculate baseCost for invention
     materials = item.activity_products.filter_by(
-        activity=Activity.INVENTION
+        activity=ActivityEnum.INVENTION.id
     ).first().product.activity_materials.filter_by(
-        activity=Activity.MANUFACTURING
+        activity=ActivityEnum.MANUFACTURING.id
     )
     invention_base_cost = calculate_base_cost(materials)
 
@@ -327,8 +330,8 @@ def invention(item_id):
         IndustryIndex.solarsystem_id == SolarSystem.id,
         SolarSystem.name == current_user.pref.invention_system,
         IndustryIndex.activity.in_([
-            Activity.COPYING,
-            Activity.INVENTION,
+            ActivityEnum.COPYING.id,
+            ActivityEnum.INVENTION.id,
         ])
     )
 
@@ -344,7 +347,7 @@ def invention(item_id):
         'blueprint': item,
         'activity_copy': activity_copy,
         'activity_invention': item.activities.filter_by(
-            activity=Activity.INVENTION
+            activity=ActivityEnum.INVENTION.id
         ).one(),
         'copy_base_cost': copy_base_cost,
         'invention_base_cost': invention_base_cost,
@@ -353,10 +356,10 @@ def invention(item_id):
         'encryption_skill': encryption_skill,
         'index_list': index_list,
         'invention_materials': item.activity_materials.filter_by(
-            activity=Activity.INVENTION
+            activity=ActivityEnum.INVENTION.id
         ).all(),
         'invention_products': item.activity_products.filter_by(
-            activity=Activity.INVENTION
+            activity=ActivityEnum.INVENTION.id
         ).all(),
         'regions': get_regions(),
         'industry_skills': get_common_industry_skill(char),
@@ -373,13 +376,13 @@ def reaction(item_id):
         abort(404)
 
     activity = item.activities.filter_by(
-        activity=Activity.REACTIONS
+        activity=ActivityEnum.REACTIONS.id
     ).one()
     materials = item.activity_materials.filter_by(
-        activity=Activity.REACTIONS
+        activity=ActivityEnum.REACTIONS.id
     )
     product = item.activity_products.filter_by(
-        activity=Activity.REACTIONS
+        activity=ActivityEnum.REACTIONS.id
     ).one()
 
     return render_template('blueprint/reaction.html', **{

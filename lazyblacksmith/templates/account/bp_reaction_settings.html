@@ -182,10 +182,10 @@
             <span class="input-group-btn">
                 <div class="btn-group btn-group-toggle" id="order-type-reaction" data-toggle="buttons">
                     <label class="btn btn-outline-secondary {% if pref.reaction_price_type == 'sell' %}active{% endif %}">
-                        <input type="radio" name="order-type-reaction" autocomplete="off" value="sell" {% if pref.reaction_price_type_pi == 'sell' %}checked{% endif %}>Sell
+                        <input type="radio" name="order-type-reaction" autocomplete="off" value="sell" {% if pref.reaction_price_type == 'sell' %}checked{% endif %}>Sell
                     </label>
                     <label class="btn btn-outline-secondary {% if pref.reaction_price_type == 'buy' %}active{% endif %}">
-                        <input type="radio" name="order-type-reaction" autocomplete="off" value="buy" {% if pref.reaction_price_type_pi == 'buy' %}checked{% endif %}>Buy
+                        <input type="radio" name="order-type-reaction" autocomplete="off" value="buy" {% if pref.reaction_price_type == 'buy' %}checked{% endif %}>Buy
                     </label>
                 </div>
             </span>

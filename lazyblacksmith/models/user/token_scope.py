@@ -24,9 +24,9 @@ class TokenScope(db.Model):
         primary_key=True
     )
     user = db.relationship('User', backref=db.backref('tokens'))
-    scope = db.Column(db.String(100), primary_key=True)
+    scope = db.Column(db.String(250), primary_key=True)
 
-    access_token = db.Column(db.String(100))
+    access_token = db.Column(db.String(4096))
     access_token_expires = db.Column(UTCDateTime(timezone=True))
     refresh_token = db.Column(db.String(100))
     last_update = db.Column(UTCDateTime(timezone=True))

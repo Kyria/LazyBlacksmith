@@ -1,10 +1,6 @@
 var researchBlueprint = (function ($, lb, utils, eveUtils, eveData, Humanize) {
     'use strict'
 
-    var ACTIVITY_RESEARCHING_TIME_EFFICIENCY = 3
-    var ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY = 4
-    var ACTIVITY_COPYING = 5
-
     var options = {
         // base values
         baseCost: 0,
@@ -167,7 +163,7 @@ var researchBlueprint = (function ($, lb, utils, eveUtils, eveData, Humanize) {
 
         var copyCost = eveUtils.calculateCopyInstallationCost(
             options.baseCost,
-            options.indexes[options.system][ACTIVITY_COPYING],
+            options.indexes[options.system][eveData.activity.copy],
             options.copyNumber,
             options.runPerCopy,
             1.1
@@ -212,7 +208,7 @@ var researchBlueprint = (function ($, lb, utils, eveUtils, eveData, Humanize) {
             );
             var MECost = eveUtils.calculateResearchInstallationCost(
                 options.baseCost,
-                options.indexes[options.system][ACTIVITY_RESEARCHING_MATERIAL_EFFICIENCY],
+                options.indexes[options.system][eveData.activity.me],
                 level,
                 1.1
             );
@@ -229,7 +225,7 @@ var researchBlueprint = (function ($, lb, utils, eveUtils, eveData, Humanize) {
             );
             var TECost = eveUtils.calculateResearchInstallationCost(
                 options.baseCost,
-                options.indexes[options.system][ACTIVITY_RESEARCHING_TIME_EFFICIENCY],
+                options.indexes[options.system][eveData.activity.te],
                 level,
                 1.1
             );

@@ -40,18 +40,18 @@ class SdeImport(Command):
 
         if clear:
             importer = Importer(None, db.engine)
-            print "Starting SDE Data cleanup"
+            print("Starting SDE Data cleanup")
             importer.delete_all()
-            print "\nCleanup : Done"
+            print("\nCleanup : Done")
             return
 
         importer = Importer(self.create_sde_engine(database), db.engine)
 
         # do import, as all step have been verified :)
-        print "Starting SDE Import..."
+        print("Starting SDE Import...")
         importer.delete_all()
         importer.import_all()
-        print "\nSDE Import : Done"
+        print("\nSDE Import : Done")
         return
 
     def create_sde_engine(self, database):

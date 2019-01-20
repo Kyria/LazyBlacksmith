@@ -1,8 +1,6 @@
 var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
     "use strict";
 
-    var ACTIVITY_REACTIONS = 11;
-
     // template variables
     var tplSublistBlock = '';
     var tplSublistRow = '';
@@ -106,7 +104,8 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
                 materialList[material.id] = materialList[material.id] || {
                     qty: 0,
                     name: material.name,
-                    icon: material.icon
+                    icon: material.icon,
+                    volume: material.volume
                 };
                 materialList[material.id].qty += material.qtyJob;
 
@@ -116,7 +115,8 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
                     materialList[subMaterial.id] = materialList[subMaterial.id] || {
                         qty: 0,
                         name: subMaterial.name,
-                        icon: subMaterial.icon
+                        icon: subMaterial.icon,
+                        volume: subMaterial.volume
                     };
                     materialList[subMaterial.id].qty += subMaterial.qtyJob;
                 }
@@ -231,10 +231,11 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
                 var material = materialsData.materials[tmpMaterial['product_id']];
                 var secStatusMultiplier = (material.isManufactured) ? structureSecStatusMultiplier : refinerySecStatusMultiplier;
 
-                material.blueprint_id = tmpMaterial['id'];
-                material.blueprint_name = tmpMaterial['name'];
-                material.blueprint_icon = tmpMaterial['icon'];
-                material.maxRunPerBp = tmpMaterial['max_run_per_bp'];
+                material.blueprint_id = tmpMaterial['id']
+                material.blueprint_name = tmpMaterial['name']
+                material.blueprint_icon = tmpMaterial['icon']
+                material.maxRunPerBp = tmpMaterial['max_run_per_bp']
+                material.volume = tmpMaterial['volume']
 
                 // quantity and runs
                 material.resultQtyPerRun = tmpMaterial['product_qty_per_run'];
@@ -283,6 +284,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
                         'qtyRequiredPerRun': tmpSubMaterial['quantity'],
                         'priceType': tmpSubMaterial['price_type'],
                         'priceRegion': tmpSubMaterial['price_region'],
+                        'volume': tmpSubMaterial['volume']
                     };
 
                     subMaterial.qtyAdjusted = eveUtils.calculateAdjustedQuantity(
@@ -747,17 +749,25 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         if(options.useIcons) {
             iconColumn = '<td class="icon"><img src="@@ICON@@" alt="@@NAME@@" /></td>';
         }
-        var rowMaterial = '<tr>' + iconColumn + '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td></tr>';
+        var rowMaterial = '<tr>' + iconColumn
+        rowMaterial += '<td>@@NAME@@</td><td class="quantity">@@QTY@@</td>'
+        rowMaterial += '<td class="quantity">@@VOLUME@@</td><td class="quantity">@@TOTAL_VOLUME@@</td></tr>'
         var output = "";
         multiBuy = '';
 
-        for(var id in materialQuantityList) {
+        var globalVolume = 0.0
+        for (var id in materialQuantityList) {
+            var totalVolume = materialQuantityList[id].volume * materialQuantityList[id].qty
+            globalVolume += totalVolume
+            
             output += rowMaterial.replace(/@@ICON@@/g, materialQuantityList[id].icon)
                                  .replace(/@@NAME@@/g, materialQuantityList[id].name)
-                                 .replace(/@@QTY@@/g, Humanize.intcomma(materialQuantityList[id].qty));
-            multiBuy += materialQuantityList[id].name + " " + materialQuantityList[id].qty + "\n";
+                                 .replace(/@@QTY@@/g, Humanize.intcomma(materialQuantityList[id].qty))
+                                 .replace(/@@VOLUME@@/g, Humanize.intcomma(materialQuantityList[id].volume, 2))
+                                 .replace(/@@TOTAL_VOLUME@@/g, Humanize.intcomma(totalVolume, 2))
+            multiBuy += materialQuantityList[id].name + ' ' + materialQuantityList[id].qty + '\n'
         }
-
+        $('#materials-requirement #mat-total-volume').html(Humanize.intcomma(globalVolume, 2))
         $('#materials-requirement tbody').html(output);
     }
 
@@ -823,7 +833,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
         // set the main blueprint
         var taxPrice = _calculateBaseCost(materialsData.productItemId);
-        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].factorySystem][ACTIVITY_REACTIONS];
+        taxPrice *= 1.1 * costIndex[materialsData.materials[materialsData.productItemId].factorySystem][eveData.activity.reaction];
         totalInstallationCost += taxPrice;
 
         var output = rowTax.replace(/@@ICON@@/g, materialsData.materials[materialsData.productItemId].icon)
@@ -837,7 +847,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
             if(material.isManufactured || material.isFromReaction) {
                 var taxPrice = _calculateBaseCost(material.id);
-                taxPrice *= 1.1 * costIndex[material.factorySystem][ACTIVITY_REACTIONS];
+                taxPrice *= 1.1 * costIndex[material.factorySystem][eveData.activity.reaction];
 
                 output += rowTax.replace(/@@ICON@@/g, material.icon)
                                 .replace(/@@NAME@@/g, material.name)

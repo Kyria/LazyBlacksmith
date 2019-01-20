@@ -216,7 +216,7 @@ def save_item_prices(item_list):
         )
         db.engine.execute(
             update_stmt,
-            item_list['update'].values()
+            list(item_list['update'].values())
         )
 
     # check if we have any insert to do
@@ -224,7 +224,7 @@ def save_item_prices(item_list):
         # execute inserts
         db.engine.execute(
             ItemPrice.__table__.insert(),
-            item_list['insert'].values()
+            list(item_list['insert'].values())
         )
 
     db.session.commit()

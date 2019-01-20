@@ -39,7 +39,7 @@ if __name__ == '__main__':
             from flask_debugtoolbar import DebugToolbarExtension
             DebugToolbarExtension(APP)
         except ImportError:
-            print "Library 'flask-debugtoolbar' is missing. Please install it using 'pip'"
+            print("Library 'flask-debugtoolbar' is missing. Please install it using 'pip'")
             sys.exit()
 
     APP.run(port=config.PORT, host=config.HOST)

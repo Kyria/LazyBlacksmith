@@ -23,6 +23,7 @@
             'qtyRequiredPerRun': {{ product.quantity }},
             'qtyAdjusted': {{ product.quantity }},
             'qtyJob': {{ product.quantity }},
+            'volume': {{ product.product.volume }},
             'timePerRun': {{ activity.time }},
             'effectiveTimePerRun': {{ activity.time }},
             'timeTotal': {{ activity.time }},
@@ -50,6 +51,7 @@
             'qtyRequiredPerRun': {{ material.quantity }},
             'qtyAdjusted': {{ material.quantity }},
             'qtyJob': {{ material.quantity }},
+            'volume': {{ material.material.volume }},
             'timePerRun': 0,
             'timeTotal': 0,
             'effectiveTimePerRun': 0,
@@ -273,15 +275,14 @@
                             <button class="btn btn-outline-secondary btn-sm" id="multibuy" data-toggle="tooltip" data-placement="bottom" title="Copy to clipboard - Multibuy">
                                 <i class="fa fa-clipboard" aria-hidden="true"></i>
                             </button>
-
                             <span class="raw-component-btn">
-                                <span id="raw-components" data-toggle="buttons">
+                                <span id="raw-components" class="btn-group-toggle" data-toggle="buttons">
                                     <label class="btn btn-danger btn-sm m-0">
                                         <input type="checkbox" autocomplete="off">
                                         Raw components: <span class="state">NO</span>
                                     </label>
                                 </span>
-                                <span id="build-fuel" data-toggle="buttons">
+                                <span id="build-fuel" class="btn-group-toggle" data-toggle="buttons">
                                     <label class="btn btn-success btn-sm m-0 active">
                                         <input type="checkbox" autocomplete="off" checked>
                                         Build Fuel: <span class="state">Main Reaction</span>
@@ -294,12 +295,21 @@
                                 <tr>
                                     {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}
                                     <th>Name</th>
-                                    <th>Quantity</th>
+                                    <th class="text-right">Quantity</th>
+                                    <th class="text-right">Volume (m&sup3;)</th>
+                                    <th class="text-right">Total Volume</th>
                                 </tr>
                             </thead>
                             <tbody>
 
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    {% if config.USE_CCP_ICONS -%}<td>&nbsp;</td>{%- endif %}
+                                    <td colspan="3" class="title">Total Volume</td>
+                                    <td id="mat-total-volume"></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
 
@@ -525,7 +535,7 @@
 
                             <div class="modal-structure-configs mt-3">
                                 System Security<br>
-                                <div class="btn-group w-100 mt-1" id="modal-structure-sec-status" data-toggle="buttons">
+                                <div class="btn-group btn-group-toggle w-100 mt-1" id="modal-structure-sec-status" data-toggle="buttons">
                                     <label class="btn col btn-sm btn-secondary manufacturing-strct">
                                         <input type="radio" name="modal-structure-sec-status" autocomplete="off" value="h">HS
                                     </label>
@@ -548,7 +558,7 @@
                                 Runs Per Batch<br>
                                 <div class="input-group mt-1">
                                     <input id="modalRunsPerJob" type="text" class="form-control form-control-sm" value="1">
-                                    <span class="input-group-btn" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
+                                    <span class="btn-group-toggle" data-toggle="buttons" id="toggleMaxRunPerBpcModal">
                                         <label class="btn btn-secondary btn-sm m-0">
                                             <input type="checkbox" autocomplete="off">Max Run/30d
                                         </label>

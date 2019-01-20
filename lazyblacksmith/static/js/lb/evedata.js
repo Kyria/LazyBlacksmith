@@ -166,6 +166,15 @@ var eveData = (function () {
             '0.95': 'SC-805'
         }
     }
+    var activity = {
+        'none': 0,
+        'manufacturing': 1,
+        'te': 3,
+        'me': 4,
+        'copy': 5,
+        'invention': 8,
+        'reaction': 11
+    }
 
     return {
         structureIndustryRigs: structureIndustryRigs,
@@ -175,6 +184,7 @@ var eveData = (function () {
         structureSecStatusMultiplier: structureSecStatusMultiplier,
         facilities: facilities,
         securityStatus: securityStatus,
-        implants: implants
+        implants: implants,
+        activity: activity
     }
 })()

@@ -6,8 +6,8 @@ from flask import request
 from flask import session
 from flask import url_for
 from flask import flash
-from urlparse import urlparse
-from urlparse import urljoin
+from urllib.parse import urlparse
+from urllib.parse import urljoin
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import logout_user
