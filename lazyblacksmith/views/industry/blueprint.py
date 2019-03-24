@@ -4,6 +4,8 @@ import config
 from flask import Blueprint as FlaskBlueprint
 from flask import abort
 from flask import render_template
+from flask import redirect
+from flask import url_for
 from flask_login import current_user
 
 from lazyblacksmith.models import Activity
@@ -79,7 +81,23 @@ def manufacturing(item_id, me=0, te=0):
     item = Item.query.get(item_id)
     char = current_user.pref.prod_character
 
-    if item is None or item.max_production_limit is None:
+    if item is None:
+        abort(404)
+
+    if item.max_production_limit is None:
+        if item.is_from_manufacturing:
+            activity_product = item.product_for_activities.filter_by(
+                activity=ActivityEnum.MANUFACTURING.id
+            ).one()
+            return redirect(
+                url_for(
+                    ".manufacturing",
+                    item_id=activity_product.item_id,
+                    me=me,
+                    te=te
+                ),
+                code=301
+            )
         abort(404)
 
     activity = item.activities.filter_by(
@@ -283,7 +301,46 @@ def invention(item_id):
     item = Item.query.get(item_id)
     char = current_user.pref.invention_character
 
-    if item is None or item.max_production_limit is None:
+    if item is None:
+        abort(404)
+
+    # check if the blueprint requested actually has invention available
+    check_invention = ActivityProduct.query.filter_by(
+        item_id=item_id
+    ).filter_by(
+        activity=ActivityEnum.INVENTION.id
+    ).first()
+
+    if item.max_production_limit is None or check_invention is None:
+        # the item_id is not a blueprint, so get the blueprint then redirect
+        if item.max_production_limit is None and item.is_from_manufacturing:
+            source_blueprint = item.product_for_activities.filter_by(
+                activity=ActivityEnum.MANUFACTURING.id
+            ).one_or_none()
+            return redirect(
+                url_for(
+                    ".invention",
+                    item_id=source_blueprint.item_id
+                ),
+                code=301
+            )
+
+        # the item id is always a blueprint or an non manufactured item here
+        # so we check if it's a blueprint (check_invention is None) and get
+        # the source from invention, or abort.
+        if item.max_production_limit is not None:
+            activity_product = item.product_for_activities.filter_by(
+                activity=ActivityEnum.INVENTION.id
+            ).one_or_none()
+            if activity_product is not None:
+                return redirect(
+                    url_for(
+                        ".invention",
+                        item_id=activity_product.item_id
+                    ),
+                    code=301
+                )
+
         abort(404)
 
     # global activity
@@ -372,7 +429,21 @@ def reaction(item_id):
     item = Item.query.get(item_id)
     char = current_user.pref.prod_character
 
-    if item is None or item.max_production_limit is None:
+    if item is None:
+        abort(404)
+
+    if item.max_production_limit is None:
+        activity_product = item.product_for_activities.filter_by(
+            activity=ActivityEnum.REACTIONS.id
+        ).one_or_none()
+        if activity_product is not None:
+            return redirect(
+                url_for(
+                    ".reaction",
+                    item_id=activity_product.item_id
+                ),
+                code=301
+            )
         abort(404)
 
     activity = item.activities.filter_by(
