@@ -79,7 +79,20 @@ def manufacturing(item_id, me=0, te=0):
     item = Item.query.get(item_id)
     char = current_user.pref.prod_character
 
-    if item is None or item.max_production_limit is None:
+    if item is None:
+        abort(404)
+
+    if item.max_production_limit is None:
+        if item.is_from_manufacturing():
+            activity_product = item.product_for_activities.filter_by(
+                activity=ActivityEnum.MANUFACTURING.id
+            ).one()
+            return redirect(url_for(
+                ".manufacturing",
+                item_id=activity_product.item_id,
+                me=me,
+                te=te
+            ))
         abort(404)
 
     activity = item.activities.filter_by(
@@ -284,6 +297,14 @@ def invention(item_id):
     char = current_user.pref.invention_character
 
     if item is None or item.max_production_limit is None:
+        activity_product = item.product_for_activities.filter_by(
+            activity=ActivityEnum.INVENTION.id
+        ).one_or_none()
+        if activity_product is not None:
+            return redirect(url_for(
+                ".invention",
+                item_id=activity_product.item_id
+            ))
         abort(404)
 
     # global activity
@@ -373,6 +394,14 @@ def reaction(item_id):
     char = current_user.pref.prod_character
 
     if item is None or item.max_production_limit is None:
+        activity_product = item.product_for_activities.filter_by(
+            activity=ActivityEnum.REACTIONS.id
+        ).one_or_none()
+        if activity_product is not None:
+            return redirect(url_for(
+                ".reaction",
+                item_id=activity_product.item_id
+            ))
         abort(404)
 
     activity = item.activities.filter_by(
