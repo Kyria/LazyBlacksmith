@@ -315,7 +315,7 @@ def invention(item_id):
         if item.max_production_limit is None and item.is_from_manufacturing:
             item = item.product_for_activities.filter_by(
                 activity=ActivityEnum.MANUFACTURING.id
-            ).one_or_none()
+            ).one_or_none().blueprint
 
         if item is not None:
             activity_product = item.product_for_activities.filter_by(
