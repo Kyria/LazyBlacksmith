@@ -89,12 +89,15 @@ def manufacturing(item_id, me=0, te=0):
             activity_product = item.product_for_activities.filter_by(
                 activity=ActivityEnum.MANUFACTURING.id
             ).one()
-            return redirect(url_for(
-                ".manufacturing",
-                item_id=activity_product.item_id,
-                me=me,
-                te=te
-            ))
+            return redirect(
+                url_for(
+                    ".manufacturing",
+                    item_id=activity_product.item_id,
+                    me=me,
+                    te=te
+                ),
+                code=301
+            )
         abort(404)
 
     activity = item.activities.filter_by(
@@ -298,15 +301,34 @@ def invention(item_id):
     item = Item.query.get(item_id)
     char = current_user.pref.invention_character
 
-    if item is None or item.max_production_limit is None:
-        activity_product = item.product_for_activities.filter_by(
-            activity=ActivityEnum.INVENTION.id
-        ).one_or_none()
-        if activity_product is not None:
-            return redirect(url_for(
-                ".invention",
-                item_id=activity_product.item_id
-            ))
+    # check if the blueprint requested actually has invention available
+    check_invention = ActivityProduct.query.filter_by(
+        item_id=item_id
+    ).filter_by(
+        activity=ActivityEnum.INVENTION.id
+    ).first()
+
+    if item is None or item.max_production_limit is None or check_invention is None:
+        # the item_id is not a blueprint, so get the blueprint then next step
+        # we override item to get the source blueprint from the manufacturing
+        # and then, if it's a t2, we'll get the t1 blueprint and redirect
+        if item.max_production_limit is None and item.is_from_manufacturing:
+            item = item.product_for_activities.filter_by(
+                activity=ActivityEnum.MANUFACTURING.id
+            ).one_or_none()
+
+        if item is not None:
+            activity_product = item.product_for_activities.filter_by(
+                activity=ActivityEnum.INVENTION.id
+            ).one_or_none()
+            if activity_product is not None:
+                return redirect(
+                    url_for(
+                        ".invention",
+                        item_id=activity_product.item_id
+                    ),
+                    code=301
+                )
         abort(404)
 
     # global activity
@@ -400,10 +422,13 @@ def reaction(item_id):
             activity=ActivityEnum.REACTIONS.id
         ).one_or_none()
         if activity_product is not None:
-            return redirect(url_for(
-                ".reaction",
-                item_id=activity_product.item_id
-            ))
+            return redirect(
+                url_for(
+                    ".reaction",
+                    item_id=activity_product.item_id
+                ),
+                code=301
+            )
         abort(404)
 
     activity = item.activities.filter_by(
