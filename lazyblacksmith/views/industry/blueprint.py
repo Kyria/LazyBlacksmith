@@ -4,6 +4,7 @@ import config
 from flask import Blueprint as FlaskBlueprint
 from flask import abort
 from flask import render_template
+from flask import redirect
 from flask_login import current_user
 
 from lazyblacksmith.models import Activity
@@ -83,7 +84,7 @@ def manufacturing(item_id, me=0, te=0):
         abort(404)
 
     if item.max_production_limit is None:
-        if item.is_from_manufacturing():
+        if item.is_from_manufacturing:
             activity_product = item.product_for_activities.filter_by(
                 activity=ActivityEnum.MANUFACTURING.id
             ).one()
