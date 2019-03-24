@@ -301,6 +301,9 @@ def invention(item_id):
     item = Item.query.get(item_id)
     char = current_user.pref.invention_character
 
+    if item is None:
+        abort(404)
+
     # check if the blueprint requested actually has invention available
     check_invention = ActivityProduct.query.filter_by(
         item_id=item_id
@@ -308,16 +311,24 @@ def invention(item_id):
         activity=ActivityEnum.INVENTION.id
     ).first()
 
-    if item is None or item.max_production_limit is None or check_invention is None:
-        # the item_id is not a blueprint, so get the blueprint then next step
-        # we override item to get the source blueprint from the manufacturing
-        # and then, if it's a t2, we'll get the t1 blueprint and redirect
+    if item.max_production_limit is None or check_invention is None:
+        # the item_id is not a blueprint, so get the blueprint then redirect
         if item.max_production_limit is None and item.is_from_manufacturing:
-            item = item.product_for_activities.filter_by(
+            source_blueprint = item.product_for_activities.filter_by(
                 activity=ActivityEnum.MANUFACTURING.id
-            ).one_or_none().blueprint
+            ).one_or_none()
+            return redirect(
+                url_for(
+                    ".invention",
+                    item_id=source_blueprint.item_id
+                ),
+                code=301
+            )
 
-        if item is not None:
+        # the item id is always a blueprint or an non manufactured item here
+        # so we check if it's a blueprint (check_invention is None) and get
+        # the source from invention, or abort.
+        if item.max_production_limit is not None:
             activity_product = item.product_for_activities.filter_by(
                 activity=ActivityEnum.INVENTION.id
             ).one_or_none()
@@ -329,6 +340,7 @@ def invention(item_id):
                     ),
                     code=301
                 )
+
         abort(404)
 
     # global activity
@@ -417,7 +429,10 @@ def reaction(item_id):
     item = Item.query.get(item_id)
     char = current_user.pref.prod_character
 
-    if item is None or item.max_production_limit is None:
+    if item is None:
+        abort(404)
+
+    if item.max_production_limit is None:
         activity_product = item.product_for_activities.filter_by(
             activity=ActivityEnum.REACTIONS.id
         ).one_or_none()
