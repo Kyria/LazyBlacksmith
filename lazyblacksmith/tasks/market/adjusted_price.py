@@ -5,6 +5,7 @@ from lazyblacksmith.extension.celery_app import celery_app
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_markets_prices
 from lazyblacksmith.models import Activity
+from lazyblacksmith.models import ActivityEnum
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import Item
 from lazyblacksmith.models import TaskState
