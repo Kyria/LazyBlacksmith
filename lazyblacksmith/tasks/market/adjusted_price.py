@@ -79,7 +79,7 @@ def update_base_costs(prices):
     for bp in blueprints:
         bp.base_cost = 0.0
         materials = bp.activity_materials.filter_by(
-            activity=Activity.MANUFACTURING
+            activity=ActivityEnum.MANUFACTURING.id
         ).all()
 
         for material in materials:
