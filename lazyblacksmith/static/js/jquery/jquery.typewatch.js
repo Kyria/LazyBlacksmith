@@ -1,11 +1,7 @@
 /*
-*	TypeWatch 2.2.1
+*	TypeWatch 3
 *
 *	Examples/Docs: github.com/dennyferra/TypeWatch
-*	
-*  Copyright(c) 2014
-*	Denny Ferrassoli - dennyferra.com
-*   Charles Christolini
 *  
 *  Dual licensed under the MIT and GPL licenses:
 *  http://www.opensource.org/licenses/mit-license.php
@@ -25,7 +21,7 @@
 	$.fn.typeWatch = function(o) {
 		// The default input types that are supported
 		var _supportedInputTypes =
-			['TEXT', 'TEXTAREA', 'PASSWORD', 'TEL', 'SEARCH', 'URL', 'EMAIL', 'DATETIME', 'DATE', 'MONTH', 'WEEK', 'TIME', 'DATETIME-LOCAL', 'NUMBER', 'RANGE'];
+			['TEXT', 'TEXTAREA', 'PASSWORD', 'TEL', 'SEARCH', 'URL', 'EMAIL', 'DATETIME', 'DATE', 'MONTH', 'WEEK', 'TIME', 'DATETIME-LOCAL', 'NUMBER', 'RANGE', 'DIV'];
 
 		// Options
 		var options = $.extend({
@@ -33,50 +29,56 @@
 			callback: function() { },
 			highlight: true,
 			captureLength: 2,
+			allowSubmit: false,
 			inputTypes: _supportedInputTypes
 		}, o);
 
 		function checkElement(timer, override) {
-			var value = $(timer.el).val();
+			var value = timer.type === 'DIV' 
+				? jQuery(timer.el).html()
+				: jQuery(timer.el).val();
 
-			// Fire if text >= options.captureLength AND text != saved text OR if override AND text >= options.captureLength
-			if ((value.length >= options.captureLength && value.toUpperCase() != timer.text)
-				|| (override && value.length >= options.captureLength))
+			// If has capture length and has changed value
+			// Or override and has capture length or allowSubmit option is true
+			// Or capture length is zero and changed value
+			if ((value.length >= options.captureLength && value != timer.text)
+				|| (override && (value.length >= options.captureLength || options.allowSubmit))
+				|| (value.length == 0 && timer.text))
 			{
-				timer.text = value.toUpperCase();
+				timer.text = value;
 				timer.cb.call(timer.el, value);
 			}
 		};
 
 		function watchElement(elem) {
-			var elementType = elem.type.toUpperCase();
-			if ($.inArray(elementType, options.inputTypes) >= 0) {
-
+			var elementType = (elem.type || elem.nodeName).toUpperCase();
+			if (jQuery.inArray(elementType, options.inputTypes) >= 0) {
+				
 				// Allocate timer element
 				var timer = {
 					timer: null,
-					text: $(elem).val().toUpperCase(),
+					text: (elementType === 'DIV') ? jQuery(elem).html() : jQuery(elem).val(),
 					cb: options.callback,
 					el: elem,
+					type: elementType,
 					wait: options.wait
 				};
 
 				// Set focus action (highlight)
-				if (options.highlight) {
-					$(elem).focus(
-						function() {
-							this.select();
-						});
-				}
+				if (options.highlight && elementType !== 'DIV')
+					jQuery(elem).focus(function() { this.select(); });
 
 				// Key watcher / clear and reset the timer
 				var startWatch = function(evt) {
 					var timerWait = timer.wait;
 					var overrideBool = false;
-					var evtElementType = this.type.toUpperCase();
+					var evtElementType = elementType;
 
-					// If enter key is pressed and not a TEXTAREA and matched inputTypes
-					if (typeof evt.keyCode != 'undefined' && evt.keyCode == 13 && evtElementType != 'TEXTAREA' && $.inArray(evtElementType, options.inputTypes) >= 0) {
+					// If enter key is pressed and not a TEXTAREA or DIV
+					if (typeof evt.keyCode != 'undefined' && evt.keyCode == 13
+						&& evtElementType !== 'TEXTAREA' && elementType !== 'DIV')
+					{
+						console.log('OVERRIDE');
 						timerWait = 1;
 						overrideBool = true;
 					}
@@ -85,19 +87,18 @@
 						checkElement(timer, overrideBool)
 					}
 
-					// Clear timer					
+					// Clear timer
 					clearTimeout(timer.timer);
 					timer.timer = setTimeout(timerCallbackFx, timerWait);
 				};
 
-				$(elem).on('keydown paste cut input', startWatch);
+				jQuery(elem).on('keydown paste cut input', startWatch);
 			}
 		};
 
-		// Watch Each Element
+		// Watch each element
 		return this.each(function() {
 			watchElement(this);
 		});
-
 	};
 });
