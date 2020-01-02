@@ -83,7 +83,7 @@ var searchBlueprint = (function ($, lb, utils) {
 
                 var research = resultBtn.replace(/@@LINK@@/, researchLink)
                                         .replace(/@@NAME@@/, 'Research')
-                                        .replace(/@@ICON@@/, '<i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>');
+                                        .replace(/@@ICON@@/, '<i class="far fa-hourglass" aria-hidden="true"></i> / <i class="far fa-gem" aria-hidden="true"></i>');
                 var manufacturing = resultBtn.replace(/@@LINK@@/, manufacturingLink)
                                              .replace(/@@NAME@@/, 'Manufacture')
                                              .replace(/@@ICON@@/, '<i class="fa fa-industry" aria-hidden="true"></i>');

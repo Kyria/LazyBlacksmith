@@ -16,7 +16,6 @@
 {% if config.DEBUG %}
     <link href="{{ url_for('static', filename='css/lb.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/animate.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/font-awesome.css') }}" rel="stylesheet">
 {% else %}
     <link href="{{ url_for('static', filename='css/lb.min.css') }}" rel="stylesheet">
 {% endif %}
@@ -73,14 +72,14 @@
             </div>
         </div>
     </footer>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
     {% block modal %}{% endblock %}
 {% if config.DEBUG %}
-    <script src="{{ url_for('static', filename='js/jquery/jquery.cookie.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery.typewatch.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/jquery.tablesorter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery/bootstrap-notify.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/misc/font-awesome.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/humanize.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/typeahead.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/popper.js') }}"></script>

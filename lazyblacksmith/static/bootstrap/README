@@ -1,0 +1,7 @@
+# Bootstrap
+
+https://github.com/twbs/bootstrap/releases
+
+Folders:
+* js: contains the `bootstrap.js` file from the twbs/bootstrap/dist folder (we don't change it, so we can use it)
+* scss: contains the scss files for bootstrap we will then import to build the final css.

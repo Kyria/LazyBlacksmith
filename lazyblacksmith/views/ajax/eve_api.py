@@ -2,6 +2,7 @@
 from flask import Blueprint
 from flask import jsonify
 from flask import request
+from sqlalchemy import func
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
@@ -64,7 +65,7 @@ def get_index_activity(solar_system_names):
 
     # get the solar systems
     solar_systems = SolarSystem.query.filter(
-        SolarSystem.name.in_(ss_name_list)
+        func.lower(SolarSystem.name).in_(ss_name_list)
     ).all()
 
     if not solar_systems:
