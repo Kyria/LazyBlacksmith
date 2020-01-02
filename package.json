@@ -1,57 +1,26 @@
 {
-  "name": "LazyBlacksmith",
-  "version": "1.0.0",
+  "name": "lazyblacksmith",
+  "version": "1.1.0",
   "license": "BSD-3-Clause",
-  "devDependencies": {
-    "@babel/cli": "7.0.0-beta.44",
-    "@babel/core": "7.0.0-beta.44",
-    "@babel/preset-env": "7.0.0-beta.44",
-    "autoprefixer": "^8.3.0",
-    "clean-css-cli": "^4.1.11",
-    "eslint": "^5.1.0",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0",
-    "node-sass": "^4.8.3",
-    "npm-run-all": "^4.1.2",
-    "npm-watch": "^0.2.0",
-    "rollup": "^0.58.0",
-    "rollup-plugin-babel": "4.0.0-beta.4",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "shx": "^0.2.2",
-    "uglify-js": "^3.3.21"
-  },
-  "watch": {
-    "watch-css": {
-      "patterns": [
-        "lazyblacksmith/static/scss/",
-        "lazyblacksmith/static/scss/*/"
-      ],
-      "extensions": "scss,css"
-    },
-    "watch-js": {
-      "patterns": [
-        "lazyblacksmith/static/js/misc/",
-        "lazyblacksmith/static/js/lb/",
-        "lazyblacksmith/static/js/lb/*",
-        "lazyblacksmith/static/js/jquery/"
-      ]
-    }
-  },
   "scripts": {
-    "watch-css": "npm-run-all css-build css-concat css-minify",
-    "watch-js": "npm-run-all js-compile-bootstrap js-concat js-minify",
-    "watch": "npm-watch",
-    "css": "npm-run-all css-build css-concat css-minify",
+    "css-main": "npm-run-all css-build css-concat css-minify",
     "css-build": "node-sass --output-style expanded --precision 6 lazyblacksmith/static/scss/lb.scss lazyblacksmith/static/css/bootstrap_lb.css",
     "css-concat": "shx cat lazyblacksmith/static/css/bootstrap_lb.css lazyblacksmith/static/css/animate.css lazyblacksmith/static/css/font-awesome.css > lazyblacksmith/static/css/lb.css",
-    "css-minify": "cleancss --level 1 --source-map --source-map-inline-sources --output lazyblacksmith/static/css/lb.min.css lazyblacksmith/static/css/lb.css",
-    "js": "npm-run-all js-compile-bootstrap js-concat js-minify",
-    "js-compile-bootstrap": "rollup --environment BUNDLE:false --config bootstrap/build/rollup.config.js --file lazyblacksmith/static/js/bootstrap.js",
-    "js-concat": "shx cat lazyblacksmith/static/js/misc/{humanize,nouislider,popper,typeahead.bundle,utils}.js lazyblacksmith/static/js/bootstrap.js lazyblacksmith/static/js/jquery/*.js lazyblacksmith/static/js/lb/*.js lazyblacksmith/static/js/lb/*/*.js > lazyblacksmith/static/js/lb.js",
+    "css-minify": "cleancss --level 1  --format breakWith=lf --source-map --source-map-inline-sources --output lazyblacksmith/static/css/lb.min.css lazyblacksmith/static/css/lb.css",
+    "js-main": "npm-run-all js-concat js-minify",
+    "js-concat": "shx cat lazyblacksmith/static/js/misc/{humanize,nouislider,popper,typeahead.bundle,utils}.js lazyblacksmith/static/bootstrap/js/bootstrap.js lazyblacksmith/static/js/jquery/*.js lazyblacksmith/static/js/lb/*.js lazyblacksmith/static/js/lb/*/*.js > lazyblacksmith/static/js/lb.js",
     "js-minify": "uglifyjs --compress typeofs=false --mangle --comments \"/^!/\" --source-map \"includeSources,url=lb.min.js.map\" --output lazyblacksmith/static/js/lb.min.js lazyblacksmith/static/js/lb.js",
-    "dist": "npm-run-all --parallel js css"
+    "dist": "npm-run-all --parallel js-main css-main",
+    "watch": "npm-run-all --parallel watch-*",
+    "watch-css-main": "nodemon --watch lazyblacksmith/static/scss/ --ext scss --exec \"npm run css-main\"",
+    "watch-js-main": "nodemon --watch lazyblacksmith/static/js/ --ext js --exec \"npm run js-main\""
+  },
+  "devDependencies": {
+    "clean-css-cli": "^4.3.0",
+    "node-sass": "^4.13.0",
+    "nodemon": "^1.19.4",
+    "npm-run-all": "^4.1.5",
+    "shx": "^0.3.2",
+    "uglify-js": "^3.6.9"
   }
 }
