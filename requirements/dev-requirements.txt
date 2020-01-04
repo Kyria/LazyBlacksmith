@@ -1,1 +1,4 @@
 Flask-DebugToolbar>=0.10.1
+pylint
+flake8
+black
