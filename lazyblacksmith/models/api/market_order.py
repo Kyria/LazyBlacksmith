@@ -1,9 +1,10 @@
 # -*- encoding: utf-8 -*-
 from . import db
 
+
 class MarketOrder(db.Model):
     """ Model that describe a market order with the info we need """
-    order_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    order_id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
     item_id = db.Column(db.Integer)
     region_id = db.Column(db.Integer)
     system_id = db.Column(db.Integer)
