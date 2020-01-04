@@ -37,7 +37,15 @@ esiclient = EsiClient(
     security=esisecurity,
     transport_adapter=TRANSPORT_ADAPTER,
     cache=LBCACHE,
-    headers={'User-Agent': config.ESI_USER_AGENT}
+    headers={'User-Agent': config.ESI_USER_AGENT},
+    retry_requests=True
+)
+esiclient_nocache = EsiClient(
+    security=esisecurity,
+    transport_adapter=TRANSPORT_ADAPTER,
+    cache=None,
+    headers={'User-Agent': config.ESI_USER_AGENT},
+    retry_requests=True
 )
 
 # register observers
