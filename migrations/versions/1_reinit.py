@@ -1,7 +1,9 @@
+# -*- encoding: utf-8 -*-
+# flake8: noqa
 """reinit
 
 Revision ID: 1
-Revises: 
+Revises:
 Create Date: 2020-01-01 22:59:10.872705
 
 """
