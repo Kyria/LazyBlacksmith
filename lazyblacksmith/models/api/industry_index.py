@@ -23,14 +23,14 @@ class IndustryIndex(db.Model):
     @classmethod
     def activity_string_to_activity(cls, activity_string):
         if activity_string == 'invention':
-            return ActivityEnum.INVENTION.id
+            return ActivityEnum.INVENTION.aid
         if activity_string == 'manufacturing':
-            return ActivityEnum.MANUFACTURING.id
+            return ActivityEnum.MANUFACTURING.aid
         if activity_string == 'researching_time_efficiency':
-            return ActivityEnum.RESEARCH_TIME_EFFICIENCY.id
+            return ActivityEnum.RESEARCH_TIME_EFFICIENCY.aid
         if activity_string == 'researching_material_efficiency':
-            return ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id
+            return ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.aid
         if activity_string == 'copying':
-            return ActivityEnum.COPYING.id
+            return ActivityEnum.COPYING.aid
         if activity_string == 'reaction':
-            return ActivityEnum.REACTIONS.id
+            return ActivityEnum.REACTIONS.aid
