@@ -20,8 +20,7 @@ from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 
 # extensions
-from lazyblacksmith.extension.cache import cache
-from lazyblacksmith.extension.celery_app import celery_app
+from lazyblacksmith.extension.cache import CACHE
 from lazyblacksmith.extension.login_manager import login_manager
 
 

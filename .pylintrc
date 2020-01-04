@@ -1,2 +1,4 @@
+[MASTER]
+ignore=migrations
 [TYPECHECK]
 ignored-classes=scoped_session,SQLAlchemy,alembic,alembic.op
