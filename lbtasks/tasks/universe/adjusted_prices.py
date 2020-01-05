@@ -8,8 +8,8 @@ from lazyblacksmith.models.enums import ActivityEnum
 
 from ... import lbtsk
 
-@lbtsk(name="update_adjusted_price")
-def task_update_adjusted_price_base_cost():
+@lbtsk(name="adjusted_price")
+def task_adjusted_price_base_cost():
     """Task that update the adjusted prices from the API then calculate the
     base cost for every blueprints.
     """

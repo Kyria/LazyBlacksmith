@@ -2,5 +2,6 @@
 # flake8: noqa
 """ import all tasks here for easier use """
 
-from .universe.indexes import task_update_industry_indexes
-from .universe.adjusted_prices import task_update_adjusted_price_base_cost
+from .universe.indexes import task_industry_indexes
+from .universe.adjusted_prices import task_adjusted_price_base_cost
+from .universe.market_order import task_market_orders

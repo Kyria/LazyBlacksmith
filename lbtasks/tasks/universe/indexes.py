@@ -7,8 +7,8 @@ from lazyblacksmith.models import db
 from ... import lbtsk
 
 
-@lbtsk(name="update_indexes")
-def task_update_industry_indexes():
+@lbtsk(name="industry_indexes")
+def task_industry_indexes():
     """ Get the industry indexes list from API. """
     all_indexes = esiclient.request(get_industry_systems())
     insert_index_list = []
