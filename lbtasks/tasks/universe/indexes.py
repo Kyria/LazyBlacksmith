@@ -4,10 +4,10 @@ from lazyblacksmith.extension.esipy.operations import get_industry_systems
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import db
 
-from ... import lbtsk
+from ... import CELERY_APP
 
 
-@lbtsk(name="industry_indexes")
+@CELERY_APP.task(name="industry_indexes")
 def task_industry_indexes():
     """ Get the industry indexes list from API. """
     all_indexes = esiclient.request(get_industry_systems())

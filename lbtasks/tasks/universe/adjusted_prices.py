@@ -6,9 +6,9 @@ from lazyblacksmith.models import Item
 from lazyblacksmith.models import db
 from lazyblacksmith.models.enums import ActivityEnum
 
-from ... import lbtsk
+from ... import CELERY_APP
 
-@lbtsk(name="adjusted_price")
+@CELERY_APP.task(name="adjusted_price")
 def task_adjusted_price_base_cost():
     """Task that update the adjusted prices from the API then calculate the
     base cost for every blueprints.

@@ -1,12 +1,9 @@
 # -*- encoding: utf-8 -*-"
-""" Provide light app factory for huey and flask app """
+""" Provide light app factory for flask app with celery requirements """
 from flask import Flask
-from huey import RedisHuey
 
-from lazyblacksmith.models import db
+from lazyblacksmith.extension.database import db
 from lazyblacksmith.extension.cache import CACHE
-
-import config
 
 
 def create_app(config_object):
@@ -17,23 +14,16 @@ def create_app(config_object):
         config_object (object/module): configuration object
 
     Returns:
-        tuple: (flask_app, huey_object) tuple
+        tuple: flask_app tuple
     """
     # app
     app = Flask(__name__.split('.')[0])
     app.config.from_object(config_object)
 
-    huey = RedisHuey(
-        host=config.HUEY_REDIS_HOST,
-        port=config.HUEY_REDIS_PORT,
-        db=config.HUEY_REDIS_DB,
-        name=config.HUEY_QUEUE_NAME
-    )
-
     register_extensions(app)
 
     # return app
-    return app, huey
+    return app
 
 
 def register_extensions(app):

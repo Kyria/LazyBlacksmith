@@ -2,3 +2,5 @@
 ignore=migrations
 [TYPECHECK]
 ignored-classes=scoped_session,SQLAlchemy,alembic,alembic.op
+[MESSAGES CONTROL]
+disable=no-self-use

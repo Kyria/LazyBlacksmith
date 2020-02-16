@@ -25,4 +25,3 @@ class BlueprintEnum(Enum):
     RELIC = 2
     BPC = 3
     BPO = 4
-

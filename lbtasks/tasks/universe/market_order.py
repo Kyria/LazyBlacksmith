@@ -16,13 +16,13 @@ from lazyblacksmith.models import Region
 from lazyblacksmith.models import db
 from lazyblacksmith.utils.time import utcnow
 
-from ... import lbtsk
+from ... import CELERY_APP
 
 LOGGER = logging.getLogger('lbtasks')
 MOLOCK = Lock()
 
 
-@lbtsk(name="market_orders_region_id")
+@CELERY_APP(name="market_orders_region_id")
 def task_market_order_price(region_id: int):
     item_list = {'update': {}, 'insert': {}}
 
@@ -71,7 +71,7 @@ def task_market_order_price(region_id: int):
     print(len(item_list))
     print(item_list)
 
-@lbtsk(name="market_orders_page_region_id")
+@CELERY_APP(name="market_orders_page_region_id")
 def get_market_page(
         region_id: int,
         page: int,

@@ -1,37 +1,54 @@
 # -*- encoding: utf-8 -*-
-from functools import wraps
+import celery
+import flask
 
-import config
+from sqlalchemy.exc import SQLAlchemyError
+from lazyblacksmith.extension.esipy import esisecurity
+from lazyblacksmith.models import TokenScope
+from lazyblacksmith.models import db
 
-from .huey_app import create_app
 
-APP, HUEY = create_app(config)
+class LbTsk(celery.Task):
+    """ Base class for task, that defines some basic methods, such as
+    update for the task state, and allow to get the token_scope easily """
 
-def lbtsk(as_argument=False, **kwargs):
-    """Force flask context into huey tasks. Because we need it?
+    def __call__(self, *args, **kwargs):
+        if flask.has_app_context():
+            return super(LbTsk, self).__call__(self, *args, **kwargs)
+        with self.app.app_context():
+            return super(LbTsk, self).__call__(self, *args, **kwargs)
 
-    Using decorator, it would give something like the following:
-    @huey.task(...)
-    @push_flask_context(...)
-    def our_function():
-        pass
+    def run(self, *args, **kwargs):
+        """We don't implement it here. So let's take exactly
+        the same as default... for linting..."""
+        raise NotImplementedError('Tasks must define the run method.')
 
-    So we are doing two decorator inside this one, and do all at once
-    hiding completely @huey.task, also allowing us to configure whatever
-    we want for all tasks at once (and it's shorter to write!...)
-    """
-    def flask_context(func):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            with APP.app_context():
-                if as_argument:
-                    return func(APP, *args, **kwargs)
-                else:
-                    return func(*args, **kwargs)
-        return inner
+    def get_token_update_esipy(self, character_id, scope):
+        """ get token, update it and return everything
+        Get the token using what have been given in parameter
+        then try to update esisecurity, verify the token is
+        up to date and catch any APIException while updating
+        it to be able to invalidate wrong tokens.
+        """
+        token = TokenScope.query.filter(
+            TokenScope.user_id == character_id,
+            TokenScope.scope == scope
+        ).one()
+        esisecurity.update_token(token.get_sso_data())
 
-    def actual_task_decorator(func):
-        return HUEY.task(**kwargs)(flask_context(func))
-    return actual_task_decorator
+        if esisecurity.is_token_expired():
+            token.update_token(esisecurity.refresh())
+            try:
+                db.session.commit()
+            except SQLAlchemyError:
+                db.session.rollback()
 
-# kwargs task() <-- param for taskwrapper == task_base base Task class
+        return token
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        """ if failure, force db rollback before anything else """
+        db.session.rollback()
+
+    def on_success(self, retval, task_id, args, kwargs):
+        """ force commit if success """
+        db.session.commit()
