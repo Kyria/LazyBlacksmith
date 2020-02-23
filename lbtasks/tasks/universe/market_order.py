@@ -13,7 +13,7 @@ from lazyblacksmith.utils.time import utcnow
 from ... import celery_app, logger
 
 
-@celery_app.task(name="spawn_market_price_tasks")
+@celery_app.task(name="universe.spawn_market_price_tasks")
 def spawn_market_price_tasks():
     """Celery task to spawn market prices update tasks"""
     region_list = Region.query.filter(
@@ -33,7 +33,7 @@ def spawn_market_price_tasks():
         )
 
 
-@celery_app.task(name="update_region_order_price")
+@celery_app.task(name="universe.update_region_order_price")
 def task_update_region_order_price(region_id, item_id_list):
     """ Get the price from the API and update the database for a given region
     """

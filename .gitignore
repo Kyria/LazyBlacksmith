@@ -89,3 +89,4 @@ lazyblacksmith/static/js/lb\.min\.js\.map
 
 \.vscode/
 worker.pid
+celerybeat-schedule.db

@@ -8,7 +8,7 @@ from lazyblacksmith.models import db
 from ... import celery_app
 
 
-@celery_app.task(name="industry_indexes")
+@celery_app.task(name="universe.industry_indexes")
 def task_industry_indexes():
     """ Get the industry indexes list from API. """
     all_indexes = esiclient.request(get_industry_systems())

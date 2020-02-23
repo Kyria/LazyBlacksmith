@@ -6,16 +6,16 @@ from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_status
 from lazyblacksmith.models import TokenScope
 from lazyblacksmith.utils.time import utcnow
-from lbtasks.tasks import (
-    task_industry_indexes,
-    task_adjusted_price_base_cost,
-    spawn_market_price_tasks,
-    task_update_character_skills,
-    task_update_character_blueprints,
+from lbtasks.tasks.blueprint.character import task_update_character_blueprints
+from lbtasks.tasks.blueprint.corporation import \
     task_update_corporation_blueprints
-)
+from lbtasks.tasks.character.skills import task_update_character_skills
+from lbtasks.tasks.universe.adjusted_prices import \
+    task_adjusted_price_base_cost
+from lbtasks.tasks.universe.indexes import task_industry_indexes
+from lbtasks.tasks.universe.market_order import spawn_market_price_tasks
 
-from .. import celery_app, logger
+from ... import celery_app, logger
 
 CHAR_TASK_SCOPE = {
     TokenScope.SCOPE_SKILL: task_update_character_skills,

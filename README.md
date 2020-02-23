@@ -12,6 +12,7 @@ LazyBlacksmith is a flask application allowing people to get informations about 
  * Manufacturing informations including components required and installation costs
  * Research data for material and time efficiency (time, cost)
  * Invention informations for components and costs.
+ * Reaction informations for components and costs.
 * Get and compare item price over all regions
 
 ## Documentation

@@ -83,11 +83,10 @@ class SdeImport(Command):
     def bunzip2(self, path, source_filename, dest_filename):
         """ Bunzip the file provided """
         source_file = "%s/%s" % (path, source_filename)
-        dest_file = "%s/%s" % (path, dest_filename)
         try:
             print("Decompressing file ... ", end='')
             with open(source_file, 'rb') as bz2file:
-                with open(dest_file, 'wb') as unzipped_file:
+                with open(dest_filename, 'wb') as unzipped_file:
                     decompressor = bz2.BZ2Decompressor()
                     for data in iter(lambda: bz2file.read(100 * 1024), b''):
                         unzipped_file.write(decompressor.decompress(data))
@@ -100,12 +99,18 @@ class SdeImport(Command):
         print("[SUCCESS]")
         return True
 
+    # pylint: disable=method-hidden,arguments-differ
     def run(self, database_name, clear, download, url):
-        current_path = os.path.dirname(os.path.realpath(__file__))
+        # so we create in LazyBlacksmith folder, not in lbcmd
+        current_path = os.path.realpath(
+            '%s/../' % os.path.dirname(os.path.realpath(__file__))
+        )
         tmp_path = '%s/tmp' % current_path
         bzip_name = "%s.bz2" % database_name
         if download:
-            os.makedirs(tmp_path)
+            # if we download the file, change the path
+            database_name = '%s/%s' % (tmp_path, database_name)
+            os.makedirs(tmp_path, exist_ok=True)
             if self.download(tmp_path, url, bzip_name):
                 if self.bunzip2(tmp_path, bzip_name, database_name):
                     os.remove("%s/%s" % (tmp_path, bzip_name))
@@ -129,7 +134,6 @@ class SdeImport(Command):
     def create_sde_engine(self, database):
         con = sqlite3.connect(database)
         return con
-
 
 
 def get_human_size(size, precision=2):

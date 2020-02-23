@@ -6,10 +6,10 @@ import config
 from lazyblacksmith.models import ItemPrice, TokenScope, db
 from lazyblacksmith.utils.time import utcnow
 
-from .. import celery_app
+from ... import celery_app
 
 
-@celery_app.task(name="purge")
+@celery_app.task(name="schedule.purge")
 def task_purge():
     """ Purge all old stuff everywhere. """
     # purge all tokens people never updated
