@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 from celery import Celery
+import flask
 
 
 class FlaskCelery(Celery):
@@ -19,6 +20,7 @@ class FlaskCelery(Celery):
         self.config_from_object(app.config, namespace='CELERY')
 
 
-CELERY_APP = FlaskCelery(
+celery_app = FlaskCelery(
+    'lbtasks',
     task_cls='lbtasks.lbtsk:LbTsk'
 )

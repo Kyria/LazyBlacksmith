@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
+""" Market adjusted prices tasks """
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_markets_prices
-from lazyblacksmith.models import ItemAdjustedPrice
-from lazyblacksmith.models import Item
-from lazyblacksmith.models import db
+from lazyblacksmith.models import Item, ItemAdjustedPrice, db
 from lazyblacksmith.models.enums import ActivityEnum
 
-from ... import CELERY_APP
+from ... import celery_app
 
-@CELERY_APP.task(name="adjusted_price")
+
+@celery_app.task(name="adjusted_price")
 def task_adjusted_price_base_cost():
     """Task that update the adjusted prices from the API then calculate the
     base cost for every blueprints.

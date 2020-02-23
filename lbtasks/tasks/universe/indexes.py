@@ -1,13 +1,14 @@
 # -*- encoding: utf-8 -*-
+""" Market indexes task """
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_industry_systems
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import db
 
-from ... import CELERY_APP
+from ... import celery_app
 
 
-@CELERY_APP.task(name="industry_indexes")
+@celery_app.task(name="industry_indexes")
 def task_industry_indexes():
     """ Get the industry indexes list from API. """
     all_indexes = esiclient.request(get_industry_systems())

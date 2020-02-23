@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from __future__ import absolute_import
 import celery
 import flask
 
@@ -14,9 +15,9 @@ class LbTsk(celery.Task):
 
     def __call__(self, *args, **kwargs):
         if flask.has_app_context():
-            return super(LbTsk, self).__call__(self, *args, **kwargs)
-        with self.app.app_context():
-            return super(LbTsk, self).__call__(self, *args, **kwargs)
+            return super(LbTsk, self).__call__(*args, **kwargs)
+        with self.app.app.app_context():
+            return super(LbTsk, self).__call__(*args, **kwargs)
 
     def run(self, *args, **kwargs):
         """We don't implement it here. So let's take exactly
