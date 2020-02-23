@@ -22,14 +22,10 @@ from .sde.orerefining import OreRefining
 from .sde.region import Region
 from .sde.solarsystem import SolarSystem
 
-# Tasks related models
-from .tasks.task_state import TaskState
-
 # EVE API / universe models
 from .api.industry_index import IndustryIndex
 from .api.item_adjusted_price import ItemAdjustedPrice
 from .api.item_price import ItemPrice
-from .api.market_order import MarketOrder
 
 # EVE API / Character models
 from .character.blueprint import Blueprint
