@@ -88,3 +88,4 @@ lazyblacksmith/static/js/lb\.min\.js
 lazyblacksmith/static/js/lb\.min\.js\.map
 
 \.vscode/
+worker.pid

@@ -1,21 +1,21 @@
 # -*- encoding: utf-8 -*-
 # pylint: disable=unused-import
 # flake8: noqa
-""" entry point for huey_consumer """
+from __future__ import absolute_import
 import logging
 
 import config
 
-from lbtasks import CELERY_APP
+from lbtasks.flask_celery import celery_app
 from lbtasks.task_app import create_app
 
 # disable / enable loggers we want
 logging.getLogger('pyswagger').setLevel(logging.ERROR)
 logging.getLogger('lb.tasks').setLevel(logging.WARNING)
 
-CELERY_APP.init_app(create_app(config))
+celery_app.init_app(create_app(config))
 
-CELERY_APP.conf.imports = [
-    'lbtasks.tasks.task_adjusted_price_base_cost',
-    'lbtasks.tasks.task_industry_indexes',
+celery_app.conf.imports = [
+    'lbtasks.tasks',
+    'lbtasks.tasks.task_spawner'
 ]
