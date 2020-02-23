@@ -1,83 +1,42 @@
 # -*- encoding: utf-8 -*-
-import config
-import logging
-import time
-
-from ..lb_task import LbTask
-
-from lazyblacksmith.extension.celery_app import celery_app
-from lazyblacksmith.extension.esipy.esipy import transport_adapter
-from lazyblacksmith.extension.esipy.operations import (
-    get_markets_region_id_orders
-)
-from lazyblacksmith.models import ItemPrice
-from lazyblacksmith.models import Region
-from lazyblacksmith.models import TaskState
-from lazyblacksmith.models import db
-from lazyblacksmith.utils.tasks import is_task_running
-from lazyblacksmith.utils.time import utcnow
-
-from esipy import EsiClient
+""" Market order tasks """
 from flask import json
 from sqlalchemy.exc import SQLAlchemyError
 
-# (re)define some required objects
-esiclient = EsiClient(
-    transport_adapter=transport_adapter,
-    cache=None,
-    headers={'User-Agent': config.ESI_USER_AGENT},
-    retry_requests=True
-)
+import config
+from lazyblacksmith.extension.esipy import esiclient_nocache as esiclient
+from lazyblacksmith.extension.esipy.operations import \
+    get_markets_region_id_orders
+from lazyblacksmith.models import ItemPrice, Region, db
+from lazyblacksmith.utils.time import utcnow
 
-logger = logging.getLogger('lb.tasks')
+from ... import celery_app, logger
 
 
-@celery_app.task(name="spawn_market_price_tasks", base=LbTask, bind=True)
-def spawn_market_price_tasks(self):
+@celery_app.task(name="universe.spawn_market_price_tasks")
+def spawn_market_price_tasks():
     """Celery task to spawn market prices update tasks"""
-    self.start()
     region_list = Region.query.filter(
         Region.id.in_(config.ESI_REGION_PRICE)
     ).all()
 
     for region in region_list:
-        if not is_task_running(region.id,
-                               task_update_region_order_price.__name__):
-            item_id_list = [
-                it[0] for it in db.session.query(
-                    ItemPrice.item_id
-                ).filter_by(region_id=region.id)
-            ]
+        item_id_list = [
+            it[0] for it in db.session.query(
+                ItemPrice.item_id
+            ).filter_by(region_id=region.id)
+        ]
 
-            task_id = "%s-%s-%s" % (
-                utcnow().strftime('%Y%m%d-%H%M%S'),
-                task_update_region_order_price.__name__,
-                region.name
-            )
-            token_state = TaskState(
-                task_id=task_id,
-                id=region.id,
-                scope=task_update_region_order_price.__name__,
-            )
-            db.session.add(token_state)
-            db.session.commit()
-
-            task_update_region_order_price.s(
-                region.id,
-                item_id_list
-            ).apply_async(
-                task_id=task_id
-            )
-
-    self.end(TaskState.SUCCESS)
+        task_update_region_order_price.delay(
+            region.id,
+            item_id_list
+        )
 
 
-@celery_app.task(name="update_region_order_price", base=LbTask, bind=True)
-def task_update_region_order_price(self, region_id, item_id_list):
+@celery_app.task(name="universe.update_region_order_price")
+def task_update_region_order_price(region_id, item_id_list):
     """ Get the price from the API and update the database for a given region
     """
-    self.start()
-    fail = False
 
     # call the market page and extract all items from every pages if required
     item_list = {'update': {}, 'insert': {}}
@@ -92,13 +51,13 @@ def task_update_region_order_price(self, region_id, item_id_list):
 
     # if failed, stop
     if region_order_one.status != 200:
-        logger.error('Request failed [%s, %s, %d]: %s' % (
+        logger.error(
+            'Request failed [%s, %s, %d]: %s',
             op[0].url,
             op[0].query,
             region_order_one.status,
             region_order_one.raw,
-        ))
-        self.end(TaskState.ERROR)
+        )
         return
 
     # prepare all other pages
@@ -125,13 +84,13 @@ def task_update_region_order_price(self, region_id, item_id_list):
     for req, response in [(op[0], region_order_one)] + order_list:
         region_orders = json.loads(response.raw)
         if response.status != 200:
-            fail = True
-            logger.error('Request failed [%s, %s, %d]: %s' % (
+            logger.error(
+                'Request failed [%s, %s, %d]: %s',
                 req.url,
                 req.query,
                 response.status,
                 response.raw,
-            ))
+            )
             continue
 
         if not region_orders:
@@ -148,22 +107,16 @@ def task_update_region_order_price(self, region_id, item_id_list):
     try:
         save_item_prices(item_list)
 
-    except SQLAlchemyError as e:
+    except SQLAlchemyError as exc:
         logger.error(
-            'Something went wrong while trying to insert/update data: %s' % (
-                e.message
-            )
+            'Something went wrong while trying to insert/update data: %s',
+            str(exc)
         )
         db.session.rollback()
-        fail = True
-
-    if not fail:
-        self.end(TaskState.SUCCESS)
-    else:
-        self.end(TaskState.ERROR)
 
 
 def update_itemlist_from_order(region_id, item_list, item_id_list, order):
+    """ update the final itemlist with min/max SO/BO """
     item_id = order['type_id']
 
     # values if we already have this item in database or not
@@ -206,6 +159,7 @@ def update_itemlist_from_order(region_id, item_list, item_id_list, order):
 
 
 def save_item_prices(item_list):
+    """ Save everything in the database """
     # check if we have any update to do
     if len(item_list['update']) > 0:
         update_stmt = ItemPrice.__table__.update()

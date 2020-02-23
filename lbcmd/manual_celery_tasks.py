@@ -1,12 +1,8 @@
 # -*- encoding: utf-8 -*-
-from flask_script import Command
-from flask_script import Option
+from flask_script import Command, Option
 
-from lazyblacksmith.tasks.task_spawner import spawn_character_tasks
-from lazyblacksmith.tasks.task_spawner import spawn_universe_tasks
-from lazyblacksmith.tasks.purge import task_purge
-from lazyblacksmith.models import TaskState, db
-from lazyblacksmith.utils.time import utcnow
+from lbtasks.tasks import (spawn_character_tasks, spawn_universe_tasks,
+                           task_purge)
 
 
 class ManualCeleryTasks(Command):
@@ -14,7 +10,7 @@ class ManualCeleryTasks(Command):
 
     Arguments:
         -c|--character: triggers character related task spawner
-        -u|--universe: triggers universe related task spawner (orders, indexes...)
+        -u|--universe: triggers universe related task spawner
         -p|--purge: purge old data task
     """
 
@@ -42,22 +38,11 @@ class ManualCeleryTasks(Command):
         ),
     )
 
+    # pylint: disable=method-hidden,arguments-differ
     def run(self, character, universe, purge):
         if character:
-            spawn_character_tasks()
+            spawn_character_tasks.delay()
         if universe:
-            spawn_universe_tasks()
+            spawn_universe_tasks.delay()
         if purge:
-            task_id = "%s-%s" % (
-                utcnow().strftime('%Y%m%d-%H%M%S'),
-                task_purge.__name__,
-            )
-            token_state = TaskState(
-                task_id=task_id,
-                id=None,
-                scope=task_purge.__name__,
-            )
-            db.session.add(token_state)
-            db.session.commit()
-
-            task_purge.s().apply_async(task_id=task_id)
+            task_purge.delay()

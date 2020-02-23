@@ -1,2 +1,6 @@
+[MASTER]
+ignore=migrations
 [TYPECHECK]
 ignored-classes=scoped_session,SQLAlchemy,alembic,alembic.op
+[MESSAGES CONTROL]
+disable=C0103,R0201,R0903,no-member

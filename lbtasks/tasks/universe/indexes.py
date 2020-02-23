@@ -1,18 +1,16 @@
 # -*- encoding: utf-8 -*-
-from ..lb_task import LbTask
-
-from lazyblacksmith.extension.celery_app import celery_app
+""" Market indexes task """
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_industry_systems
 from lazyblacksmith.models import IndustryIndex
-from lazyblacksmith.models import TaskState
 from lazyblacksmith.models import db
 
+from ... import celery_app
 
-@celery_app.task(name="update_industry_indexes", base=LbTask, bind=True)
-def task_update_industry_indexes(self):
+
+@celery_app.task(name="universe.industry_indexes")
+def task_industry_indexes():
     """ Get the industry indexes list from API. """
-    self.start()
     all_indexes = esiclient.request(get_industry_systems())
     insert_index_list = []
 
@@ -35,7 +33,3 @@ def task_update_industry_indexes(self):
             insert_index_list
         )
         db.session.commit()
-        self.end(TaskState.SUCCESS)
-
-    else:
-        self.end(TaskState.ERROR)

@@ -1,39 +1,29 @@
 # -*- encoding: utf-8 -*-
-from ..lb_task import LbTask
-
-from lazyblacksmith.extension.celery_app import celery_app
+""" Market adjusted prices tasks """
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_markets_prices
-from lazyblacksmith.models import Activity
-from lazyblacksmith.models import ItemAdjustedPrice
-from lazyblacksmith.models import Item
-from lazyblacksmith.models import TaskState
-from lazyblacksmith.models import db
+from lazyblacksmith.models import Item, ItemAdjustedPrice, db
 from lazyblacksmith.models.enums import ActivityEnum
 
+from ... import celery_app
 
-@celery_app.task(name="update_adjusted_price", base=LbTask, bind=True)
-def task_update_adjusted_price_base_cost(self):
+
+@celery_app.task(name="universe.adjusted_price")
+def task_adjusted_price_base_cost():
     """Task that update the adjusted prices from the API then calculate the
     base cost for every blueprints.
     """
-    self.start()
     prices = update_adjusted_price()
     if prices is not None:
-        if update_base_costs(prices):
-            return self.end(TaskState.SUCCESS)
-    return self.end(TaskState.ERROR)
+        update_base_costs(prices)
 
 
 def update_adjusted_price():
-    """ Get market prices from ESI and update the database.
+    """Get market prices from ESI and update the database.
     Raises exception if database cannot be updated.
 
-    Returns
-    -------
-    Dict
-        the prices that were updated.
-
+    Returns:
+        Dict: The update prices
     """
     item_adjusted_price = {}
     count = 0
@@ -60,19 +50,14 @@ def update_adjusted_price():
 
 
 def update_base_costs(prices):
-    """ Calculate the base cost for every blueprints
+    """Calculate the base cost for every blueprints
 
-    Parameters
-    ----------
-    prices : dict
-        Description of parameter `prices`.
+    Args:
+        prices (dict): the price updated. Keys are item_id
 
-    Returns
-    -------
-    Boolean
-        if the basecost were calculated correctly or not.
+    Returns:
+        boolean: If the base costs were calculated correctly or not.
     """
-
     blueprints = Item.query.filter(
         Item.max_production_limit.isnot(None)
     ).all()
@@ -80,7 +65,7 @@ def update_base_costs(prices):
     for bp in blueprints:
         bp.base_cost = 0.0
         materials = bp.activity_materials.filter_by(
-            activity=ActivityEnum.MANUFACTURING.id
+            activity=ActivityEnum.MANUFACTURING.aid
         ).all()
 
         for material in materials:

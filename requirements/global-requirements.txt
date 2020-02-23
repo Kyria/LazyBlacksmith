@@ -1,5 +1,5 @@
 # flask
-flask>=1.11.1
+Flask>=1.1.1
 Flask-Caching>=1.8.0
 Flask-Login>=0.4.1
 Flask-Migrate>=2.5.2
@@ -7,8 +7,11 @@ Flask-Script>=2.0.6
 Flask-WTF>=0.14
 
 # database
-sqlalchemy>=1.3.12
+SQLAlchemy>=1.3.12
 alembic>=1.3.2
+
+# tasks
+celery>=4.4.0
 
 # others
 pytz>=2019.3
@@ -18,4 +21,4 @@ ratelimiter>=1.1.0
 simplejson>=3.17.0
 
 # EVE API Libs
-esipy==1.0.0
+EsiPy>=1.0.0

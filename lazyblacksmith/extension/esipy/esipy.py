@@ -4,41 +4,26 @@ from __future__ import absolute_import
 from esipy import EsiApp
 from esipy import EsiClient
 from esipy import EsiSecurity
-from esipy.cache import BaseCache
-from esipy.cache import _hash
 from esipy.events import AFTER_TOKEN_REFRESH
 from requests.adapters import HTTPAdapter
 
-from .esipy_observers import token_update_observer
-from lazyblacksmith.extension.cache import cache
-
 import config
+from lazyblacksmith.extension.cache import LBCACHE
+from .esipy_observers import token_update_observer
 
 
-class LbCache(BaseCache):
-    """ Custom BaseCache implementation for Lazyblacksmith
-        used in esipy, to use the flask cache
-    """
-
-    def set(self, key, value, timeout=300):
-        cache.set(_hash(key), value, timeout)
-
-    def get(self, key, default=None):
-        cached = cache.get(_hash(key))
-        return cached if cached is not None else default
-
-    def invalidate(self, key):
-        cache.delete(_hash(key))
-
-lbcache = LbCache()
-
-transport_adapter = HTTPAdapter(
+TRANSPORT_ADAPTER = HTTPAdapter(
     pool_connections=20,
     pool_maxsize=300,
 )
 
 # ESI objects to be imported
-esiapp = EsiApp(cache=lbcache, cache_time=0, datasource=config.ESI_DATASOURCE)
+esiapp = EsiApp(
+    cache=LBCACHE,
+    cache_time=21600,
+    datasource=config.ESI_DATASOURCE
+)
+
 esisecurity = EsiSecurity(
     app=esiapp.get_latest_swagger,
     redirect_uri="%s%s" % (
@@ -50,9 +35,17 @@ esisecurity = EsiSecurity(
 )
 esiclient = EsiClient(
     security=esisecurity,
-    transport_adapter=transport_adapter,
-    cache=lbcache,
-    headers={'User-Agent': config.ESI_USER_AGENT}
+    transport_adapter=TRANSPORT_ADAPTER,
+    cache=LBCACHE,
+    headers={'User-Agent': config.ESI_USER_AGENT},
+    retry_requests=True
+)
+esiclient_nocache = EsiClient(
+    security=esisecurity,
+    transport_adapter=TRANSPORT_ADAPTER,
+    cache=None,
+    headers={'User-Agent': config.ESI_USER_AGENT},
+    retry_requests=True
 )
 
 # register observers

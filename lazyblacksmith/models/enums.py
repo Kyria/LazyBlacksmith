@@ -12,17 +12,16 @@ class ActivityEnum(Enum):
     INVENTION = (8, 'Invention')
     REACTIONS = (11, 'Reactions')
 
-    def __init__(self, id, label):
-        self.id = id
+    def __init__(self, aid, label):
+        self.aid = aid
         self.label = label
-        
+
 
 class BlueprintEnum(Enum):
     """ Identify the "blueprint" type between bpo, bpc, reaction, relics """
-    
+
     NOTABLUEPRINT = 0
     REACTION = 1
     RELIC = 2
     BPC = 3
     BPO = 4
-    

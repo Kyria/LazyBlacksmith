@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+# flake8: noqa
 """${message}
 
 Revision ID: ${up_revision}

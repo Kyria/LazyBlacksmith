@@ -20,8 +20,7 @@ from lazyblacksmith.models import User
 from lazyblacksmith.models import db
 
 # extensions
-from lazyblacksmith.extension.cache import cache
-from lazyblacksmith.extension.celery_app import celery_app
+from lazyblacksmith.extension.cache import CACHE
 from lazyblacksmith.extension.login_manager import login_manager
 
 
@@ -72,9 +71,8 @@ def register_extensions(app):
     db.init_app(app)
     csrf = CSRFProtect()
     csrf.init_app(app)
-    cache.init_app(app)
+    CACHE.init_app(app)
     login_manager.init_app(app)
-    celery_app.init_app(app)
 
 
 def register_errorhandlers(app):

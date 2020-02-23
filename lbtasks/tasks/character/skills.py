@@ -1,34 +1,25 @@
 # -*- encoding: utf-8 -*-
-from ..lb_task import LbTask
-
-from lazyblacksmith.extension.celery_app import celery_app
+""" Update character skills """
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_characters_skills
-from lazyblacksmith.models import Skill
-from lazyblacksmith.models import TaskState
-from lazyblacksmith.models import TokenScope
-from lazyblacksmith.models import User
-from lazyblacksmith.models import db
-from lazyblacksmith.utils.time import utcnow
+from lazyblacksmith.models import Skill, TokenScope, User, db
+from lazyblacksmith.utils.models import (get_token_update_esipy,
+                                         inc_fail_token_scope,
+                                         update_token_state)
 
-from datetime import datetime
-from email.utils import parsedate
-
-import pytz
+from ... import celery_app
 
 
-@celery_app.task(name="update_character_skill", base=LbTask, bind=True)
-def task_update_character_skills(self, character_id):
+@celery_app.task(name="update_character_skill")
+def task_update_character_skills(character_id):
     """ Update the skills for a given character_id """
-    self.start()
-    skill_number = 0
 
     character = User.query.get(character_id)
     if character is None:
         return
 
     # get token
-    token = self.get_token_update_esipy(
+    token = get_token_update_esipy(
         character_id=character_id,
         scope=TokenScope.SCOPE_SKILL
     )
@@ -53,19 +44,9 @@ def task_update_character_skills(self, character_id):
                     level=skill_object.active_skill_level,
                 )
                 db.session.merge(skill)
-            skill_number += 1
+
         db.session.commit()
+        update_token_state(token, character_skills.header['Expires'][0])
 
     else:
-        self.inc_fail_token_scope(token, character_skills.status)
-        self.end(TaskState.ERROR)
-        return
-
-    # update the token and the state
-    token.request_try = 0
-    token.last_update = utcnow()
-    token.cached_until = datetime(
-        *parsedate(character_skills.header['Expires'][0])[:6]
-    ).replace(tzinfo=pytz.utc)
-    db.session.commit()
-    self.end(TaskState.SUCCESS)
+        inc_fail_token_scope(token, character_skills.status)

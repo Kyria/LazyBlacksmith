@@ -2,7 +2,6 @@
 from . import db
 from lazyblacksmith.models.utcdatetime import UTCDateTime
 
-from esipy import EsiClient
 from flask_login import UserMixin
 from sqlalchemy import func
 
@@ -51,10 +50,11 @@ class User(db.Model, UserMixin):
     # methods
     def get_portrait_url(self, datasource='tranquility', size=128):
         """returns URL to Character portrait from EVE Image Server"""
-        return "{0}Character/{1}_{2}.jpg".format(
-            EsiClient.__image_server__[datasource],
+        return "{0}/character/{1}/portrait/?size={3}&tenant={4}".format(
+            'https://images.evetech.net',
             self.character_id,
-            size
+            size,
+            datasource
         )
 
     def get_id(self):
