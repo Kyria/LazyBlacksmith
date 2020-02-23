@@ -8,17 +8,17 @@ title: Installation
 &nbsp;
 
 ## Requirements
-* Python 2.7
-* Celery 4
+* Python 3.5+
+* Celery 4.4
+* Celery Beat or manual trigger for tasks
 * Virtualenv (recommended)
-* [NodeJS](http://nodejs.org/) + [Grunt-CLI](http://gruntjs.com/getting-started)
-* Database connectors depending on the one you use (MySQL 5.6+,...)
+* [NodeJS](http://nodejs.org/)
+* Database connectors depending on the one you use (Validated for postgresql and mysql/mariadb)
 * See [requirements.txt](https://github.com/Kyria/LazyBlacksmith/tree/master/requirements/) for other requirements
-* (Optional/Recommended) Cache system (eg. python-memcached or redis-cache)
-* (Optional) [Redis](http://redis.io/) for async tasks and queues (and cache)!
+* (Optional/Recommended) Cache system, see [Flask-Caching](https://pythonhosted.org/Flask-Caching/)
 * Eve Online Icons (see CCP Icons part)
 
-__Important:__ As we use Celery 4.x, it will not work on windows !
+__Important:__ As we use Celery 4.4, it may not work on windows !
 
 &nbsp;
 
@@ -26,66 +26,56 @@ __Important:__ As we use Celery 4.x, it will not work on windows !
 
 #### Environnement
 Create your virtualenv and get LazyBlacksmith.
-```sh
+```bash
 git clone https://github.com/Kyria/LazyBlacksmith.git
 cd LazyBlacksmith
 virtualenv env
 ```
 
 Once your virtualenv is created, load it and install requirements
-```sh
+```bash
 source env/bin/activate
-pip install -r requirements/requirements.txt
-
-# if you are using celery with redis (optional)
-pip install -r requirements/requirements-celery-redis.txt
+pip3 install -U -r requirements/global-requirements.txt
+# If you want to use MySQL, add the following requirements
+pip3 install -U -r requirements/mysql-requirements.txt
+# If you want to use PostgreSQL, add the following requirements
+pip3 install -U -r requirements/postgresql-requirements.txt
 ```
 
 &nbsp;
 
 #### Configs
-You now need to create an application on [EVE Online Developpers](https://developers.eveonline.com/applications) to get CREST informations (secret key, client ID)
+You now need to create an application on [EVE Online Developpers](https://developers.eveonline.com/applications) to get ESI informations (secret key, client ID)
 
-Once this is done, copy config.dist into config.py and edit the file.
-Some mandatory informations :
+Once this is done, copy config.dist into config.py and edit the file with the right information everywhere.
+```bash
+cp config.dist config.py
 ```
-DEBUG : True for dev, False for prod (require static compilation, see below)
-SECRET_KEY : a secret key used for everything related to auth. Please change it !
-SQLALCHEMY_DATABASE_URI : the database informations
-USE_CCP_ICONS : True/False to display icons (read the CCP Icons chapter below)
-CACHE_TYPE : leave 'null' if no cache, or set it your needs
 
----
-
-Celery configs, use default config unless you know what you do.
-
----
-
-ESI configs : set it with what you got/set before in CCP Developpers Application
-```
+** Celery configuration is mandatory if you use it. Cache is highly recommended **
 
 &nbsp;
 
-#### Init data
+#### Setup the database
 Now you set everything, it's time to "install" the database. This should create all the table in your database (if you get any errors, check you sqlalchemy informations)
 ```sh
 python manage.py db upgrade
 ```
 
-Update the SDE data by running the following command. It will download the latest from fuzzwork SDE Conversion and import them. 
+Update the SDE data by running the following command. It will download the latest from fuzzwork SDE Conversion and import them.
 ```sh
-python update_sde.py
+python manage.py sde_import -d
 ```
 
 &nbsp;
 
 #### Static file compilation
-If you are using it in production environnement, or upgrading your installation, you need to remake all static files (css/js). 
+If you are using it in production environnement, or upgrading your installation, you need to remake all static files (css/js).
 
 ```sh
 # to install all the nodejs required package.
 npm install
-# to compile files 
+# to compile files
 npm run dist
 ```
 
@@ -104,19 +94,20 @@ To update the ESI data, you have 2 solutions :
 
 If you want to run celery tasks with crontab, you first need to start a celery worker :
 ```sh
-PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A celery_app:celery_app -Q lbqueue -c5
+# THIS IS ONLY AN EXAMPLE !
+PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A app_celery:celery_app -c5
 ```
 
 Then in your crontab, you must schedule all these commands:
 ```sh
 # to update character related data (every 5 min is enough)
-python manage.py celery_task -c
+python celery_cli.py tasks -c
 
 # to update universe (prices, etc) related data (every hour is enough)
-python manage.py celery_task -u
+python celery_cli.py tasks -u
 
 # to purge application useless data (once per day)
-python manage.py celery_task -p
+python celery_cli.py tasks -p
 ```
 
 As these commands must be run within the virtualenv, it'd be better to encapsulated these commands within a script like:
@@ -125,7 +116,7 @@ As these commands must be run within the virtualenv, it'd be better to encapsula
 source PATH/TO/LazyBlacksmith/env/bin/activate
 
 cd PATH/TO/LazyBlacksmith/
-python manage.py celery_task -c
+python celery_cli.py tasks -c
 ```
 
 &nbsp;
@@ -135,16 +126,16 @@ There are multiple solution to run celery with celery beat. The example below ar
 
 You can celery with the -B option, to run beat and worker in the same time :
 ```
-PATH/TO/LazyBlacksmith/env/bin/celery worker -A celery_app:celery_app -Q lbqueue -B -c5
+PATH/TO/LazyBlacksmith/env/bin/celery worker -A app_celery:celery_app -B -c5
 ```
 
 Or you can run two daemons, one for celery beat, the other for the workers :
 ```sh
 # celery beat
-PATH/TO/LazyBlacksmith/env/bin/celery beat -A celery_app:celery_app -Q lbqueue
+PATH/TO/LazyBlacksmith/env/bin/celery beat -A app_celery:celery_app
 
 # celery workers
-PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A celery_app:celery_app -Q lbqueue -c5
+PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A app_celery:celery_app -c5
 ```
 
 
