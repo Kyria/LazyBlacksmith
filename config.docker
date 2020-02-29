@@ -163,4 +163,4 @@ PURGE_OLD_PRICES = 15
 # set to None to use as much thread as there are pages.
 # You can adjust the number if you feel like the task
 # is too slow.
-MARKET_ORDER_THREADS = os.getenv('MARKET_ORDER_THREADS', 4)
+MARKET_ORDER_THREADS = int(os.getenv('MARKET_ORDER_THREADS', 4))
