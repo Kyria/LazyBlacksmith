@@ -17,21 +17,9 @@ RUN pip3 install -U -r mysql-requirements.txt
 RUN pip3 install -U -r postgresql-requirements.txt
 RUN pip3 install -U uwsgi redis
 
-COPY lazyblacksmith /lb/lazyblacksmith/
-COPY lbcmd          /lb/lbcmd/
-COPY lbtasks        /lb/lbtasks/
-COPY migrations     /lb/migrations/
-COPY app_celery.py  /lb/
-COPY app.py         /lb/
-COPY celery_cli.py  /lb/
-COPY config.dist    /lb/
-COPY manage.py      /lb/
-COPY config.docker  /lb/
-COPY package.json       /lb/
-COPY package-lock.json  /lb/
-COPY deploy/entrypoint.sh /lb/
+COPY . /lb/
 
-RUN chmod a+x /lb/entrypoint.sh
+RUN chmod a+x /lb/deploy/entrypoint.sh
 
 WORKDIR /lb
 RUN npm install
@@ -54,7 +42,11 @@ ENV PATH="/venv/bin:$PATH" \
     MARKET_ORDER_THREADS=4 \
     EVE_TYPES=http://content.eveonline.com/data/Invasion_1.0_Types.zip \
     UWSGI_PROCESSES=4 \
-    UWSGI_SOCKET_TYPE="--socket"
+    UWSGI_SOCKET_TYPE="--socket" \
+    UWSGI_OPTIONS="" \
+    CELERY_CONCURRENCY=4 \
+    CELERY_LOGLEVEL=INFO \
+    CELERY_OPTIONS=""
 
 EXPOSE 9090
 
@@ -69,4 +61,6 @@ COPY --chown=lb:lb --from=builder /lb /lb
 USER lb:lb
 
 WORKDIR /lb
-CMD ["/lb/entrypoint.sh"]
+
+ENTRYPOINT ["/lb/deploy/entrypoint.sh"]
+CMD ["uwsgi"]
