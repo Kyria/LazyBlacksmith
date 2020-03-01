@@ -25,6 +25,11 @@ WORKDIR /lb
 RUN npm install
 RUN npm run dist
 RUN rm -fR /lb/node_modules
+RUN mkdir -p /static \
+    && cp -fR /lb/lazyblacksmith/static/ccp /static \
+    && cp -fR /lb/lazyblacksmith/static/js  /static \
+    && cp -fR /lb/lazyblacksmith/static/css /static \
+    && cp -fR /lb/lazyblacksmith/static/img /static
 
 # ------------------------------------
 FROM python:3.7-slim AS runtime
@@ -55,8 +60,11 @@ RUN apt-get update \
     && groupadd -g 1001 lb \
     && useradd -M -s /bin/false -u 1001 -g lb -d /lb lb
 
+VOLUME [ "/static" ]
+
 COPY --chown=lb:lb --from=builder /venv /venv
 COPY --chown=lb:lb --from=builder /lb /lb
+COPY --chown=lb:lb --from=builder /static /static
 
 USER lb:lb
 
