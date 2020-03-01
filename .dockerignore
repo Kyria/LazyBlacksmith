@@ -32,3 +32,6 @@ celerybeat-schedule.db
 
 # configs
 config.py
+
+# docker stuff...
+Dockerfile

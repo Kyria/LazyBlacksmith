@@ -19,7 +19,7 @@ RUN pip3 install -U uwsgi redis
 
 COPY . /lb/
 
-RUN chmod a+x /lb/deploy/entrypoint.sh
+RUN chmod a+x /lb/deploy/*.sh
 
 WORKDIR /lb
 RUN npm install
@@ -34,7 +34,7 @@ RUN mkdir -p /static \
 # ------------------------------------
 FROM python:3.7-slim AS runtime
 
-ENV PATH="/venv/bin:$PATH" \
+ENV PATH="/venv/bin:/lb/deploy:$PATH" \
     SECRET_KEY="YouNeedToChangeThis8946513!!??" \
     EVE_DATASOURCE="tranquility" \
     DB_URI="mysql://user:password@db/db" \
@@ -45,7 +45,7 @@ ENV PATH="/venv/bin:$PATH" \
     ESI_REDIRECT_DOMAIN="" \
     ESI_USER_AGENT="LazyBlacksmith Docker/1.0" \
     MARKET_ORDER_THREADS=4 \
-    EVE_TYPES=http://content.eveonline.com/data/Invasion_1.0_Types.zip \
+    EVE_TYPES_URL=http://content.eveonline.com/data/Invasion_1.0_Types.zip \
     UWSGI_PROCESSES=4 \
     UWSGI_SOCKET_TYPE="--socket" \
     UWSGI_OPTIONS="" \
@@ -56,7 +56,7 @@ ENV PATH="/venv/bin:$PATH" \
 EXPOSE 9090
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev libmariadb-dev \
+    && apt-get install -y --no-install-recommends libpq-dev libmariadb-dev unzip bzip2 wget \
     && groupadd -g 1001 lb \
     && useradd -M -s /bin/false -u 1001 -g lb -d /lb lb
 
@@ -70,5 +70,5 @@ USER lb:lb
 
 WORKDIR /lb
 
-ENTRYPOINT ["/lb/deploy/entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["uwsgi"]
