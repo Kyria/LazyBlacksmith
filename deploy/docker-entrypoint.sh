@@ -53,5 +53,5 @@ case $ACTION in
     'uwsgi') run_uwsgi;;
     'celery') run_celery;;
     'celery-beat') run_celery_beat;;
-    *) run_uwsgi;;
+    *) exec "$@";;
 esac
