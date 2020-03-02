@@ -88,8 +88,8 @@ Where command can be one of the following.
 |-|-|
 | `dl_eve_types http://someURL` | Download the files from the URL provided. This is to update the EVE Types images from https://developers.eveonline.com/resource/resources |
 | `update_static_files` | Update the static files in the volume `/static`. This is required after an upgrade ! |
-| `"source /venv/bin/activate && python manage.py db upgrade"` | Upgrade the database model (required if you use SKIP_DB_UPGRADE from above) |
-| `"source /venv/bin/activate && python manage.py sde_import -d"` | Upgrade the sde data by downloading the latest export from fuzzwork (required if you use SKIP_DB_UPGRADE from above) |
-| `"source /venv/bin/activate && python celery_cli.py tasks -u"` | Manually run the celery tasks to update universe data |
-| `"source /venv/bin/activate && python celery_cli.py tasks -c"` | Manually run the celery tasks to update character data |
-| `"source /venv/bin/activate && python celery_cli.py tasks -p"` | Manually run the celery tasks to purge old data |
+| `bash -c "source /venv/bin/activate && python manage.py db upgrade"` | Upgrade the database model (required if you use SKIP_DB_UPGRADE from above) |
+| `bash -c "source /venv/bin/activate && python manage.py sde_import -d"` | Upgrade the sde data by downloading the latest export from fuzzwork (required if you use SKIP_DB_UPGRADE from above) |
+| `bash -c "source /venv/bin/activate && python celery_cli.py tasks -u"` | Manually run the celery tasks to update universe data |
+| `bash -c "source /venv/bin/activate && python celery_cli.py tasks -c"` | Manually run the celery tasks to update character data |
+| `bash -c "source /venv/bin/activate && python celery_cli.py tasks -p"` | Manually run the celery tasks to purge old data |
