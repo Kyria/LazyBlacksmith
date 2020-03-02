@@ -1,3 +1,8 @@
+---
+layout: base
+section: getting_started/docker
+title: Using Docker
+---
 # Running with docker
 
 ## Requirements
