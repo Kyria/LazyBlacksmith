@@ -22,23 +22,23 @@ If you use nginx or any webserver to serve static file, do not hesitate to map i
 
 | Variable | Defaults | Description |
 |-|-|-|
-| SECRET_KEY            | "YouNeedToChangeThis8946513!!??" | The secret key used for persistent session in flask. Please set your own ! |
-| DB_URI                | "mysql://user:password@db/db" | The DB URI to connect to the database |
-| EVE_DATASOURCE        | "tranquility" | ESI Related configuration: define where you get resources (tranquility, singularity...)|
-| ESI_SECRET_KEY        | "" | ESI Secret Key from https://developers.eveonline.com/ |
-| ESI_CLIENT_ID         | "" | ESI Client ID from https://developers.eveonline.com/  |
-| ESI_REDIRECT_DOMAIN   | "" | Redirect Base domain for ESI callback. This must be the root of your Lazyblacksmith instance, for example "http://127.0.0.1:9090 from this container |
-| ESI_USER_AGENT        | "LazyBlacksmith Docker/1.0" | Define the user agent that will be send with ESI queries. Use something that means really something / A way to contact you |
-| MARKET_ORDER_THREADS  | 4 | Number of threads used to gather regions market orders. The more you have the faster it may be, but also the more memory you will use |
-| EVE_TYPES_URL         | http://content.eveonline.com/data/Invasion_1.0_Types.zip | The URL to get the expansion types from https://developers.eveonline.com/resource/resources |
-| UWSGI_PROCESSES       | 4 | The number of uwsgi worker to run the application. |
-| UWSGI_SOCKET_TYPE     | "--socket" | Use "--socket" (default) to use this container behind a nginx instance (with uwsgi_pass). Use "--http-socket" to use http proxy (other than nginx) or direct access to this container |
-| UWSGI_OPTIONS         | "" | Use this to give uwsgi any other options you may need |
-| CELERY_BROKER         | "amqp://guest:guest@rabbitmq:5672" | The broker URI to connect the messaging queue for Celery |
-| CELERY_RESULT_BACKEND | "rpc://" | The result backend URI for celery |
-| CELERY_CONCURRENCY    | 4 | The number of worker run by celery |
-| CELERY_LOGLEVEL       | INFO | Default log verbosity |
-| CELERY_OPTIONS        | "" | Any options you may want to provide to celery workers and/or celery beat. |
+| SECRET_KEY            | `YouNeedToChangeThis8946513!!??` | The secret key used for persistent session in flask. Please set your own ! |
+| DB_URI                | `mysql://user:password@db/db` | The DB URI to connect to the database |
+| EVE_DATASOURCE        | `tranquility` | ESI Related configuration: define where you get resources (tranquility, singularity...)|
+| ESI_SECRET_KEY        |  | ESI Secret Key from https://developers.eveonline.com/ |
+| ESI_CLIENT_ID         |  | ESI Client ID from https://developers.eveonline.com/  |
+| ESI_REDIRECT_DOMAIN   |  | Redirect Base domain for ESI callback. This must be the root of your Lazyblacksmith instance, for example `http://127.0.0.1:9090` from this container |
+| ESI_USER_AGENT        | `LazyBlacksmith Docker/1.0` | Define the user agent that will be send with ESI queries. Use something that means really something / A way to contact you |
+| MARKET_ORDER_THREADS  | `4` | Number of threads used to gather regions market orders. The more you have the faster it may be, but also the more memory you will use |
+| EVE_TYPES_URL         | `http://content.eveonline.com/data/Invasion_1.0_Types.zip` | The URL to get the expansion types from https://developers.eveonline.com/resource/resources |
+| UWSGI_PROCESSES       | `4` | The number of uwsgi worker to run the application. |
+| UWSGI_SOCKET_TYPE     | `--socket` | Use `--socket` (default) to use this container behind a nginx instance (with uwsgi_pass). Use `--http-socket` to use http proxy (other than nginx) or direct access to this container |
+| UWSGI_OPTIONS         |  | Use this to give uwsgi any other options you may need |
+| CELERY_BROKER         | `amqp://guest:guest@rabbitmq:5672` | The broker URI to connect the messaging queue for Celery |
+| CELERY_RESULT_BACKEND | `rpc://` | The result backend URI for celery |
+| CELERY_CONCURRENCY    | `4` | The number of worker run by celery |
+| CELERY_LOGLEVEL       | `INFO` | Default log verbosity |
+| CELERY_OPTIONS        |  | Any options you may want to provide to celery workers and/or celery beat. |
 
 You may also want to provide your own `config.py` file if you need more customization (caching, market order region...).
 In this case just map the file to the container with `-v /your/custom/config.py:/lb/config.py`
