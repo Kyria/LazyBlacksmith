@@ -2,6 +2,7 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+name: lb-docker-build
 
 trigger:
   batch: true
@@ -40,6 +41,7 @@ jobs:
         Dockerfile: '**/Dockerfile'
         arguments: '--rm'
         addPipelineData: false
+        buildContext: $(Build.SourcesDirectory)
 
 - job: BuildAndPushToDockerHub
   displayName: 'Build and Push to Docker Hub'
@@ -59,6 +61,7 @@ jobs:
         Dockerfile: '**/Dockerfile'
         tags: $(customTag)
         addPipelineData: false
+        buildContext: $(Build.SourcesDirectory)
     - task: Docker@2
       displayName: Logout of Docker Registry
       inputs:
