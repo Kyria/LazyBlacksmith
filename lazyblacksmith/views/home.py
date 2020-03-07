@@ -4,7 +4,7 @@ from flask import redirect
 from flask import render_template
 from flask import url_for
 
-from lazyblacksmith.extension.cache import cache
+from lazyblacksmith.extension.cache import CACHE
 
 home = Blueprint('home', __name__)
 
@@ -15,6 +15,6 @@ def index():
 
 
 @home.route('/legal')
-@cache.cached(timeout=3600 * 24 * 7)
+@CACHE.cached(timeout=3600 * 24 * 7)
 def legal():
     return render_template('legal.html')

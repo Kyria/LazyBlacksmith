@@ -1,33 +1,32 @@
 # -*- encoding: utf-8 -*-
-from flask_sqlalchemy import SQLAlchemy
+""" Load all models here for migration ease """
+# pylint: disable=unused-import
+# flake8: noqa
 
-db = SQLAlchemy()
+from lazyblacksmith.extension.database import db
 
 # LB models
-from .user.token_scope import TokenScope  # noqa
-from .user.user import User  # noqa
-from .user.user_preference import UserPreference  # noqa
+from .user.token_scope import TokenScope
+from .user.user import User
+from .user.user_preference import UserPreference
 
 # SDE models
-from .sde.activity import Activity  # noqa
-from .sde.activitymaterial import ActivityMaterial  # noqa
-from .sde.activityproduct import ActivityProduct  # noqa
-from .sde.activityskill import ActivitySkill  # noqa
-from .sde.constellation import Constellation  # noqa
-from .sde.decryptor import Decryptor  # noqa
-from .sde.item import Item  # noqa
-from .sde.orerefining import OreRefining  # noqa
-from .sde.region import Region  # noqa
-from .sde.solarsystem import SolarSystem  # noqa
-
-# Tasks related models
-from .tasks.task_state import TaskState  # noqa
+from .sde.activity import Activity
+from .sde.activitymaterial import ActivityMaterial
+from .sde.activityproduct import ActivityProduct
+from .sde.activityskill import ActivitySkill
+from .sde.constellation import Constellation
+from .sde.decryptor import Decryptor
+from .sde.item import Item
+from .sde.orerefining import OreRefining
+from .sde.region import Region
+from .sde.solarsystem import SolarSystem
 
 # EVE API / universe models
-from .api.industry_index import IndustryIndex  # noqa
-from .api.item_adjusted_price import ItemAdjustedPrice  # noqa
-from .api.item_price import ItemPrice  # noqa
+from .api.industry_index import IndustryIndex
+from .api.item_adjusted_price import ItemAdjustedPrice
+from .api.item_price import ItemPrice
 
 # EVE API / Character models
-from .character.blueprint import Blueprint  # noqa
-from .character.skill import Skill  # noqa
+from .character.blueprint import Blueprint
+from .character.skill import Skill

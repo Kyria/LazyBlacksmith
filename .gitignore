@@ -8,6 +8,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+env_lnx/
 build/
 develop-eggs/
 dist/
@@ -87,3 +88,5 @@ lazyblacksmith/static/js/lb\.min\.js
 lazyblacksmith/static/js/lb\.min\.js\.map
 
 \.vscode/
+worker.pid
+celerybeat-schedule.db

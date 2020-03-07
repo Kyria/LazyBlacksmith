@@ -3,4 +3,5 @@ from __future__ import absolute_import
 
 from .esipy import esiapp  # noqa
 from .esipy import esiclient  # noqa
+from .esipy import esiclient_nocache  # noqa
 from .esipy import esisecurity  # noqa

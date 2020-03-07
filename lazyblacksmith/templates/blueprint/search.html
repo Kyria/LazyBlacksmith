@@ -42,7 +42,7 @@
                         {% for blueprint in blueprints -%}
                         <tr class="blueprint-{% if blueprint.corporation %}corporation{% else %}character{% endif %}" style="{% if blueprint.corporation %}display:none{% endif %}">
                             <td class="name">
-                                {% if blueprint.item.activity_products__eager and blueprint.item.activity_products__eager[0].activity == ActivityEnum.REACTIONS.id %}
+                                {% if blueprint.item.activity_products__eager and blueprint.item.activity_products__eager[0].activity == ActivityEnum.REACTIONS.aid %}
                                     <span class="badge badge-success">REA</span>
                                 {% elif blueprint.original %}
                                     <span class="badge badge-primary">BPO</span>
@@ -56,7 +56,7 @@
                             <td class="text-right">{% if blueprint.original %}&infin;{% else %}{{ blueprint.total_runs }}{% endif %}</td>
                             <td class="lb-search-bp-icon">
                                 <div class="btn-group" role="group">
-                                    {% if blueprint.item.activity_products__eager and blueprint.item.activity_products__eager[0].activity == ActivityEnum.REACTIONS.id %}
+                                    {% if blueprint.item.activity_products__eager and blueprint.item.activity_products__eager[0].activity == ActivityEnum.REACTIONS.aid %}
                                         <a href="{{ url_for('blueprint.reaction', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Reaction">
                                             <i class="fa fa-share-alt" aria-hidden="true"></i>
                                         </a>
@@ -69,7 +69,7 @@
                                         {% if not blueprint.item.is_ancient_relic() %}
                                             {% if blueprint.original %}
                                             <a href="{{ url_for('blueprint.research', item_id=blueprint.item_id) }}" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Research">
-                                                <i class="fa fa-hourglass-o" aria-hidden="true"></i> / <i class="fa fa-diamond" aria-hidden="true"></i>
+                                                <i class="far fa-hourglass" aria-hidden="true"></i> / <i class="far fa-gem" aria-hidden="true"></i>
                                             </a>
                                             {%- endif %}
                                             <a href="{{ url_for('blueprint.manufacturing', item_id=blueprint.item_id, me=blueprint.material_efficiency, te=blueprint.time_efficiency) }}" class="btn btn-outline-secondary btn-sm"  data-toggle="tooltip" data-placement="top" title="Manufacturing">

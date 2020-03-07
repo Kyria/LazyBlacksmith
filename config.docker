@@ -1,0 +1,166 @@
+from lazyblacksmith import __version__ as version
+import datetime
+import os
+
+# Application configurations
+# ------------------------------------------------------
+DEBUG = False
+SECRET_KEY = os.getenv('SECRET_KEY', 'YouNeedToChangeThis8946513!!??')
+PORT = 5015
+HOST = '0.0.0.0'
+
+# ESI swagger JSON endpoint
+# ------------------------------------------------------
+# Change it to 'singularity' to use the test server
+ESI_DATASOURCE = os.getenv('EVE_DATASOURCE', 'tranquility')
+ESI_SWAGGER_JSON = 'https://esi.tech.ccp.is/latest/swagger.json?datasource=%s' % ESI_DATASOURCE
+
+# ------------------------------------------------------
+# Database configuration
+# ------------------------------------------------------
+SQLALCHEMY_DATABASE_URI = os.getenv('DB_URI', 'mysql://user:password@server/db')
+
+# ------------------------------------------------------
+# Lazyblacksmith/CCP config
+# ------------------------------------------------------
+USE_CCP_ICONS = True
+
+# ------------------------------------------------------
+# cache configuration : use
+# https://pythonhosted.org/Flask-Caching/
+# to configure the cache you want
+# ------------------------------------------------------
+CACHE_TYPE = 'null'
+
+# ------------------------------------------------------
+# Celery configs
+# ------------------------------------------------------
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER', 'amqp://guest:guest@localhost:5672//')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'rpc://')
+CELERY_TASK_IGNORE_RESULT = True
+CELERY_TASK_DEFAULT_QUEUE = 'lbqueue'
+
+
+# EVE Online API Informations
+# register your app on https://developers.eveonline.com/
+# ------------------------------------------------------
+# Your ESI secret key
+# ------------------------------------------------------
+ESI_SECRET_KEY = os.getenv('ESI_SECRET_KEY')
+
+# ------------------------------------------------------
+# Your client ID
+# ------------------------------------------------------
+ESI_CLIENT_ID = os.getenv('ESI_CLIENT_ID')
+
+# ------------------------------------------------------
+# Redirect domain. Only put the domain, as the whole URL will be
+# constructed dynamically. (example: "localhost", "https://yourdomain.com")
+# ------------------------------------------------------
+ESI_REDIRECT_DOMAIN = os.getenv('ESI_REDIRECT_DOMAIN')
+
+# ------------------------------------------------------
+# Custom user agent to identify yourself to CCP, in case of problems
+# None for default
+# ------------------------------------------------------
+ESI_USER_AGENT = os.getenv('ESI_USER_AGENT', 'LazyBlacksmith/%d' % version)
+
+# ------------------------------------------------------
+# regions to get price from. (all 64 regions in k-space)
+# ------------------------------------------------------
+ESI_REGION_PRICE = [
+    10000001,
+    10000002,
+    10000003,
+    10000005,
+    10000006,
+    10000007,
+    10000008,
+    10000009,
+    10000010,
+    10000011,
+    10000012,
+    10000013,
+    10000014,
+    10000015,
+    10000016,
+    10000018,
+    10000020,
+    10000021,
+    10000022,
+    10000023,
+    10000025,
+    10000027,
+    10000028,
+    10000029,
+    10000030,
+    10000031,
+    10000032,
+    10000033,
+    10000034,
+    10000035,
+    10000036,
+    10000037,
+    10000038,
+    10000039,
+    10000040,
+    10000041,
+    10000042,
+    10000043,
+    10000044,
+    10000045,
+    10000046,
+    10000047,
+    10000048,
+    10000049,
+    10000050,
+    10000051,
+    10000052,
+    10000053,
+    10000054,
+    10000055,
+    10000056,
+    10000057,
+    10000058,
+    10000059,
+    10000060,
+    10000061,
+    10000062,
+    10000063,
+    10000064,
+    10000065,
+    10000066,
+    10000067,
+    10000068,
+    10000069
+]
+
+# ------------------------------------------------------
+# DO NOT EDIT
+# Fix warnings from flask-sqlalchemy / others
+# ------------------------------------------------------
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+CACHE_NO_NULL_WARNING = True
+
+# ------------------------------------------------------
+# Session settings
+# ------------------------------------------------------
+PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=30)
+
+# ------------------------------------------------------
+# Purge settings (in days)
+# ------------------------------------------------------
+PURGE_OLD_TASKS = 15
+PURGE_INVALID_TOKENS = 30
+PURGE_OLD_PRICES = 15
+
+# ------------------------------------------------------
+# Tasks settings
+# ------------------------------------------------------
+
+# Task: task_update_region_order_price
+# ----
+# set to None to use as much thread as there are pages.
+# You can adjust the number if you feel like the task
+# is too slow.
+MARKET_ORDER_THREADS = int(os.getenv('MARKET_ORDER_THREADS', 4))

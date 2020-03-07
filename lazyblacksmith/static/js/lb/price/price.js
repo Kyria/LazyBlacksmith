@@ -147,8 +147,8 @@ var itemPriceLookup = (function ($, lb, Humanize, utils) {
         $('.price-list').tablesorter({
             theme: "bootstrap",
             headerTemplate : '{content} {icon}',
-            cssIconAsc: 'fa fa-sort-asc',
-            cssIconDesc: 'fa fa-sort-desc',
+            cssIconAsc: 'fa fa-sort-up',
+            cssIconDesc: 'fa fa-sort-down',
             cssIconNone: 'fa fa-sort',
         });
 

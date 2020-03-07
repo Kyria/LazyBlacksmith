@@ -1,0 +1,64 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+name: lb-docker-build
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - develop
+    - master
+    - refs/tags/*
+
+pr:
+ branches:
+    include:
+    - develop
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    customTag: 'latest'
+  ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
+    customTag: $(Build.SourceBranchName)
+  
+jobs:
+- job: pullrequests
+  displayName: "Pull Request build test"
+  condition: eq(variables['Build.Reason'], 'PullRequest')
+  steps:
+    - task: Docker@2
+      displayName: Build LB image
+      inputs:
+        containerRegistry: 'dockerhub'
+        repository: 'anakhon/lazyblacksmith'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+        arguments: '--rm'
+        addPipelineData: false
+        buildContext: $(Build.SourcesDirectory)
+
+- job: BuildAndPushToDockerHub
+  displayName: 'Build and Push to Docker Hub'
+  condition: ne(variables['Build.Reason'], 'PullRequest') 
+  steps:
+    - task: Docker@2
+      displayName: Login to Docker Registry
+      inputs:
+        command: login
+        containerRegistry: 'dockerhub'
+    - task: Docker@2
+      displayName: Build & Push LB image
+      inputs:
+        containerRegistry: 'dockerhub'
+        repository: 'anakhon/lazyblacksmith'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: $(customTag)
+        addPipelineData: false
+        buildContext: $(Build.SourcesDirectory)

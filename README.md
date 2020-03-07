@@ -4,130 +4,20 @@
 
 An EVE Online Industry application for lazy people.
 
-
 ## About
 LazyBlacksmith is a flask application allowing people to get informations about industry in eveonline.
 
-#### Features
+## Features
 * Blueprints
  * Manufacturing informations including components required and installation costs
  * Research data for material and time efficiency (time, cost)
  * Invention informations for components and costs.
+ * Reaction informations for components and costs.
 * Get and compare item price over all regions
 
-#### CREST (as batch or through celery)
-* Use CREST market price / adjusted price for costs
-* Use CREST industry index for installation fee
+## Documentation
 
-#### TODO
-* Ore refining and compression (see branch ore_refining_compression)
- * View refining table
- * Calculate compression from user needs (in materials) and using defaults ore
-  * Also allow to manually select what ore we want to use to compress
-* Permalinks in manufacturing / research / production
-* Link API key to user account (CREST Login) to get, save and configure existing blueprints, with their ME/TE for direct use in manufacturing / invention
-
-
-
-## Requirements
-* Python 2.7
-* Virtualenv (recommended)
-* [NodeJS](http://nodejs.org/) + [Grunt-CLI](http://gruntjs.com/getting-started)
-* Database connectors depending on the one you use (MySQL 5.6+,...)
-* See [requirements.txt](requirements/) for other requirements
-* (Optional/Recommended) Cache system (eg. python-memcached or redis-cache)
-* (Optional) [Redis](http://redis.io/) for async tasks and queues (and cache)!
-* Eve Online Icons (see CCP Icons part)
-
-
-
-## Installation
-
-#### Environnement
-Create your virtualenv and get LazyBlacksmith.
-```shell
-git clone https://github.com/Kyria/LazyBlacksmith.git
-cd LazyBlacksmith
-virtualenv env
-```
-
-Once your virtualenv is created, load it and install requirements
-```
-# in windows, type env/Script/activate
-source env/bin/activate
-pip install -r requirements/requirements.txt
-
-# if you are using celery with redis
-pip install -r requirements/requirements-celery-redis.txt
-```
-
-#### Configs
-You now need to create an application on [EVE Online Developpers](https://developers.eveonline.com/applications) to get CREST informations (secret key, client ID)
-
-Once this is done, copy config.dist into config.py and edit the file.
-Some mandatory informations :
-```
-DEBUG : True for dev, False for prod (require static compilation, see below)
-SQLALCHEMY_DATABASE_URI : the database informations
-USE_CCP_ICONS : True/False to display icons (read the CCP Icons chapter below)
-CACHE_TYPE : leave 'null' if no cache, or set it your needs
-
-Celery configs, if you don't use it, leave them like that
-
-CREST API informations : set it with what you got/set before in CCP Developpers Application
-```
-
-#### Init data
-Now you set everything, it's time to "install" the database. This should create all the table in your database (if you get any errors, check you sqlalchemy informations)
-```
-python manage.py db upgrade
-```
-
-Download the latest SDE conversion from fuzzwork in sqlite [here](https://www.fuzzwork.co.uk/dump/sqlite-latest.sqlite.bz2) unzip it then load it with :
-```
-python manage.py sde_import -d path/to/sqlite-latest.sqlite
-```
-
-If you also want to have some CREST data right now, you can run the following commands :
-```
-python manage.py celery_task -a update_adjusted_price
-python manage.py celery_task -a update_industry_index
-python manage.py celery_task -a update_market_price
-```
-
-#### Static file compilation
-If you are using it in production environnement, or upgrading your installation, you need to remake all static files (css/js). For this, first do ```npm install``` to install all the nodejs required package, then type ```grunt``` to compile the static files.
-
-#### CREST / API
-To update the CREST data, you have 2 solutions :
-* run them directly, as you did in the "init data" part
-* use celery
-
-##### Celery + Celery Beat (Scheduler)
-There are multiple solution to run celery with celery beat. The example below are the minimal configurations.
-
-You can celery with the -B option, to run beat and worker in the same time :
-```
-PATH/TO/LazyBlacksmith/env/bin/celery worker -A celery_app:celery_app -B -c5
-```
-
-Or you can run two daemons, one for celery beat, the other for the workers :
-```
-# celery beat
-PATH/TO/LazyBlacksmith/env/bin/celery beat -A celery_app:celery_app
-
-# celery workers
-PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A celery_app:celery_app -c5
-```
-
-
-
-## CCP Icons
-
-If you set ```USE_CCP_ICONS = True``` you need to download the files "EVE_VERSION_Types.zip" from CCP Toolkit ; https://developers.eveonline.com/resource/resources and then
-move the files into ```lazyblacksmith/static/ccp/``` (as a result, you should have ```lazyblacksmith/static/ccp/Types/files.png```)
-
-
+[See here for the docs](https://kyria.github.io/LazyBlacksmith/)
 
 ## Contact
 Guillaume B.

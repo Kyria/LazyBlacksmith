@@ -50,8 +50,8 @@ def search():
         ).outerjoin(
             ActivityProduct,
             (Blueprint.item_id == ActivityProduct.item_id) & (
-                (ActivityProduct.activity == ActivityEnum.INVENTION.id) |
-                (ActivityProduct.activity == ActivityEnum.REACTIONS.id)
+                (ActivityProduct.activity == ActivityEnum.INVENTION.aid) |
+                (ActivityProduct.activity == ActivityEnum.REACTIONS.aid)
             )
         ).options(
             db.contains_eager(Blueprint.item)
@@ -87,7 +87,7 @@ def manufacturing(item_id, me=0, te=0):
     if item.max_production_limit is None:
         if item.is_from_manufacturing:
             activity_product = item.product_for_activities.filter_by(
-                activity=ActivityEnum.MANUFACTURING.id
+                activity=ActivityEnum.MANUFACTURING.aid
             ).one()
             return redirect(
                 url_for(
@@ -101,18 +101,18 @@ def manufacturing(item_id, me=0, te=0):
         abort(404)
 
     activity = item.activities.filter_by(
-        activity=ActivityEnum.MANUFACTURING.id
+        activity=ActivityEnum.MANUFACTURING.aid
     ).one()
     materials = item.activity_materials.filter_by(
-        activity=ActivityEnum.MANUFACTURING.id
+        activity=ActivityEnum.MANUFACTURING.aid
     )
     product = item.activity_products.filter_by(
-        activity=ActivityEnum.MANUFACTURING.id
+        activity=ActivityEnum.MANUFACTURING.aid
     ).one()
 
     # get science skill name, if applicable
     manufacturing_skills = item.activity_skills.filter_by(
-        activity=ActivityEnum.MANUFACTURING.id,
+        activity=ActivityEnum.MANUFACTURING.aid,
     ).filter(
         ActivitySkill.skill_id != 3380  # industry
     )
@@ -165,15 +165,15 @@ def research(item_id):
         abort(404)
 
     activity_material = item.activities.filter_by(
-        activity=ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id
+        activity=ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.aid
     ).one()
 
     activity_time = item.activities.filter_by(
-        activity=ActivityEnum.RESEARCH_TIME_EFFICIENCY.id
+        activity=ActivityEnum.RESEARCH_TIME_EFFICIENCY.aid
     ).one()
 
     activity_copy = item.activities.filter_by(
-        activity=ActivityEnum.COPYING.id
+        activity=ActivityEnum.COPYING.aid
     ).one()
 
     research_activity_materials = item.activity_materials.all()
@@ -183,9 +183,9 @@ def research(item_id):
         IndustryIndex.solarsystem_id == SolarSystem.id,
         SolarSystem.name == current_user.pref.research_system,
         IndustryIndex.activity.in_([
-            ActivityEnum.COPYING.id,
-            ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id,
-            ActivityEnum.RESEARCH_TIME_EFFICIENCY.id,
+            ActivityEnum.COPYING.aid,
+            ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.aid,
+            ActivityEnum.RESEARCH_TIME_EFFICIENCY.aid,
         ])
     )
     index_list = {}
@@ -194,7 +194,7 @@ def research(item_id):
 
     # get materials and prices
     manufacturing_materials = item.activity_materials.filter_by(
-        activity=ActivityEnum.MANUFACTURING.id
+        activity=ActivityEnum.MANUFACTURING.aid
     ).all()
 
     prices = {}
@@ -234,11 +234,11 @@ def research(item_id):
         te_duration = activity_time.time * level_modifier
         me_cost = (
             item.base_cost * 0.02 * level_modifier * 1.1 *
-            index_list[ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id]
+            index_list[ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.aid]
         )
         te_cost = (
             item.base_cost * 0.02 * level_modifier * 1.1 *
-            index_list[ActivityEnum.RESEARCH_TIME_EFFICIENCY.id]
+            index_list[ActivityEnum.RESEARCH_TIME_EFFICIENCY.aid]
         )
 
         me_time[level] = {
@@ -252,9 +252,9 @@ def research(item_id):
 
     # get materials for all activities except manuf/reaction
     research_materials = {
-        ActivityEnum.COPYING.id: {'total': 0, 'mats': []},
-        ActivityEnum.RESEARCH_TIME_EFFICIENCY.id: {'total': 0, 'mats': []},
-        ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.id: {'total': 0, 'mats': []},
+        ActivityEnum.COPYING.aid: {'total': 0, 'mats': []},
+        ActivityEnum.RESEARCH_TIME_EFFICIENCY.aid: {'total': 0, 'mats': []},
+        ActivityEnum.RESEARCH_MATERIAL_EFFICIENCY.aid: {'total': 0, 'mats': []},
     }
 
     for material in research_activity_materials:
@@ -308,14 +308,14 @@ def invention(item_id):
     check_invention = ActivityProduct.query.filter_by(
         item_id=item_id
     ).filter_by(
-        activity=ActivityEnum.INVENTION.id
+        activity=ActivityEnum.INVENTION.aid
     ).first()
 
     if item.max_production_limit is None or check_invention is None:
         # the item_id is not a blueprint, so get the blueprint then redirect
         if item.max_production_limit is None and item.is_from_manufacturing:
             source_blueprint = item.product_for_activities.filter_by(
-                activity=ActivityEnum.MANUFACTURING.id
+                activity=ActivityEnum.MANUFACTURING.aid
             ).one_or_none()
             return redirect(
                 url_for(
@@ -330,7 +330,7 @@ def invention(item_id):
         # the source from invention, or abort.
         if item.max_production_limit is not None:
             activity_product = item.product_for_activities.filter_by(
-                activity=ActivityEnum.INVENTION.id
+                activity=ActivityEnum.INVENTION.aid
             ).one_or_none()
             if activity_product is not None:
                 return redirect(
@@ -345,11 +345,11 @@ def invention(item_id):
 
     # global activity
     activity_copy = item.activities.filter_by(
-        activity=ActivityEnum.COPYING.id
+        activity=ActivityEnum.COPYING.aid
     ).first()
 
     invention_skills = item.activity_skills.filter_by(
-        activity=ActivityEnum.INVENTION.id
+        activity=ActivityEnum.INVENTION.aid
     ).all()
 
     # copy stuff
@@ -357,7 +357,7 @@ def invention(item_id):
     if activity_copy is not None:
         # copy base cost, as it's different from the invention
         materials = item.activity_materials.filter_by(
-            activity=ActivityEnum.MANUFACTURING.id
+            activity=ActivityEnum.MANUFACTURING.aid
         )
         copy_base_cost = calculate_base_cost(materials)
 
@@ -376,9 +376,9 @@ def invention(item_id):
 
     # calculate baseCost for invention
     materials = item.activity_products.filter_by(
-        activity=ActivityEnum.INVENTION.id
+        activity=ActivityEnum.INVENTION.aid
     ).first().product.activity_materials.filter_by(
-        activity=ActivityEnum.MANUFACTURING.id
+        activity=ActivityEnum.MANUFACTURING.aid
     )
     invention_base_cost = calculate_base_cost(materials)
 
@@ -387,8 +387,8 @@ def invention(item_id):
         IndustryIndex.solarsystem_id == SolarSystem.id,
         SolarSystem.name == current_user.pref.invention_system,
         IndustryIndex.activity.in_([
-            ActivityEnum.COPYING.id,
-            ActivityEnum.INVENTION.id,
+            ActivityEnum.COPYING.aid,
+            ActivityEnum.INVENTION.aid,
         ])
     )
 
@@ -404,7 +404,7 @@ def invention(item_id):
         'blueprint': item,
         'activity_copy': activity_copy,
         'activity_invention': item.activities.filter_by(
-            activity=ActivityEnum.INVENTION.id
+            activity=ActivityEnum.INVENTION.aid
         ).one(),
         'copy_base_cost': copy_base_cost,
         'invention_base_cost': invention_base_cost,
@@ -413,10 +413,10 @@ def invention(item_id):
         'encryption_skill': encryption_skill,
         'index_list': index_list,
         'invention_materials': item.activity_materials.filter_by(
-            activity=ActivityEnum.INVENTION.id
+            activity=ActivityEnum.INVENTION.aid
         ).all(),
         'invention_products': item.activity_products.filter_by(
-            activity=ActivityEnum.INVENTION.id
+            activity=ActivityEnum.INVENTION.aid
         ).all(),
         'regions': get_regions(),
         'industry_skills': get_common_industry_skill(char),
@@ -434,7 +434,7 @@ def reaction(item_id):
 
     if item.max_production_limit is None:
         activity_product = item.product_for_activities.filter_by(
-            activity=ActivityEnum.REACTIONS.id
+            activity=ActivityEnum.REACTIONS.aid
         ).one_or_none()
         if activity_product is not None:
             return redirect(
@@ -447,13 +447,13 @@ def reaction(item_id):
         abort(404)
 
     activity = item.activities.filter_by(
-        activity=ActivityEnum.REACTIONS.id
+        activity=ActivityEnum.REACTIONS.aid
     ).one()
     materials = item.activity_materials.filter_by(
-        activity=ActivityEnum.REACTIONS.id
+        activity=ActivityEnum.REACTIONS.aid
     )
     product = item.activity_products.filter_by(
-        activity=ActivityEnum.REACTIONS.id
+        activity=ActivityEnum.REACTIONS.aid
     ).one()
 
     return render_template('blueprint/reaction.html', **{
