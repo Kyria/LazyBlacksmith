@@ -1,0 +1,40 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - develop
+    - master
+    - refs/tags/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'anakhon/lazyblacksmith'
+  dockerRegistry: 'dockerhub'
+  tag: ${Build.SourceBranchName}
+
+steps:
+- task: Docker@2
+  displayName: Login to Docker Registry
+  inputs:
+    command: login
+    containerRegistry: ${dockerRegistry}
+- task: Docker@2
+  displayName: Build LB image
+  inputs:
+    Dockerfile: deploy/Dockerfile
+    command: buildAndPush
+    repository: ${imageName}
+    containerRegistry: ${dockerRegistry}
+    tags: 
+- task: Docker@2
+  displayName: Logout of Docker Registry
+  inputs:
+    command: logout
+    containerRegistry: ${dockerRegistry}
