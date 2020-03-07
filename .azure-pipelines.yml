@@ -16,7 +16,6 @@ pool:
 
 variables:
   imageName: 'anakhon/lazyblacksmith'
-  dockerRegistry: 'dockerhub'
   tag: ${Build.SourceBranchName}
 
 steps:
@@ -24,17 +23,17 @@ steps:
   displayName: Login to Docker Registry
   inputs:
     command: login
-    containerRegistry: ${dockerRegistry}
+    containerRegistry: 'dockerhub'
 - task: Docker@2
   displayName: Build LB image
   inputs:
     Dockerfile: deploy/Dockerfile
     command: buildAndPush
     repository: ${imageName}
-    containerRegistry: ${dockerRegistry}
-    tags: 
+    containerRegistry: 'dockerhub'
+    tags: ${tag}
 - task: Docker@2
   displayName: Logout of Docker Registry
   inputs:
     command: logout
-    containerRegistry: ${dockerRegistry}
+    containerRegistry: 'dockerhub'
