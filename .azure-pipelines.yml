@@ -53,7 +53,7 @@ jobs:
         command: login
         containerRegistry: 'dockerhub'
     - task: Docker@2
-      displayName: Build LB image
+      displayName: Build & Push LB image
       inputs:
         containerRegistry: 'dockerhub'
         repository: 'anakhon/lazyblacksmith'
@@ -62,8 +62,3 @@ jobs:
         tags: $(customTag)
         addPipelineData: false
         buildContext: $(Build.SourcesDirectory)
-    - task: Docker@2
-      displayName: Logout of Docker Registry
-      inputs:
-        command: logout
-        containerRegistry: 'dockerhub'
