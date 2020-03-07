@@ -1,3 +1,4 @@
+#python stuff
 __pycache__
 *.pyc
 *.pyo
@@ -16,22 +17,19 @@ pip-delete-this-directory.txt
 nosetests.xml
 coverage.xml
 *,cover
-*.log
-.git
-node_modules
+
+# Project specific
+.azure-pipelines.yml
 .eslintrc.json
 .gitattributes
 .gitignore
 .pylintrc
 .vscode
-tmp
 *.sqlite
-
-# celery stuff
+*.log
+.git
 celerybeat-schedule.db
-
-# configs
 config.py
-
-# docker stuff...
 Dockerfile
+tmp
+node_modules
