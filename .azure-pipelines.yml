@@ -11,29 +11,56 @@ trigger:
     - master
     - refs/tags/*
 
+pr:
+ branches:
+    include:
+    - develop
+    - master
+
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  imageName: 'anakhon/lazyblacksmith'
-  tag: ${Build.SourceBranchName}
+  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    customTag: 'latest'
+  ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
+    customTag: $(Build.SourceBranchName)
+  
+jobs:
+- job: pullrequests
+  displayName: "Pull Request build test"
+  condition: eq(variables['Build.Reason'], 'PullRequest')
+  steps:
+    - task: Docker@2
+      displayName: Build LB image
+      inputs:
+        containerRegistry: 'dockerhub'
+        repository: 'anakhon/lazyblacksmith'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+        arguments: '--rm'
+        addPipelineData: false
 
-steps:
-- task: Docker@2
-  displayName: Login to Docker Registry
-  inputs:
-    command: login
-    containerRegistry: 'dockerhub'
-- task: Docker@2
-  displayName: Build LB image
-  inputs:
-    Dockerfile: deploy/Dockerfile
-    command: buildAndPush
-    repository: ${imageName}
-    containerRegistry: 'dockerhub'
-    tags: ${tag}
-- task: Docker@2
-  displayName: Logout of Docker Registry
-  inputs:
-    command: logout
-    containerRegistry: 'dockerhub'
+- job: BuildAndPushToDockerHub
+  displayName: 'Build and Push to Docker Hub'
+  condition: ne(variables['Build.Reason'], 'PullRequest') 
+  steps:
+    - task: Docker@2
+      displayName: Login to Docker Registry
+      inputs:
+        command: login
+        containerRegistry: 'dockerhub'
+    - task: Docker@2
+      displayName: Build LB image
+      inputs:
+        containerRegistry: 'dockerhub'
+        repository: 'anakhon/lazyblacksmith'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: $(customTag)
+        addPipelineData: false
+    - task: Docker@2
+      displayName: Logout of Docker Registry
+      inputs:
+        command: logout
+        containerRegistry: 'dockerhub'
