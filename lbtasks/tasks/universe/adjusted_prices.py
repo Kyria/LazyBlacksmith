@@ -1,11 +1,12 @@
 # -*- encoding: utf-8 -*-
 """ Market adjusted prices tasks """
+from sqlalchemy.exc import SQLAlchemyError
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_markets_prices
 from lazyblacksmith.models import Item, ItemAdjustedPrice, db
 from lazyblacksmith.models.enums import ActivityEnum
 
-from ... import celery_app
+from ... import celery_app, logger
 
 
 @celery_app.task(name="universe.adjusted_price")
@@ -13,9 +14,13 @@ def task_adjusted_price_base_cost():
     """Task that update the adjusted prices from the API then calculate the
     base cost for every blueprints.
     """
-    prices = update_adjusted_price()
-    if prices is not None:
-        update_base_costs(prices)
+    try:
+        prices = update_adjusted_price()
+        if prices is not None:
+            update_base_costs(prices)
+    except SQLAlchemyError:
+        db.session.rollback()
+        logger.exception("Error while trying to update adjusted prices")
 
 
 def update_adjusted_price():

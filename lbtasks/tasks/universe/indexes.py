@@ -1,11 +1,12 @@
 # -*- encoding: utf-8 -*-
 """ Market indexes task """
+from sqlalchemy.exc import SQLAlchemyError
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_industry_systems
 from lazyblacksmith.models import IndustryIndex
 from lazyblacksmith.models import db
 
-from ... import celery_app
+from ... import celery_app, logger
 
 
 @celery_app.task(name="universe.industry_indexes")
@@ -27,9 +28,13 @@ def task_industry_indexes():
                 row['cost_index'] = activity_index.cost_index
                 insert_index_list.append(row)
 
-        db.engine.execute("TRUNCATE TABLE %s" % IndustryIndex.__tablename__)
-        db.engine.execute(
-            IndustryIndex.__table__.insert(),
-            insert_index_list
-        )
-        db.session.commit()
+        try:
+            db.engine.execute("TRUNCATE TABLE %s" % IndustryIndex.__tablename__)
+            db.engine.execute(
+                IndustryIndex.__table__.insert(),
+                insert_index_list
+            )
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            logger.exception("Error while updating indexes")

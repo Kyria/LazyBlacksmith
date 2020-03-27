@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 """ Update character skills """
+from sqlalchemy.exc import SQLAlchemyError
 from lazyblacksmith.extension.esipy import esiclient
 from lazyblacksmith.extension.esipy.operations import get_characters_skills
 from lazyblacksmith.models import Skill, TokenScope, User, db
@@ -7,7 +8,7 @@ from lazyblacksmith.utils.models import (get_token_update_esipy,
                                          inc_fail_token_scope,
                                          update_token_state)
 
-from ... import celery_app
+from ... import celery_app, logger
 
 
 @celery_app.task(name="update_character_skill")
@@ -45,8 +46,14 @@ def task_update_character_skills(character_id):
                 )
                 db.session.merge(skill)
 
-        db.session.commit()
-        update_token_state(token, character_skills.header['Expires'][0])
+        try:
+            db.session.commit()
+            update_token_state(token, character_skills.header['Expires'][0])
+        except SQLAlchemyError:
+            db.session.rollback()
+            logger.exception(
+                "Error while to commit skills"
+            )
 
     else:
         inc_fail_token_scope(token, character_skills.status)
