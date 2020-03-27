@@ -19,7 +19,7 @@ RUN pip3 install -U uwsgi redis
 
 COPY . /lb/
 
-RUN chmod a+x /lb/deploy/*.sh
+RUN chmod a+x /lb/deploy/*
 
 WORKDIR /lb
 RUN npm install
