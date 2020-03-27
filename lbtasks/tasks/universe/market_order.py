@@ -108,9 +108,8 @@ def task_update_region_order_price(region_id, item_id_list):
         save_item_prices(item_list)
 
     except SQLAlchemyError as exc:
-        logger.error(
-            'Something went wrong while trying to insert/update data: %s',
-            str(exc)
+        logger.exception(
+            'Something went wrong while trying to insert/update data:',
         )
         db.session.rollback()
 

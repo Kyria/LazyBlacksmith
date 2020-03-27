@@ -111,7 +111,8 @@ def task_update_character_blueprints(character_id):
                     db.session.add(blueprints[key])
                     db.session.commit()
                 except SQLAlchemyError:
-                    logger.exception(
+                    db.session.rollback()
+                    logger.error(
                         "Error while trying to add blueprint id: %d",
                         item_id
                     )
@@ -127,7 +128,8 @@ def task_update_character_blueprints(character_id):
     try:
         db.session.commit()
     except SQLAlchemyError:
-        logger.exception(
+        db.session.rollback()
+        logger.error(
             "Error while trying to delete unused blueprints"
         )
 
