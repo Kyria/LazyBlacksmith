@@ -164,7 +164,7 @@
                     <option selected value="0">None</option>
                     {% for decryptor in decryptors -%}
                     <option value="{{ decryptor.item_id }}">
-                        {{ decryptor.item.name }} ({{ (decryptor.probability_multiplier - 1) * 100}}% / {{ decryptor.material_modifier }} / {{ decryptor.time_modifier }} / {{ decryptor.run_modifier }})
+                        {{ decryptor.item.name }} ({{ ((decryptor.probability_multiplier - 1) * 100) | floatcomma }}% / {{ decryptor.material_modifier }} / {{ decryptor.time_modifier }} / {{ decryptor.run_modifier }})
                     </option>
                     {% endfor %}
                 </select>
