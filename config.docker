@@ -63,7 +63,7 @@ ESI_REDIRECT_DOMAIN = os.getenv('ESI_REDIRECT_DOMAIN')
 # Custom user agent to identify yourself to CCP, in case of problems
 # None for default
 # ------------------------------------------------------
-ESI_USER_AGENT = os.getenv('ESI_USER_AGENT', 'LazyBlacksmith/%d' % version)
+ESI_USER_AGENT = os.getenv('ESI_USER_AGENT', 'LazyBlacksmith/%s' % version)
 
 # ------------------------------------------------------
 # regions to get price from. (all 64 regions in k-space)
