@@ -61,7 +61,7 @@ ESI_REDIRECT_DOMAIN = ''
 # Custom user agent to identify yourself to CCP, in case of problems
 # None for default
 # ------------------------------------------------------
-ESI_USER_AGENT = 'LazyBlacksmith/%d' % version
+ESI_USER_AGENT = 'LazyBlacksmith/%s' % version
 
 # ------------------------------------------------------
 # Request per seconds for market order fetch (via ESI)
