@@ -239,6 +239,7 @@
                         <th class="text-right">ME</th>
                         <th class="text-right">TE</th>
                         <th class="text-right">Invention Cost</th>
+                        <th class="text-right">Inv. Cost / Manuf. run</th>
                         <th class="text-right">Product Price / Run</th>
                     </thead>
                     <tbody>
@@ -249,6 +250,7 @@
                             <td class="text-right">2%</td>
                             <td class="text-right">4%</td>
                             <td class="text-right invention-cost">0</td>
+                            <td class="text-right invention-cost-per-product">0</td>
                             <td class="text-right total-cost">0</td>
                         </tr>
                         {% for decryptor in decryptors -%}
@@ -259,6 +261,7 @@
                             <td class="text-right">{{ decryptor.material_modifier + 2 }}%</td>
                             <td class="text-right">{{ decryptor.time_modifier + 4 }}%</td>
                             <td class="text-right invention-cost">0</td>
+                            <td class="text-right invention-cost-per-product">0</td>
                             <td class="text-right total-cost">0</td>
                         </tr>
                         {% endfor %}
@@ -332,18 +335,22 @@
                                 {% set copy_cost = "0" %}
                                 {% endif %}
                                 <tr>
-                                    <td class="title">Invention Installation</td>
+                                    <td class="title">Installation</td>
                                     {% set invention_cost = (invention_base_cost * index_list[8] * 0.02 * 1.1) -%}
                                     <td class="data invention-install-cost">{{ invention_cost | floatcomma }}</td>
                                 </tr>
                                 <tr>
                                     {% set invention_total_cost = (copy_cost | float) + (invention_cost | float) -%}
-                                    <td class="title">Total</td>
+                                    <td class="title">Invention</td>
                                     <td class="data invention-total-cost">{{ invention_total_cost | floatcomma }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="title">Total with Probability</td>
+                                    <td class="title">Invention + Probability</td>
                                     <td class="data invention-total-cost-proba">{{ (invention_total_cost / invention_products[0].probability) | floatcomma }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="title">Invention + Probability / Manufacturing Run</td>
+                                    <td class="data invention-total-cost-per-product">{{ ((invention_total_cost / invention_products[0].probability) / invention_products[0].quantity) | floatcomma }}</td>
                                 </tr>
                                 <tr>
                                     <td class="title">
