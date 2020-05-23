@@ -6,25 +6,24 @@
 {% block js %}
 {% set pref = current_user.pref %}
     <script>
-        lb.urls.manufacturingUrl    = "{{ url_for('blueprint.manufacturing', item_id='111111') }}";
-        lb.urls.buildCostUrl        = "{{ url_for('ajax_eve_sde.build_cost_item', material_efficiency='0,1,2,3,4,5', blueprint_id=invention_products[0].product_id, region_id=10000002) }}";
+        lb.urls.manufacturingUrl    = "{{ url_for('blueprint.manufacturing', item_id='111111') }}"
+        lb.urls.buildCostUrl        = "{{ url_for('ajax_eve_sde.build_cost_item', material_efficiency='0,1,2,3,4,5', blueprint_id=invention_products[0].product_id, region_id=10000002) }}"
 
-        {{ blueprint.item_id }}
-        inventionBlueprint.options.inventionBaseCost = {{ invention_base_cost }};
-        inventionBlueprint.options.copyBaseCost = {{ copy_base_cost }};
-        inventionBlueprint.options.baseCopyTime = {% if activity_copy is not none %}{{ activity_copy.time }}{% else %}0{% endif %};
-        inventionBlueprint.options.baseInventionTime = {{ activity_invention.time }};
-        inventionBlueprint.options.baseInventionProbability = {{ invention_products[0].probability }};
-        inventionBlueprint.options.baseOutputRun = {{ invention_products[0].quantity }};
-        inventionBlueprint.options.copyImplant = {{ pref.invention_copy_implant }};
+        inventionBlueprint.options.inventionBaseCost = {{ invention_base_cost }}
+        inventionBlueprint.options.copyBaseCost = {{ copy_base_cost }}
+        inventionBlueprint.options.baseCopyTime = {% if activity_copy is not none %}{{ activity_copy.time }}{% else %}0{% endif %}
+        inventionBlueprint.options.baseInventionTime = {{ activity_invention.time }}
+        inventionBlueprint.options.baseInventionProbability = {{ invention_products[0].probability }}
+        inventionBlueprint.options.baseOutputRun = {{ invention_products[0].quantity }}
+        inventionBlueprint.options.copyImplant = {{ pref.invention_copy_implant }}
 
-        inventionBlueprint.indexes['{{ pref.invention_system|lower }}'] = {};
+        inventionBlueprint.indexes['{{ pref.invention_system|lower }}'] = {}
         {% for activity, index in index_list.items() -%}
-        inventionBlueprint.indexes['{{ pref.invention_system|lower }}'][{{ activity }}] = {{ index }};
+        inventionBlueprint.indexes['{{ pref.invention_system|lower }}'][{{ activity }}] = {{ index }}
         {% endfor %}
 
-        {% for inv_mat in invention_materials %}
-        inventionBlueprint.matData.idList.push({{ inv_mat.material_id }});
+        {% for inv_mat in invention_materials -%}
+        inventionBlueprint.matData.idList.push({{ inv_mat.material_id }})
         inventionBlueprint.matData.materials[{{ inv_mat.material_id }}] = {
             quantity: {{ inv_mat.quantity }},
             id: {{ inv_mat.material_id }},
@@ -32,16 +31,16 @@
         }
         {% endfor -%}
         {%- if blueprint.is_ancient_relic() %}
-        inventionBlueprint.matData.idList.push({{ blueprint.id }});
+        inventionBlueprint.matData.idList.push({{ blueprint.id }})
         inventionBlueprint.matData.materials[{{ blueprint.id }}] = {
             quantity: 1,
             id: {{ blueprint.id }},
             name: '{{ blueprint.name }}',
         }
-        {% endif %}
+        {% endif -%}
 
-        {% for decryptor in decryptors %}
-        inventionBlueprint.decryptorData.idList.push({{ decryptor.item_id }});
+        {%- for decryptor in decryptors -%}
+        inventionBlueprint.decryptorData.idList.push({{ decryptor.item_id }})
         inventionBlueprint.decryptorData.items[{{ decryptor.item_id }}] = {
             id: {{ decryptor.item_id }},
             name: '{{ decryptor.item.name }}',
@@ -49,25 +48,25 @@
             me: {{ decryptor.material_modifier }},
             te: {{ decryptor.time_modifier }},
             run: {{ decryptor.run_modifier }},
-        };
-        {% endfor %}
+        }
+        {% endfor -%}
 
-        inventionBlueprint.options.system = '{{ pref.invention_system|lower }}';
-        inventionBlueprint.options.region = {{ pref.invention_price_region }};
-        inventionBlueprint.options.regionType = '{{ pref.invention_price_type }}';
-        inventionBlueprint.options.structureInventionRig = {{ pref.invention_invention_rig }};
-        inventionBlueprint.options.structureCopyRig = {{ pref.invention_copy_rig }};
-        inventionBlueprint.options.structureSecStatus = '{{ pref.invention_security }}';
-        inventionBlueprint.options.facility = {{ pref.invention_facility }};
+        inventionBlueprint.options.system = '{{ pref.invention_system|lower }}'
+        inventionBlueprint.options.region = {{ pref.invention_price_region }}
+        inventionBlueprint.options.regionType = '{{ pref.invention_price_type }}'
+        inventionBlueprint.options.structureInventionRig = {{ pref.invention_invention_rig }}
+        inventionBlueprint.options.structureCopyRig = {{ pref.invention_copy_rig }}
+        inventionBlueprint.options.structureSecStatus = '{{ pref.invention_security }}'
+        inventionBlueprint.options.facility = {{ pref.invention_facility }}
 
-        {% for skill in datacore_skills %}
-        inventionBlueprint.options.datacoreLevel{{loop.index}} = {{ skill.level }};
-        {%- endfor %}
-        inventionBlueprint.options.encryptionLevel = {{ encryption_skill.level }};
-        inventionBlueprint.options.advancedIndustryLevel = {{ industry_skills['adv_industry'] }};
-        inventionBlueprint.options.scienceLevel = {{ industry_skills['science'] }};
+        {% for skill in datacore_skills -%}
+        inventionBlueprint.options.datacoreLevel{{loop.index}} = {{ skill.level }}
+        {% endfor -%}
+        inventionBlueprint.options.encryptionLevel = {{ encryption_skill.level }}
+        inventionBlueprint.options.advancedIndustryLevel = {{ industry_skills['adv_industry'] }}
+        inventionBlueprint.options.scienceLevel = {{ industry_skills['science'] }}
 
-        lb.run('inventionBlueprint');
+        lb.run('inventionBlueprint')
     </script>
 {% endblock %}
 
