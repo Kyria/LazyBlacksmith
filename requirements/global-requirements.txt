@@ -22,4 +22,4 @@ ratelimiter>=1.1.0
 simplejson>=3.17.0
 
 # EVE API Libs
-EsiPy>=1.0.0
+EsiPy>=1.2.0

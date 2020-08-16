@@ -11,8 +11,8 @@ class LbCache(BaseCache):
     def __init__(self, lb_cache):
         self.cache = lb_cache
 
-    def set(self, key, value):
-        self.cache.set(_hash(key), value)
+    def set(self, key, value, expire=300):
+        self.cache.set(_hash(key), value, expire)
 
     def get(self, key, default=None):
         cached = self.cache.get(_hash(key))
