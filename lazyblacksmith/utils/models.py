@@ -21,6 +21,8 @@ def get_regions(is_wh=False):
         Region.id.in_(config.ESI_REGION_PRICE)
     ).filter_by(
         wh=is_wh
+    ).order_by(
+        Region.name
     )
 
 
