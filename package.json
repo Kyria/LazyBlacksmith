@@ -6,7 +6,7 @@
     "css-main": "npm-run-all css-build css-concat css-minify",
     "css-build": "node-sass --output-style expanded --precision 6 lazyblacksmith/static/scss/lb.scss lazyblacksmith/static/css/bootstrap_lb.css",
     "css-concat": "shx cat lazyblacksmith/static/css/bootstrap_lb.css lazyblacksmith/static/css/animate.css > lazyblacksmith/static/css/lb.css",
-    "css-minify": "cleancss --level 1  --format breakWith=lf --source-map --source-map-inline-sources --output lazyblacksmith/static/css/lb.min.css lazyblacksmith/static/css/lb.css",
+    "css-minify": "cleancss -O1 --format breakWith=lf --source-map --source-map-inline-sources --output lazyblacksmith/static/css/lb.min.css lazyblacksmith/static/css/lb.css",
     "js-main": "npm-run-all js-concat js-minify",
     "js-concat": "shx cat lazyblacksmith/static/js/misc/{font-awesome,humanize,nouislider,popper,typeahead.bundle,utils}.js lazyblacksmith/static/bootstrap/js/bootstrap.js lazyblacksmith/static/js/jquery/*.js lazyblacksmith/static/js/lb/*.js lazyblacksmith/static/js/lb/*/*.js > lazyblacksmith/static/js/lb.js",
     "js-minify": "uglifyjs --compress typeofs=false --mangle --comments \"/^!/\" --source-map \"includeSources,url=lb.min.js.map\" --output lazyblacksmith/static/js/lb.min.js lazyblacksmith/static/js/lb.js",
@@ -16,11 +16,11 @@
     "watch-js-main": "nodemon --watch lazyblacksmith/static/js/ --ext js --exec \"npm run js-main\""
   },
   "devDependencies": {
-    "clean-css-cli": "^4.3.0",
-    "node-sass": "^4.13.0",
-    "nodemon": "^1.19.4",
+    "clean-css-cli": "^5.2.2",
+    "node-sass": "^5.0.0",
+    "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.2",
-    "uglify-js": "^3.6.9"
+    "uglify-js": "^3.13.3"
   }
 }
