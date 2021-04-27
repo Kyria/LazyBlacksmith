@@ -39,7 +39,7 @@ def search():
     has_corp_bp = False
 
     if current_user.is_authenticated:
-        blueprints = Blueprint.query.join(User, Item).filter(
+        blueprints = Blueprint.query.join(Item).join(User).filter(
             (
                 (Blueprint.character_id == current_user.character_id) |
                 (

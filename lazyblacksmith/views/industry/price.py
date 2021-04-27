@@ -15,6 +15,8 @@ def index():
         Region.id.in_(config.ESI_REGION_PRICE)
     ).filter_by(
         wh=False
+    ).order_by(
+        Region.name
     )
 
     return render_template('price/price.html', **{

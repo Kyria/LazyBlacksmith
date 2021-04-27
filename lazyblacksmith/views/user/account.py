@@ -18,7 +18,7 @@ account = Blueprint('account', __name__)
 @login_required
 def index():
     # get region from pref price region (for display)
-    all_regions = Region.query.filter(Region.wh.is_(False)).all()
+    all_regions = Region.query.filter(Region.wh.is_(False)).order_by(Region.name).all()
     the_forge_region = Region.query.get(10000002)
 
     invention_price_region = Region.query.get(
