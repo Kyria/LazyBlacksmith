@@ -15,6 +15,7 @@ from lazyblacksmith.utils.purge import delete_account
 from lazyblacksmith.utils.purge import purge_characters_blueprints
 from lazyblacksmith.utils.purge import purge_characters_skill
 from lazyblacksmith.utils.purge import purge_corporation_blueprints
+from lazyblacksmith.utils.request import is_xhr
 
 from . import logger
 
@@ -25,7 +26,7 @@ ajax_account = Blueprint('ajax_account', __name__)
 @login_required
 def delete_characters_skills():
     """ remove all character skills for current user """
-    if request.is_xhr:
+    if is_xhr(request):
         try:
             purge_characters_skill(current_user)
             return json_response(
@@ -49,7 +50,7 @@ def delete_characters_skills():
 @login_required
 def delete_characters_blueprint():
     """ remove all character blueprint for current user """
-    if request.is_xhr:
+    if is_xhr(request):
         try:
             purge_characters_blueprints(current_user)
             return json_response(
@@ -73,7 +74,7 @@ def delete_characters_blueprint():
 @login_required
 def delete_corporation_blueprint():
     """ remove all character blueprint for current user """
-    if request.is_xhr:
+    if is_xhr(request):
         try:
             purge_corporation_blueprints(current_user)
             return json_response(
@@ -99,7 +100,7 @@ def delete_corporation_blueprint():
 @login_required
 def delete_user_account():
     """ remove all character blueprint for current user """
-    if request.is_xhr:
+    if is_xhr(request):
         char_id = current_user.character_id
         try:
             delete_account(current_user)
@@ -122,7 +123,7 @@ def delete_user_account():
 @login_required
 def delete_scope(character_id, scope):
     """ Remove a scope for a given character_id from the database """
-    if request.is_xhr:
+    if is_xhr(request):
         allowed_character_id = [
             alt.character_id for alt in current_user.alts_characters.all()
         ]
@@ -157,7 +158,7 @@ def delete_scope(character_id, scope):
 @login_required
 def update_user_industry_preference():
     """ Update the user preferences for industry """
-    if request.is_xhr:
+    if is_xhr(request):
         preferences = request.get_json()
 
         if 'production' in preferences:

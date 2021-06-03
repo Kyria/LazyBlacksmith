@@ -8,6 +8,7 @@ from lazyblacksmith.models import ItemAdjustedPrice
 from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.utils.json import json_response
+from lazyblacksmith.utils.request import is_xhr
 
 import humanize
 
@@ -19,7 +20,7 @@ def get_price(item_list):
     """
     Get prices for all items we need !
     """
-    if request.is_xhr:
+    if is_xhr(request):
 
         item_list = item_list.split(',')
 

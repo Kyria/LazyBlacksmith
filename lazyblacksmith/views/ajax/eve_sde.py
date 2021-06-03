@@ -19,6 +19,7 @@ from lazyblacksmith.models import ItemPrice
 from lazyblacksmith.models import SolarSystem
 from lazyblacksmith.models import db
 from lazyblacksmith.models.enums import ActivityEnum
+from lazyblacksmith.utils.request import is_xhr
 
 
 ajax_eve_sde = Blueprint('ajax_eve_sde', __name__)
@@ -31,7 +32,7 @@ def blueprint_search(name):
     Return JSON result for a specific search
     name is the request name.
     """
-    if request.is_xhr:
+    if is_xhr(request):
         name_lower = name.lower()
 
         # prevent only % string, to avoid query the full database at once...
@@ -94,7 +95,7 @@ def blueprint_bom(blueprint_id):
     As reaction and manufacturing cannot happen on the same blueprint at once
     we can safely ask for both at the same time (to be used in prod/reactions)
     """
-    if request.is_xhr:
+    if is_xhr(request):
         blueprints = ActivityMaterial.query.filter(
             ActivityMaterial.item_id == blueprint_id,
             (
@@ -179,7 +180,7 @@ def solarsystems():
     """
     Return JSON result with system list (ID,Name)
     """
-    if request.is_xhr:
+    if is_xhr(request):
         systems = SolarSystem.query.all()
         data = []
         for system in systems:
@@ -196,7 +197,7 @@ def item_search(name):
     Return JSON result for a specific search
     name is the request name.
     """
-    if request.is_xhr:
+    if is_xhr(request):
         cache_key = 'item:search:%s' % (name.lower().replace(" ", ""),)
 
         data = CACHE.get(cache_key)

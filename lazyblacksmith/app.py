@@ -13,6 +13,7 @@ from lazyblacksmith.utils.template_filter import templatefilter
 from lazyblacksmith.utils.time import utcnow
 from lazyblacksmith.utils.context_processor import inject_user
 from lazyblacksmith.utils.context_processor import inject_enums
+from lazyblacksmith.utils.request import is_xhr
 
 # db
 from lazyblacksmith.models import TokenScope
@@ -93,7 +94,7 @@ def register_before_requests(app):
 
     def check_and_update_user():
         """ check for invalid token and print message and update last seen """
-        if flask_login.current_user.is_authenticated and not request.is_xhr:
+        if flask_login.current_user.is_authenticated and not is_xhr(request):
             char_id = flask_login.current_user.character_id
             current_user = flask_login.current_user
             count_error = TokenScope.query.filter_by(
