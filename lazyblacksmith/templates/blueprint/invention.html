@@ -230,7 +230,7 @@
         </ul>
         <div class="tab-content">
             <div class="fade show active tab-pane" role="tabpanel" id="summary">
-                <table class="lb-table-sm">
+                <table class="lb-table-sm lb-sorted" id="summary-decryptors">
                     <thead>
                         <th class="text-center">Decryptor</th>
                         <th class="text-right">Chance</th>
@@ -368,7 +368,7 @@
                         </table>
                     </div>
                     <div class="col-sm-6">
-                        <table class="lb-list lb-table-sm">
+                        <table class="lb-list lb-table-sm lb-sorted" id="details-materials">
                             <thead>
                                 <tr>
                                     {% if config.USE_CCP_ICONS -%}<th>&nbsp;</th>{%- endif %}

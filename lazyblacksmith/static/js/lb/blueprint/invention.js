@@ -278,6 +278,8 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
         $('.copy-time').html(utils.durationToString(copyTime))
         $('.copy-cost').html(Humanize.intcomma(copyCost, 2))
+
+        $("#details-materials").trigger("update",[true]);
     }
 
 
@@ -352,6 +354,7 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             $('.decryptor-' + decryptor.id + ' .invention-cost').html(Humanize.intcomma(inventionTotalPriceProba, 2))
             $('.decryptor-' + decryptor.id + ' .invention-cost-per-product').html(Humanize.intcomma(inventionCostPerProduct, 2))
             $('.decryptor-' + decryptor.id + ' .total-cost').html(Humanize.intcomma(totalPrice, 2))
+            $("#summary-decryptors").trigger("update",[true]);
         }
     }
 
@@ -547,6 +550,14 @@ var inventionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         $('[data-toggle="tooltip"]').tooltip({
             container: 'body',
         })
+
+        $('.lb-sorted').tablesorter({
+            theme: "bootstrap",
+            headerTemplate : '{content} {icon}',
+            cssIconAsc: 'fa fa-sort-up',
+            cssIconDesc: 'fa fa-sort-down',
+            cssIconNone: 'fa fa-sort',
+        });
 
         // check all required urls (so we don't have to do it later)
         if(!lb.urls.manufacturingUrl || !lb.urls.buildCostUrl) {

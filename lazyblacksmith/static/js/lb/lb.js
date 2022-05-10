@@ -26,6 +26,7 @@ var lb = (function($, utils) {
         modules[moduleName] = module;
     };
 
+
     /**
      * Call the run function on the specific module
      */
