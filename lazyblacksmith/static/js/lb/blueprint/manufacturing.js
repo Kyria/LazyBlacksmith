@@ -317,6 +317,14 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
 
             $('#tab-subcomp .content').html(html)
 
+            $('#tab-subcomp .lb-sorted').tablesorter({
+                theme: "bootstrap",
+                headerTemplate : '{content} {icon}',
+                cssIconAsc: 'fa fa-sort-up',
+                cssIconDesc: 'fa fa-sort-down',
+                cssIconNone: 'fa fa-sort',
+            });
+
             // update material quantity list
             _generateMaterialListQuantity()
 
@@ -692,6 +700,7 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
             }
         }
         $('#materials-time tbody').html(output)
+        $("#materials-time").trigger("update",[true]);
     }
 
     /**
@@ -723,6 +732,7 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
         }
         $('#materials-requirement #mat-total-volume').html(Humanize.intcomma(globalVolume, 2))
         $('#materials-requirement tbody').html(output)
+        $("#materials-requirement").trigger("update",[true]);
     }
 
     /**
@@ -761,6 +771,7 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
                                .replace(/@@PRICE_TOTAL@@/g, Humanize.intcomma(materialPrice, 2))
         }
         $('#materials-prices tbody').html(output)
+        $("#materials-prices").trigger("update",[true]);
 
         priceData.totalCost = materialTotalPrice
         _getSystemCostIndex()
@@ -812,6 +823,7 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
             }
         }
         $('#materials-taxes tbody').html(output)
+        $("#materials-taxes").trigger("update",[true]);
 
         priceData.totalInstallationCost = totalInstallationCost
         _updateMarginMarkupTable()
@@ -1504,6 +1516,14 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
             utils.copyToClipboard(multiBuy)
         })
 
+        $('.lb-sorted').tablesorter({
+            theme: "bootstrap",
+            headerTemplate : '{content} {icon}',
+            cssIconAsc: 'fa fa-sort-up',
+            cssIconDesc: 'fa fa-sort-down',
+            cssIconNone: 'fa fa-sort',
+        });
+
         // check all required urls (so we don't have to do it later)
         if (!lb.urls.systemUrls || !lb.urls.materialBOMUrl || !lb.urls.priceUrl || !lb.urls.indexActivityUrl ||
             !lb.urls.tplSublistBlockUrl || !lb.urls.tplSublistRowUrl || !lb.urls.tplModalPriceUrl) {
@@ -1522,6 +1542,7 @@ var manufacturingBlueprint = (function ($, lb, utils, eveUtils, eveData, Humaniz
         _updateSummaryTabs()
         _updateMaterial()
         _updateTime()
+
     }
 
     // -------------------------------------------------

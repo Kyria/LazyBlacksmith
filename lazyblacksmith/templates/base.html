@@ -105,6 +105,21 @@
         lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
         lb.urls.index               = "{{ url_for('home.index') }}"
 
+        $.tablesorter.addParser({
+            id: "humanizedDuration",
+            is: function(s) {
+                return /\d+[dhms]/.test(s);
+            },
+            format: function(str) {
+                d = parseInt((str.match(/\d+d/g) ?? ["0d"])[0]);
+                h = parseInt((str.match(/\d+h/g) ?? ["0h"])[0]);
+                m = parseInt((str.match(/\d+m/g) ?? ["0m"])[0]);
+                s = parseInt((str.match(/\d+s/g) ?? ["0s"])[0]);
+                return ((d*24 + h)*60+m)*60+s;
+            },
+            type: "numeric"
+        });
+
         {% with messages = get_flashed_messages(with_categories=true) -%}
             {%- if messages -%}
                 {%- for category, message in messages -%}

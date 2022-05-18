@@ -331,6 +331,14 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
             $('#tab-subcomp .content').html(html);
 
+            $('#tab-subcomp .lb-sorted').tablesorter({
+                theme: "bootstrap",
+                headerTemplate : '{content} {icon}',
+                cssIconAsc: 'fa fa-sort-up',
+                cssIconDesc: 'fa fa-sort-down',
+                cssIconNone: 'fa fa-sort',
+            });
+
             // update material quantity list
             _generateMaterialListQuantity();
 
@@ -736,6 +744,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             }
         }
         $('#materials-time tbody').html(output);
+        $("#materials-time").trigger("update",[true]);
     }
 
 
@@ -769,6 +778,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
         }
         $('#materials-requirement #mat-total-volume').html(Humanize.intcomma(globalVolume, 2))
         $('#materials-requirement tbody').html(output);
+        $("#materials-requirement").trigger("update",[true]);
     }
 
 
@@ -808,6 +818,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
                                .replace(/@@PRICE_TOTAL@@/g, Humanize.intcomma(materialPrice, 2));
         }
         $('#materials-prices tbody').html(output);
+        $("#materials-prices").trigger("update",[true]);
 
         priceData.totalCost = materialTotalPrice;
         _getSystemCostIndex();
@@ -860,6 +871,7 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
             }
         }
         $('#materials-taxes tbody').html(output);
+        $("#materials-taxes").trigger("update",[true]);
 
         priceData.totalInstallationCost = totalInstallationCost;
         _updateMarginMarkupTable();
@@ -1599,6 +1611,14 @@ var reactionBlueprint = (function($, lb, utils, eveUtils, eveData, Humanize) {
 
         $('#multibuy').on('click', function() {
             utils.copyToClipboard(multiBuy);
+        });
+
+        $('.lb-sorted').tablesorter({
+            theme: "bootstrap",
+            headerTemplate : '{content} {icon}',
+            cssIconAsc: 'fa fa-sort-up',
+            cssIconDesc: 'fa fa-sort-down',
+            cssIconNone: 'fa fa-sort',
         });
 
         // check all required urls (so we don't have to do it later)

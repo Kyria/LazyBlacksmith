@@ -270,6 +270,7 @@ class Importer(object):
             JOIN invGroups ig ON ig.groupID = it1.groupID
             WHERE ig.categoryID = 25
                 AND it1.published = 1
+                AND it1.marketGroupID is not NULL
         """)
 
         new = []
