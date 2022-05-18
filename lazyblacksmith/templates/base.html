@@ -85,7 +85,7 @@
     <script src="{{ url_for('static', filename='js/misc/popper.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/nouislider.js') }}"></script>
     <script src="{{ url_for('static', filename='js/misc/utils.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lb/eveutils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lb/evedata.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lb/lb.js') }}"></script>
@@ -100,9 +100,9 @@
     <script src="{{ url_for('static', filename='js/lb.min.js') }}"></script>
 {% endif %}
     <script>
-        lb.urls.indexActivityUrl    = "{{ url_for('ajax_eve_api.get_index_activity', solar_system_names='SYSTEM_LIST_TO_REPLACE') }}";
-        lb.urls.priceUrl            = "{{ url_for('ajax_eve_api.get_price', item_list='ITEM_LIST_TO_REPLACE') }}";
-        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
+        lb.urls.indexActivityUrl    = "{{ url_for('ajax_eve_api.get_index_activity', solar_system_names='SYSTEM_LIST_TO_REPLACE') }}";
+        lb.urls.priceUrl            = "{{ url_for('ajax_eve_api.get_price', item_list='ITEM_LIST_TO_REPLACE') }}";
+        lb.urls.systemUrls          = "{{ url_for('ajax_eve_sde.solarsystems') }}";
         lb.urls.index               = "{{ url_for('home.index') }}"
 
         $.tablesorter.addParser({
