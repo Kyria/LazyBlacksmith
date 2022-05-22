@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 from . import db
-from .activity import Activity
 
 
 class Item(db.Model):
@@ -76,7 +75,8 @@ class Item(db.Model):
     activity_products__eager = db.relationship(
         'ActivityProduct',
         lazy='joined',
-        foreign_keys='ActivityProduct.item_id'
+        foreign_keys='ActivityProduct.item_id',
+        viewonly=True
     )
 
     def icon(self, size):
