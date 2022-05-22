@@ -12,18 +12,6 @@ then
 fi
 
 function run_uwsgi {
-    # check if TYPES Icons are set already or if they changed.
-    if [[ ! -z "$EVE_TYPES_URL" ]]
-    then
-        types_name=${EVE_TYPES_URL##*/}
-        types_loaded=$(cat /static/ccp/loaded 2>/dev/null)
-        if [[ "$types_name" != "$types_loaded" ]]
-        then
-            dl_eve_types "$EVE_TYPES_URL"
-            [[ $? -eq 0 ]] && echo $types_name > /static/ccp/loaded
-        fi
-    fi
-
     # check if we want to skip the db upgrade at startup
     if [[ "$SKIP" -eq 0 ]]
     then

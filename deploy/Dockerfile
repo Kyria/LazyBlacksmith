@@ -26,7 +26,6 @@ RUN npm install
 RUN npm run dist
 RUN rm -fR /lb/node_modules
 RUN mkdir -p /static \
-    && cp -fR /lb/lazyblacksmith/static/ccp /static \
     && cp -fR /lb/lazyblacksmith/static/js  /static \
     && cp -fR /lb/lazyblacksmith/static/css /static \
     && cp -fR /lb/lazyblacksmith/static/img /static
@@ -45,7 +44,6 @@ ENV PATH="/venv/bin:/lb/deploy:$PATH" \
     ESI_REDIRECT_DOMAIN="" \
     ESI_USER_AGENT="LazyBlacksmith Docker/1.0" \
     MARKET_ORDER_THREADS=4 \
-    EVE_TYPES_URL=http://content.eveonline.com/data/Invasion_1.0_Types.zip \
     UWSGI_PROCESSES=4 \
     UWSGI_SOCKET_TYPE="--socket" \
     UWSGI_OPTIONS="" \

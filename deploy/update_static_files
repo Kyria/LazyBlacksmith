@@ -4,8 +4,6 @@ echo "[INFO] Create /static"
 mkdir -p /static
 
 echo "[INFO] Copy files in /static ..."
-echo "# ccp files"
-cp -fR /lb/lazyblacksmith/static/ccp /static
 echo "# js files"
 cp -fR /lb/lazyblacksmith/static/js  /static
 echo "# css files"
