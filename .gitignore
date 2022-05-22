@@ -58,6 +58,7 @@ docs/_build/
 target/
 
 # nodeJS stuff
+.nvmrc
 node_modules/
 
 # OSX hidden files
@@ -67,6 +68,7 @@ node_modules/
 config.py
 *.sqlite
 *.sublime-*
+.env
 env3/
 config_docker\.py
 

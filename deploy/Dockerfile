@@ -1,37 +1,42 @@
-FROM python:3.7-slim as builder
-LABEL maintainer="anakhon@gmail.com"
+FROM node:12-slim as js-builder
 
-ARG NODEJS_SOURCE=https://deb.nodesource.com/setup_12.x
+COPY package.json package-lock.json /lb/
 
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends build-essential gcc libpq-dev libmariadb-dev curl
-RUN curl -sL $NODEJS_SOURCE | bash - && apt-get install -y nodejs
+WORKDIR /lb
 
-RUN python -m venv /venv
-ENV PATH="/venv/bin:$PATH"
-
-COPY requirements .
-RUN pip install --upgrade pip
-RUN pip3 install -U -r global-requirements.txt
-RUN pip3 install -U -r mysql-requirements.txt
-RUN pip3 install -U -r postgresql-requirements.txt
-RUN pip3 install -U uwsgi redis
+RUN npm install
 
 COPY . /lb/
 
-RUN chmod a+x /lb/deploy/*
-
-WORKDIR /lb
-RUN npm install
 RUN npm run dist
-RUN rm -fR /lb/node_modules
+
 RUN mkdir -p /static \
     && cp -fR /lb/lazyblacksmith/static/js  /static \
     && cp -fR /lb/lazyblacksmith/static/css /static \
     && cp -fR /lb/lazyblacksmith/static/img /static
 
 # ------------------------------------
+
+FROM python:3.7-slim as py-builder
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential gcc libpq-dev libmariadb-dev
+
+RUN python -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+COPY requirements .
+
+RUN pip install --upgrade pip && \
+    pip install -U -r global-requirements.txt && \
+    pip install -U -r mysql-requirements.txt && \
+    pip install -U -r postgresql-requirements.txt && \
+    pip install -U uwsgi redis
+
+# ------------------------------------
+
 FROM python:3.7-slim AS runtime
+LABEL maintainer="anakhon@gmail.com"
 
 ENV PATH="/venv/bin:/lb/deploy:$PATH" \
     SECRET_KEY="YouNeedToChangeThis8946513!!??" \
@@ -54,15 +59,22 @@ ENV PATH="/venv/bin:/lb/deploy:$PATH" \
 EXPOSE 9090
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev libmariadb-dev unzip bzip2 wget \
+    && apt-get install -y --no-install-recommends libpq-dev libmariadb-dev \
     && groupadd -g 1001 lb \
     && useradd -M -s /bin/false -u 1001 -g lb -d /lb lb
 
+COPY --chown=lb:lb --from=py-builder /venv /venv
+COPY --chown=lb:lb --from=js-builder /static /static
+COPY --chown=lb:lb . /lb/
+
+RUN chmod a+x /lb/deploy/*
+
 VOLUME [ "/static" ]
 
-COPY --chown=lb:lb --from=builder /venv /venv
-COPY --chown=lb:lb --from=builder /lb /lb
-COPY --chown=lb:lb --from=builder /static /static
+RUN mkdir /sde && \
+    chown lb:lb /sde
+
+VOLUME [ "/sde" ]
 
 USER lb:lb
 

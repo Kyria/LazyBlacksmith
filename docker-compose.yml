@@ -1,0 +1,109 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14
+    hostname: postgres
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lazyblacksmith}
+      POSTGRES_USER: lazyblacksmith
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - lazyblacksmith
+    restart: always
+
+  redis:
+    image: redis:6
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - lazyblacksmith
+    logging:
+      driver: none
+    restart: always
+
+  # this container will run db migrations and do the initial load of the SDE
+  # if you want to force an SDE update, you can run
+  # `docker-compose run init-db sde-import`
+  init-db:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    command: init-db
+    env_file: .env
+    environment: &service_environment
+      UWSGI_SOCKET_TYPE: ${UWSGI_SOCKET_TYPE:---http}
+      CELERY_BROKER: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      DB_URI: postgresql://lazyblacksmith:${POSTGRES_PASSWORD:-lazyblacksmith}@postgres/lazyblacksmith
+      SECRET_KEY: ${SECRET_KEY?SECRET_KEY must be set in your .env file}
+      ESI_SECRET_KEY: ${ESI_SECRET_KEY-}
+      ESI_CLIENT_ID: ${ESI_CLIENT_ID-}
+      ESI_REDIRECT_DOMAIN: ${ESI_REDIRECT_DOMAIN-}
+    volumes:
+      - sde:/sde
+    networks:
+      - lazyblacksmith
+    depends_on:
+      - postgres
+      - redis
+
+  uwsgi:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    hostname: web
+    command: uwsgi
+    env_file: .env
+    environment: *service_environment
+    volumes:
+      - static:/static
+    ports:
+      - "${PORT:-9090}:9090"
+    networks:
+      - lazyblacksmith
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+    restart: always
+
+  celery:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    hostname: celery
+    command: celery
+    env_file: .env
+    environment: *service_environment
+    networks:
+      - lazyblacksmith
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+    restart: always
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    command: celery-beat
+    env_file: .env
+    environment: *service_environment
+    networks:
+      - lazyblacksmith
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+    restart: always
+
+volumes:
+  db_data:
+  redis_data:
+  static:
+  sde:
+
+networks:
+  lazyblacksmith:
