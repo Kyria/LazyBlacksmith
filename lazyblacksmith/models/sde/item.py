@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 from . import db
 from .activity import Activity
-from flask import url_for
 
 
 class Item(db.Model):
@@ -80,13 +79,19 @@ class Item(db.Model):
         foreign_keys='ActivityProduct.item_id'
     )
 
+    def icon(self, size):
+        if self.max_production_limit:
+            image_type = "bp"
+        else:
+            image_type = "icon"
+
+        return "https://images.evetech.net/types/%d/%s?size=%d" % (self.id, image_type, size)
+
     def icon_32(self):
-        static_url = "ccp/Types/%d_32.png" % self.id
-        return url_for('static', filename=static_url)
+        return self.icon(32)
 
     def icon_64(self):
-        static_url = "ccp/Types/%d_64.png" % self.id
-        return url_for('static', filename=static_url)
+        return self.icon(64)
 
     def is_moon_goo(self):
         return self.market_group_id == 499
