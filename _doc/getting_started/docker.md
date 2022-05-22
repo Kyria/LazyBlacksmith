@@ -30,7 +30,6 @@ If you use nginx or any webserver to serve static file, do not hesitate to map i
 | ESI_REDIRECT_DOMAIN   |  | Redirect Base domain for ESI callback. This must be the root of your Lazyblacksmith instance, for example `http://127.0.0.1:9090` from this container |
 | ESI_USER_AGENT        | `LazyBlacksmith Docker/1.0` | Define the user agent that will be send with ESI queries. Use something that means really something / A way to contact you |
 | MARKET_ORDER_THREADS  | `4` | Number of threads used to gather regions market orders. The more you have the faster it may be, but also the more memory you will use |
-| EVE_TYPES_URL         | `http://content.eveonline.com/data/Invasion_1.0_Types.zip` | The URL to get the expansion types from [https://developers.eveonline.com/resource/resources](https://developers.eveonline.com/resource/resources) |
 | UWSGI_PROCESSES       | `4` | The number of uwsgi worker to run the application. |
 | UWSGI_SOCKET_TYPE     | `--socket` | Use `--socket` (default) to use this container behind a nginx instance (with uwsgi_pass). Use `--http-socket` to use http proxy (other than nginx) or direct access to this container |
 | UWSGI_OPTIONS         |  | Use this to give uwsgi any other options you may need |
@@ -91,7 +90,6 @@ Where command can be one of the following.
 
 | Command | Description |
 |-|-|
-| `dl_eve_types http://someURL` | Download the files from the URL provided. This is to update the EVE Types images from [https://developers.eveonline.com/resource/resources](https://developers.eveonline.com/resource/resources) |
 | `update_static_files` | Update the static files in the volume `/static`. This is required after an upgrade ! |
 | `bash -c "source /venv/bin/activate && python manage.py db upgrade"` | Upgrade the database model (required if you use SKIP_DB_UPGRADE from above) |
 | `bash -c "source /venv/bin/activate && python manage.py sde_import -d"` | Upgrade the sde data by downloading the latest export from fuzzwork (required if you use SKIP_DB_UPGRADE from above) |
