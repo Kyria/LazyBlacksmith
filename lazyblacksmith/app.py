@@ -56,12 +56,16 @@ def register_blueprints(app):
 
     app.register_blueprint(ajax_eve_api, url_prefix='/ajax/eveapi')
     app.register_blueprint(ajax_eve_sde, url_prefix='/ajax/evesde')
-    app.register_blueprint(ajax_account, url_prefix='/ajax/account')
     app.register_blueprint(blueprint, url_prefix='/blueprint')
     app.register_blueprint(template, url_prefix='/template')
-    app.register_blueprint(sso, url_prefix='/sso')
     app.register_blueprint(price, url_prefix='/price')
-    app.register_blueprint(account, url_prefix='/account')
+
+    # Allow logins if ESI_SECRET_KEY is set
+    if app.config.get("ESI_SECRET_KEY"):
+        app.register_blueprint(ajax_account, url_prefix='/ajax/account')
+        app.register_blueprint(sso, url_prefix='/sso')
+        app.register_blueprint(account, url_prefix='/account')
+
     app.register_blueprint(home)
     app.register_blueprint(templatefilter)
 
@@ -95,6 +99,10 @@ def register_before_requests(app):
     def check_and_update_user():
         """ check for invalid token and print message and update last seen """
         if flask_login.current_user.is_authenticated and not is_xhr(request):
+            if not app.config.get("ESI_SECRET_KEY"):
+                flask_login.logout_user()
+                return
+
             char_id = flask_login.current_user.character_id
             current_user = flask_login.current_user
             count_error = TokenScope.query.filter_by(
@@ -117,8 +125,8 @@ def register_before_requests(app):
             flask_login.current_user.current_login_at = utcnow()
             db.session.commit()
 
-    app.before_request(global_user)
     app.before_request(check_and_update_user)
+    app.before_request(global_user)
 
 
 def register_context_processors(app):

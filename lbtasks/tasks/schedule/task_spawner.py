@@ -34,6 +34,9 @@ UNIVERSE_TASKS = [
 def spawn_character_tasks():
     """ Task triggered every minutes that scan all tasks done to find
     any character based task to do (based on the cached_until field) """
+    if not celery_app.app.config.get("ESI_SECRET_KEY"):
+        return
+
     now = utcnow()
 
     # checking if API is up. If not, just stop it

@@ -46,7 +46,7 @@
                             </ul>
                         </li>
                     </ul>
-                    {% else %}
+                    {% elif config.ESI_SECRET_KEY %}
                     <div class="my-0">
                         <a href="{{ url_for('sso.login') }}">
                             <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png" alt="Log in with eveonline.com" />
