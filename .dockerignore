@@ -33,3 +33,4 @@ config.py
 Dockerfile
 tmp
 node_modules
+.env

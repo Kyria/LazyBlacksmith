@@ -11,14 +11,23 @@ then
     cp -f /lb/config.docker /lb/config.py
 fi
 
-function run_uwsgi {
+function run_sde_import {
+    python manage.py sde_import -d -n /sde/sqlite-latest.sqlite
+}
+
+function run_init_db {
     # check if we want to skip the db upgrade at startup
     if [[ "$SKIP" -eq 0 ]]
     then
         python manage.py db upgrade
-        python manage.py sde_import -d
+        if [[ ! -e /sde/sqlite-latest.sqlite ]]
+        then
+            run_sde_import
+        fi
     fi
+}
 
+function run_uwsgi {
     # starting uwsgi, define options and run
     SOCKET_PORT="$UWSGI_SOCKET_TYPE :9090"
     exec uwsgi -p $UWSGI_PROCESSES $SOCKET_PORT \
@@ -41,5 +50,7 @@ case $ACTION in
     'uwsgi') run_uwsgi;;
     'celery') run_celery;;
     'celery-beat') run_celery_beat;;
+    'init-db') run_init_db;;
+    'sde-import') run_sde_import;;
     *) exec "$@";;
 esac
