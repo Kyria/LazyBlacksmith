@@ -17,7 +17,7 @@ RUN mkdir -p /static \
 
 # ------------------------------------
 
-FROM python:3.7-slim as py-builder
+FROM python:3.9-slim as py-builder
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential gcc libpq-dev libmariadb-dev
@@ -35,7 +35,7 @@ RUN pip install --upgrade pip && \
 
 # ------------------------------------
 
-FROM python:3.7-slim AS runtime
+FROM python:3.9-slim AS runtime
 LABEL maintainer="anakhon@gmail.com"
 
 ENV PATH="/venv/bin:/lb/deploy:$PATH" \
