@@ -101,13 +101,13 @@ PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A app_celery:celery_ap
 Then in your crontab, you must schedule all these commands:
 ```sh
 # to update character related data (every 5 min is enough)
-python celery_cli.py tasks -c
+python celery_cli.py celery_tasks -c
 
 # to update universe (prices, etc) related data (every hour is enough)
-python celery_cli.py tasks -u
+python celery_cli.py celery_tasks -u
 
 # to purge application useless data (once per day)
-python celery_cli.py tasks -p
+python celery_cli.py celery_tasks -p
 ```
 
 As these commands must be run within the virtualenv, it'd be better to encapsulated these commands within a script like:
@@ -116,7 +116,7 @@ As these commands must be run within the virtualenv, it'd be better to encapsula
 source PATH/TO/LazyBlacksmith/env/bin/activate
 
 cd PATH/TO/LazyBlacksmith/
-python celery_cli.py tasks -c
+python celery_cli.py celery_tasks -c
 ```
 
 &nbsp;
@@ -126,16 +126,16 @@ There are multiple solution to run celery with celery beat. The example below ar
 
 You can celery with the -B option, to run beat and worker in the same time :
 ```
-PATH/TO/LazyBlacksmith/env/bin/celery worker -A app_celery:celery_app -B -c5
+PATH/TO/LazyBlacksmith/env/bin/celery -A app_celery:celery_app worker -B -c5
 ```
 
 Or you can run two daemons, one for celery beat, the other for the workers :
 ```sh
 # celery beat
-PATH/TO/LazyBlacksmith/env/bin/celery beat -A app_celery:celery_app
+PATH/TO/LazyBlacksmith/env/bin/celery -A app_celery:celery_app beat
 
 # celery workers
-PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A app_celery:celery_app -c5
+PATH/TO/LazyBlacksmith/env/bin/celery -A app_celery:celery_app worker -c5
 ```
 
 
@@ -143,7 +143,5 @@ PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A app_celery:celery_ap
 
 ## CCP Icons
 
-If you set ```USE_CCP_ICONS = True``` you need to download the files "EVE_VERSION_Types.zip" from [CCP Toolkit](https://developers.eveonline.com/resource/resources)
-
-Then move the files into ```lazyblacksmith/static/ccp/``` (as a result, you should have ```lazyblacksmith/static/ccp/Types/files.png```)
+If you set ```USE_CCP_ICONS = True``` you will use the images from ```images.evetech.net```
 

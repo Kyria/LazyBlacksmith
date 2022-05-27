@@ -42,7 +42,7 @@ If you use nginx or any webserver to serve static file, do not hesitate to map i
 You may also want to provide your own `config.py` file if you need more customization (caching, market order region...).
 In this case just map the file to the container with `-v /your/custom/config.py:/lb/config.py`
 
-You can find [the default configurations here](https://github.com/Kyria/LazyBlacksmith/blob/master/config.dist)
+You can find [the default configurations here](https://github.com/Kyria/LazyBlacksmith/blob/master/config.docker)
 
 ## Start the application
 
@@ -93,6 +93,35 @@ Where command can be one of the following.
 | `update_static_files` | Update the static files in the volume `/static`. This is required after an upgrade ! |
 | `bash -c "source /venv/bin/activate && python manage.py db upgrade"` | Upgrade the database model (required if you use SKIP_DB_UPGRADE from above) |
 | `bash -c "source /venv/bin/activate && python manage.py sde_import -d"` | Upgrade the sde data by downloading the latest export from fuzzwork (required if you use SKIP_DB_UPGRADE from above) |
-| `bash -c "source /venv/bin/activate && python celery_cli.py tasks -u"` | Manually run the celery tasks to update universe data |
-| `bash -c "source /venv/bin/activate && python celery_cli.py tasks -c"` | Manually run the celery tasks to update character data |
-| `bash -c "source /venv/bin/activate && python celery_cli.py tasks -p"` | Manually run the celery tasks to purge old data |
+| `bash -c "source /venv/bin/activate && python celery_cli.py celery_tasks -u"` | Manually run the celery tasks to update universe data |
+| `bash -c "source /venv/bin/activate && python celery_cli.py celery_tasks -c"` | Manually run the celery tasks to update character data |
+| `bash -c "source /venv/bin/activate && python celery_cli.py celery_tasks -p"` | Manually run the celery tasks to purge old data |
+
+
+# Run with docker compose from source
+
+If you want to run the full application, from the source, there's a base docker-compose you can use for this. It's [located in the root folder](https://github.com/Kyria/LazyBlacksmith/blob/master/docker-compose.yml)
+
+The compose file requires you to create a ```.env``` file at the root of the project, containing the following lines:
+```
+# the flask secret key
+SECRET_KEY=XXXXXXXXXXXXXXXX
+
+# OPTIONAL: ESI informations
+ESI_SECRET_KEY=
+ESI_CLIENT_ID=
+ESI_REDIRECT_DOMAIN=
+```
+
+If you don't include ESI information, the application will run without any authenticated features (account, character/corp blueprints, etc).
+
+Once you are set, you can start the app using the following:
+```
+# if you use the docker-compose binary, replace "docker compose" with "docker-compose"
+docker compose up --build
+```
+
+Once it's started, you can update the SDE at any time using
+```
+docker compose run init-db sde-import
+```
