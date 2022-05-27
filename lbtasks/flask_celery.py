@@ -17,7 +17,7 @@ class FlaskCelery(Celery):
     def init_app(self, app):
         """ init celery app with flask app """
         self.app = app
-        self.config_from_object(app.config, namespace='CELERY')
+        self.conf.update(app.config['CELERY_CONFIG'])
 
 
 celery_app = FlaskCelery(

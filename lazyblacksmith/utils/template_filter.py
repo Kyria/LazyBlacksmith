@@ -6,31 +6,31 @@ import jinja2
 templatefilter = flask.Blueprint('filters', __name__)
 
 
-@jinja2.contextfilter
+@jinja2.pass_context
 @templatefilter.app_template_filter()
 def intcomma(context, value):
     return humanize.intcomma(value)
 
 
-@jinja2.contextfilter
+@jinja2.pass_context
 @templatefilter.app_template_filter()
 def intword(context, value):
     return humanize.intword()
 
 
-@jinja2.contextfilter
+@jinja2.pass_context
 @templatefilter.app_template_filter()
 def naturalday(context, value, format='%b %d'):
     return humanize.naturalday(value, format)
 
 
-@jinja2.contextfilter
+@jinja2.pass_context
 @templatefilter.app_template_filter()
 def naturaltime(context, value, future=False, months=True):
     return humanize.naturaltime(value, future, months)
 
 
-@jinja2.contextfilter
+@jinja2.pass_context
 @templatefilter.app_template_filter()
 def duration(context, seconds):
     """Turn a duration in seconds into a human readable string"""
@@ -49,7 +49,7 @@ def duration(context, seconds):
     return ' '.join(parts)
 
 
-@jinja2.contextfilter
+@jinja2.pass_context
 @templatefilter.app_template_filter()
 def floatcomma(context, value, decimal=2):
     float_format = '%%.%df' % decimal

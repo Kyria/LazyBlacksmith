@@ -1,26 +1,23 @@
 # flask
-Flask>=1.1.1
-Flask-Caching>=1.8.0
-Flask-Login>=0.4.1
-Flask-Migrate==2.6.0
-Flask-Script>=2.0.6
-Flask-WTF>=0.14
-Werkzeug<1.0.0 # thanks flask..
+Flask>=2.1.2,<2.2
+Flask-Caching>=1.10.1
+Flask-Login>=0.6.1
+Flask-Migrate>=3.1.0
+Flask-WTF>=1.0.1
 
 # database
-SQLAlchemy>=1.3.12
-alembic>=1.3.2
+SQLAlchemy>=1.4.36
+alembic>=1.7.7
 
 # tasks
-celery>=4.4.0,<5
+celery>=5.0,<6
 
 # others
-pytz>=2019.3
-humanize>=0.5.1
-requests>=2.22.0
-ratelimiter>=1.1.0
-simplejson>=3.17.0
-MarkupSafe==2.0.1
+pytz>=2022.1
+humanize>=4.1.0
+requests>=2.27.1
+ratelimiter>=1.2.0.post0
+simplejson>=3.17.6
 
 # EVE API Libs
-EsiPy>=1.2.0
+EsiPy>=1.2.3

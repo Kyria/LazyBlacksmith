@@ -35,11 +35,12 @@ CACHE_TYPE = 'null'
 # ------------------------------------------------------
 # Celery configs
 # ------------------------------------------------------
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER', 'amqp://guest:guest@localhost:5672//')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'rpc://')
-CELERY_TASK_IGNORE_RESULT = True
-CELERY_TASK_DEFAULT_QUEUE = 'lbqueue'
-
+CELERY_CONFIG = {
+    "broker_url": os.getenv('CELERY_BROKER', 'amqp://guest:guest@localhost:5672//'),
+    "result_backend": os.getenv('CELERY_RESULT_BACKEND', 'rpc://'),
+    "task_ignore_result": True,
+    "task_default_queue": 'lbqueue',
+}
 
 # EVE Online API Informations
 # register your app on https://developers.eveonline.com/

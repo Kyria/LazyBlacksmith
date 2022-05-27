@@ -39,11 +39,11 @@ function run_uwsgi {
 }
 
 function run_celery {
-    exec celery worker -A app_celery:celery_app -c $CELERY_CONCURRENCY --loglevel $CELERY_LOGLEVEL $CELERY_OPTIONS
+    exec celery -A app_celery:celery_app worker -c $CELERY_CONCURRENCY --loglevel $CELERY_LOGLEVEL $CELERY_OPTIONS
 }
 
 function run_celery_beat {
-    exec celery beat -A app_celery:celery_app $CELERY_OPTIONS
+    exec celery -A app_celery:celery_app beat $CELERY_OPTIONS
 }
 
 case $ACTION in
