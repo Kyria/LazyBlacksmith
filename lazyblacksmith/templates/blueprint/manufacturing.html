@@ -5,10 +5,10 @@
 {% block js %}
 {% set pref = current_user.pref %}
     <script>
-        lb.urls.materialBOMUrl      = "{{ url_for('ajax_eve_sde.blueprint_bom', blueprint_id=blueprint.id) }}";
-        lb.urls.tplSublistBlockUrl  = "{{ url_for('template.manufacturing_sublist_block') }}";
-        lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
-        lb.urls.tplModalPriceUrl    = "{{ url_for('template.manufacturing_modal_price') }}";
+        lb.urls.materialBOMUrl      = "{{ url_for('ajax_eve_sde.blueprint_bom', blueprint_id=blueprint.id) }}";
+        lb.urls.tplSublistBlockUrl  = "{{ url_for('template.manufacturing_sublist_block') }}";
+        lb.urls.tplSublistRowUrl    = "{{ url_for('template.manufacturing_sublist_row') }}";
+        lb.urls.tplModalPriceUrl    = "{{ url_for('template.manufacturing_modal_price') }}";
 
         manufacturingBlueprint.options.hasManufacturedComponent = {% if has_manufactured_components %}true{% else %}false{% endif %};
         manufacturingBlueprint.options.useIcons = {% if config.USE_CCP_ICONS %}true{% else %}false{% endif %};
