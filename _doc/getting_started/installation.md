@@ -8,8 +8,8 @@ title: Installation
 &nbsp;
 
 ## Requirements
-* Python 3.5+
-* Celery 4.4
+* Python 3.7+
+* Celery 5
 * Celery Beat or manual trigger for tasks
 * Virtualenv (recommended)
 * [NodeJS](http://nodejs.org/)
@@ -18,7 +18,7 @@ title: Installation
 * (Optional/Recommended) Cache system, see [Flask-Caching](https://pythonhosted.org/Flask-Caching/)
 * Eve Online Icons (see CCP Icons part)
 
-__Important:__ As we use Celery 4.4, it may not work on windows !
+__Important:__ As we use Celery 5, it may not work on windows !
 
 &nbsp;
 
@@ -95,7 +95,7 @@ To update the ESI data, you have 2 solutions :
 If you want to run celery tasks with crontab, you first need to start a celery worker :
 ```sh
 # THIS IS ONLY AN EXAMPLE !
-PATH/TO/LazyBlacksmith/env/bin/celery multi start worker -A app_celery:celery_app -c5
+PATH/TO/LazyBlacksmith/env/bin/celery -A app_celery:celery_app  worker-c5
 ```
 
 Then in your crontab, you must schedule all these commands:
