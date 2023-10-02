@@ -1,3 +1,5 @@
+# If someone wants to maintain a fork, please let me know so I can mention it here and in the docs
+
 # LazyBlacksmith
 
 ![Logo](https://raw.githubusercontent.com/Kyria/LazyBlacksmith/master/lazyblacksmith/static/img/logo128.png)
